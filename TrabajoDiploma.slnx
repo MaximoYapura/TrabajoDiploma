@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="BE/BE_08YS.csproj" Id="611df768-0b94-4169-b272-cc6387cd884e" />
+  <Project Path="BLL/BLL_08YS.csproj" Id="578abc9f-0665-4b31-a9d1-2ae211cd4a43" />
+  <Project Path="DAL/DAL_08YS.csproj" Id="dc1a0f3f-fd0a-4339-8657-96c88431059e" />
+  <Project Path="GUI/GUI_08YS.csproj" Id="18f19568-1fb4-46d2-af70-82fc9d9e7300" />
+  <Project Path="MPP/MPP_08YS.csproj" Id="4bca8705-9b28-4eb5-a8d6-7e366f3a58e9">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+  <Project Path="Service_08YS/Service_08YS.csproj" Id="6196a91d-881c-4563-b43c-5adcd13c0c14" />
+</Solution>

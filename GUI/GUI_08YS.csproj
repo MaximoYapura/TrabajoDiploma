@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{18F19568-1FB4-46D2-AF70-82FC9D9E7300}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>GUI_08YS</RootNamespace>
+    <AssemblyName>GUI_08YS</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FontAwesome.Sharp, Version=6.6.0.0, Culture=neutral, PublicKeyToken=d16d1e4e568ec10f, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome.Sharp.6.6.0\lib\net48\FontAwesome.Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Admin\FormAccesoAM_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\FormAccesoAM_08YS.Designer.cs">
+      <DependentUpon>FormAccesoAM_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\FormBitacora_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\FormBitacora_08YS.Designer.cs">
+      <DependentUpon>FormBitacora_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\FormInconsistenciaDB_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\FormInconsistenciaDB_08YS.Designer.cs">
+      <DependentUpon>FormInconsistenciaDB_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\FormGestionAcceso_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\FormGestionAcceso_08YS.Designer.cs">
+      <DependentUpon>FormGestionAcceso_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\FormGestionRespaldos_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\FormGestionRespaldos_08YS.Designer.cs">
+      <DependentUpon>FormGestionRespaldos_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PermissionFilter_08YS.cs" />
+    <Compile Include="UserControls\CustomCalendarPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UserControls\CustomTimePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UserControls\IconCache.cs" />
+    <Compile Include="UserControls\IconComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Usuario\FormCambiarContraseña_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Usuario\FormCambiarContraseña_08YS.Designer.cs">
+      <DependentUpon>FormCambiarContraseña_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\FormGestionUsuarios_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\FormGestionUsuarios_08YS.Designer.cs">
+      <DependentUpon>FormGestionUsuarios_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Usuario\FormMDI_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Usuario\FormMDI_08YS.Designer.cs">
+      <DependentUpon>FormMDI_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Usuario\FormLogin_08YS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Usuario\FormLogin_08YS.Designer.cs">
+      <DependentUpon>FormLogin_08YS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\IconDateTimePicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\IconPlaceholderTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\MenuColorTable.cs" />
+    <Compile Include="UserControls\MenuRenderer.cs" />
+    <Compile Include="UserControls\DropdownMenuStrip_08YS.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UserControls\PlaceholderTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Config\Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Admin\FormAccesoAM_08YS.resx">
+      <DependentUpon>FormAccesoAM_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\FormBitacora_08YS.resx">
+      <DependentUpon>FormBitacora_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\FormInconsistenciaDB_08YS.resx">
+      <DependentUpon>FormInconsistenciaDB_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\FormGestionAcceso_08YS.resx">
+      <DependentUpon>FormGestionAcceso_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\FormGestionRespaldos_08YS.resx">
+      <DependentUpon>FormGestionRespaldos_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Usuario\FormCambiarContraseña_08YS.resx">
+      <DependentUpon>FormCambiarContraseña_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\FormGestionUsuarios_08YS.resx">
+      <DependentUpon>FormGestionUsuarios_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Usuario\FormMDI_08YS.resx">
+      <DependentUpon>FormMDI_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Usuario\FormLogin_08YS.resx">
+      <DependentUpon>FormLogin_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Config\packages.config" />
+    <Content Include="AppIcon.ico" />
+    <Content Include="idiomas.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\AppIcon.ico" />
+    <Content Include="script.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Config\App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BE\BE_08YS.csproj">
+      <Project>{611df768-0b94-4169-b272-cc6387cd884e}</Project>
+      <Name>BE_08YS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BLL\BLL_08YS.csproj">
+      <Project>{578abc9f-0665-4b31-a9d1-2ae211cd4a43}</Project>
+      <Name>BLL_08YS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service_08YS\Service_08YS.csproj">
+      <Project>{6196a91d-881c-4563-b43c-5adcd13c0c14}</Project>
+      <Name>Service_08YS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ChatGPT Image 19 may 2026, 21_58_41.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HorizonLogoPuro.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HorizonLogoPuro1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ChatGPT Image 19 may 2026, 22_23_23.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BackGroundHorizon1.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
