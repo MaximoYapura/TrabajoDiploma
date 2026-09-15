@@ -34,7 +34,7 @@ namespace BLL_08YS
         public static readonly string[] TablasMonitoreadas =
         {
             "Users", "Roles", "Familias", "Permisos",
-            "FamiliaPermiso", "FamiliaIntegrada", "RolFamilia", "RolPermiso"
+            "FamiliaPermiso", "FamiliaIntegrada", "RolFamilia", "RolPermiso", "Clientes"
         };
 
         private readonly IDvRepository_08YS _repo;

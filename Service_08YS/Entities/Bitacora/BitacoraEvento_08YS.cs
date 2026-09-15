@@ -18,7 +18,8 @@ namespace Service_08YS.Entities.Bitacora
     {
         Usuarios,
         Login,
-        Perfiles
+        Perfiles,
+        Clientes 
     }
 
     public enum Evento
@@ -38,7 +39,8 @@ namespace Service_08YS.Entities.Bitacora
         FamiliaModificada,
         RolCreado,
         RolEliminado,
-        RolModificado
+        RolModificado,
+        ClienteRegistrado
     }
 
     public class BitacoraEvento_08YS

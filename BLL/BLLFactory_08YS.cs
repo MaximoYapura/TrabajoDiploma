@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DAL_08YS;
+﻿using DAL_08YS;
 using DAL_08YS.Interfaces_Repositories;
 using DAL_08YS.Repositories_Interfaces;
 using DAL_08YS.SQL;
 using Service_08YS;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Runtime;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BLL_08YS
 {
@@ -63,5 +64,12 @@ namespace BLL_08YS
             IBackupRepository_08YS backupRepo = new SqlBackupRepository_08YS(factory);
             return new BackupBLL_08YS(backupRepo);
         }
+        public static ClienteBLL_790MY CreateClienteBLL()
+        {
+            IClienteRepository_790MY repo = new SqlClienteRepository_790MY();
+            BitacoraBLL_08YS bitacoraBll = CreateBitacoraBLL();
+            return new ClienteBLL_790MY(repo, bitacoraBll);
+        }
+
     }
 }

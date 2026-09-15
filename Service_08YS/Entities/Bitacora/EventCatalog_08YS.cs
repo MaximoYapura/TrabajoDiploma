@@ -30,7 +30,7 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.UsuarioDesbloqueado,    new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Medio)         },
                 { Evento.UsuarioDeshabilitado,   new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Alto)          },
                 { Evento.UsuarioHabilitado,      new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Alto)          },
-                { Evento.UsuarioEmailModificado,      new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Bajo)          },
+                { Evento.UsuarioEmailModificado, new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Bajo)          },
                 { Evento.CambioContraseña,       new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Medio)         },
                 { Evento.UsuarioRolModificado,   new EventoMetadata_08YS(   Modulo.Usuarios,       Criticidad.Alto)          },
                 { Evento.FamiliaCreada,          new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
@@ -38,7 +38,8 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.FamiliaEliminada,       new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
                 { Evento.RolCreado,              new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
                 { Evento.RolModificado,          new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
-                { Evento.RolEliminado,           new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          }
+                { Evento.RolEliminado,           new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
+                { Evento.ClienteRegistrado,      new EventoMetadata_08YS(Modulo.Clientes, Criticidad.Medio) }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];
