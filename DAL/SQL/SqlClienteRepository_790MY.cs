@@ -15,10 +15,9 @@ namespace DAL_08YS.SQL
         private readonly string _connectionString;
 
         public SqlClienteRepository_790MY()
-            : this(ConfigurationManager.ConnectionStrings["DAL.Properties.Settings.TP_INGENIERIA_SOFTWAREConnectionString"].ConnectionString)
+    : this(SqlDbFactory_08YS.ConnectionString)
         {
         }
-
         public SqlClienteRepository_790MY(string connectionString)
         {
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));

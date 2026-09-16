@@ -13,7 +13,7 @@ namespace DAL_08YS
     {
         private const string NombreClaveConfig = "TP_Ing_Soft";
         private const string ConnectionStringDefault =
-            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TP_Ing_Soft;Integrated Security=True";
+           @"Data Source=PC_Maximo;Initial Catalog=TP_Ing_Soft;Integrated Security=True";
 
         // Seteable manualmente (ej: instalador, tests). Si queda vacía, se resuelve
         // desde App.config y, si tampoco hay nada ahí, se usa el default local.
@@ -25,16 +25,17 @@ namespace DAL_08YS
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(_connectionStringOverride))
-                    return _connectionStringOverride;
+                //if (!string.IsNullOrWhiteSpace(_connectionStringOverride))
+                //    return _connectionStringOverride;
 
-                string desdeConfig = ConfigurationManager
-                    .ConnectionStrings[NombreClaveConfig]?.ConnectionString;
+                //string desdeConfig = ConfigurationManager
+                //    .ConnectionStrings[NombreClaveConfig]?.ConnectionString;
 
-                if (!string.IsNullOrWhiteSpace(desdeConfig))
-                    return desdeConfig;
+                //if (!string.IsNullOrWhiteSpace(desdeConfig))
+                //    return desdeConfig;
 
-                return ConnectionStringDefault;
+                //return ConnectionStringDefault;
+                return @"Data Source=PC_Maximo;Initial Catalog=TP_Ing_Soft;Integrated Security=True";
             }
             set { _connectionStringOverride = value; }
         }

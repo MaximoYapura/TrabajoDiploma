@@ -25,7 +25,7 @@ namespace GUI_08YS.RF1
         public FormClientes_790MY()
         {
             InitializeComponent();
-            _clienteBll = BLLFactory_790MY.CreateClienteBLL();
+            _clienteBll = BLLFactory_08YS.CreateClienteBLL();
         }
 
         private void FormClientes_790MY_Load(object sender, EventArgs e)
