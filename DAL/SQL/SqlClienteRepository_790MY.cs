@@ -1,6 +1,5 @@
 ﻿using BE_08YS;
 using DAL_08YS.Interfaces_Repositories;
-using MPP_08YS;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -41,7 +40,7 @@ namespace DAL_08YS.SQL
         public void Create(Cliente_790MY cliente)
         {
             const string sql = @"INSERT INTO Clientes (DNI, Nombre, Apellido, Email, Telefono, Activo)
-                                  VALUES (@Dni, @Nombre, @Apellido, @Email, @Telefono, 1)";
+                                  VALUES (@Dni, @Nombre, @Apellido, @Email, @Telefono, @Activo)";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(sql, connection))
@@ -51,6 +50,7 @@ namespace DAL_08YS.SQL
                 command.Parameters.Add("@Apellido", SqlDbType.NVarChar, 100).Value = cliente.Apellido;
                 command.Parameters.Add("@Email", SqlDbType.NVarChar, 150).Value = cliente.Email;
                 command.Parameters.Add("@Telefono", SqlDbType.NVarChar, 30).Value = cliente.Telefono;
+                command.Parameters.Add("@Activo", SqlDbType.Bit).Value = cliente.Activo;
 
                 connection.Open();
                 command.ExecuteNonQuery();
@@ -59,7 +59,7 @@ namespace DAL_08YS.SQL
 
         public List<Cliente_790MY> GetAll()
         {
-            const string sql = "SELECT DNI, Nombre, Apellido, Email, Telefono FROM Clientes";
+            const string sql = "SELECT DNI, Nombre, Apellido, Email, Telefono, Activo FROM Clientes";
             var resultado = new List<Cliente_790MY>();
 
             using (var connection = new SqlConnection(_connectionString))
@@ -76,7 +76,8 @@ namespace DAL_08YS.SQL
                             Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
                             Apellido = reader.GetString(reader.GetOrdinal("Apellido")),
                             Email = reader.GetString(reader.GetOrdinal("Email")),
-                            Telefono = reader.GetString(reader.GetOrdinal("Telefono"))
+                            Telefono = reader.GetString(reader.GetOrdinal("Telefono")),
+                            Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
                         });
                     }
                 }

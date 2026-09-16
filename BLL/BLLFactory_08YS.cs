@@ -64,12 +64,5 @@ namespace BLL_08YS
             IBackupRepository_08YS backupRepo = new SqlBackupRepository_08YS(factory);
             return new BackupBLL_08YS(backupRepo);
         }
-        public static ClienteBLL_790MY CreateClienteBLL()
-        {
-            IClienteRepository_790MY repo = new SqlClienteRepository_790MY();
-            BitacoraBLL_08YS bitacoraBll = CreateBitacoraBLL();
-            return new ClienteBLL_790MY(repo, bitacoraBll);
-        }
-
     }
 }
