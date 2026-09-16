@@ -40,7 +40,7 @@ namespace Service_08YS.Entities.Bitacora
         RolCreado,
         RolEliminado,
         RolModificado,
-        ClienteRegistrado
+        ClienteRegistrado = 20
     }
 
     public class BitacoraEvento_08YS
