@@ -59,6 +59,7 @@
             this.rolesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.familiasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gestionRespaldosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -425,12 +426,13 @@
             this.gestionUsuarioToolStripMenuItem,
             this.bitacoraToolStripMenuItem,
             this.gestionAccesosToolStripMenuItem,
-            this.gestionRespaldosToolStripMenuItem});
+            this.gestionRespaldosToolStripMenuItem,
+            this.clientesToolStripMenuItem});
             this.AdministrativoDropDownMenu.MenuItemHeight = 25;
             this.AdministrativoDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.AdministrativoDropDownMenu.Name = "dropdownMenuStrip_08YS1";
             this.AdministrativoDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
-            this.AdministrativoDropDownMenu.Size = new System.Drawing.Size(201, 100);
+            this.AdministrativoDropDownMenu.Size = new System.Drawing.Size(201, 124);
             // 
             // gestionUsuarioToolStripMenuItem
             // 
@@ -481,6 +483,14 @@
             this.gestionRespaldosToolStripMenuItem.Tag = "menuRespaldos";
             this.gestionRespaldosToolStripMenuItem.Text = "Gestion Respaldos";
             this.gestionRespaldosToolStripMenuItem.Click += new System.EventHandler(this.gestionRespaldosToolStripMenuItem_Click);
+            // 
+            // clientesToolStripMenuItem
+            // 
+            this.clientesToolStripMenuItem.Name = "clientesToolStripMenuItem";
+            this.clientesToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.clientesToolStripMenuItem.Tag = "menuClientes";
+            this.clientesToolStripMenuItem.Text = "Clientes";
+            this.clientesToolStripMenuItem.Click += new System.EventHandler(this.clientesToolStripMenuItem_Click);
             // 
             // PerfilDropDownMenu
             // 
@@ -586,6 +596,6 @@
         private System.Windows.Forms.Panel panel3;
         private FontAwesome.Sharp.IconButton btnCerrarSesion;
         private System.Windows.Forms.ToolStripMenuItem gestionRespaldosToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clientesToolStripMenuItem;
     }
 }
-
