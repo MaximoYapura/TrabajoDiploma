@@ -1,4 +1,6 @@
 ﻿using BLL_08YS;
+using BLL_08YS.Exceptions;
+using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,15 +15,22 @@ namespace GUI_08YS.RF1
 {
     public partial class FormClientes_790MY : Form
     {
+        private static readonly Dictionary<string, Permisos> _mapaPermisos =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(btnRegistrar_790MY), Permisos.CrearCliente }
+            };
+
         private readonly ClienteBLL_790MY _clienteBll;
         public FormClientes_790MY()
         {
             InitializeComponent();
-            _clienteBll = BLLFactory_08YS.CreateClienteBLL();
+            _clienteBll = BLLFactory_790MY.CreateClienteBLL();
         }
 
         private void FormClientes_790MY_Load(object sender, EventArgs e)
         {
+            PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
             CargarGrilla();
         }
 
@@ -78,9 +87,9 @@ namespace GUI_08YS.RF1
                 LimpiarCampos();
                 CargarGrilla();
             }
-            catch (InvalidOperationException ex)
+            catch (ClienteDniDuplicadoException_790MY ex)
             {
-                // Regla de negocio incumplida (ej. DNI duplicado)
+                // Regla de negocio incumplida: DNI duplicado
                 MessageBox.Show(ex.Message, "Operación no permitida",
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -92,7 +101,9 @@ namespace GUI_08YS.RF1
             }
             catch (Exception)
             {
-                // Última barrera: no exponemos detalles técnicos al usuario
+                // Última barrera: no exponemos detalles técnicos al usuario.
+                // Nota: esto también captura cualquier fallo de SessionManager_08YS.ValidatePermission
+                // (no se agregó un catch específico porque no se confirmó el tipo exacto que lanza).
                 MessageBox.Show("Ocurrió un error inesperado al registrar el cliente.", "Error",
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
