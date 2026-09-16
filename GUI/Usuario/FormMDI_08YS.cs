@@ -2,6 +2,7 @@
 using FontAwesome.Sharp;
 using GUI;
 using GUI_08YS.Admin;
+using GUI_08YS.RF1;
 using GUI_08YS.Properties;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
@@ -29,6 +30,7 @@ namespace GUI_08YS
                 { nameof(familiasToolStripMenuItem),         Permisos.VerFamilias    },
                 { nameof(rolesToolStripMenuItem),            Permisos.VerRoles       },
                 { nameof(gestionRespaldosToolStripMenuItem), Permisos.VerRespaldos   },
+                { nameof(clientesToolStripMenuItem),         Permisos.VerClientes    },
             };
 
         public event Action CerrarSesion;
@@ -92,7 +94,8 @@ namespace GUI_08YS
             btnAdministrativo.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerUsuarios)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerBitacora)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias)
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   );
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   )
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerClientes);
 
             gestionAccesosToolStripMenuItem.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   )
                                                    || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias);
@@ -323,6 +326,12 @@ namespace GUI_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerRespaldos);
             OpenChildForm(new FormGestionRespaldos_08YS());
+        }
+
+        private void clientesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
+            OpenChildForm(new FormClientes_790MY());
         }
 
         #endregion
