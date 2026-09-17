@@ -24,7 +24,7 @@ namespace GUI_08YS.RF1
             _fecha = fecha;
             _hora = hora;
             _comensales = comensales;
-            _mesaBll = BLLFactory_08YS.CreateMesaBLL();
+            _mesaBll = BLLFactory_790MY.CreateMesaBLL();
         }
 
         private void FormSeleccionarMesa_790MY_Load(object sender, EventArgs e)
@@ -73,7 +73,6 @@ namespace GUI_08YS.RF1
 
             if (_tarjetaSeleccionada == tarjeta)
             {
-                // click sobre la misma tarjeta ya seleccionada -> deseleccionar
                 _tarjetaSeleccionada = null;
                 MesaSeleccionada = null;
             }
