@@ -11,5 +11,6 @@ namespace DAL_08YS.Interfaces_Repositories
         bool Exists(int dni);
         void Create(Cliente_790MY cliente);
         List<Cliente_790MY> GetAll();
+        Cliente_790MY GetByDni(int dni);
     }
 }

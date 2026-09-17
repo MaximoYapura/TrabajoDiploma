@@ -46,6 +46,18 @@ namespace BLL_08YS
             return _clienteRepository.GetAll();
         }
 
+        public bool Exists(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
+            return _clienteRepository.Exists(dni);
+        }
+
+        public Cliente_790MY GetByDni(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
+            return _clienteRepository.GetByDni(dni);
+        }
+
         private static void ValidarDatos(int dni, string nombre, string apellido, string email, string telefono)
         {
             if (dni <= 0)

@@ -69,15 +69,7 @@ namespace DAL_08YS.SQL
                 {
                     while (reader.Read())
                     {
-                        resultado.Add(new Cliente_790MY
-                        {
-                            DNI = reader.GetInt32(reader.GetOrdinal("DNI")),
-                            Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
-                            Apellido = reader.GetString(reader.GetOrdinal("Apellido")),
-                            Email = reader.GetString(reader.GetOrdinal("Email")),
-                            Telefono = reader.GetString(reader.GetOrdinal("Telefono")),
-                            Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
-                        });
+                        resultado.Add(MapearCliente(reader));
                     }
                 }
             }
@@ -85,5 +77,36 @@ namespace DAL_08YS.SQL
             return resultado;
         }
 
+        public Cliente_790MY GetByDni(int dni)
+        {
+            const string sql = "SELECT DNI, Nombre, Apellido, Email, Telefono, Activo FROM Clientes WHERE DNI = @Dni";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add("@Dni", SqlDbType.Int).Value = dni;
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                        return MapearCliente(reader);
+                }
+            }
+
+            return null;
+        }
+
+        private static Cliente_790MY MapearCliente(SqlDataReader reader)
+        {
+            return new Cliente_790MY
+            {
+                DNI = reader.GetInt32(reader.GetOrdinal("DNI")),
+                Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
+                Apellido = reader.GetString(reader.GetOrdinal("Apellido")),
+                Email = reader.GetString(reader.GetOrdinal("Email")),
+                Telefono = reader.GetString(reader.GetOrdinal("Telefono")),
+                Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
+            };
+        }
     }
 }
