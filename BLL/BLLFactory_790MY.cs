@@ -17,5 +17,12 @@ namespace BLL_08YS
             IMesaRepository_790MY repo = new SqlMesaRepository_790MY();
             return new MesaBLL_790MY(repo);
         }
+
+        public static ReservaBLL_790MY CreateReservaBLL()
+        {
+            IReservaRepository_790MY reservaRepo = new SqlReservaRepository_790MY();
+            IClienteRepository_790MY clienteRepo = new SqlClienteRepository_790MY();
+            return new ReservaBLL_790MY(reservaRepo, clienteRepo);
+        }
     }
 }
