@@ -51,6 +51,7 @@
     <Compile Include="DvBLL_08YS.cs" />
     <Compile Include="Exceptions\ClienteDniDuplicadoException_790MY.cs" />
     <Compile Include="FamiliaBLL_08YS.cs" />
+    <Compile Include="MesaBLL_790MY.cs" />
     <Compile Include="RolBLL_08YS.cs" />
     <Compile Include="UserBLL_08YS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
