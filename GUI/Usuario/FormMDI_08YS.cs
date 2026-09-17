@@ -1,9 +1,10 @@
-﻿using BLL_08YS;
+﻿using BE_08YS;
+using BLL_08YS;
 using FontAwesome.Sharp;
 using GUI;
 using GUI_08YS.Admin;
-using GUI_08YS.RF1;
 using GUI_08YS.Properties;
+using GUI_08YS.RF1;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
@@ -446,5 +447,20 @@ namespace GUI_08YS
             TraductorManager_08YS.Instance.CambiarIdioma(idiomaSeleccionado);
         }
 
+        private void btnReservar_Click(object sender, EventArgs e)
+        {
+            DateTime fechaPrueba = new DateTime(2026, 09, 20);
+            TimeSpan horaPrueba = new TimeSpan(20, 0, 0);
+            int comensalesPrueba = 4;
+
+            using (var frmMesa = new FormSeleccionarMesa_790MY(fechaPrueba, horaPrueba, comensalesPrueba))
+            {
+                if (frmMesa.ShowDialog(this) == DialogResult.OK)
+                {
+                    Mesa_790MY mesaElegida = frmMesa.MesaSeleccionada;
+                    MessageBox.Show($"Mesa seleccionada correctamente: Nro {mesaElegida.NroMesa} (Capacidad: {mesaElegida.Capacidad})");
+                }
+            }
+        }
     }
 }

@@ -99,6 +99,12 @@
     <Compile Include="RF1\FormClientes_790MY.Designer.cs">
       <DependentUpon>FormClientes_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="RF1\FormSeleccionarMesa_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RF1\FormSeleccionarMesa_790MY.Designer.cs">
+      <DependentUpon>FormSeleccionarMesa_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\CustomCalendarPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -107,6 +113,9 @@
     </Compile>
     <Compile Include="UserControls\IconCache.cs" />
     <Compile Include="UserControls\IconComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UserControlMesa_790MY.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Usuario\FormCambiarContraseña_08YS.cs">
