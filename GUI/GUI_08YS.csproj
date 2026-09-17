@@ -99,6 +99,12 @@
     <Compile Include="RF1\FormClientes_790MY.Designer.cs">
       <DependentUpon>FormClientes_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="RF1\FormRegistrarReserva_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RF1\FormRegistrarReserva_790MY.Designer.cs">
+      <DependentUpon>FormRegistrarReserva_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="RF1\FormSeleccionarMesa_790MY.cs">
       <SubType>Form</SubType>
     </Compile>

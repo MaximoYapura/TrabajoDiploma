@@ -449,18 +449,22 @@ namespace GUI_08YS
 
         private void btnReservar_Click(object sender, EventArgs e)
         {
-            DateTime fechaPrueba = new DateTime(2026, 09, 20);
-            TimeSpan horaPrueba = new TimeSpan(20, 0, 0);
-            int comensalesPrueba = 4;
-
-            using (var frmMesa = new FormSeleccionarMesa_790MY(fechaPrueba, horaPrueba, comensalesPrueba))
+            using (var frmReserva = new FormRegistrarReserva_790MY())
             {
-                if (frmMesa.ShowDialog(this) == DialogResult.OK)
-                {
-                    Mesa_790MY mesaElegida = frmMesa.MesaSeleccionada;
-                    MessageBox.Show($"Mesa seleccionada correctamente: Nro {mesaElegida.NroMesa} (Capacidad: {mesaElegida.Capacidad})");
-                }
+                frmReserva.ShowDialog(this);
             }
+            //DateTime fechaPrueba = new DateTime(2026, 09, 20);
+            //TimeSpan horaPrueba = new TimeSpan(20, 0, 0);
+            //int comensalesPrueba = 4;
+
+            //using (var frmMesa = new FormSeleccionarMesa_790MY(fechaPrueba, horaPrueba, comensalesPrueba))
+            //{
+            //    if (frmMesa.ShowDialog(this) == DialogResult.OK)
+            //    {
+            //        Mesa_790MY mesaElegida = frmMesa.MesaSeleccionada;
+            //        MessageBox.Show($"Mesa seleccionada correctamente: Nro {mesaElegida.NroMesa} (Capacidad: {mesaElegida.Capacidad})");
+            //    }
+            //}
         }
     }
 }

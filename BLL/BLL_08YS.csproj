@@ -46,12 +46,14 @@
     <Compile Include="BackupBLL_08YS.cs" />
     <Compile Include="BitacoraBLL_08YS.cs" />
     <Compile Include="BLLFactory_08YS.cs" />
+    <Compile Include="BLLFactory_790MY.cs" />
     <Compile Include="BLLInstalador_08YS.cs" />
     <Compile Include="ClienteBLL_790MY.cs" />
     <Compile Include="DvBLL_08YS.cs" />
     <Compile Include="Exceptions\ClienteDniDuplicadoException_790MY.cs" />
     <Compile Include="FamiliaBLL_08YS.cs" />
     <Compile Include="MesaBLL_790MY.cs" />
+    <Compile Include="ReservaBLL_790MY.cs" />
     <Compile Include="RolBLL_08YS.cs" />
     <Compile Include="UserBLL_08YS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

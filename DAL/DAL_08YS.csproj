@@ -51,6 +51,7 @@
     <Compile Include="Interfaces_Repositories\IFamiliaRepository_08YS.cs" />
     <Compile Include="Interfaces_Repositories\IMesaRepository_790MY.cs" />
     <Compile Include="Interfaces_Repositories\IPermisoRepository_08YS.cs" />
+    <Compile Include="Interfaces_Repositories\IReservaRepository_790MY.cs" />
     <Compile Include="Interfaces_Repositories\IRolRepository_08YS.cs" />
     <Compile Include="SQL\SqlBackupRepository_08YS.cs" />
     <Compile Include="SQL\SqlBitacoraRepository_08YS.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="SQL\SqlFamiliaRepository_08YS.cs" />
     <Compile Include="SQL\SqlMesaRepository_790MY.cs" />
     <Compile Include="SQL\SqlPermisoRepository_08YS.cs" />
+    <Compile Include="SQL\SqlReservaRepository_790MY.cs" />
     <Compile Include="SQL\SqlRolRepository_08YS.cs" />
     <Compile Include="SQL\SqlUserRepository_08YS.cs" />
   </ItemGroup>
