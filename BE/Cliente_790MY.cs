@@ -13,15 +13,17 @@ namespace BE_08YS
         private string _apellido;
         private string _email;
         private string _telefono;
+        private string _direccion;
         private bool _activo;
 
-        public Cliente_790MY(int dni, string nombre, string apellido, string email, string telefono, bool activo = true)
+        public Cliente_790MY(int dni, string nombre, string apellido, string email, string telefono, string direccion = null, bool activo = true)
         {
             _dni = dni;
             _nombre = nombre;
             _apellido = apellido;
             _email = email;
             _telefono = telefono;
+            _direccion = direccion;
             _activo = activo;
         }
 
@@ -45,6 +47,7 @@ namespace BE_08YS
             set { _apellido = value; }
         }
 
+        // Email/Telefono "principales": obligatorios, son los del formulario ppal.
         public string Email
         {
             get { return _email; }
@@ -57,11 +60,21 @@ namespace BE_08YS
             set { _telefono = value; }
         }
 
+        public string Direccion
+        {
+            get { return _direccion; }
+            set { _direccion = value; }
+        }
+
         public bool Activo
         {
             get { return _activo; }
             set { _activo = value; }
         }
+
+        // Emails/telefonos adicionales (relacion 1:n). No incluyen al principal.
+        public List<string> EmailsAdicionales { get; set; } = new List<string>();
+        public List<string> TelefonosAdicionales { get; set; } = new List<string>();
 
         public override bool Equals(object obj)
         {
