@@ -28,7 +28,8 @@ namespace Service_08YS.Entities.Acceso
         RealizarBackup,
         RealizarRestore,
         CrearCliente,   
-        VerClientes
+        VerClientes,
+        VerMesas
     }
 
     public class Permiso_08YS : AccessComponent_08YS
