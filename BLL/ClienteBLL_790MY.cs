@@ -24,7 +24,7 @@ namespace BLL_08YS
             _bitacoraBll = bitacoraBll;
         }
 
-        public void RegistrarCliente(int dni, string nombre, string apellido, string email, string telefono)
+        public void RegistrarCliente(int dni, string nombre, string apellido, string email, string telefono, string direccion = null)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
 
@@ -33,11 +33,35 @@ namespace BLL_08YS
             if (_clienteRepository.Exists(dni))
                 throw new ClienteDniDuplicadoException_790MY(dni);
 
-            var cliente = new Cliente_790MY(dni, nombre, apellido, email, telefono);
+            var cliente = new Cliente_790MY(dni, nombre, apellido, email, telefono, direccion);
 
             _clienteRepository.Create(cliente);
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.ClienteRegistrado, targetUsername: dni.ToString());
+        }
+
+        public void ActualizarCliente(Cliente_790MY cliente)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
+
+            ValidarDatos(cliente.DNI, cliente.Nombre, cliente.Apellido, cliente.Email, cliente.Telefono);
+
+            if (!_clienteRepository.Exists(cliente.DNI))
+                throw new ArgumentException("El cliente que intenta modificar no existe o fue dado de baja.");
+
+            _clienteRepository.Update(cliente);
+            DVManager_08YS.Recalcular();
+        }
+
+        public void EliminarCliente(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
+
+            if (!_clienteRepository.Exists(dni))
+                throw new ArgumentException("El cliente que intenta eliminar no existe o ya fue dado de baja.");
+
+            _clienteRepository.DeleteLogico(dni);
+            DVManager_08YS.Recalcular();
         }
 
         public List<Cliente_790MY> GetAll()
