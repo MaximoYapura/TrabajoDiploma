@@ -39,7 +39,9 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.RolCreado,              new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
                 { Evento.RolModificado,          new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
                 { Evento.RolEliminado,           new EventoMetadata_08YS(   Modulo.Perfiles,       Criticidad.Alto)          },
-                { Evento.ClienteRegistrado,      new EventoMetadata_08YS(Modulo.Clientes, Criticidad.Medio) }
+                { Evento.ClienteRegistrado,      new EventoMetadata_08YS(Modulo.Clientes, Criticidad.Medio) },
+                { Evento.ClienteModificado,      new EventoMetadata_08YS(Modulo.Clientes, Criticidad.Medio) },
+                { Evento.ClienteEliminado,       new EventoMetadata_08YS(Modulo.Clientes, Criticidad.Alto) }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];
