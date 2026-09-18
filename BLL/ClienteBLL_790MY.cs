@@ -24,7 +24,8 @@ namespace BLL_08YS
             _bitacoraBll = bitacoraBll;
         }
 
-        public void RegistrarCliente(int dni, string nombre, string apellido, string email, string telefono, string direccion = null)
+        public void RegistrarCliente(int dni, string nombre, string apellido, string email, string telefono,
+            string direccion = null, List<string> emailsAdicionales = null, List<string> telefonosAdicionales = null)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
 
@@ -33,7 +34,11 @@ namespace BLL_08YS
             if (_clienteRepository.Exists(dni))
                 throw new ClienteDniDuplicadoException_790MY(dni);
 
-            var cliente = new Cliente_790MY(dni, nombre, apellido, email, telefono, direccion);
+            var cliente = new Cliente_790MY(dni, nombre, apellido, email, telefono, direccion)
+            {
+                EmailsAdicionales = emailsAdicionales ?? new List<string>(),
+                TelefonosAdicionales = telefonosAdicionales ?? new List<string>()
+            };
 
             _clienteRepository.Create(cliente);
             DVManager_08YS.Recalcular();
