@@ -1,10 +1,9 @@
-﻿using BE_08YS;
-using BLL_08YS;
+﻿using BLL_08YS;
 using FontAwesome.Sharp;
 using GUI;
 using GUI_08YS.Admin;
-using GUI_08YS.Properties;
 using GUI_08YS.RF1;
+using GUI_08YS.Properties;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
@@ -22,7 +21,7 @@ namespace GUI_08YS
 {
     public partial class FormMDI_08YS : Form,IIdiomaObserver_08YS
     {
-        // Mapeo de controles del menu administrativo a los permisos necesarios para verlos y ejecutarlos
+        // Mapeo de controles del menu administrativo (seguridad/administracion transversal)
         private static readonly Dictionary<string, Permisos> _mapaMenuAdmin =
             new Dictionary<string, Permisos>
             {
@@ -31,7 +30,14 @@ namespace GUI_08YS
                 { nameof(familiasToolStripMenuItem),         Permisos.VerFamilias    },
                 { nameof(rolesToolStripMenuItem),            Permisos.VerRoles       },
                 { nameof(gestionRespaldosToolStripMenuItem), Permisos.VerRespaldos   },
-                { nameof(clientesToolStripMenuItem),         Permisos.VerClientes    },
+            };
+
+        // Mapeo del menu Maestros (Clientes, Mesas)
+        private static readonly Dictionary<string, Permisos> _mapaMenuMaestros =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(clientesToolStripMenuItem), Permisos.VerClientes },
+                { nameof(mesasToolStripMenuItem),    Permisos.VerMesas    },
             };
 
         public event Action CerrarSesion;
@@ -91,18 +97,22 @@ namespace GUI_08YS
         }
         private void AplicarPermisos()
         {
-            // Botón "Administrativo" del panel lateral — solo visible si tiene algún permiso admin
+            // Boton "Administrativo": queda reservado para seguridad/administracion transversal
             btnAdministrativo.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerUsuarios)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerBitacora)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias)
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   )
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerClientes);
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   );
 
             gestionAccesosToolStripMenuItem.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   )
                                                    || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias);
 
-            // Items del menu desplegable de admin
             PermissionFilter_08YS.AplicarMenuStrip(AdministrativoDropDownMenu, _mapaMenuAdmin);
+
+            // Boton "Maestros": Clientes y Mesas
+            btnMaestros.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerClientes)
+                               || SessionManager_08YS.Instance.HasPermission(Permisos.VerMesas);
+
+            PermissionFilter_08YS.AplicarMenuStrip(MaestrosDropDownMenu, _mapaMenuMaestros);
         }
 
         #region idioma
@@ -116,6 +126,16 @@ namespace GUI_08YS
             if (AdministrativoDropDownMenu != null)
             {
                 TraducirMenuFlotanteCustom(AdministrativoDropDownMenu);
+            }
+
+            if (MaestrosDropDownMenu != null)
+            {
+                TraducirMenuFlotanteCustom(MaestrosDropDownMenu);
+            }
+
+            if (ReservasDropDownMenu != null)
+            {
+                TraducirMenuFlotanteCustom(ReservasDropDownMenu);
             }
 
             if (PerfilDropDownMenu != null)
@@ -200,15 +220,13 @@ namespace GUI_08YS
         private void FormMDI_Load(object sender, EventArgs e)
         {
             AdministrativoDropDownMenu.IsMainMenu = true;
+            MaestrosDropDownMenu.IsMainMenu = true;
+            ReservasDropDownMenu.IsMainMenu = true;
             PerfilDropDownMenu.IsMainMenu = true;
         }
 
         private void FormMDI_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //if (MessageBox.Show($"{Resources.ContinuarCierreSesion} \n\n{Resources.ConfirmarCierreSesion}", Resources.Advertencia, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
-            //{
-            //    e.Cancel = true;
-            //}
             SessionManager_08YS.Instance.SesionInvalidada -= OnSesionInvalidada;
 
             if (SessionManager_08YS.Instance.IsLogged)
@@ -329,10 +347,42 @@ namespace GUI_08YS
             OpenChildForm(new FormGestionRespaldos_08YS());
         }
 
+        #endregion
+
+        #region Maestros
+
+        private void btnMaestros_Click(object sender, EventArgs e)
+        {
+            MaestrosDropDownMenu.Show(btnMaestros, btnMaestros.Width, 0);
+        }
+
         private void clientesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             OpenChildForm(new FormClientes_790MY());
+        }
+
+        private void mesasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
+            OpenChildForm(new FormMesas_790MY());
+        }
+
+        #endregion
+
+        #region Reservas
+
+        private void btnReservar_Click(object sender, EventArgs e)
+        {
+            ReservasDropDownMenu.Show(btnReservar, btnReservar.Width, 0);
+        }
+
+        private void registrarReservaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var frm = new FormRegistrarReserva_790MY())
+            {
+                frm.ShowDialog(this);
+            }
         }
 
         #endregion
@@ -439,32 +489,9 @@ namespace GUI_08YS
         {
             string idiomaSeleccionado = IdiomaCombobox.SelectedIndex == 1 ? "en" : "es";
 
-            // 1. Sincronizamos la memoria de la sesión actual a través de la BLL (asumiendo que tenés la referencia '_userBll')
-            // Si no tenés la instancia de la BLL inyectada o mapeada en el MDI, accedés directo:
-            //SessionManager_08YS.Instance.Current.Idioma = idiomaSeleccionado;
             _userBLL.CambiarIdiomaUsuario(idiomaSeleccionado);
-            // 2. Le avisamos al Manager para que muten todas las pantallas abiertas por el Observer
             TraductorManager_08YS.Instance.CambiarIdioma(idiomaSeleccionado);
         }
 
-        private void btnReservar_Click(object sender, EventArgs e)
-        {
-            using (var frmReserva = new FormRegistrarReserva_790MY())
-            {
-                frmReserva.ShowDialog(this);
-            }
-            //DateTime fechaPrueba = new DateTime(2026, 09, 20);
-            //TimeSpan horaPrueba = new TimeSpan(20, 0, 0);
-            //int comensalesPrueba = 4;
-
-            //using (var frmMesa = new FormSeleccionarMesa_790MY(fechaPrueba, horaPrueba, comensalesPrueba))
-            //{
-            //    if (frmMesa.ShowDialog(this) == DialogResult.OK)
-            //    {
-            //        Mesa_790MY mesaElegida = frmMesa.MesaSeleccionada;
-            //        MessageBox.Show($"Mesa seleccionada correctamente: Nro {mesaElegida.NroMesa} (Capacidad: {mesaElegida.Capacidad})");
-            //    }
-            //}
-        }
     }
 }
