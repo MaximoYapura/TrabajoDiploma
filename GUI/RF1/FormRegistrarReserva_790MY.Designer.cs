@@ -38,6 +38,7 @@
             //
             this.lblTitulo_790MY.AutoSize = true;
             this.lblTitulo_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTitulo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblTitulo_790MY.Location = new System.Drawing.Point(20, 15);
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
             this.lblTitulo_790MY.Size = new System.Drawing.Size(180, 25);
@@ -46,6 +47,7 @@
             // lblDniCliente_790MY
             //
             this.lblDniCliente_790MY.AutoSize = true;
+            this.lblDniCliente_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblDniCliente_790MY.Location = new System.Drawing.Point(20, 60);
             this.lblDniCliente_790MY.Name = "lblDniCliente_790MY";
             this.lblDniCliente_790MY.Size = new System.Drawing.Size(70, 15);
@@ -69,7 +71,7 @@
             // lblClienteInfo_790MY
             //
             this.lblClienteInfo_790MY.AutoSize = true;
-            this.lblClienteInfo_790MY.ForeColor = System.Drawing.Color.DarkGreen;
+            this.lblClienteInfo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblClienteInfo_790MY.Location = new System.Drawing.Point(365, 60);
             this.lblClienteInfo_790MY.Name = "lblClienteInfo_790MY";
             this.lblClienteInfo_790MY.Size = new System.Drawing.Size(0, 15);
@@ -77,6 +79,7 @@
             // lblFecha_790MY
             //
             this.lblFecha_790MY.AutoSize = true;
+            this.lblFecha_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblFecha_790MY.Location = new System.Drawing.Point(20, 100);
             this.lblFecha_790MY.Name = "lblFecha_790MY";
             this.lblFecha_790MY.Size = new System.Drawing.Size(40, 15);
@@ -93,6 +96,7 @@
             // lblHora_790MY
             //
             this.lblHora_790MY.AutoSize = true;
+            this.lblHora_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblHora_790MY.Location = new System.Drawing.Point(20, 140);
             this.lblHora_790MY.Name = "lblHora_790MY";
             this.lblHora_790MY.Size = new System.Drawing.Size(60, 15);
@@ -109,6 +113,7 @@
             // lblComensales_790MY
             //
             this.lblComensales_790MY.AutoSize = true;
+            this.lblComensales_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblComensales_790MY.Location = new System.Drawing.Point(20, 180);
             this.lblComensales_790MY.Name = "lblComensales_790MY";
             this.lblComensales_790MY.Size = new System.Drawing.Size(90, 15);
@@ -134,6 +139,7 @@
             //
             this.lblMesaSeleccionada_790MY.AutoSize = true;
             this.lblMesaSeleccionada_790MY.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.lblMesaSeleccionada_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblMesaSeleccionada_790MY.Location = new System.Drawing.Point(175, 232);
             this.lblMesaSeleccionada_790MY.Name = "lblMesaSeleccionada_790MY";
             this.lblMesaSeleccionada_790MY.Size = new System.Drawing.Size(110, 15);
@@ -145,11 +151,15 @@
             this.btnConfirmar_790MY.Name = "btnConfirmar_790MY";
             this.btnConfirmar_790MY.Size = new System.Drawing.Size(140, 32);
             this.btnConfirmar_790MY.Text = "Confirmar Reserva";
-            this.btnConfirmar_790MY.UseVisualStyleBackColor = true;
+            this.btnConfirmar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfirmar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnConfirmar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnConfirmar_790MY.UseVisualStyleBackColor = false;
             this.btnConfirmar_790MY.Click += new System.EventHandler(this.btnConfirmar_790MY_Click);
             //
             // FormRegistrarReserva_790MY
             //
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(500, 340);
             this.Controls.Add(this.btnConfirmar_790MY);
             this.Controls.Add(this.lblMesaSeleccionada_790MY);
