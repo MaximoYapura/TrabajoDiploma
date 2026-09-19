@@ -28,6 +28,7 @@
             //
             this.lblTitulo_790MY.AutoSize = true;
             this.lblTitulo_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTitulo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblTitulo_790MY.Location = new System.Drawing.Point(20, 15);
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
             this.lblTitulo_790MY.Size = new System.Drawing.Size(160, 25);
@@ -59,7 +60,10 @@
             this.btnAceptar_790MY.Size = new System.Drawing.Size(90, 30);
             this.btnAceptar_790MY.TabIndex = 1;
             this.btnAceptar_790MY.Text = "Aceptar";
-            this.btnAceptar_790MY.UseVisualStyleBackColor = true;
+            this.btnAceptar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAceptar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnAceptar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnAceptar_790MY.UseVisualStyleBackColor = false;
             this.btnAceptar_790MY.Click += new System.EventHandler(this.btnAceptar_790MY_Click);
             //
             // btnCancelar_790MY
@@ -76,6 +80,7 @@
             //
             this.AcceptButton = this.btnAceptar_790MY;
             this.CancelButton = this.btnCancelar_790MY;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(600, 480);
             this.Controls.Add(this.btnCancelar_790MY);
             this.Controls.Add(this.btnAceptar_790MY);
