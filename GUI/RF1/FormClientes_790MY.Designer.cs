@@ -56,6 +56,12 @@
             this.dgvClientes_790MY.AutoGenerateColumns = false;
             this.dgvClientes_790MY.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvClientes_790MY.MultiSelect = false;
+            this.dgvClientes_790MY.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.dgvClientes_790MY.EnableHeadersVisualStyles = false;
+            this.dgvClientes_790MY.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
+            this.dgvClientes_790MY.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            this.dgvClientes_790MY.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.dgvClientes_790MY.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.dgvClientes_790MY.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colDni_790MY,
             this.colApellidos_790MY,
@@ -117,28 +123,40 @@
             this.btnAnadir_790MY.Name = "btnAnadir_790MY";
             this.btnAnadir_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnAnadir_790MY.Text = "Añadir";
-            this.btnAnadir_790MY.UseVisualStyleBackColor = true;
+            this.btnAnadir_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAnadir_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnAnadir_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnAnadir_790MY.UseVisualStyleBackColor = false;
             this.btnAnadir_790MY.Click += new System.EventHandler(this.btnAnadir_790MY_Click);
             //
             this.btnModificar_790MY.Location = new System.Drawing.Point(635, 55);
             this.btnModificar_790MY.Name = "btnModificar_790MY";
             this.btnModificar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnModificar_790MY.Text = "Modificar";
-            this.btnModificar_790MY.UseVisualStyleBackColor = true;
+            this.btnModificar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnModificar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnModificar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnModificar_790MY.UseVisualStyleBackColor = false;
             this.btnModificar_790MY.Click += new System.EventHandler(this.btnModificar_790MY_Click);
             //
             this.btnEliminar_790MY.Location = new System.Drawing.Point(635, 90);
             this.btnEliminar_790MY.Name = "btnEliminar_790MY";
             this.btnEliminar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnEliminar_790MY.Text = "Eliminar";
-            this.btnEliminar_790MY.UseVisualStyleBackColor = true;
+            this.btnEliminar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEliminar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnEliminar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnEliminar_790MY.UseVisualStyleBackColor = false;
             this.btnEliminar_790MY.Click += new System.EventHandler(this.btnEliminar_790MY_Click);
             //
             this.btnAplicar_790MY.Location = new System.Drawing.Point(635, 140);
             this.btnAplicar_790MY.Name = "btnAplicar_790MY";
             this.btnAplicar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnAplicar_790MY.Text = "Aplicar";
-            this.btnAplicar_790MY.UseVisualStyleBackColor = true;
+            this.btnAplicar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAplicar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnAplicar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnAplicar_790MY.UseVisualStyleBackColor = false;
             this.btnAplicar_790MY.Click += new System.EventHandler(this.btnAplicar_790MY_Click);
             //
             this.btnCancelar_790MY.Location = new System.Drawing.Point(635, 175);
@@ -158,6 +176,7 @@
             // Formulario inferior de edición
             //
             this.lblDni_790MY.AutoSize = true;
+            this.lblDni_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblDni_790MY.Location = new System.Drawing.Point(20, 260);
             this.lblDni_790MY.Name = "lblDni_790MY";
             this.lblDni_790MY.Text = "DNI:";
@@ -167,6 +186,7 @@
             this.txtDni_790MY.Size = new System.Drawing.Size(150, 20);
             //
             this.lblApellidos_790MY.AutoSize = true;
+            this.lblApellidos_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblApellidos_790MY.Location = new System.Drawing.Point(20, 292);
             this.lblApellidos_790MY.Name = "lblApellidos_790MY";
             this.lblApellidos_790MY.Text = "Apellidos:";
@@ -176,6 +196,7 @@
             this.txtApellidos_790MY.Size = new System.Drawing.Size(280, 20);
             //
             this.lblNombres_790MY.AutoSize = true;
+            this.lblNombres_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblNombres_790MY.Location = new System.Drawing.Point(20, 324);
             this.lblNombres_790MY.Name = "lblNombres_790MY";
             this.lblNombres_790MY.Text = "Nombres:";
@@ -185,6 +206,7 @@
             this.txtNombres_790MY.Size = new System.Drawing.Size(280, 20);
             //
             this.lblEmail_790MY.AutoSize = true;
+            this.lblEmail_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblEmail_790MY.Location = new System.Drawing.Point(20, 356);
             this.lblEmail_790MY.Name = "lblEmail_790MY";
             this.lblEmail_790MY.Text = "Email:";
@@ -201,6 +223,7 @@
             this.btnEmailsAdicionales_790MY.Click += new System.EventHandler(this.btnEmailsAdicionales_790MY_Click);
             //
             this.lblCelular_790MY.AutoSize = true;
+            this.lblCelular_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblCelular_790MY.Location = new System.Drawing.Point(20, 388);
             this.lblCelular_790MY.Name = "lblCelular_790MY";
             this.lblCelular_790MY.Text = "Celular:";
@@ -217,6 +240,7 @@
             this.btnTelefonosAdicionales_790MY.Click += new System.EventHandler(this.btnTelefonosAdicionales_790MY_Click);
             //
             this.lblDireccion_790MY.AutoSize = true;
+            this.lblDireccion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblDireccion_790MY.Location = new System.Drawing.Point(20, 420);
             this.lblDireccion_790MY.Name = "lblDireccion_790MY";
             this.lblDireccion_790MY.Text = "Dirección:";
@@ -227,6 +251,7 @@
             //
             // FormClientes_790MY
             //
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(780, 460);
             this.Controls.Add(this.dgvClientes_790MY);
             this.Controls.Add(this.btnAnadir_790MY);
