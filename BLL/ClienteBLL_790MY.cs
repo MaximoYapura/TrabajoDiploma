@@ -41,7 +41,12 @@ namespace BLL_08YS
             };
 
             _clienteRepository.Create(cliente);
+
+            // DV: no existe un DVH por registro en este proyecto (IDvRepository_08YS solo
+            // maneja un digito por TABLA completa via GetTodasLasTablas/GuardarDVTabla).
+            // Recalcular() ya recorre las 9 tablas monitoreadas, Clientes incluida.
             DVManager_08YS.Recalcular();
+
             _bitacoraBll.RegistrarEvento(Evento.ClienteRegistrado, targetUsername: dni.ToString());
         }
 
@@ -56,6 +61,7 @@ namespace BLL_08YS
 
             _clienteRepository.Update(cliente);
             DVManager_08YS.Recalcular();
+            _bitacoraBll.RegistrarEvento(Evento.ClienteModificado, targetUsername: cliente.DNI.ToString());
         }
 
         public void EliminarCliente(int dni)
@@ -67,6 +73,7 @@ namespace BLL_08YS
 
             _clienteRepository.DeleteLogico(dni);
             DVManager_08YS.Recalcular();
+            _bitacoraBll.RegistrarEvento(Evento.ClienteEliminado, targetUsername: dni.ToString());
         }
 
         public List<Cliente_790MY> GetAll()
