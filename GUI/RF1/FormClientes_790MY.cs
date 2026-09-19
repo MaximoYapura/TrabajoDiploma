@@ -4,7 +4,9 @@ using BLL_08YS.Exceptions;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace GUI_08YS.RF1
 {
@@ -26,8 +28,7 @@ namespace GUI_08YS.RF1
         // solo cuando Registrar Reserva abre este formulario via ShowDialog porque el
         // DNI buscado no existe. Su unico objetivo es dar de alta al cliente y devolver
         // el resultado; no expone la grilla ni las acciones de Modificar/Eliminar/Salir
-        // del Maestro completo. Ver FormClientes_790MY_Load para el detalle de que se
-        // oculta en este modo.
+        // del Maestro completo, ni la seccion de Serializacion.
         private readonly bool _modoRegistroRapido;
         public Cliente_790MY ClienteRegistrado { get; private set; }
 
@@ -60,15 +61,17 @@ namespace GUI_08YS.RF1
                 this.Text = "Registrar Cliente";
 
                 // Este Caso de Uso (Alta Rapida, extend de Registrar Reserva) no es el
-                // Maestro: se ocultan la grilla y las acciones que no le corresponden.
-                // Se hace DESPUES de PermissionFilter_08YS.Aplicar a proposito: ese filtro
-                // podria volver a mostrar estos botones segun el permiso del usuario, y
-                // acá se fuerza que queden ocultos sin importar el permiso.
+                // Maestro: se ocultan la grilla, las acciones que no le corresponden y
+                // toda la seccion de Serializacion. Se hace DESPUES de
+                // PermissionFilter_08YS.Aplicar a proposito: ese filtro podria volver a
+                // mostrar estos botones segun el permiso del usuario, y acá se fuerza
+                // que queden ocultos sin importar el permiso.
                 dgvClientes_790MY.Visible = false;
                 btnAnadir_790MY.Visible = false;
                 btnModificar_790MY.Visible = false;
                 btnEliminar_790MY.Visible = false;
                 btnSalir_790MY.Visible = false;
+                grpSerializacion_790MY.Visible = false;
 
                 EstablecerModo(ModoEdicion.Alta);
                 txtDni_790MY.Enabled = false; // ya se busco este DNI en Registrar Reserva; no se cambia acá
@@ -118,6 +121,14 @@ namespace GUI_08YS.RF1
 
             dgvClientes_790MY.Enabled = !editando;
             btnAnadir_790MY.Enabled = !editando;
+
+            // La sección de Serialización opera sobre la lista ya cargada en la grilla,
+            // asi que se deshabilita junto con ella mientras se está dando de alta o
+            // modificando (evita serializar datos a medio confirmar).
+            btnSerializar_790MY.Enabled = !editando;
+            btnDeserializar_790MY.Enabled = !editando;
+            btnExaminarSerializar_790MY.Enabled = !editando;
+            btnExaminarDeserializar_790MY.Enabled = !editando;
 
             if (!editando)
                 ActualizarHabilitacionBotonesAccion();
@@ -299,5 +310,112 @@ namespace GUI_08YS.RF1
         {
             this.Close();
         }
+
+        #region Serializacion XML
+
+        private void btnExaminarSerializar_790MY_Click(object sender, EventArgs e)
+        {
+            using (var dialogo = new SaveFileDialog { Filter = "Archivos XML (*.xml)|*.xml", FileName = "Clientes.xml" })
+            {
+                if (dialogo.ShowDialog(this) == DialogResult.OK)
+                    txtRutaSerializar_790MY.Text = dialogo.FileName;
+            }
+        }
+
+        private void btnExaminarDeserializar_790MY_Click(object sender, EventArgs e)
+        {
+            using (var dialogo = new OpenFileDialog { Filter = "Archivos XML (*.xml)|*.xml" })
+            {
+                if (dialogo.ShowDialog(this) == DialogResult.OK)
+                    txtRutaDeserializar_790MY.Text = dialogo.FileName;
+            }
+        }
+
+        private void btnSerializar_790MY_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtRutaSerializar_790MY.Text))
+            {
+                MessageBox.Show("Elegí primero un archivo de destino con el botón de carpeta.", "Falta la ruta",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Si hay una fila seleccionada se serializa solo esa (la grilla es de
+            // seleccion unica); si no hay seleccion, se serializa la lista completa
+            // que está cargada actualmente.
+            List<Cliente_790MY> aSerializar;
+            if (dgvClientes_790MY.CurrentRow?.DataBoundItem is Cliente_790MY seleccionado)
+                aSerializar = new List<Cliente_790MY> { seleccionado };
+            else if (dgvClientes_790MY.DataSource is List<Cliente_790MY> todos)
+                aSerializar = todos;
+            else
+                aSerializar = new List<Cliente_790MY>();
+
+            try
+            {
+                var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
+                using (var writer = new StreamWriter(txtRutaSerializar_790MY.Text))
+                {
+                    serializer.Serialize(writer, aSerializar);
+                }
+
+                MessageBox.Show($"Se serializaron {aSerializar.Count} cliente(s) correctamente.", "Éxito",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ocurrió un error al serializar: {ex.Message}", "Error",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnDeserializar_790MY_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtRutaDeserializar_790MY.Text))
+            {
+                MessageBox.Show("Elegí primero un archivo XML con el botón de carpeta.", "Falta la ruta",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
+                List<Cliente_790MY> resultado;
+
+                using (var reader = new StreamReader(txtRutaDeserializar_790MY.Text))
+                {
+                    resultado = (List<Cliente_790MY>)serializer.Deserialize(reader);
+                }
+
+                lstDeserializados_790MY.Items.Clear();
+
+                if (resultado == null || resultado.Count == 0)
+                {
+                    lstDeserializados_790MY.Items.Add("(el archivo no contiene clientes)");
+                    return;
+                }
+
+                foreach (var cliente in resultado)
+                {
+                    lstDeserializados_790MY.Items.Add(
+                        $"DNI {cliente.DNI} - {cliente.Nombre} {cliente.Apellido} - {cliente.Email}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ocurrió un error al deserializar: {ex.Message}", "Error",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnLimpiarSerializacion_790MY_Click(object sender, EventArgs e)
+        {
+            txtRutaSerializar_790MY.Clear();
+            txtRutaDeserializar_790MY.Clear();
+            lstDeserializados_790MY.Items.Clear();
+        }
+
+        #endregion
     }
 }
