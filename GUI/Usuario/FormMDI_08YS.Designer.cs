@@ -92,7 +92,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(20)))), ((int)(((byte)(38)))));
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
             this.panel1.Controls.Add(this.panelIdioma);
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.button3);
@@ -133,7 +133,7 @@
             this.button3.BackColor = System.Drawing.Color.Transparent;
             this.button3.Dock = System.Windows.Forms.DockStyle.Right;
             this.button3.FlatAppearance.BorderSize = 0;
-            this.button3.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(20)))), ((int)(((byte)(90)))));
+            this.button3.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button3.ForeColor = System.Drawing.SystemColors.ControlLightLight;
@@ -152,7 +152,7 @@
             this.button2.BackColor = System.Drawing.Color.Transparent;
             this.button2.Dock = System.Windows.Forms.DockStyle.Right;
             this.button2.FlatAppearance.BorderSize = 0;
-            this.button2.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(20)))), ((int)(((byte)(90)))));
+            this.button2.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
@@ -193,12 +193,12 @@
             this.Titulo.Name = "Titulo";
             this.Titulo.Size = new System.Drawing.Size(279, 16);
             this.Titulo.TabIndex = 0;
-            this.Titulo.Text = "Sistema de Hotelería - Horizon Hotel && Resort";
+            this.Titulo.Text = "Sistema de Gestión - El Fogón del Sur";
             // 
             // panelLateral
             // 
             this.panelLateral.AutoScroll = true;
-            this.panelLateral.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(7)))), ((int)(((byte)(40)))));
+            this.panelLateral.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
             this.panelLateral.Controls.Add(this.flowLayoutPanel1);
             this.panelLateral.Controls.Add(this.panel3);
             this.panelLateral.Controls.Add(this.panelLogo);
@@ -211,7 +211,7 @@
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.flowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
             this.flowLayoutPanel1.Controls.Add(this.btnPerfil);
             this.flowLayoutPanel1.Controls.Add(this.btnAdministrativo);
             this.flowLayoutPanel1.Controls.Add(this.btnMaestros);
@@ -228,9 +228,9 @@
             this.btnPerfil.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnPerfil.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPerfil.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnPerfil.ForeColor = System.Drawing.Color.Gold;
+            this.btnPerfil.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnPerfil.IconChar = FontAwesome.Sharp.IconChar.User;
-            this.btnPerfil.IconColor = System.Drawing.Color.Gold;
+            this.btnPerfil.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnPerfil.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnPerfil.IconSize = 30;
             this.btnPerfil.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -252,9 +252,9 @@
             this.btnAdministrativo.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnAdministrativo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdministrativo.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAdministrativo.ForeColor = System.Drawing.Color.Gold;
+            this.btnAdministrativo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnAdministrativo.IconChar = FontAwesome.Sharp.IconChar.UserTag;
-            this.btnAdministrativo.IconColor = System.Drawing.Color.Gold;
+            this.btnAdministrativo.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnAdministrativo.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnAdministrativo.IconSize = 30;
             this.btnAdministrativo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -276,9 +276,9 @@
             this.btnMaestros.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnMaestros.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMaestros.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnMaestros.ForeColor = System.Drawing.Color.Gold;
+            this.btnMaestros.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnMaestros.IconChar = FontAwesome.Sharp.IconChar.Database;
-            this.btnMaestros.IconColor = System.Drawing.Color.Gold;
+            this.btnMaestros.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnMaestros.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnMaestros.IconSize = 30;
             this.btnMaestros.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -300,9 +300,9 @@
             this.btnReservar.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnReservar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReservar.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnReservar.ForeColor = System.Drawing.Color.Gold;
+            this.btnReservar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnReservar.IconChar = FontAwesome.Sharp.IconChar.CalendarCheck;
-            this.btnReservar.IconColor = System.Drawing.Color.Gold;
+            this.btnReservar.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnReservar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnReservar.IconSize = 30;
             this.btnReservar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -331,14 +331,14 @@
             // 
             // btnCerrarSesion
             // 
-            this.btnCerrarSesion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(7)))), ((int)(((byte)(50)))));
+            this.btnCerrarSesion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(10)))), ((int)(((byte)(10)))));
             this.btnCerrarSesion.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCerrarSesion.Flip = FontAwesome.Sharp.FlipOrientation.Horizontal;
             this.btnCerrarSesion.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCerrarSesion.ForeColor = System.Drawing.Color.Gold;
+            this.btnCerrarSesion.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnCerrarSesion.IconChar = FontAwesome.Sharp.IconChar.SignOut;
-            this.btnCerrarSesion.IconColor = System.Drawing.Color.Gold;
+            this.btnCerrarSesion.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.btnCerrarSesion.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnCerrarSesion.IconSize = 30;
             this.btnCerrarSesion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -381,7 +381,7 @@
             // 
             this.lblNombreApellido.AutoSize = true;
             this.lblNombreApellido.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNombreApellido.ForeColor = System.Drawing.Color.LightGray;
+            this.lblNombreApellido.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.lblNombreApellido.Location = new System.Drawing.Point(87, 11);
             this.lblNombreApellido.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblNombreApellido.Name = "lblNombreApellido";
@@ -393,7 +393,7 @@
             // 
             this.lblRolSistema.AutoSize = true;
             this.lblRolSistema.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRolSistema.ForeColor = System.Drawing.Color.LightGray;
+            this.lblRolSistema.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.lblRolSistema.Location = new System.Drawing.Point(89, 39);
             this.lblRolSistema.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblRolSistema.Name = "lblRolSistema";
@@ -403,6 +403,7 @@
             // 
             // panel2
             // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.panel2.BackgroundImage = global::GUI_08YS.Properties.Resources.ChatGPT_Image_19_may_2026__22_23_23;
             this.panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -414,20 +415,20 @@
             // 
             // IdiomaCombobox
             // 
-            this.IdiomaCombobox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(20)))), ((int)(((byte)(38)))));
-            this.IdiomaCombobox.BorderColor = System.Drawing.Color.Goldenrod;
-            this.IdiomaCombobox.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.IdiomaCombobox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
+            this.IdiomaCombobox.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            this.IdiomaCombobox.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.IdiomaCombobox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.IdiomaCombobox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.IdiomaCombobox.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(20)))), ((int)(((byte)(38)))));
-            this.IdiomaCombobox.DropDownBorderColor = System.Drawing.Color.Goldenrod;
+            this.IdiomaCombobox.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
+            this.IdiomaCombobox.DropDownBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.IdiomaCombobox.DropDownForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.IdiomaCombobox.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(20)))), ((int)(((byte)(100)))));
+            this.IdiomaCombobox.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.IdiomaCombobox.DropDownHighlightForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.IdiomaCombobox.DropDownItemHeight = 35;
             this.IdiomaCombobox.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.IdiomaCombobox.IconChar = FontAwesome.Sharp.IconChar.Earth;
-            this.IdiomaCombobox.IconColor = System.Drawing.Color.Goldenrod;
+            this.IdiomaCombobox.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.IdiomaCombobox.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.IdiomaCombobox.IconPadding = 10;
             this.IdiomaCombobox.IconSize = 30;
