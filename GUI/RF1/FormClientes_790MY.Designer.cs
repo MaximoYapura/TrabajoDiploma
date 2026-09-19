@@ -44,7 +44,19 @@
             this.btnTelefonosAdicionales_790MY = new System.Windows.Forms.Button();
             this.lblDireccion_790MY = new System.Windows.Forms.Label();
             this.txtDireccion_790MY = new System.Windows.Forms.TextBox();
+            this.grpSerializacion_790MY = new System.Windows.Forms.GroupBox();
+            this.lblRutaSerializar_790MY = new System.Windows.Forms.Label();
+            this.txtRutaSerializar_790MY = new System.Windows.Forms.TextBox();
+            this.btnExaminarSerializar_790MY = new System.Windows.Forms.Button();
+            this.lblRutaDeserializar_790MY = new System.Windows.Forms.Label();
+            this.txtRutaDeserializar_790MY = new System.Windows.Forms.TextBox();
+            this.btnExaminarDeserializar_790MY = new System.Windows.Forms.Button();
+            this.btnSerializar_790MY = new System.Windows.Forms.Button();
+            this.btnDeserializar_790MY = new System.Windows.Forms.Button();
+            this.btnLimpiarSerializacion_790MY = new System.Windows.Forms.Button();
+            this.lstDeserializados_790MY = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes_790MY)).BeginInit();
+            this.grpSerializacion_790MY.SuspendLayout();
             this.SuspendLayout();
             //
             // dgvClientes_790MY
@@ -249,10 +261,108 @@
             this.txtDireccion_790MY.Name = "txtDireccion_790MY";
             this.txtDireccion_790MY.Size = new System.Drawing.Size(280, 20);
             //
+            // grpSerializacion_790MY
+            //
+            this.grpSerializacion_790MY.Controls.Add(this.lblRutaSerializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.txtRutaSerializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.btnExaminarSerializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.lblRutaDeserializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.txtRutaDeserializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.btnExaminarDeserializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.btnSerializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.btnDeserializar_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.btnLimpiarSerializacion_790MY);
+            this.grpSerializacion_790MY.Controls.Add(this.lstDeserializados_790MY);
+            this.grpSerializacion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.grpSerializacion_790MY.Location = new System.Drawing.Point(20, 450);
+            this.grpSerializacion_790MY.Name = "grpSerializacion_790MY";
+            this.grpSerializacion_790MY.Size = new System.Drawing.Size(715, 235);
+            this.grpSerializacion_790MY.TabStop = false;
+            this.grpSerializacion_790MY.Text = "Serialización";
+            //
+            // lblRutaSerializar_790MY
+            //
+            this.lblRutaSerializar_790MY.AutoSize = true;
+            this.lblRutaSerializar_790MY.Location = new System.Drawing.Point(15, 28);
+            this.lblRutaSerializar_790MY.Name = "lblRutaSerializar_790MY";
+            this.lblRutaSerializar_790MY.Text = "Archivo a serializar:";
+            //
+            this.txtRutaSerializar_790MY.Location = new System.Drawing.Point(160, 25);
+            this.txtRutaSerializar_790MY.Name = "txtRutaSerializar_790MY";
+            this.txtRutaSerializar_790MY.ReadOnly = true;
+            this.txtRutaSerializar_790MY.Size = new System.Drawing.Size(430, 20);
+            //
+            this.btnExaminarSerializar_790MY.Location = new System.Drawing.Point(600, 23);
+            this.btnExaminarSerializar_790MY.Name = "btnExaminarSerializar_790MY";
+            this.btnExaminarSerializar_790MY.Size = new System.Drawing.Size(40, 24);
+            this.btnExaminarSerializar_790MY.Text = "📁";
+            this.btnExaminarSerializar_790MY.UseVisualStyleBackColor = true;
+            this.btnExaminarSerializar_790MY.Click += new System.EventHandler(this.btnExaminarSerializar_790MY_Click);
+            //
+            // lblRutaDeserializar_790MY
+            //
+            this.lblRutaDeserializar_790MY.AutoSize = true;
+            this.lblRutaDeserializar_790MY.Location = new System.Drawing.Point(15, 58);
+            this.lblRutaDeserializar_790MY.Name = "lblRutaDeserializar_790MY";
+            this.lblRutaDeserializar_790MY.Text = "Archivo a deserializar:";
+            //
+            this.txtRutaDeserializar_790MY.Location = new System.Drawing.Point(160, 55);
+            this.txtRutaDeserializar_790MY.Name = "txtRutaDeserializar_790MY";
+            this.txtRutaDeserializar_790MY.ReadOnly = true;
+            this.txtRutaDeserializar_790MY.Size = new System.Drawing.Size(430, 20);
+            //
+            this.btnExaminarDeserializar_790MY.Location = new System.Drawing.Point(600, 53);
+            this.btnExaminarDeserializar_790MY.Name = "btnExaminarDeserializar_790MY";
+            this.btnExaminarDeserializar_790MY.Size = new System.Drawing.Size(40, 24);
+            this.btnExaminarDeserializar_790MY.Text = "📁";
+            this.btnExaminarDeserializar_790MY.UseVisualStyleBackColor = true;
+            this.btnExaminarDeserializar_790MY.Click += new System.EventHandler(this.btnExaminarDeserializar_790MY_Click);
+            //
+            // btnSerializar_790MY
+            //
+            this.btnSerializar_790MY.Location = new System.Drawing.Point(15, 95);
+            this.btnSerializar_790MY.Name = "btnSerializar_790MY";
+            this.btnSerializar_790MY.Size = new System.Drawing.Size(140, 32);
+            this.btnSerializar_790MY.Text = "SERIALIZAR";
+            this.btnSerializar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSerializar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnSerializar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnSerializar_790MY.UseVisualStyleBackColor = false;
+            this.btnSerializar_790MY.Click += new System.EventHandler(this.btnSerializar_790MY_Click);
+            //
+            // btnDeserializar_790MY
+            //
+            this.btnDeserializar_790MY.Location = new System.Drawing.Point(165, 95);
+            this.btnDeserializar_790MY.Name = "btnDeserializar_790MY";
+            this.btnDeserializar_790MY.Size = new System.Drawing.Size(140, 32);
+            this.btnDeserializar_790MY.Text = "DES-SERIALIZAR";
+            this.btnDeserializar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDeserializar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnDeserializar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnDeserializar_790MY.UseVisualStyleBackColor = false;
+            this.btnDeserializar_790MY.Click += new System.EventHandler(this.btnDeserializar_790MY_Click);
+            //
+            // btnLimpiarSerializacion_790MY
+            //
+            this.btnLimpiarSerializacion_790MY.Location = new System.Drawing.Point(315, 95);
+            this.btnLimpiarSerializacion_790MY.Name = "btnLimpiarSerializacion_790MY";
+            this.btnLimpiarSerializacion_790MY.Size = new System.Drawing.Size(100, 32);
+            this.btnLimpiarSerializacion_790MY.Text = "LIMPIAR";
+            this.btnLimpiarSerializacion_790MY.UseVisualStyleBackColor = true;
+            this.btnLimpiarSerializacion_790MY.Click += new System.EventHandler(this.btnLimpiarSerializacion_790MY_Click);
+            //
+            // lstDeserializados_790MY
+            //
+            this.lstDeserializados_790MY.FormattingEnabled = true;
+            this.lstDeserializados_790MY.Location = new System.Drawing.Point(15, 140);
+            this.lstDeserializados_790MY.Name = "lstDeserializados_790MY";
+            this.lstDeserializados_790MY.Size = new System.Drawing.Size(685, 82);
+            //
             // FormClientes_790MY
             //
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(780, 460);
+            this.ClientSize = new System.Drawing.Size(780, 710);
+            this.Controls.Add(this.grpSerializacion_790MY);
             this.Controls.Add(this.dgvClientes_790MY);
             this.Controls.Add(this.btnAnadir_790MY);
             this.Controls.Add(this.btnModificar_790MY);
@@ -278,6 +388,8 @@
             this.Text = "Clientes";
             this.Load += new System.EventHandler(this.FormClientes_790MY_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes_790MY)).EndInit();
+            this.grpSerializacion_790MY.ResumeLayout(false);
+            this.grpSerializacion_790MY.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -312,5 +424,16 @@
         private System.Windows.Forms.Button btnTelefonosAdicionales_790MY;
         private System.Windows.Forms.Label lblDireccion_790MY;
         private System.Windows.Forms.TextBox txtDireccion_790MY;
+        private System.Windows.Forms.GroupBox grpSerializacion_790MY;
+        private System.Windows.Forms.Label lblRutaSerializar_790MY;
+        private System.Windows.Forms.TextBox txtRutaSerializar_790MY;
+        private System.Windows.Forms.Button btnExaminarSerializar_790MY;
+        private System.Windows.Forms.Label lblRutaDeserializar_790MY;
+        private System.Windows.Forms.TextBox txtRutaDeserializar_790MY;
+        private System.Windows.Forms.Button btnExaminarDeserializar_790MY;
+        private System.Windows.Forms.Button btnSerializar_790MY;
+        private System.Windows.Forms.Button btnDeserializar_790MY;
+        private System.Windows.Forms.Button btnLimpiarSerializacion_790MY;
+        private System.Windows.Forms.ListBox lstDeserializados_790MY;
     }
 }
