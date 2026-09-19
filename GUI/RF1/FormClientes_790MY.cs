@@ -22,7 +22,12 @@ namespace GUI_08YS.RF1
 
         private readonly ClienteBLL_790MY _clienteBll;
 
-        // Modo "registro rapido": ver comentario en el constructor con parametro.
+        // Modo "registro rapido": Caso de Uso distinto del Maestro (ABM-C). Se activa
+        // solo cuando Registrar Reserva abre este formulario via ShowDialog porque el
+        // DNI buscado no existe. Su unico objetivo es dar de alta al cliente y devolver
+        // el resultado; no expone la grilla ni las acciones de Modificar/Eliminar/Salir
+        // del Maestro completo. Ver FormClientes_790MY_Load para el detalle de que se
+        // oculta en este modo.
         private readonly bool _modoRegistroRapido;
         public Cliente_790MY ClienteRegistrado { get; private set; }
 
@@ -52,8 +57,21 @@ namespace GUI_08YS.RF1
 
             if (_modoRegistroRapido)
             {
+                this.Text = "Registrar Cliente";
+
+                // Este Caso de Uso (Alta Rapida, extend de Registrar Reserva) no es el
+                // Maestro: se ocultan la grilla y las acciones que no le corresponden.
+                // Se hace DESPUES de PermissionFilter_08YS.Aplicar a proposito: ese filtro
+                // podria volver a mostrar estos botones segun el permiso del usuario, y
+                // acá se fuerza que queden ocultos sin importar el permiso.
                 dgvClientes_790MY.Visible = false;
-                btnAnadir_790MY.PerformClick();
+                btnAnadir_790MY.Visible = false;
+                btnModificar_790MY.Visible = false;
+                btnEliminar_790MY.Visible = false;
+                btnSalir_790MY.Visible = false;
+
+                EstablecerModo(ModoEdicion.Alta);
+                txtDni_790MY.Enabled = false; // ya se busco este DNI en Registrar Reserva; no se cambia acá
             }
             else
             {
