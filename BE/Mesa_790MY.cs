@@ -12,12 +12,14 @@
         private int _nroMesa;
         private int _capacidad;
         private EstadoMesa_790MY _estado;
+        private bool _activo;
 
-        public Mesa_790MY(int nroMesa, int capacidad, EstadoMesa_790MY estado)
+        public Mesa_790MY(int nroMesa, int capacidad, EstadoMesa_790MY estado, bool activo = true)
         {
             _nroMesa = nroMesa;
             _capacidad = capacidad;
             _estado = estado;
+            _activo = activo;
         }
 
         public Mesa_790MY() { }
@@ -38,6 +40,12 @@
         {
             get { return _estado; }
             set { _estado = value; }
+        }
+
+        public bool Activo
+        {
+            get { return _activo; }
+            set { _activo = value; }
         }
 
         public override bool Equals(object obj)
