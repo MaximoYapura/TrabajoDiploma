@@ -21,9 +21,22 @@ namespace DAL_08YS.SQL
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
+        public bool Exists(int nroMesa)
+        {
+            const string sql = "SELECT COUNT(1) FROM Mesas WHERE NroMesa = @NroMesa";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = nroMesa;
+                connection.Open();
+                return (int)command.ExecuteScalar() > 0;
+            }
+        }
+
         public List<Mesa_790MY> GetAll()
         {
-            const string sql = "SELECT NroMesa, Capacidad, Estado FROM Mesas";
+            const string sql = "SELECT NroMesa, Capacidad, Estado, Activo FROM Mesas WHERE Activo = 1";
             var resultado = new List<Mesa_790MY>();
 
             using (var connection = new SqlConnection(_connectionString))
@@ -45,9 +58,10 @@ namespace DAL_08YS.SQL
         public List<Mesa_790MY> GetDisponibles(DateTime fecha, TimeSpan hora, int comensales)
         {
             const string sql = @"
-                SELECT m.NroMesa, m.Capacidad, m.Estado
+                SELECT m.NroMesa, m.Capacidad, m.Estado, m.Activo
                 FROM Mesas m
-                WHERE m.Capacidad >= @Comensales
+                WHERE m.Activo = 1
+                  AND m.Capacidad >= @Comensales
                   AND NOT EXISTS (
                         SELECT 1
                         FROM Reservas r
@@ -81,6 +95,54 @@ namespace DAL_08YS.SQL
             return resultado;
         }
 
+        public void Add(Mesa_790MY mesa)
+        {
+            const string sql = @"INSERT INTO Mesas (NroMesa, Capacidad, Estado, Activo)
+                                  VALUES (@NroMesa, @Capacidad, @Estado, @Activo)";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = mesa.NroMesa;
+                command.Parameters.Add("@Capacidad", SqlDbType.Int).Value = mesa.Capacidad;
+                command.Parameters.Add("@Estado", SqlDbType.NVarChar, 20).Value = mesa.Estado.ToString();
+                command.Parameters.Add("@Activo", SqlDbType.Bit).Value = mesa.Activo;
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void Update(Mesa_790MY mesa)
+        {
+            // No actualiza NroMesa (clave) ni Activo (eso lo maneja DeleteLogico).
+            const string sql = @"UPDATE Mesas SET Capacidad = @Capacidad, Estado = @Estado WHERE NroMesa = @NroMesa";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = mesa.NroMesa;
+                command.Parameters.Add("@Capacidad", SqlDbType.Int).Value = mesa.Capacidad;
+                command.Parameters.Add("@Estado", SqlDbType.NVarChar, 20).Value = mesa.Estado.ToString();
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteLogico(int nroMesa)
+        {
+            const string sql = "UPDATE Mesas SET Activo = 0 WHERE NroMesa = @NroMesa";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = nroMesa;
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
         public void UpdateEstado(int nroMesa, EstadoMesa_790MY estado)
         {
             const string sql = "UPDATE Mesas SET Estado = @Estado WHERE NroMesa = @NroMesa";
@@ -102,7 +164,8 @@ namespace DAL_08YS.SQL
             {
                 NroMesa = reader.GetInt32(reader.GetOrdinal("NroMesa")),
                 Capacidad = reader.GetInt32(reader.GetOrdinal("Capacidad")),
-                Estado = (EstadoMesa_790MY)Enum.Parse(typeof(EstadoMesa_790MY), reader.GetString(reader.GetOrdinal("Estado")))
+                Estado = (EstadoMesa_790MY)Enum.Parse(typeof(EstadoMesa_790MY), reader.GetString(reader.GetOrdinal("Estado"))),
+                Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
             };
         }
     }
