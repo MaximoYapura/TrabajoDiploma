@@ -19,7 +19,8 @@ namespace Service_08YS.Entities.Bitacora
         Usuarios,
         Login,
         Perfiles,
-        Clientes 
+        Clientes,
+        Mesas
     }
 
     public enum Evento
@@ -42,7 +43,10 @@ namespace Service_08YS.Entities.Bitacora
         RolModificado,
         ClienteRegistrado = 20,
         ClienteModificado = 21,
-        ClienteEliminado = 22
+        ClienteEliminado = 22,
+        MesaRegistrada = 23,
+        MesaModificada = 24,
+        MesaEliminada = 25
     }
 
     public class BitacoraEvento_08YS
