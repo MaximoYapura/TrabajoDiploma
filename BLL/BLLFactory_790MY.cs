@@ -15,7 +15,8 @@ namespace BLL_08YS
         public static MesaBLL_790MY CreateMesaBLL()
         {
             IMesaRepository_790MY repo = new SqlMesaRepository_790MY();
-            return new MesaBLL_790MY(repo);
+            BitacoraBLL_08YS bitacoraBll = BLLFactory_08YS.CreateBitacoraBLL();
+            return new MesaBLL_790MY(repo, bitacoraBll);
         }
 
         public static ReservaBLL_790MY CreateReservaBLL()
