@@ -67,9 +67,12 @@ namespace GUI_08YS.RF1
 
             try
             {
-                if (_clienteBll.Exists(dni))
+                // GetByDni (no Exists) porque filtra por Activo = 1: un cliente dado de
+                // baja logicamente no deberia ofrecerse como "encontrado" para reservar.
+                _clienteActual = _clienteBll.GetByDni(dni);
+
+                if (_clienteActual != null)
                 {
-                    _clienteActual = _clienteBll.GetByDni(dni);
                     MostrarCliente(_clienteActual);
                     return;
                 }
