@@ -8,8 +8,11 @@ namespace DAL_08YS.Interfaces_Repositories
 {
     public interface IClienteRepository_790MY
     {
-        // Todos los metodos de consulta (Exists, GetByDni, GetAll) operan solo
-        // sobre clientes con Activo = 1 (borrado logico).
+        // No filtra por Activo: verifica existencia fisica de la fila para prevenir
+        // una violacion de clave primaria al registrar un DNI que ya existe (aunque
+        // este dado de baja logicamente). Para saber si un cliente existe Y esta
+        // activo (por ejemplo, para permitirle hacer una reserva), usar GetByDni
+        // (que si filtra por Activo = 1) y chequear que no devuelva null.
         bool Exists(int dni);
         void Create(Cliente_790MY cliente);
         void Update(Cliente_790MY cliente);

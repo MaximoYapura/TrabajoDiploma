@@ -20,8 +20,10 @@ namespace BLL_08YS
             if (mesa == null)
                 throw new ArgumentException("Debe seleccionar una mesa.");
 
-            if (!_clienteRepository.Exists(clienteDni))
-                throw new ArgumentException("El cliente indicado no está registrado.");
+            // GetByDni (no Exists) porque filtra por Activo = 1: un cliente dado de baja
+            // logicamente existe como fila pero no deberia poder reservar.
+            if (_clienteRepository.GetByDni(clienteDni) == null)
+                throw new ArgumentException("El cliente indicado no está registrado o fue dado de baja.");
 
             if (comensales <= 0)
                 throw new ArgumentException("La cantidad de comensales debe ser mayor a cero.");

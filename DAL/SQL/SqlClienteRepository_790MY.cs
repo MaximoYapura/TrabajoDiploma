@@ -26,7 +26,8 @@ namespace DAL_08YS.SQL
 
         public bool Exists(int dni)
         {
-            const string sql = "SELECT COUNT(1) FROM Clientes WHERE DNI = @Dni AND Activo = 1";
+            // Sin filtro de Activo a proposito: ver comentario en la interfaz.
+            const string sql = "SELECT COUNT(1) FROM Clientes WHERE DNI = @Dni";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(sql, connection))
