@@ -8,9 +8,6 @@ namespace BE_08YS
         Cancelada
     }
 
-    // Esqueleto minimo: solo lo indispensable para que SqlMesaRepository_790MY.GetDisponibles
-    // pueda hacer el NOT EXISTS contra reservas activas. El CU "Generar Reserva" completo
-    // (con sus propias validaciones e integracion con Cliente) queda para una etapa posterior.
     public class Reserva_790MY
     {
         private int _reservaId;
@@ -74,5 +71,10 @@ namespace BE_08YS
             get { return _estado; }
             set { _estado = value; }
         }
+
+        // Solo para lectura/visualizacion (no se persiste, no participa de Add):
+        // lo completan las consultas de busqueda que hacen JOIN con Clientes,
+        // para no tener que ir a buscar el cliente aparte solo para mostrar su nombre.
+        public string ClienteNombreCompleto { get; set; }
     }
 }
