@@ -54,6 +54,7 @@
             this.mesasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReservasDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.registrarReservaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.consultarReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -540,12 +541,13 @@
             this.ReservasDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.ReservasDropDownMenu.IsMainMenu = false;
             this.ReservasDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.registrarReservaToolStripMenuItem});
+            this.registrarReservaToolStripMenuItem,
+            this.consultarReservasToolStripMenuItem});
             this.ReservasDropDownMenu.MenuItemHeight = 25;
             this.ReservasDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.ReservasDropDownMenu.Name = "dropdownMenuStrip_08YS_Reservas";
             this.ReservasDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
-            this.ReservasDropDownMenu.Size = new System.Drawing.Size(201, 30);
+            this.ReservasDropDownMenu.Size = new System.Drawing.Size(201, 52);
             // 
             // registrarReservaToolStripMenuItem
             // 
@@ -554,6 +556,14 @@
             this.registrarReservaToolStripMenuItem.Tag = "menuRegistrarReserva";
             this.registrarReservaToolStripMenuItem.Text = "Registrar Reserva";
             this.registrarReservaToolStripMenuItem.Click += new System.EventHandler(this.registrarReservaToolStripMenuItem_Click);
+            // 
+            // consultarReservasToolStripMenuItem
+            // 
+            this.consultarReservasToolStripMenuItem.Name = "consultarReservasToolStripMenuItem";
+            this.consultarReservasToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.consultarReservasToolStripMenuItem.Tag = "menuConsultarReservas";
+            this.consultarReservasToolStripMenuItem.Text = "Consultar / Cancelar Reservas";
+            this.consultarReservasToolStripMenuItem.Click += new System.EventHandler(this.consultarReservasToolStripMenuItem_Click);
             // 
             // PerfilDropDownMenu
             // 
@@ -667,5 +677,6 @@
         private System.Windows.Forms.ToolStripMenuItem mesasToolStripMenuItem;
         private DropdownMenuStrip_08YS ReservasDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem registrarReservaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem consultarReservasToolStripMenuItem;
     }
 }
