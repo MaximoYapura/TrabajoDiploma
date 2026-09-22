@@ -1,6 +1,10 @@
 ﻿using BE_08YS;
 using DAL_08YS.Interfaces_Repositories;
+using Service_08YS;
+using Service_08YS.Entities.Acceso;
+using Service_08YS.Entities.Bitacora;
 using System;
+using System.Collections.Generic;
 
 namespace BLL_08YS
 {
@@ -8,11 +12,13 @@ namespace BLL_08YS
     {
         private readonly IReservaRepository_790MY _reservaRepository;
         private readonly IClienteRepository_790MY _clienteRepository;
+        private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository)
+        public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository, BitacoraBLL_08YS bitacoraBll)
         {
             _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
             _clienteRepository = clienteRepository ?? throw new ArgumentNullException(nameof(clienteRepository));
+            _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
         public void RegistrarReserva(int clienteDni, Mesa_790MY mesa, DateTime fecha, TimeSpan hora, int comensales)
@@ -37,7 +43,25 @@ namespace BLL_08YS
 
             var reserva = new Reserva_790MY(clienteDni, mesa.NroMesa, fecha.Date, hora, comensales, EstadoReserva_790MY.Confirmada);
 
+            // Nota: esta alta no queda auditada en Bitacora todavia (no se pidio al
+            // implementar Registrar Reserva). Cancelar Reserva si lo hace, ver abajo.
+            // Es una inconsistencia real entre altas y bajas de este mismo modulo.
             _reservaRepository.Add(reserva);
+        }
+
+        public List<Reserva_790MY> Buscar(DateTime? desde, DateTime? hasta, int? clienteDni, EstadoReserva_790MY? estado)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
+            return _reservaRepository.Buscar(desde, hasta, clienteDni, estado);
+        }
+
+        public void CancelarReserva(int reservaId)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CancelarReserva);
+
+            _reservaRepository.CancelarReserva(reservaId);
+            DVManager_08YS.Recalcular();
+            _bitacoraBll.RegistrarEvento(Evento.ReservaCancelada, targetUsername: reservaId.ToString());
         }
     }
 }

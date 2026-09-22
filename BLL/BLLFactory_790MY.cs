@@ -23,7 +23,8 @@ namespace BLL_08YS
         {
             IReservaRepository_790MY reservaRepo = new SqlReservaRepository_790MY();
             IClienteRepository_790MY clienteRepo = new SqlClienteRepository_790MY();
-            return new ReservaBLL_790MY(reservaRepo, clienteRepo);
+            BitacoraBLL_08YS bitacoraBll = BLLFactory_08YS.CreateBitacoraBLL();
+            return new ReservaBLL_790MY(reservaRepo, clienteRepo, bitacoraBll);
         }
     }
 }
