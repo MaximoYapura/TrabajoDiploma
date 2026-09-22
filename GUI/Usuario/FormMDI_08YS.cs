@@ -40,6 +40,15 @@ namespace GUI_08YS
                 { nameof(mesasToolStripMenuItem),    Permisos.VerMesas    },
             };
 
+        // Mapeo del menu Reservas. "Registrar Reserva" queda sin permiso propio a
+        // proposito: no existe un Permisos.RegistrarReserva (nunca se creo), y agregarlo
+        // no fue pedido en este cambio - es una inconsistencia real, se deja anotada.
+        private static readonly Dictionary<string, Permisos> _mapaMenuReservas =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(consultarReservasToolStripMenuItem), Permisos.VerReservas },
+            };
+
         public event Action CerrarSesion;
         private UserBLL_08YS _userBLL;
 
@@ -113,6 +122,10 @@ namespace GUI_08YS
                                || SessionManager_08YS.Instance.HasPermission(Permisos.VerMesas);
 
             PermissionFilter_08YS.AplicarMenuStrip(MaestrosDropDownMenu, _mapaMenuMaestros);
+
+            // Menu Reservas: Registrar Reserva no tiene permiso propio (ver nota arriba),
+            // asi que solo se filtra el item de Consultar/Cancelar.
+            PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
         }
 
         #region idioma
@@ -383,6 +396,12 @@ namespace GUI_08YS
             {
                 frm.ShowDialog(this);
             }
+        }
+
+        private void consultarReservasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
+            OpenChildForm(new FormGestionReservas_790MY());
         }
 
         #endregion
