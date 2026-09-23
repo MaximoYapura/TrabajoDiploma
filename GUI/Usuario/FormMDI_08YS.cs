@@ -21,7 +21,6 @@ namespace GUI_08YS
 {
     public partial class FormMDI_08YS : Form,IIdiomaObserver_08YS
     {
-        // Mapeo de controles del menu administrativo (seguridad/administracion transversal)
         private static readonly Dictionary<string, Permisos> _mapaMenuAdmin =
             new Dictionary<string, Permisos>
             {
@@ -32,7 +31,6 @@ namespace GUI_08YS
                 { nameof(gestionRespaldosToolStripMenuItem), Permisos.VerRespaldos   },
             };
 
-        // Mapeo del menu Maestros (Clientes, Mesas)
         private static readonly Dictionary<string, Permisos> _mapaMenuMaestros =
             new Dictionary<string, Permisos>
             {
@@ -40,13 +38,11 @@ namespace GUI_08YS
                 { nameof(mesasToolStripMenuItem),    Permisos.VerMesas    },
             };
 
-        // Mapeo del menu Reservas. "Registrar Reserva" queda sin permiso propio a
-        // proposito: no existe un Permisos.RegistrarReserva (nunca se creo), y agregarlo
-        // no fue pedido en este cambio - es una inconsistencia real, se deja anotada.
         private static readonly Dictionary<string, Permisos> _mapaMenuReservas =
             new Dictionary<string, Permisos>
             {
-                { nameof(consultarReservasToolStripMenuItem), Permisos.VerReservas },
+                { nameof(registrarReservaToolStripMenuItem),  Permisos.RegistrarReserva },
+                { nameof(consultarReservasToolStripMenuItem), Permisos.VerReservas      },
             };
 
         public event Action CerrarSesion;
@@ -82,150 +78,112 @@ namespace GUI_08YS
 
         private void RefrescarContenidoComboIdioma()
         {
-            // Bloqueamos el evento para evitar recursividad infinita al limpiar/agregar ítems
             IdiomaCombobox.SelectedIndexChanged -= IdiomaCombobox_SelectedIndexChanged;
 
             int indexTemporal = IdiomaCombobox.SelectedIndex;
 
             IdiomaCombobox.Items.Clear();
-            // Obtenemos los nombres de los idiomas traducidos dinámicamente
-            IdiomaCombobox.Items.Add(TraductorManager_08YS.Instance.GetTexto("idioma_es")); // "Español"
-            IdiomaCombobox.Items.Add(TraductorManager_08YS.Instance.GetTexto("idioma_en")); // "Inglés"
+            IdiomaCombobox.Items.Add(TraductorManager_08YS.Instance.GetTexto("idioma_es"));
+            IdiomaCombobox.Items.Add(TraductorManager_08YS.Instance.GetTexto("idioma_en"));
 
-            // Si es la primera carga, inicializamos según la sesión del usuario
             if (indexTemporal < 0)
-            {
                 IdiomaCombobox.SelectedIndex = (SessionManager_08YS.Instance.Current.Idioma == "en") ? 1 : 0;
-            }
             else
-            {
                 IdiomaCombobox.SelectedIndex = indexTemporal;
-            }
 
             IdiomaCombobox.SelectedIndexChanged += IdiomaCombobox_SelectedIndexChanged;
         }
+
         private void AplicarPermisos()
         {
-            // Boton "Administrativo": queda reservado para seguridad/administracion transversal
             btnAdministrativo.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerUsuarios)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerBitacora)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias)
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   );
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles);
 
-            gestionAccesosToolStripMenuItem.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles   )
+            gestionAccesosToolStripMenuItem.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles)
                                                    || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias);
 
             PermissionFilter_08YS.AplicarMenuStrip(AdministrativoDropDownMenu, _mapaMenuAdmin);
 
-            // Boton "Maestros": Clientes y Mesas
             btnMaestros.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerClientes)
                                || SessionManager_08YS.Instance.HasPermission(Permisos.VerMesas);
 
             PermissionFilter_08YS.AplicarMenuStrip(MaestrosDropDownMenu, _mapaMenuMaestros);
 
-            // Menu Reservas: Registrar Reserva no tiene permiso propio (ver nota arriba),
-            // asi que solo se filtra el item de Consultar/Cancelar.
+            // Reservar: visible si tiene al menos uno de los dos permisos
+            btnReservar.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarReserva)
+                               || SessionManager_08YS.Instance.HasPermission(Permisos.VerReservas);
+
             PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
         }
 
         #region idioma
         public void UpdateIdioma()
         {
-            // 1. Traduce los controles nativos y paneles del formulario (los botones del panel lateral, labels, etc.)
             TraducirControles(this);
 
-            // 2. TRADUCCIÓN EXPLÍCITA DE MENÚS FLOTANTES COMPOSITE
-            // Como no están en Controls, los enviamos individualmente a procesar
             if (AdministrativoDropDownMenu != null)
-            {
                 TraducirMenuFlotanteCustom(AdministrativoDropDownMenu);
-            }
 
             if (MaestrosDropDownMenu != null)
-            {
                 TraducirMenuFlotanteCustom(MaestrosDropDownMenu);
-            }
 
             if (ReservasDropDownMenu != null)
-            {
                 TraducirMenuFlotanteCustom(ReservasDropDownMenu);
-            }
 
             if (PerfilDropDownMenu != null)
-            {
                 TraducirMenuFlotanteCustom(PerfilDropDownMenu);
-            }
+
             RefrescarContenidoComboIdioma();
         }
 
-        // NUEVO MÉTODO: Dedicado a los ContextMenuStrip / DropdownMenuStrip personalizados
         private void TraducirMenuFlotanteCustom(ContextMenuStrip menuFlotante)
         {
             foreach (ToolStripItem item in menuFlotante.Items)
-            {
                 TraducirItemsDesplegables(item);
-            }
         }
 
         private void TraducirControles(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
-                // 1. Si el control tiene hijos (un Panel, GroupBox, FlowLayoutPanel, etc.) y NO es una barra de herramientas,
-                // nos metemos inmediatamente a traducirlos de forma recursiva primero.
                 if (c.HasChildren && !(c is ToolStrip))
-                {
                     TraducirControles(c);
-                }
 
-                // 2. SI ES UNA BARRA DE MENÚ (MenuStrip / ToolStrip tradicional)
                 if (c is ToolStrip barraMenu)
                 {
                     TraducirBarraHerramientas(barraMenu);
                     continue;
                 }
 
-                // 3. SI ES UN ICONBUTTON (Como btnPerfil, btnAdministrativo, btnReservar, btnCerrarSesion)
                 if (c is IconButton botonIcono)
                 {
                     if (botonIcono.Tag != null && !string.IsNullOrWhiteSpace(botonIcono.Tag.ToString()))
-                    {
                         botonIcono.Text = TraductorManager_08YS.Instance.GetTexto(botonIcono.Tag.ToString());
-                    }
                     continue;
                 }
 
-                // 4. Control común y corriente (Labels, Checkbox, etc.)
                 if (c.Tag != null && !string.IsNullOrWhiteSpace(c.Tag.ToString()))
-                {
                     c.Text = TraductorManager_08YS.Instance.GetTexto(c.Tag.ToString());
-                }
             }
         }
 
-        // Recorre los ítems que están adentro de la barra de herramientas de FontAwesome
         private void TraducirBarraHerramientas(ToolStrip barra)
         {
             foreach (ToolStripItem item in barra.Items)
-            {
                 TraducirItemsDesplegables(item);
-            }
         }
 
-        // Se mete de forma recursiva en los submenús del Dropdown (sirve para ToolStrip y ContextMenuStrip)
         private void TraducirItemsDesplegables(ToolStripItem item)
         {
             if (item.Tag != null && !string.IsNullOrWhiteSpace(item.Tag.ToString()))
-            {
                 item.Text = TraductorManager_08YS.Instance.GetTexto(item.Tag.ToString());
-            }
 
             if (item is ToolStripDropDownItem itemDesplegable && itemDesplegable.HasDropDownItems)
             {
                 foreach (ToolStripItem subItem in itemDesplegable.DropDownItems)
-                {
-                    TraducirItemsDesplegables(subItem); // Recursividad para sub-ítems anidados
-                }
+                    TraducirItemsDesplegables(subItem);
             }
         }
         #endregion
@@ -245,7 +203,7 @@ namespace GUI_08YS
             if (SessionManager_08YS.Instance.IsLogged)
             {
                 _userBLL.Logout();
-                CerrarSesion?.Invoke(); // Desoculta el Username y limpia Singleton
+                CerrarSesion?.Invoke();
             }
         }
 
@@ -263,22 +221,22 @@ namespace GUI_08YS
             panel2.Controls.Add(childForm);
             panel2.Tag = childForm;
 
-            ForceCustomControlsLayout(childForm);   // ← MOVER antes del Show
+            ForceCustomControlsLayout(childForm);
 
-            childForm.ResumeLayout(false);          // ← false: no forzar redibujado todavía
+            childForm.ResumeLayout(false);
             panel2.ResumeLayout(false);
 
             if(childForm is IIdiomaObserver_08YS observer)
             {
-                TraductorManager_08YS.Instance.Suscribir(observer); // Suscribir al nuevo formulario al cambio de idioma
-                observer.UpdateIdioma(); // Forzar actualización inmediata del idioma al abrir la pantalla
+                TraductorManager_08YS.Instance.Suscribir(observer);
+                observer.UpdateIdioma();
             }
 
-            childForm.Load += (s, e) => TraductorManager_08YS.Instance.Suscribir(childForm as IIdiomaObserver_08YS); // Suscribir al nuevo formulario al cambio de idioma
-            childForm.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(childForm as IIdiomaObserver_08YS); // Desuscribir al cerrar
+            childForm.Load += (s, e) => TraductorManager_08YS.Instance.Suscribir(childForm as IIdiomaObserver_08YS);
+            childForm.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(childForm as IIdiomaObserver_08YS);
 
-            childForm.Show();                       // ← mostrar DESPUÉS de que todo esté listo
-            childForm.Refresh();                    // ← forzar un pintado limpio único
+            childForm.Show();
+            childForm.Refresh();
         }
 
         private void ForceCustomControlsLayout(Control parent)
@@ -307,13 +265,12 @@ namespace GUI_08YS
 
                 if (ctrl is Label lbl && lbl.AutoSize)
                 {
-                    lbl.MaximumSize = Size.Empty;  // elimina cualquier límite
-                    lbl.Size = Size.Empty;         // fuerza recálculo desde cero
+                    lbl.MaximumSize = Size.Empty;
+                    lbl.Size = Size.Empty;
                     lbl.Refresh();
                 }
                 if (ctrl is CustomControls.IconPlaceholderTextBox txt)
                 {
-                    // Forzar estado visual correcto
                     bool hasText = !string.IsNullOrEmpty(txt.RealText);
                     txt.InnerTextBox.Visible = hasText || txt.InnerTextBox.Focused;
                     txt.Invalidate();
@@ -324,7 +281,6 @@ namespace GUI_08YS
         #region Menu
 
         #region Administrativo
-
         private void btnAdministrativo_Click(object sender, EventArgs e)
         {
             AdministrativoDropDownMenu.Show(btnAdministrativo, btnAdministrativo.Width, 0);
@@ -359,11 +315,9 @@ namespace GUI_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerRespaldos);
             OpenChildForm(new FormGestionRespaldos_08YS());
         }
-
         #endregion
 
         #region Maestros
-
         private void btnMaestros_Click(object sender, EventArgs e)
         {
             MaestrosDropDownMenu.Show(btnMaestros, btnMaestros.Width, 0);
@@ -380,11 +334,9 @@ namespace GUI_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
             OpenChildForm(new FormMesas_790MY());
         }
-
         #endregion
 
         #region Reservas
-
         private void btnReservar_Click(object sender, EventArgs e)
         {
             ReservasDropDownMenu.Show(btnReservar, btnReservar.Width, 0);
@@ -392,6 +344,7 @@ namespace GUI_08YS
 
         private void registrarReservaToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
             using (var frm = new FormRegistrarReserva_790MY())
             {
                 frm.ShowDialog(this);
@@ -403,11 +356,9 @@ namespace GUI_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
             OpenChildForm(new FormGestionReservas_790MY());
         }
-
         #endregion
 
         #region Perfil
-
         private void btnPerfil_Click(object sender, EventArgs e)
         {
             PerfilDropDownMenu.Show(btnPerfil, btnPerfil.Width, 0);
@@ -421,9 +372,8 @@ namespace GUI_08YS
             {
                 if (form.DialogResult == DialogResult.OK)
                 {
-                    // Ejecutamos el cierre de sesión e invocamos el evento para desocultar el Username
                     CerrarSesion?.Invoke();
-                    this.Close(); // Cerramos el MDI
+                    this.Close();
                 }
             };
             OpenChildForm(form);
@@ -444,12 +394,10 @@ namespace GUI_08YS
 
             if (respuesta == DialogResult.Yes)
             {
-
                 CerrarSesion?.Invoke();
                 this.Close();
             }
         }
-
         #endregion
 
         private void btnCerrarSesion_Click(object sender, EventArgs e)
@@ -470,17 +418,13 @@ namespace GUI_08YS
         #endregion
 
         #region BarraSuperior
-
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
         private extern static void ReleaseCapture();
 
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
         private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
 
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+        private void button1_Click_1(object sender, EventArgs e) { Application.Exit(); }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
@@ -490,27 +434,20 @@ namespace GUI_08YS
                 this.WindowState = FormWindowState.Normal;
         }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            this.WindowState = FormWindowState.Minimized;
-        }
+        private void button3_Click(object sender, EventArgs e) { this.WindowState = FormWindowState.Minimized; }
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
             SendMessage(this.Handle, 0x112, 0xf012, 0);
         }
-
-
         #endregion
 
         private void IdiomaCombobox_SelectedIndexChanged(object sender, EventArgs e)
         {
             string idiomaSeleccionado = IdiomaCombobox.SelectedIndex == 1 ? "en" : "es";
-
             _userBLL.CambiarIdiomaUsuario(idiomaSeleccionado);
             TraductorManager_08YS.Instance.CambiarIdioma(idiomaSeleccionado);
         }
-
     }
 }
