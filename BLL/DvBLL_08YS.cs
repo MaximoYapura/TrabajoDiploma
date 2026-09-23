@@ -1,4 +1,4 @@
-﻿using DAL_08YS.Interfaces_Repositories;
+using DAL_08YS.Interfaces_Repositories;
 using Service_08YS;
 using Service_08YS.Entities;
 using System;
@@ -31,10 +31,15 @@ namespace BLL_08YS
 
     public class DvBLL_08YS
     {
+        // RS0..RS8 existían desde el inicio del proyecto.
+        // RS9 = Mesas, RS10 = Reservas fueron incorporadas al SP
+        // sp_GetAllTablesParaDV en la iteración RF1; este array debe
+        // mantenerse sincronizado con los result-sets que devuelve ese SP.
         public static readonly string[] TablasMonitoreadas =
         {
             "Users", "Roles", "Familias", "Permisos",
-            "FamiliaPermiso", "FamiliaIntegrada", "RolFamilia", "RolPermiso", "Clientes"
+            "FamiliaPermiso", "FamiliaIntegrada", "RolFamilia", "RolPermiso", "Clientes",
+            "Mesas", "Reservas"
         };
 
         private readonly IDvRepository_08YS _repo;

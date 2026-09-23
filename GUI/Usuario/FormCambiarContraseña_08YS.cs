@@ -1,4 +1,4 @@
-﻿using BLL_08YS;
+using BLL_08YS;
 using CustomControls;
 using FontAwesome.Sharp;
 using Service_08YS;
@@ -46,6 +46,15 @@ namespace GUI_08YS
             AsignarEventosPlaceholder();
             TraductorManager_08YS.Instance.Suscribir(this);
             UpdateIdioma();
+        }
+
+        // Al cerrar el formulario se desuscribe del Observer de idioma para evitar
+        // que Notificar() intente invocar UpdateIdioma() sobre un form ya disposed,
+        // lo que provocaría NullReferenceException al iterar sus controles.
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            TraductorManager_08YS.Instance.Desuscribir(this);
+            base.OnFormClosed(e);
         }
 
         public void UpdateIdioma()

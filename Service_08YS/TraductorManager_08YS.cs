@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -73,9 +73,14 @@ namespace Service_08YS
 
         private void Notificar()
         {
-            foreach (var obs in _observadores)
+            // Se itera sobre una copia de la lista para tolerar desuscripciones
+            // que puedan ocurrir durante la notificación (p.ej. un form que se
+            // cierra al recibir el cambio de idioma).
+            // La guarda obs?.UpdateIdioma() previene NullReferenceException en
+            // caso de que alguna referencia huérfana haya quedado en la lista.
+            foreach (var obs in _observadores.ToList())
             {
-                obs.UpdateIdioma();
+                obs?.UpdateIdioma();
             }
         }
 
