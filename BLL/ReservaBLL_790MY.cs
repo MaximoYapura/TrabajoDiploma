@@ -1,4 +1,5 @@
 ﻿using BE_08YS;
+using DAL_08YS;
 using DAL_08YS.Interfaces_Repositories;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
@@ -23,11 +24,13 @@ namespace BLL_08YS
 
         public void RegistrarReserva(int clienteDni, Mesa_790MY mesa, DateTime fecha, TimeSpan hora, int comensales)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
+
             if (mesa == null)
                 throw new ArgumentException("Debe seleccionar una mesa.");
 
-            // GetByDni (no Exists) porque filtra por Activo = 1: un cliente dado de baja
-            // logicamente existe como fila pero no deberia poder reservar.
+            // GetByDni filtra por Activo = 1: un cliente dado de baja logicamente
+            // no deberia poder hacer reservas.
             if (_clienteRepository.GetByDni(clienteDni) == null)
                 throw new ArgumentException("El cliente indicado no está registrado o fue dado de baja.");
 
@@ -43,10 +46,12 @@ namespace BLL_08YS
 
             var reserva = new Reserva_790MY(clienteDni, mesa.NroMesa, fecha.Date, hora, comensales, EstadoReserva_790MY.Confirmada);
 
-            // Nota: esta alta no queda auditada en Bitacora todavia (no se pidio al
-            // implementar Registrar Reserva). Cancelar Reserva si lo hace, ver abajo.
-            // Es una inconsistencia real entre altas y bajas de este mismo modulo.
             _reservaRepository.Add(reserva);
+
+            DVManager_08YS.Recalcular();
+            _bitacoraBll.RegistrarEvento(
+                Evento.ReservaRegistrada,
+                targetUsername: $"Reserva {reserva.ReservaID} - Cliente DNI {clienteDni}");
         }
 
         public List<Reserva_790MY> Buscar(DateTime? desde, DateTime? hasta, int? clienteDni, EstadoReserva_790MY? estado)

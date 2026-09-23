@@ -67,8 +67,7 @@ namespace GUI_08YS.RF1
 
             try
             {
-                // GetByDni (no Exists) porque filtra por Activo = 1: un cliente dado de
-                // baja logicamente no deberia ofrecerse como "encontrado" para reservar.
+                // Escenario 1: cliente activo — GetByDni filtra por Activo = 1.
                 _clienteActual = _clienteBll.GetByDni(dni);
 
                 if (_clienteActual != null)
@@ -77,6 +76,20 @@ namespace GUI_08YS.RF1
                     return;
                 }
 
+                // Escenario 2: DNI existe en BD pero inactivo (baja lógica).
+                // Exists no filtra por Activo, por lo que devuelve true en ese caso.
+                if (_clienteBll.Exists(dni))
+                {
+                    MessageBox.Show(
+                        "El cliente se encuentra dado de baja.\n" +
+                        "Debe reactivarlo desde el Maestro de Clientes para operar.",
+                        "Cliente inactivo",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Escenario 3: DNI no existe en absoluto — ofrecer registro rápido.
                 var respuesta = MessageBox.Show(
                     "No existe un cliente registrado con ese DNI. ¿Desea registrarlo ahora?",
                     "Cliente no encontrado", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
