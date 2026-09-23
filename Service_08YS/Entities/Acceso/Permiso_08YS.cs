@@ -32,7 +32,8 @@ namespace Service_08YS.Entities.Acceso
         VerMesas,
         CrearMesa,
         VerReservas,
-        CancelarReserva
+        CancelarReserva,
+        RegistrarReserva
     }
 
     public class Permiso_08YS : AccessComponent_08YS

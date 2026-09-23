@@ -48,7 +48,8 @@ namespace Service_08YS.Entities.Bitacora
         MesaRegistrada = 23,
         MesaModificada = 24,
         MesaEliminada = 25,
-        ReservaCancelada = 26
+        ReservaCancelada = 26,
+        ReservaRegistrada = 27
     }
 
     public class BitacoraEvento_08YS
