@@ -2,10 +2,11 @@
 using BLL_08YS;
 using System;
 using System.Windows.Forms;
+using Service_08YS;
 
 namespace GUI_08YS.RF1
 {
-    public partial class FormGestionReservas_790MY : Form
+    public partial class FormGestionReservas_790MY : Form, IIdiomaObserver_08YS
     {
         private readonly ReservaBLL_790MY _reservaBll;
 
@@ -13,7 +14,10 @@ namespace GUI_08YS.RF1
         {
             InitializeComponent();
             _reservaBll = BLLFactory_790MY.CreateReservaBLL();
+            TraductorManager_08YS.Instance.Suscribir(this);
+            this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
+          
 
         private void FormGestionReservas_790MY_Load(object sender, EventArgs e)
         {
@@ -111,5 +115,23 @@ namespace GUI_08YS.RF1
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        #region i18n
+        public void UpdateIdioma()
+        {
+            AplicarTraducciones(this);
+        }
+
+        private void AplicarTraducciones(Control contenedor)
+        {
+            foreach (Control c in contenedor.Controls)
+            {
+                if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
+                    c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+                if (c.HasChildren)
+                    AplicarTraducciones(c);
+            }
+        }
+        #endregion
     }
 }

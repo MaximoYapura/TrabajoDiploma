@@ -3,6 +3,7 @@ using FontAwesome.Sharp;
 using GUI;
 using GUI_08YS.Admin;
 using GUI_08YS.RF1;
+using GUI_08YS.Maestros;
 using GUI_08YS.Properties;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
@@ -345,10 +346,7 @@ namespace GUI_08YS
         private void registrarReservaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
-            using (var frm = new FormRegistrarReserva_790MY())
-            {
-                frm.ShowDialog(this);
-            }
+            OpenChildForm(new FormRegistrarReserva_790MY());
         }
 
         private void consultarReservasToolStripMenuItem_Click(object sender, EventArgs e)

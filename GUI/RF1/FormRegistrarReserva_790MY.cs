@@ -1,11 +1,12 @@
 ﻿using BE_08YS;
+using Service_08YS;
 using BLL_08YS;
 using System;
 using System.Windows.Forms;
-
+using GUI_08YS.Maestros;
 namespace GUI_08YS.RF1
 {
-    public partial class FormRegistrarReserva_790MY : Form
+    public partial class FormRegistrarReserva_790MY : Form, IIdiomaObserver_08YS
     {
         private readonly ClienteBLL_790MY _clienteBll;
         private readonly ReservaBLL_790MY _reservaBll;
@@ -26,6 +27,8 @@ namespace GUI_08YS.RF1
 
             _clienteBll = BLLFactory_790MY.CreateClienteBLL();
             _reservaBll = BLLFactory_790MY.CreateReservaBLL();
+            TraductorManager_08YS.Instance.Suscribir(this);
+            this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
 
         private void FormRegistrarReserva_790MY_Load(object sender, EventArgs e)
@@ -98,7 +101,7 @@ namespace GUI_08YS.RF1
 
                 using (var frmCliente = new FormClientes_790MY(dni))
                 {
-                    if (frmCliente.ShowDialog(this) == DialogResult.OK)
+                    if (frmCliente.ShowDialog(this.FindForm()) == DialogResult.OK)
                     {
                         _clienteActual = frmCliente.ClienteRegistrado;
                         MostrarCliente(_clienteActual);
@@ -133,7 +136,7 @@ namespace GUI_08YS.RF1
 
             using (var frmMesa = new FormSeleccionarMesa_790MY(dtpFecha_790MY.Value, hora, comensales))
             {
-                if (frmMesa.ShowDialog(this) == DialogResult.OK)
+                if (frmMesa.ShowDialog(this.FindForm()) == DialogResult.OK)
                 {
                     _mesaSeleccionada = frmMesa.MesaSeleccionada;
                     lblMesaSeleccionada_790MY.Text = $"Mesa {_mesaSeleccionada.NroMesa} ({_mesaSeleccionada.Capacidad} pers.)";
@@ -202,5 +205,23 @@ namespace GUI_08YS.RF1
 
             txtDniCliente_790MY.Focus();
         }
+
+        #region i18n
+        public void UpdateIdioma()
+        {
+            AplicarTraducciones(this);
+        }
+
+        private void AplicarTraducciones(Control contenedor)
+        {
+            foreach (Control c in contenedor.Controls)
+            {
+                if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
+                    c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+                if (c.HasChildren)
+                    AplicarTraducciones(c);
+            }
+        }
+        #endregion
     }
 }

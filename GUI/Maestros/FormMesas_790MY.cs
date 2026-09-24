@@ -4,10 +4,11 @@ using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Service_08YS;
 
-namespace GUI_08YS.RF1
+namespace GUI_08YS.Maestros
 {
-    public partial class FormMesas_790MY : Form
+    public partial class FormMesas_790MY : Form, IIdiomaObserver_08YS
     {
         private enum ModoEdicion { Reposo, Alta, Modificacion }
 
@@ -31,6 +32,8 @@ namespace GUI_08YS.RF1
         {
             InitializeComponent();
             _mesaBll = BLLFactory_790MY.CreateMesaBLL();
+            TraductorManager_08YS.Instance.Suscribir(this);
+            this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
 
         private void FormMesas_790MY_Load(object sender, EventArgs e)
@@ -192,5 +195,23 @@ namespace GUI_08YS.RF1
         {
             this.Close();
         }
+
+        #region i18n
+        public void UpdateIdioma()
+        {
+            AplicarTraducciones(this);
+        }
+
+        private void AplicarTraducciones(Control contenedor)
+        {
+            foreach (Control c in contenedor.Controls)
+            {
+                if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
+                    c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+                if (c.HasChildren)
+                    AplicarTraducciones(c);
+            }
+        }
+        #endregion
     }
 }

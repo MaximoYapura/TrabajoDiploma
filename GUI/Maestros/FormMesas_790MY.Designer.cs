@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.RF1
+﻿namespace GUI_08YS.Maestros
 {
     partial class FormMesas_790MY
     {

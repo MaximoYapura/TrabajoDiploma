@@ -3,10 +3,11 @@ using BLL_08YS;
 using CustomControls;
 using System;
 using System.Windows.Forms;
+using Service_08YS;
 
 namespace GUI_08YS.RF1
 {
-    public partial class FormSeleccionarMesa_790MY : Form
+    public partial class FormSeleccionarMesa_790MY : Form, IIdiomaObserver_08YS
     {
         private readonly MesaBLL_790MY _mesaBll;
         private readonly DateTime _fecha;
@@ -25,7 +26,10 @@ namespace GUI_08YS.RF1
             _hora = hora;
             _comensales = comensales;
             _mesaBll = BLLFactory_790MY.CreateMesaBLL();
+            TraductorManager_08YS.Instance.Suscribir(this);
+            this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
+            
 
         private void FormSeleccionarMesa_790MY_Load(object sender, EventArgs e)
         {
@@ -105,5 +109,23 @@ namespace GUI_08YS.RF1
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
+
+        #region i18n
+        public void UpdateIdioma()
+        {
+            AplicarTraducciones(this);
+        }
+
+        private void AplicarTraducciones(Control contenedor)
+        {
+            foreach (Control c in contenedor.Controls)
+            {
+                if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
+                    c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+                if (c.HasChildren)
+                    AplicarTraducciones(c);
+            }
+        }
+        #endregion
     }
 }

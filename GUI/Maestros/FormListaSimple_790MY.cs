@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Service_08YS;
 
-namespace GUI_08YS.RF1
+namespace GUI_08YS.Maestros
 {
     /// <summary>
     /// Dialogo generico para agregar/quitar valores de texto sueltos (emails o
     /// telefonos adicionales de un Cliente, por ahora). No conoce nada de Cliente
     /// ni de negocio: solo edita una lista de strings y la devuelve.
     /// </summary>
-    public partial class FormListaSimple_790MY : Form
+    public partial class FormListaSimple_790MY : Form, IIdiomaObserver_08YS
     {
         public List<string> Valores { get; private set; }
 
@@ -19,6 +20,8 @@ namespace GUI_08YS.RF1
             InitializeComponent();
 
             this.Text = titulo;
+            TraductorManager_08YS.Instance.Suscribir(this);
+            this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
             lblTitulo_790MY.Text = titulo;
 
             foreach (var valor in valoresIniciales ?? Enumerable.Empty<string>())
@@ -68,5 +71,23 @@ namespace GUI_08YS.RF1
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
+
+        #region i18n
+        public void UpdateIdioma()
+        {
+            AplicarTraducciones(this);
+        }
+
+        private void AplicarTraducciones(Control contenedor)
+        {
+            foreach (Control c in contenedor.Controls)
+            {
+                if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
+                    c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+                if (c.HasChildren)
+                    AplicarTraducciones(c);
+            }
+        }
+        #endregion
     }
 }
