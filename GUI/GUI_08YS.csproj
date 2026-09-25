@@ -101,16 +101,22 @@
     <Compile Include="Maestros\FormListaSimple_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Maestros\FormListaSimple_790MY.Designer.cs" />
+    <Compile Include="Maestros\FormListaSimple_790MY.Designer.cs">
+      <DependentUpon>FormListaSimple_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="Maestros\FormMesas_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Maestros\FormMesas_790MY.Designer.cs" />
+    <Compile Include="Maestros\FormMesas_790MY.Designer.cs">
+      <DependentUpon>FormMesas_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="PermissionFilter_08YS.cs" />
     <Compile Include="RF1\FormGestionReservas_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RF1\FormGestionReservas_790MY.Designer.cs" />
+    <Compile Include="RF1\FormGestionReservas_790MY.Designer.cs">
+      <DependentUpon>FormGestionReservas_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="RF1\FormRegistrarReserva_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -193,6 +199,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Admin\FormGestionRespaldos_08YS.resx">
       <DependentUpon>FormGestionRespaldos_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RF1\FormSeleccionarMesa_790MY.resx">
+      <DependentUpon>FormSeleccionarMesa_790MY.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Usuario\FormCambiarContraseña_08YS.resx">
       <DependentUpon>FormCambiarContraseña_08YS.cs</DependentUpon>

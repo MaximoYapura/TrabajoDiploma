@@ -213,7 +213,12 @@ namespace GUI_08YS.Maestros
             colCapacidad_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colCapacidad");
             colEstado_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colEstado");
             this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
-           
+            string titulo = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
+            this.Text = titulo;
+
+          
+
+            this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
 
         }
 

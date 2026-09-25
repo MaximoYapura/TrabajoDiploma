@@ -28,6 +28,8 @@ namespace GUI_08YS.RF1
             _mesaBll = BLLFactory_790MY.CreateMesaBLL();
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
+
+            UpdateIdioma();
         }
 
         private void FormSeleccionarMesa_790MY_Load(object sender, EventArgs e)
@@ -115,14 +117,25 @@ namespace GUI_08YS.RF1
         #region i18n
         public void UpdateIdioma()
         {
+            // Traduce automáticamente todos los controles que tengan su Tag configurado (incluyendo lblTituloSeleccionarMesa_790MY)
             TraducirControles(this);
 
+            // Traduce el título de la ventana principal
+            string textoTraducido = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
+            if (!string.IsNullOrEmpty(textoTraducido))
+            {
+                this.Text = textoTraducido;
+                if (lblTituloSeleccionarMesa_790MY != null)
+                {
+                    lblTituloSeleccionarMesa_790MY.Text = textoTraducido;
+                }
+            }
             // Preservar la mesa seleccionada antes de regenerar las tarjetas
             int? nroMesaAnterior = MesaSeleccionada?.NroMesa;
 
             // Regenerar las tarjetas para que sus etiquetas reflejen el nuevo idioma
             CargarMesasDisponibles();
-
+            lblTituloSeleccionarMesa_790MY.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
             // Restaurar la selección previa si la había
             if (nroMesaAnterior.HasValue)
             {
