@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.RF1
+namespace GUI_08YS.RF1
 {
     partial class FormRegistrarReserva_790MY
     {
@@ -43,6 +43,7 @@
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
             this.lblTitulo_790MY.Size = new System.Drawing.Size(180, 25);
             this.lblTitulo_790MY.Text = "Registrar Reserva";
+            this.lblTitulo_790MY.Tag = "RR_titulo";
             //
             // lblDniCliente_790MY
             //
@@ -52,6 +53,7 @@
             this.lblDniCliente_790MY.Name = "lblDniCliente_790MY";
             this.lblDniCliente_790MY.Size = new System.Drawing.Size(70, 15);
             this.lblDniCliente_790MY.Text = "DNI Cliente:";
+            this.lblDniCliente_790MY.Tag = "RR_lblDniCliente";
             //
             // txtDniCliente_790MY
             //
@@ -65,6 +67,7 @@
             this.btnBuscarCliente_790MY.Name = "btnBuscarCliente_790MY";
             this.btnBuscarCliente_790MY.Size = new System.Drawing.Size(80, 25);
             this.btnBuscarCliente_790MY.Text = "Buscar";
+            this.btnBuscarCliente_790MY.Tag = "btnBuscar";
             this.btnBuscarCliente_790MY.UseVisualStyleBackColor = true;
             this.btnBuscarCliente_790MY.Click += new System.EventHandler(this.btnBuscarCliente_790MY_Click);
             //
@@ -84,6 +87,7 @@
             this.lblFecha_790MY.Name = "lblFecha_790MY";
             this.lblFecha_790MY.Size = new System.Drawing.Size(40, 15);
             this.lblFecha_790MY.Text = "Fecha:";
+            this.lblFecha_790MY.Tag = "RR_lblFecha";
             //
             // dtpFecha_790MY
             //
@@ -101,6 +105,7 @@
             this.lblHora_790MY.Name = "lblHora_790MY";
             this.lblHora_790MY.Size = new System.Drawing.Size(60, 15);
             this.lblHora_790MY.Text = "Turno:";
+            this.lblHora_790MY.Tag = "RR_lblHora";
             //
             // cmbHora_790MY
             //
@@ -118,6 +123,7 @@
             this.lblComensales_790MY.Name = "lblComensales_790MY";
             this.lblComensales_790MY.Size = new System.Drawing.Size(90, 15);
             this.lblComensales_790MY.Text = "Comensales:";
+            this.lblComensales_790MY.Tag = "RR_lblComensales";
             //
             // nudComensales_790MY
             //
@@ -132,6 +138,7 @@
             this.btnSeleccionarMesa_790MY.Name = "btnSeleccionarMesa_790MY";
             this.btnSeleccionarMesa_790MY.Size = new System.Drawing.Size(140, 28);
             this.btnSeleccionarMesa_790MY.Text = "Seleccionar Mesa";
+            this.btnSeleccionarMesa_790MY.Tag = "RR_btnSeleccionarMesa";
             this.btnSeleccionarMesa_790MY.UseVisualStyleBackColor = true;
             this.btnSeleccionarMesa_790MY.Click += new System.EventHandler(this.btnSeleccionarMesa_790MY_Click);
             //
@@ -144,6 +151,7 @@
             this.lblMesaSeleccionada_790MY.Name = "lblMesaSeleccionada_790MY";
             this.lblMesaSeleccionada_790MY.Size = new System.Drawing.Size(110, 15);
             this.lblMesaSeleccionada_790MY.Text = "(sin seleccionar)";
+            this.lblMesaSeleccionada_790MY.Tag = "RR_lblMesaSinSeleccionar";
             //
             // btnConfirmar_790MY
             //
@@ -151,6 +159,7 @@
             this.btnConfirmar_790MY.Name = "btnConfirmar_790MY";
             this.btnConfirmar_790MY.Size = new System.Drawing.Size(140, 32);
             this.btnConfirmar_790MY.Text = "Confirmar Reserva";
+            this.btnConfirmar_790MY.Tag = "RR_btnConfirmar";
             this.btnConfirmar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnConfirmar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnConfirmar_790MY.ForeColor = System.Drawing.Color.White;

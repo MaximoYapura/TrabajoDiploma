@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.RF1
+namespace GUI_08YS.RF1
 {
     partial class FormSeleccionarMesa_790MY
     {
@@ -33,6 +33,7 @@
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
             this.lblTitulo_790MY.Size = new System.Drawing.Size(160, 25);
             this.lblTitulo_790MY.Text = "Seleccionar Mesa";
+            this.lblTitulo_790MY.Tag = "SM_titulo";
             //
             // lblSinResultados_790MY
             //
@@ -42,6 +43,7 @@
             this.lblSinResultados_790MY.Name = "lblSinResultados_790MY";
             this.lblSinResultados_790MY.Size = new System.Drawing.Size(280, 15);
             this.lblSinResultados_790MY.Text = "No hay mesas disponibles para ese turno.";
+            this.lblSinResultados_790MY.Tag = "SM_lblSinResultados";
             this.lblSinResultados_790MY.Visible = false;
             //
             // flowLayoutMesas_790MY
@@ -60,6 +62,7 @@
             this.btnAceptar_790MY.Size = new System.Drawing.Size(90, 30);
             this.btnAceptar_790MY.TabIndex = 1;
             this.btnAceptar_790MY.Text = "Aceptar";
+            this.btnAceptar_790MY.Tag = "btn_aceptar";
             this.btnAceptar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAceptar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnAceptar_790MY.ForeColor = System.Drawing.Color.White;
@@ -73,6 +76,7 @@
             this.btnCancelar_790MY.Size = new System.Drawing.Size(90, 30);
             this.btnCancelar_790MY.TabIndex = 2;
             this.btnCancelar_790MY.Text = "Cancelar";
+            this.btnCancelar_790MY.Tag = "btn_cancelar";
             this.btnCancelar_790MY.UseVisualStyleBackColor = true;
             this.btnCancelar_790MY.Click += new System.EventHandler(this.btnCancelar_790MY_Click);
             //

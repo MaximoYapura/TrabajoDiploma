@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.Maestros
+namespace GUI_08YS.Maestros
 {
     partial class FormMesas_790MY
     {
@@ -85,6 +85,7 @@
             this.btnAnadir_790MY.Name = "btnAnadir_790MY";
             this.btnAnadir_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnAnadir_790MY.Text = "Añadir";
+            this.btnAnadir_790MY.Tag = "btnAnadir";
             this.btnAnadir_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAnadir_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnAnadir_790MY.ForeColor = System.Drawing.Color.White;
@@ -95,6 +96,7 @@
             this.btnModificar_790MY.Name = "btnModificar_790MY";
             this.btnModificar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnModificar_790MY.Text = "Modificar";
+            this.btnModificar_790MY.Tag = "btnModificar";
             this.btnModificar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnModificar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnModificar_790MY.ForeColor = System.Drawing.Color.White;
@@ -105,6 +107,7 @@
             this.btnEliminar_790MY.Name = "btnEliminar_790MY";
             this.btnEliminar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnEliminar_790MY.Text = "Eliminar";
+            this.btnEliminar_790MY.Tag = "btnEliminar";
             this.btnEliminar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEliminar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnEliminar_790MY.ForeColor = System.Drawing.Color.White;
@@ -115,6 +118,7 @@
             this.btnAplicar_790MY.Name = "btnAplicar_790MY";
             this.btnAplicar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnAplicar_790MY.Text = "Aplicar";
+            this.btnAplicar_790MY.Tag = "btnAplicar";
             this.btnAplicar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAplicar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnAplicar_790MY.ForeColor = System.Drawing.Color.White;
@@ -125,6 +129,7 @@
             this.btnCancelar_790MY.Name = "btnCancelar_790MY";
             this.btnCancelar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnCancelar_790MY.Text = "Cancelar";
+            this.btnCancelar_790MY.Tag = "btn_Cancelar";
             this.btnCancelar_790MY.UseVisualStyleBackColor = true;
             this.btnCancelar_790MY.Click += new System.EventHandler(this.btnCancelar_790MY_Click);
             //
@@ -132,6 +137,7 @@
             this.btnSalir_790MY.Name = "btnSalir_790MY";
             this.btnSalir_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnSalir_790MY.Text = "Salir";
+            this.btnSalir_790MY.Tag = "btnSalir";
             this.btnSalir_790MY.UseVisualStyleBackColor = true;
             this.btnSalir_790MY.Click += new System.EventHandler(this.btnSalir_790MY_Click);
             //
@@ -142,6 +148,7 @@
             this.lblNumero_790MY.Location = new System.Drawing.Point(20, 340);
             this.lblNumero_790MY.Name = "lblNumero_790MY";
             this.lblNumero_790MY.Text = "Número:";
+            this.lblNumero_790MY.Tag = "FM_lblNumero";
             //
             this.txtNumero_790MY.Location = new System.Drawing.Point(110, 337);
             this.txtNumero_790MY.Name = "txtNumero_790MY";
@@ -152,6 +159,7 @@
             this.lblCapacidad_790MY.Location = new System.Drawing.Point(20, 372);
             this.lblCapacidad_790MY.Name = "lblCapacidad_790MY";
             this.lblCapacidad_790MY.Text = "Capacidad:";
+            this.lblCapacidad_790MY.Tag = "FM_lblCapacidad";
             //
             this.txtCapacidad_790MY.Location = new System.Drawing.Point(110, 369);
             this.txtCapacidad_790MY.Name = "txtCapacidad_790MY";

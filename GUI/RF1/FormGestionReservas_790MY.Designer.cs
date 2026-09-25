@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.RF1
+namespace GUI_08YS.RF1
 {
     partial class FormGestionReservas_790MY
     {
@@ -49,6 +49,7 @@
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
             this.lblTitulo_790MY.Size = new System.Drawing.Size(260, 25);
             this.lblTitulo_790MY.Text = "Consultar / Cancelar Reservas";
+            this.lblTitulo_790MY.Tag = "GR_titulo";
             //
             // lblDesde_790MY
             //
@@ -57,6 +58,7 @@
             this.lblDesde_790MY.Location = new System.Drawing.Point(20, 60);
             this.lblDesde_790MY.Name = "lblDesde_790MY";
             this.lblDesde_790MY.Text = "Desde:";
+            this.lblDesde_790MY.Tag = "GR_lblDesde";
             //
             // dtpDesde_790MY
             //
@@ -73,6 +75,7 @@
             this.lblHasta_790MY.Location = new System.Drawing.Point(235, 60);
             this.lblHasta_790MY.Name = "lblHasta_790MY";
             this.lblHasta_790MY.Text = "Hasta:";
+            this.lblHasta_790MY.Tag = "GR_lblHasta";
             //
             // dtpHasta_790MY
             //
@@ -89,6 +92,7 @@
             this.lblDni_790MY.Location = new System.Drawing.Point(20, 95);
             this.lblDni_790MY.Name = "lblDni_790MY";
             this.lblDni_790MY.Text = "DNI cliente:";
+            this.lblDni_790MY.Tag = "GR_lblDni";
             //
             // txtDni_790MY
             //
@@ -103,6 +107,7 @@
             this.lblEstado_790MY.Location = new System.Drawing.Point(240, 95);
             this.lblEstado_790MY.Name = "lblEstado_790MY";
             this.lblEstado_790MY.Text = "Estado:";
+            this.lblEstado_790MY.Tag = "GR_lblEstado";
             //
             // cmbEstado_790MY
             //
@@ -117,6 +122,7 @@
             this.btnBuscar_790MY.Name = "btnBuscar_790MY";
             this.btnBuscar_790MY.Size = new System.Drawing.Size(90, 26);
             this.btnBuscar_790MY.Text = "Buscar";
+            this.btnBuscar_790MY.Tag = "btnBuscar";
             this.btnBuscar_790MY.UseVisualStyleBackColor = true;
             this.btnBuscar_790MY.Click += new System.EventHandler(this.btnBuscar_790MY_Click);
             //
@@ -218,6 +224,7 @@
             this.btnCancelarReserva_790MY.Name = "btnCancelarReserva_790MY";
             this.btnCancelarReserva_790MY.Size = new System.Drawing.Size(160, 32);
             this.btnCancelarReserva_790MY.Text = "Cancelar Reserva";
+            this.btnCancelarReserva_790MY.Tag = "GR_btnCancelarReserva";
             this.btnCancelarReserva_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelarReserva_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnCancelarReserva_790MY.ForeColor = System.Drawing.Color.White;

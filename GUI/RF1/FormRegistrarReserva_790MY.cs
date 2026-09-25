@@ -1,4 +1,4 @@
-﻿using BE_08YS;
+using BE_08YS;
 using Service_08YS;
 using BLL_08YS;
 using System;
@@ -56,14 +56,16 @@ namespace GUI_08YS.RF1
             if (_mesaSeleccionada == null) return;
 
             _mesaSeleccionada = null;
-            lblMesaSeleccionada_790MY.Text = "(sin seleccionar)";
+            lblMesaSeleccionada_790MY.Text = TraductorManager_08YS.Instance.GetTexto("RR_lblMesaSinSeleccionar");
         }
 
         private void btnBuscarCliente_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (!int.TryParse(txtDniCliente_790MY.Text.Trim(), out int dni))
             {
-                MessageBox.Show("Ingrese un DNI numérico válido.", "Dato inválido",
+                MessageBox.Show(t.GetTexto("msg_rr_dni_invalido"), t.GetTexto("titulo_dato_invalido"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -84,9 +86,8 @@ namespace GUI_08YS.RF1
                 if (_clienteBll.Exists(dni))
                 {
                     MessageBox.Show(
-                        "El cliente se encuentra dado de baja.\n" +
-                        "Debe reactivarlo desde el Maestro de Clientes para operar.",
-                        "Cliente inactivo",
+                        t.GetTexto("msg_rr_cliente_inactivo"),
+                        t.GetTexto("titulo_cliente_inactivo"),
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return;
@@ -94,8 +95,8 @@ namespace GUI_08YS.RF1
 
                 // Escenario 3: DNI no existe en absoluto — ofrecer registro rápido.
                 var respuesta = MessageBox.Show(
-                    "No existe un cliente registrado con ese DNI. ¿Desea registrarlo ahora?",
-                    "Cliente no encontrado", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    t.GetTexto("msg_rr_cliente_no_encontrado"),
+                    t.GetTexto("titulo_cliente_no_encontrado"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (respuesta != DialogResult.Yes) return;
 
@@ -110,8 +111,8 @@ namespace GUI_08YS.RF1
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ocurrió un error al buscar el cliente: {ex.Message}", "Error",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format(t.GetTexto("msg_rr_error_buscar_cliente"), ex.Message),
+                                 t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -119,14 +120,16 @@ namespace GUI_08YS.RF1
         {
             lblClienteInfo_790MY.Text = cliente != null
                 ? $"{cliente.Nombre} {cliente.Apellido}"
-                : "(no encontrado)";
+                : TraductorManager_08YS.Instance.GetTexto("RR_lblClienteNoEncontrado");
         }
 
         private void btnSeleccionarMesa_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (cmbHora_790MY.SelectedItem == null)
             {
-                MessageBox.Show("Seleccione un turno horario antes de elegir la mesa.", "Falta el turno",
+                MessageBox.Show(t.GetTexto("msg_rr_falta_turno"), t.GetTexto("titulo_falta_turno"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -139,30 +142,35 @@ namespace GUI_08YS.RF1
                 if (frmMesa.ShowDialog(this.FindForm()) == DialogResult.OK)
                 {
                     _mesaSeleccionada = frmMesa.MesaSeleccionada;
-                    lblMesaSeleccionada_790MY.Text = $"Mesa {_mesaSeleccionada.NroMesa} ({_mesaSeleccionada.Capacidad} pers.)";
+                    lblMesaSeleccionada_790MY.Text = string.Format(
+                        t.GetTexto("RR_lblMesaSeleccionada"),
+                        _mesaSeleccionada.NroMesa,
+                        _mesaSeleccionada.Capacidad);
                 }
             }
         }
 
         private void btnConfirmar_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (_clienteActual == null)
             {
-                MessageBox.Show("Busque y confirme un cliente antes de continuar.", "Falta el cliente",
+                MessageBox.Show(t.GetTexto("msg_rr_falta_cliente"), t.GetTexto("titulo_falta_cliente"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (_mesaSeleccionada == null)
             {
-                MessageBox.Show("Seleccione una mesa antes de continuar.", "Falta la mesa",
+                MessageBox.Show(t.GetTexto("msg_rr_falta_mesa"), t.GetTexto("titulo_falta_mesa_sel"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (cmbHora_790MY.SelectedItem == null)
             {
-                MessageBox.Show("Seleccione un turno horario.", "Falta el turno",
+                MessageBox.Show(t.GetTexto("msg_rr_falta_turno"), t.GetTexto("titulo_falta_turno"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -174,19 +182,20 @@ namespace GUI_08YS.RF1
             {
                 _reservaBll.RegistrarReserva(_clienteActual.DNI, _mesaSeleccionada, dtpFecha_790MY.Value, hora, comensales);
 
-                MessageBox.Show("Reserva registrada correctamente.", "Éxito",
+                MessageBox.Show(t.GetTexto("msg_rr_registrada_ok"), t.GetTexto("exito"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 LimpiarFormulario();
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, "Datos inválidos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, t.GetTexto("titulo_datos_invalidos"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ocurrió un error inesperado al registrar la reserva: {ex.Message}", "Error",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format(t.GetTexto("msg_rr_error_registrar"), ex.Message),
+                                 t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -197,7 +206,7 @@ namespace GUI_08YS.RF1
 
             txtDniCliente_790MY.Clear();
             lblClienteInfo_790MY.Text = string.Empty;
-            lblMesaSeleccionada_790MY.Text = "(sin seleccionar)";
+            lblMesaSeleccionada_790MY.Text = TraductorManager_08YS.Instance.GetTexto("RR_lblMesaSinSeleccionar");
 
             dtpFecha_790MY.Value = DateTime.Today;
             if (cmbHora_790MY.Items.Count > 0) cmbHora_790MY.SelectedIndex = -1;
@@ -209,17 +218,35 @@ namespace GUI_08YS.RF1
         #region i18n
         public void UpdateIdioma()
         {
-            AplicarTraducciones(this);
+            TraducirControles(this);
+
+            // lblMesaSeleccionada_790MY tiene Tag "RR_lblMesaSinSeleccionar" y TraducirControles
+            // ya lo tradujo al texto "sin seleccionar". Si hay una mesa elegida, restauramos
+            // el texto formateado con los datos reales.
+            if (_mesaSeleccionada != null)
+                lblMesaSeleccionada_790MY.Text = string.Format(
+                    TraductorManager_08YS.Instance.GetTexto("RR_lblMesaSeleccionada"),
+                    _mesaSeleccionada.NroMesa,
+                    _mesaSeleccionada.Capacidad);
+
+            // lblClienteInfo_790MY no tiene Tag; si hay cliente activo restauramos su nombre.
+            if (_clienteActual != null)
+                lblClienteInfo_790MY.Text = $"{_clienteActual.Nombre} {_clienteActual.Apellido}";
         }
 
-        private void AplicarTraducciones(Control contenedor)
+        private void TraducirControles(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
+                // Omitir TextBox y RichTextBox: son entradas editables por el usuario
+                if (c is TextBox || c is RichTextBox)
+                    continue;
+
                 if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
                     c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+
                 if (c.HasChildren)
-                    AplicarTraducciones(c);
+                    TraducirControles(c);
             }
         }
         #endregion

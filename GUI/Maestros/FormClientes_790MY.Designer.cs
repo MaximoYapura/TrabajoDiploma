@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.Maestros
+namespace GUI_08YS.Maestros
 {
     partial class FormClientes_790MY
     {
@@ -135,6 +135,7 @@
             this.btnAnadir_790MY.Name = "btnAnadir_790MY";
             this.btnAnadir_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnAnadir_790MY.Text = "Añadir";
+            this.btnAnadir_790MY.Tag = "btnAnadir";
             this.btnAnadir_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAnadir_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnAnadir_790MY.ForeColor = System.Drawing.Color.White;
@@ -145,6 +146,7 @@
             this.btnModificar_790MY.Name = "btnModificar_790MY";
             this.btnModificar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnModificar_790MY.Text = "Modificar";
+            this.btnModificar_790MY.Tag = "btnModificar";
             this.btnModificar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnModificar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnModificar_790MY.ForeColor = System.Drawing.Color.White;
@@ -155,6 +157,7 @@
             this.btnEliminar_790MY.Name = "btnEliminar_790MY";
             this.btnEliminar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnEliminar_790MY.Text = "Eliminar";
+            this.btnEliminar_790MY.Tag = "btnEliminar";
             this.btnEliminar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEliminar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnEliminar_790MY.ForeColor = System.Drawing.Color.White;
@@ -165,6 +168,7 @@
             this.btnAplicar_790MY.Name = "btnAplicar_790MY";
             this.btnAplicar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnAplicar_790MY.Text = "Aplicar";
+            this.btnAplicar_790MY.Tag = "btnAplicar";
             this.btnAplicar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAplicar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnAplicar_790MY.ForeColor = System.Drawing.Color.White;
@@ -175,6 +179,7 @@
             this.btnCancelar_790MY.Name = "btnCancelar_790MY";
             this.btnCancelar_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnCancelar_790MY.Text = "Cancelar";
+            this.btnCancelar_790MY.Tag = "btn_Cancelar";
             this.btnCancelar_790MY.UseVisualStyleBackColor = true;
             this.btnCancelar_790MY.Click += new System.EventHandler(this.btnCancelar_790MY_Click);
             //
@@ -182,6 +187,7 @@
             this.btnSalir_790MY.Name = "btnSalir_790MY";
             this.btnSalir_790MY.Size = new System.Drawing.Size(110, 28);
             this.btnSalir_790MY.Text = "Salir";
+            this.btnSalir_790MY.Tag = "btnSalir";
             this.btnSalir_790MY.UseVisualStyleBackColor = true;
             this.btnSalir_790MY.Click += new System.EventHandler(this.btnSalir_790MY_Click);
             //
@@ -192,6 +198,7 @@
             this.lblDni_790MY.Location = new System.Drawing.Point(20, 260);
             this.lblDni_790MY.Name = "lblDni_790MY";
             this.lblDni_790MY.Text = "DNI:";
+            this.lblDni_790MY.Tag = "FC_lblDni";
             //
             this.txtDni_790MY.Location = new System.Drawing.Point(110, 257);
             this.txtDni_790MY.Name = "txtDni_790MY";
@@ -202,6 +209,7 @@
             this.lblApellidos_790MY.Location = new System.Drawing.Point(20, 292);
             this.lblApellidos_790MY.Name = "lblApellidos_790MY";
             this.lblApellidos_790MY.Text = "Apellidos:";
+            this.lblApellidos_790MY.Tag = "FC_lblApellidos";
             //
             this.txtApellidos_790MY.Location = new System.Drawing.Point(110, 289);
             this.txtApellidos_790MY.Name = "txtApellidos_790MY";
@@ -212,6 +220,7 @@
             this.lblNombres_790MY.Location = new System.Drawing.Point(20, 324);
             this.lblNombres_790MY.Name = "lblNombres_790MY";
             this.lblNombres_790MY.Text = "Nombres:";
+            this.lblNombres_790MY.Tag = "FC_lblNombres";
             //
             this.txtNombres_790MY.Location = new System.Drawing.Point(110, 321);
             this.txtNombres_790MY.Name = "txtNombres_790MY";
@@ -222,6 +231,7 @@
             this.lblEmail_790MY.Location = new System.Drawing.Point(20, 356);
             this.lblEmail_790MY.Name = "lblEmail_790MY";
             this.lblEmail_790MY.Text = "Email:";
+            this.lblEmail_790MY.Tag = "FC_lblEmail";
             //
             this.txtEmail_790MY.Location = new System.Drawing.Point(110, 353);
             this.txtEmail_790MY.Name = "txtEmail_790MY";
@@ -239,6 +249,7 @@
             this.lblCelular_790MY.Location = new System.Drawing.Point(20, 388);
             this.lblCelular_790MY.Name = "lblCelular_790MY";
             this.lblCelular_790MY.Text = "Celular:";
+            this.lblCelular_790MY.Tag = "FC_lblCelular";
             //
             this.txtCelular_790MY.Location = new System.Drawing.Point(110, 385);
             this.txtCelular_790MY.Name = "txtCelular_790MY";
@@ -256,6 +267,7 @@
             this.lblDireccion_790MY.Location = new System.Drawing.Point(20, 420);
             this.lblDireccion_790MY.Name = "lblDireccion_790MY";
             this.lblDireccion_790MY.Text = "Dirección:";
+            this.lblDireccion_790MY.Tag = "FC_lblDireccion";
             //
             this.txtDireccion_790MY.Location = new System.Drawing.Point(110, 417);
             this.txtDireccion_790MY.Name = "txtDireccion_790MY";
@@ -279,6 +291,7 @@
             this.grpSerializacion_790MY.Size = new System.Drawing.Size(715, 235);
             this.grpSerializacion_790MY.TabStop = false;
             this.grpSerializacion_790MY.Text = "Serialización";
+            this.grpSerializacion_790MY.Tag = "FC_grpSerializacion";
             //
             // lblRutaSerializar_790MY
             //
@@ -286,6 +299,7 @@
             this.lblRutaSerializar_790MY.Location = new System.Drawing.Point(15, 28);
             this.lblRutaSerializar_790MY.Name = "lblRutaSerializar_790MY";
             this.lblRutaSerializar_790MY.Text = "Archivo a serializar:";
+            this.lblRutaSerializar_790MY.Tag = "FC_lblRutaSerializar";
             //
             this.txtRutaSerializar_790MY.Location = new System.Drawing.Point(160, 25);
             this.txtRutaSerializar_790MY.Name = "txtRutaSerializar_790MY";
@@ -305,6 +319,7 @@
             this.lblRutaDeserializar_790MY.Location = new System.Drawing.Point(15, 58);
             this.lblRutaDeserializar_790MY.Name = "lblRutaDeserializar_790MY";
             this.lblRutaDeserializar_790MY.Text = "Archivo a deserializar:";
+            this.lblRutaDeserializar_790MY.Tag = "FC_lblRutaDeserializar";
             //
             this.txtRutaDeserializar_790MY.Location = new System.Drawing.Point(160, 55);
             this.txtRutaDeserializar_790MY.Name = "txtRutaDeserializar_790MY";
@@ -324,6 +339,7 @@
             this.btnSerializar_790MY.Name = "btnSerializar_790MY";
             this.btnSerializar_790MY.Size = new System.Drawing.Size(140, 32);
             this.btnSerializar_790MY.Text = "SERIALIZAR";
+            this.btnSerializar_790MY.Tag = "FC_btnSerializar";
             this.btnSerializar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSerializar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnSerializar_790MY.ForeColor = System.Drawing.Color.White;
@@ -336,6 +352,7 @@
             this.btnDeserializar_790MY.Name = "btnDeserializar_790MY";
             this.btnDeserializar_790MY.Size = new System.Drawing.Size(140, 32);
             this.btnDeserializar_790MY.Text = "DES-SERIALIZAR";
+            this.btnDeserializar_790MY.Tag = "FC_btnDeserializar";
             this.btnDeserializar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeserializar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnDeserializar_790MY.ForeColor = System.Drawing.Color.White;
@@ -348,6 +365,7 @@
             this.btnLimpiarSerializacion_790MY.Name = "btnLimpiarSerializacion_790MY";
             this.btnLimpiarSerializacion_790MY.Size = new System.Drawing.Size(100, 32);
             this.btnLimpiarSerializacion_790MY.Text = "LIMPIAR";
+            this.btnLimpiarSerializacion_790MY.Tag = "FC_btnLimpiar";
             this.btnLimpiarSerializacion_790MY.UseVisualStyleBackColor = true;
             this.btnLimpiarSerializacion_790MY.Click += new System.EventHandler(this.btnLimpiarSerializacion_790MY_Click);
             //

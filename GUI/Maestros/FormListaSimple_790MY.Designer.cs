@@ -1,4 +1,4 @@
-﻿namespace GUI_08YS.Maestros
+namespace GUI_08YS.Maestros
 {
     partial class FormListaSimple_790MY
     {
@@ -54,6 +54,7 @@
             this.btnAgregar_790MY.Name = "btnAgregar_790MY";
             this.btnAgregar_790MY.Size = new System.Drawing.Size(75, 24);
             this.btnAgregar_790MY.Text = "Agregar";
+            this.btnAgregar_790MY.Tag = "btn_agregar";
             this.btnAgregar_790MY.UseVisualStyleBackColor = true;
             this.btnAgregar_790MY.Click += new System.EventHandler(this.btnAgregar_790MY_Click);
             //
@@ -63,6 +64,7 @@
             this.btnQuitar_790MY.Name = "btnQuitar_790MY";
             this.btnQuitar_790MY.Size = new System.Drawing.Size(90, 24);
             this.btnQuitar_790MY.Text = "Quitar";
+            this.btnQuitar_790MY.Tag = "btn_quitar";
             this.btnQuitar_790MY.UseVisualStyleBackColor = true;
             this.btnQuitar_790MY.Click += new System.EventHandler(this.btnQuitar_790MY_Click);
             //
@@ -72,6 +74,7 @@
             this.btnAceptar_790MY.Name = "btnAceptar_790MY";
             this.btnAceptar_790MY.Size = new System.Drawing.Size(75, 26);
             this.btnAceptar_790MY.Text = "Aceptar";
+            this.btnAceptar_790MY.Tag = "btn_aceptar";
             this.btnAceptar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAceptar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnAceptar_790MY.ForeColor = System.Drawing.Color.White;
@@ -84,6 +87,7 @@
             this.btnCancelar_790MY.Name = "btnCancelar_790MY";
             this.btnCancelar_790MY.Size = new System.Drawing.Size(75, 26);
             this.btnCancelar_790MY.Text = "Cancelar";
+            this.btnCancelar_790MY.Tag = "btn_cancelar";
             this.btnCancelar_790MY.UseVisualStyleBackColor = true;
             this.btnCancelar_790MY.Click += new System.EventHandler(this.btnCancelar_790MY_Click);
             //

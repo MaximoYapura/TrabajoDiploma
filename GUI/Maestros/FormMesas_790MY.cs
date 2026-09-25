@@ -1,4 +1,4 @@
-﻿using BE_08YS;
+using BE_08YS;
 using BLL_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
@@ -34,6 +34,8 @@ namespace GUI_08YS.Maestros
             _mesaBll = BLLFactory_790MY.CreateMesaBLL();
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
+            this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
+            
         }
 
         private void FormMesas_790MY_Load(object sender, EventArgs e)
@@ -113,43 +115,46 @@ namespace GUI_08YS.Maestros
             if (!(dgvMesas_790MY.CurrentRow?.DataBoundItem is Mesa_790MY seleccionada))
                 return;
 
+            var t = TraductorManager_08YS.Instance;
             var respuesta = MessageBox.Show(
-                $"¿Confirma dar de baja la mesa Nro. {seleccionada.NroMesa}? " +
-                "Esto no afecta las reservas ya registradas para esa mesa.",
-                "Confirmar baja", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                string.Format(t.GetTexto("msg_fm_confirmar_baja_mesa"), seleccionada.NroMesa),
+                t.GetTexto("titulo_confirmar_baja"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (respuesta != DialogResult.Yes) return;
 
             try
             {
                 _mesaBll.EliminarMesa(seleccionada.NroMesa);
-                MessageBox.Show("Mesa dada de baja correctamente.", "Éxito",
+                MessageBox.Show(t.GetTexto("msg_fm_baja_ok"), t.GetTexto("exito"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 CargarGrilla();
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, "No se pudo eliminar", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, t.GetTexto("no_se_puede_eliminar"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception)
             {
-                MessageBox.Show("Ocurrió un error inesperado al eliminar la mesa.", "Error",
+                MessageBox.Show(t.GetTexto("msg_fm_error_eliminar"), t.GetTexto("error"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnAplicar_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (!int.TryParse(txtNumero_790MY.Text.Trim(), out int numero))
             {
-                MessageBox.Show("El número de mesa debe ser un valor numérico.", "Dato inválido",
+                MessageBox.Show(t.GetTexto("msg_fm_nro_invalido"), t.GetTexto("titulo_dato_invalido"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (!int.TryParse(txtCapacidad_790MY.Text.Trim(), out int capacidad))
             {
-                MessageBox.Show("La capacidad debe ser un valor numérico.", "Dato inválido",
+                MessageBox.Show(t.GetTexto("msg_fm_capacidad_invalida_num"), t.GetTexto("titulo_dato_invalido"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -159,14 +164,14 @@ namespace GUI_08YS.Maestros
                 if (_modo == ModoEdicion.Alta)
                 {
                     _mesaBll.RegistrarMesa(numero, capacidad);
-                    MessageBox.Show("Mesa registrada correctamente.", "Éxito",
+                    MessageBox.Show(t.GetTexto("msg_fm_registrada_ok"), t.GetTexto("exito"),
                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else if (_modo == ModoEdicion.Modificacion)
                 {
                     var mesa = new Mesa_790MY(numero, capacidad, _estadoEdicion);
                     _mesaBll.ModificarMesa(mesa);
-                    MessageBox.Show("Mesa modificada correctamente.", "Éxito",
+                    MessageBox.Show(t.GetTexto("msg_fm_modificada_ok"), t.GetTexto("exito"),
                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
@@ -174,13 +179,15 @@ namespace GUI_08YS.Maestros
                 CargarGrilla();
                 EstablecerModo(ModoEdicion.Reposo);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                MessageBox.Show(ex.Message, "Datos inválidos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    string.Format(t.GetTexto("msg_fm_mesa_existente"), numero),
+                    t.GetTexto("titulo_datos_invalidos"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception)
             {
-                MessageBox.Show("Ocurrió un error inesperado al guardar la mesa.", "Error",
+                MessageBox.Show(t.GetTexto("msg_fm_error_guardar"), t.GetTexto("error"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -199,17 +206,30 @@ namespace GUI_08YS.Maestros
         #region i18n
         public void UpdateIdioma()
         {
-            AplicarTraducciones(this);
+            TraducirControles(this);
+
+            // Encabezados de columnas del DGV (no son Controls, deben traducirse explícitamente)
+            colNumero_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colNumero");
+            colCapacidad_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colCapacidad");
+            colEstado_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colEstado");
+            this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
+           
+
         }
 
-        private void AplicarTraducciones(Control contenedor)
+        private void TraducirControles(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
+                // Omitir TextBox y RichTextBox: son entradas editables por el usuario
+                if (c is TextBox || c is RichTextBox)
+                    continue;
+
                 if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
                     c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+
                 if (c.HasChildren)
-                    AplicarTraducciones(c);
+                    TraducirControles(c);
             }
         }
         #endregion

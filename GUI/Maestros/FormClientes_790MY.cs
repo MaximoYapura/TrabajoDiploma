@@ -1,4 +1,4 @@
-﻿using BE_08YS;
+using BE_08YS;
 using BLL_08YS;
 using BLL_08YS.Exceptions;
 using Service_08YS.Entities.Acceso;
@@ -57,11 +57,12 @@ namespace GUI_08YS.Maestros
 
         private void FormClientes_790MY_Load(object sender, EventArgs e)
         {
+            UpdateIdioma(); // Aplicar traducciones al abrir (modo normal y modal)
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
 
             if (_modoRegistroRapido)
             {
-                this.Text = "Registrar Cliente";
+                this.Text = TraductorManager_08YS.Instance.GetTexto("FC_titulo_registro_rapido");
 
                 // Este Caso de Uso (Alta Rapida, extend de Registrar Reserva) no es el
                 // Maestro: se ocultan la grilla, las acciones que no le corresponden y
@@ -184,33 +185,36 @@ namespace GUI_08YS.Maestros
             if (!(dgvClientes_790MY.CurrentRow?.DataBoundItem is Cliente_790MY seleccionado))
                 return;
 
+            var t = TraductorManager_08YS.Instance;
             var respuesta = MessageBox.Show(
-                $"¿Confirma dar de baja al cliente {seleccionado.Nombre} {seleccionado.Apellido} (DNI {seleccionado.DNI})?",
-                "Confirmar baja", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                string.Format(t.GetTexto("msg_fc_confirmar_baja"),
+                              seleccionado.Nombre, seleccionado.Apellido, seleccionado.DNI),
+                t.GetTexto("titulo_confirmar_baja"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (respuesta != DialogResult.Yes) return;
 
             try
             {
                 _clienteBll.EliminarCliente(seleccionado.DNI);
-                MessageBox.Show("Cliente dado de baja correctamente.", "Éxito",
+                MessageBox.Show(t.GetTexto("msg_fc_baja_ok"), t.GetTexto("exito"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 CargarGrilla();
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, "No se pudo eliminar", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, t.GetTexto("no_se_puede_eliminar"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception)
             {
-                MessageBox.Show("Ocurrió un error inesperado al eliminar el cliente.", "Error",
+                MessageBox.Show(t.GetTexto("msg_fc_error_eliminar"), t.GetTexto("error"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnEmailsAdicionales_790MY_Click(object sender, EventArgs e)
         {
-            using (var frm = new FormListaSimple_790MY("Emails adicionales", _emailsAdicionalesEdicion))
+            using (var frm = new FormListaSimple_790MY("LS_titulo_emails", _emailsAdicionalesEdicion))
             {
                 if (frm.ShowDialog(this) == DialogResult.OK)
                     _emailsAdicionalesEdicion = frm.Valores;
@@ -219,7 +223,7 @@ namespace GUI_08YS.Maestros
 
         private void btnTelefonosAdicionales_790MY_Click(object sender, EventArgs e)
         {
-            using (var frm = new FormListaSimple_790MY("Celulares adicionales", _telefonosAdicionalesEdicion))
+            using (var frm = new FormListaSimple_790MY("LS_titulo_celulares", _telefonosAdicionalesEdicion))
             {
                 if (frm.ShowDialog(this) == DialogResult.OK)
                     _telefonosAdicionalesEdicion = frm.Valores;
@@ -228,18 +232,56 @@ namespace GUI_08YS.Maestros
 
         private void btnAplicar_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (!int.TryParse(txtDni_790MY.Text.Trim(), out int dni))
             {
-                MessageBox.Show("El DNI debe ser un valor numérico.", "Dato inválido",
+                MessageBox.Show(t.GetTexto("msg_fc_dni_invalido"), t.GetTexto("titulo_dato_invalido"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             string apellido = txtApellidos_790MY.Text.Trim();
+            if (string.IsNullOrWhiteSpace(apellido))
+            {
+                MessageBox.Show(t.GetTexto("msg_fc_apellido_requerido"), t.GetTexto("titulo_dato_invalido"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             string nombre = txtNombres_790MY.Text.Trim();
+            if (string.IsNullOrWhiteSpace(nombre))
+            {
+                MessageBox.Show(t.GetTexto("msg_fc_nombre_requerido"), t.GetTexto("titulo_dato_invalido"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             string email = txtEmail_790MY.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(email) &&
+                !System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                MessageBox.Show(t.GetTexto("msg_fc_email_invalido"), t.GetTexto("titulo_dato_invalido"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             string celular = txtCelular_790MY.Text.Trim();
-            string direccion = string.IsNullOrWhiteSpace(txtDireccion_790MY.Text) ? null : txtDireccion_790MY.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(celular) &&
+                !System.Text.RegularExpressions.Regex.IsMatch(celular, @"^\d+$"))
+            {
+                MessageBox.Show(t.GetTexto("msg_fc_celular_solo_numeros"), t.GetTexto("titulo_dato_invalido"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string direccion = txtDireccion_790MY.Text.Trim();
+            if (string.IsNullOrWhiteSpace(direccion))
+            {
+                MessageBox.Show(t.GetTexto("msg_fc_direccion_requerida"), t.GetTexto("titulo_dato_invalido"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             try
             {
@@ -260,7 +302,7 @@ namespace GUI_08YS.Maestros
                         return;
                     }
 
-                    MessageBox.Show("Cliente registrado correctamente.", "Éxito",
+                    MessageBox.Show(t.GetTexto("msg_fc_registrado_ok"), t.GetTexto("exito"),
                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else if (_modo == ModoEdicion.Modificacion)
@@ -273,7 +315,7 @@ namespace GUI_08YS.Maestros
 
                     _clienteBll.ActualizarCliente(cliente);
 
-                    MessageBox.Show("Cliente modificado correctamente.", "Éxito",
+                    MessageBox.Show(t.GetTexto("msg_fc_modificado_ok"), t.GetTexto("exito"),
                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
@@ -281,17 +323,19 @@ namespace GUI_08YS.Maestros
                 CargarGrilla();
                 EstablecerModo(ModoEdicion.Reposo);
             }
-            catch (ClienteDniDuplicadoException_790MY ex)
+            catch (ClienteDniDuplicadoException_790MY)
             {
-                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(t.GetTexto("msg_dni_duplicado_cliente"), t.GetTexto("titulo_operacion_no_permitida"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                MessageBox.Show(ex.Message, "Datos inválidos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(t.GetTexto("msg_fc_error_validacion_bll"), t.GetTexto("titulo_datos_invalidos"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception)
             {
-                MessageBox.Show("Ocurrió un error inesperado al guardar el cliente.", "Error",
+                MessageBox.Show(t.GetTexto("msg_fc_error_guardar"), t.GetTexto("error"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -336,9 +380,11 @@ namespace GUI_08YS.Maestros
 
         private void btnSerializar_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (string.IsNullOrWhiteSpace(txtRutaSerializar_790MY.Text))
             {
-                MessageBox.Show("Elegí primero un archivo de destino con el botón de carpeta.", "Falta la ruta",
+                MessageBox.Show(t.GetTexto("msg_fc_falta_ruta_serializar"), t.GetTexto("titulo_falta_ruta"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -362,21 +408,25 @@ namespace GUI_08YS.Maestros
                     serializer.Serialize(writer, aSerializar);
                 }
 
-                MessageBox.Show($"Se serializaron {aSerializar.Count} cliente(s) correctamente.", "Éxito",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    string.Format(t.GetTexto("msg_fc_serializacion_ok"), aSerializar.Count),
+                    t.GetTexto("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ocurrió un error al serializar: {ex.Message}", "Error",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    string.Format(t.GetTexto("msg_fc_error_serializar"), ex.Message),
+                    t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnDeserializar_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+
             if (string.IsNullOrWhiteSpace(txtRutaDeserializar_790MY.Text))
             {
-                MessageBox.Show("Elegí primero un archivo XML con el botón de carpeta.", "Falta la ruta",
+                MessageBox.Show(t.GetTexto("msg_fc_falta_ruta_deserializar"), t.GetTexto("titulo_falta_ruta"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -395,7 +445,7 @@ namespace GUI_08YS.Maestros
 
                 if (resultado == null || resultado.Count == 0)
                 {
-                    lstDeserializados_790MY.Items.Add("(el archivo no contiene clientes)");
+                    lstDeserializados_790MY.Items.Add(TraductorManager_08YS.Instance.GetTexto("msg_fc_archivo_sin_clientes"));
                     return;
                 }
 
@@ -407,8 +457,9 @@ namespace GUI_08YS.Maestros
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ocurrió un error al deserializar: {ex.Message}", "Error",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    string.Format(t.GetTexto("msg_fc_error_deserializar"), ex.Message),
+                    t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -424,17 +475,34 @@ namespace GUI_08YS.Maestros
         #region i18n
         public void UpdateIdioma()
         {
-            AplicarTraducciones(this);
+            TraducirControles(this);
+
+            // Título dinámico en modo registro rápido
+            if (_modoRegistroRapido)
+                this.Text = TraductorManager_08YS.Instance.GetTexto("FC_titulo_registro_rapido");
+
+            // Encabezados de columnas del DGV (no son Controls, deben traducirse explícitamente)
+            colDni_790MY.HeaderText       = TraductorManager_08YS.Instance.GetTexto("FC_colDni");
+            colApellidos_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colApellidos");
+            colNombres_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("FC_colNombres");
+            colEmail_790MY.HeaderText     = TraductorManager_08YS.Instance.GetTexto("FC_colEmail");
+            colCelular_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("FC_colCelular");
+            colDireccion_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDireccion");
         }
 
-        private void AplicarTraducciones(Control contenedor)
+        private void TraducirControles(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
+                // Omitir TextBox y RichTextBox: son entradas editables por el usuario
+                if (c is TextBox || c is RichTextBox)
+                    continue;
+
                 if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
                     c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+
                 if (c.HasChildren)
-                    AplicarTraducciones(c);
+                    TraducirControles(c);
             }
         }
         #endregion

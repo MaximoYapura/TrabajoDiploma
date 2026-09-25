@@ -1,4 +1,4 @@
-﻿using BE_08YS;
+using BE_08YS;
 using BLL_08YS;
 using CustomControls;
 using System;
@@ -29,7 +29,6 @@ namespace GUI_08YS.RF1
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
-            
 
         private void FormSeleccionarMesa_790MY_Load(object sender, EventArgs e)
         {
@@ -64,7 +63,9 @@ namespace GUI_08YS.RF1
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, "Datos inválidos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                var t = TraductorManager_08YS.Instance;
+                MessageBox.Show(ex.Message, t.GetTexto("titulo_datos_invalidos"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -94,7 +95,8 @@ namespace GUI_08YS.RF1
         {
             if (MesaSeleccionada == null)
             {
-                MessageBox.Show("Seleccioná una mesa antes de continuar.", "Falta seleccionar",
+                var t = TraductorManager_08YS.Instance;
+                MessageBox.Show(t.GetTexto("msg_sm_falta_seleccion"), t.GetTexto("titulo_falta_seleccionar"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -113,17 +115,44 @@ namespace GUI_08YS.RF1
         #region i18n
         public void UpdateIdioma()
         {
-            AplicarTraducciones(this);
+            TraducirControles(this);
+
+            // Preservar la mesa seleccionada antes de regenerar las tarjetas
+            int? nroMesaAnterior = MesaSeleccionada?.NroMesa;
+
+            // Regenerar las tarjetas para que sus etiquetas reflejen el nuevo idioma
+            CargarMesasDisponibles();
+
+            // Restaurar la selección previa si la había
+            if (nroMesaAnterior.HasValue)
+            {
+                foreach (Control c in flowLayoutMesas_790MY.Controls)
+                {
+                    if (c is UserControlMesa_790MY tarjeta && tarjeta.Mesa?.NroMesa == nroMesaAnterior.Value)
+                    {
+                        tarjeta.Seleccionada = true;
+                        _tarjetaSeleccionada = tarjeta;
+                        MesaSeleccionada = tarjeta.Mesa;
+                        btnAceptar_790MY.Enabled = true;
+                        break;
+                    }
+                }
+            }
         }
 
-        private void AplicarTraducciones(Control contenedor)
+        private void TraducirControles(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
+                // Omitir TextBox y RichTextBox: son entradas editables por el usuario
+                if (c is TextBox || c is RichTextBox)
+                    continue;
+
                 if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
                     c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
+
                 if (c.HasChildren)
-                    AplicarTraducciones(c);
+                    TraducirControles(c);
             }
         }
         #endregion

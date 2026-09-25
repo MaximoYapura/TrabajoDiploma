@@ -1,4 +1,5 @@
-﻿using BE_08YS;
+using BE_08YS;
+using Service_08YS;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -111,8 +112,11 @@ namespace CustomControls
                 }
             }
 
+            // Las etiquetas se obtienen del sistema i18n para que reflejen el idioma activo.
             string texto = _mesa != null
-                ? $"Mesa {_mesa.NroMesa}\n{_mesa.Capacidad} pers."
+                ? string.Format(TraductorManager_08YS.Instance.GetTexto("UC_mesa_lblMesa"), _mesa.NroMesa)
+                  + "\n" +
+                  string.Format(TraductorManager_08YS.Instance.GetTexto("UC_mesa_lblPersonas"), _mesa.Capacidad)
                 : string.Empty;
 
             var flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak;
