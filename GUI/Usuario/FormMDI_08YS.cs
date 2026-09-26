@@ -4,6 +4,7 @@ using GUI;
 using GUI_08YS.Admin;
 using GUI_08YS.RF1;
 using GUI_08YS.Maestros;
+using GUI_08YS.Reportes;
 using GUI_08YS.Properties;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
@@ -44,6 +45,12 @@ namespace GUI_08YS
             {
                 { nameof(registrarReservaToolStripMenuItem),  Permisos.RegistrarReserva },
                 { nameof(consultarReservasToolStripMenuItem), Permisos.VerReservas      },
+            };
+
+        private static readonly Dictionary<string, Permisos> _mapaMenuReportes =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(reporteReservasToolStripMenuItem), Permisos.VerReservas },
             };
 
         public event Action CerrarSesion;
@@ -117,6 +124,11 @@ namespace GUI_08YS
                                || SessionManager_08YS.Instance.HasPermission(Permisos.VerReservas);
 
             PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
+
+            // Reportes: visible si tiene permiso de ver reservas
+            btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReservas);
+
+            PermissionFilter_08YS.AplicarMenuStrip(ReportesDropDownMenu, _mapaMenuReportes);
         }
 
         #region idioma
@@ -132,6 +144,9 @@ namespace GUI_08YS
 
             if (ReservasDropDownMenu != null)
                 TraducirMenuFlotanteCustom(ReservasDropDownMenu);
+
+            if (ReportesDropDownMenu != null)
+                TraducirMenuFlotanteCustom(ReportesDropDownMenu);
 
             if (PerfilDropDownMenu != null)
                 TraducirMenuFlotanteCustom(PerfilDropDownMenu);
@@ -194,6 +209,7 @@ namespace GUI_08YS
             AdministrativoDropDownMenu.IsMainMenu = true;
             MaestrosDropDownMenu.IsMainMenu = true;
             ReservasDropDownMenu.IsMainMenu = true;
+            ReportesDropDownMenu.IsMainMenu = true;
             PerfilDropDownMenu.IsMainMenu = true;
         }
 
@@ -353,6 +369,19 @@ namespace GUI_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
             OpenChildForm(new FormGestionReservas_790MY());
+        }
+        #endregion
+
+        #region Reportes
+        private void btnReportes_790MY_Click(object sender, EventArgs e)
+        {
+            ReportesDropDownMenu.Show(btnReportes_790MY, btnReportes_790MY.Width, 0);
+        }
+
+        private void reporteReservasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
+            OpenChildForm(new FormReporteReservas_790MY());
         }
         #endregion
 

@@ -39,8 +39,14 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.9.0.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="FontAwesome.Sharp, Version=6.6.0.0, Culture=neutral, PublicKeyToken=d16d1e4e568ec10f, processorArchitecture=MSIL">
       <HintPath>..\packages\FontAwesome.Sharp.6.6.0\lib\net48\FontAwesome.Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp">
+      <HintPath>..\packages\iTextSharp.5.5.13.3\lib\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -111,6 +117,12 @@
       <DependentUpon>FormMesas_790MY.cs</DependentUpon>
     </Compile>
     <Compile Include="PermissionFilter_08YS.cs" />
+    <Compile Include="Reportes\FormReporteReservas_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reportes\FormReporteReservas_790MY.Designer.cs">
+      <DependentUpon>FormReporteReservas_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="RF1\FormGestionReservas_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -199,6 +211,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Admin\FormGestionRespaldos_08YS.resx">
       <DependentUpon>FormGestionRespaldos_08YS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\FormReporteReservas_790MY.resx">
+      <DependentUpon>FormReporteReservas_790MY.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RF1\FormSeleccionarMesa_790MY.resx">
       <DependentUpon>FormSeleccionarMesa_790MY.cs</DependentUpon>

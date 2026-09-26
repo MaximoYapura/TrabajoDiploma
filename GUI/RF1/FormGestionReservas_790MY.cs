@@ -112,6 +112,20 @@ namespace GUI_08YS.RF1
             btnCancelarReserva_790MY.Enabled = puedeCancelar;
         }
 
+        private void btnLimpiar_790MY_Click(object sender, EventArgs e)
+        {
+            LimpiarFiltros();
+        }
+
+        private void LimpiarFiltros()
+        {
+            dtpDesde_790MY.Checked       = false;
+            dtpHasta_790MY.Checked       = false;
+            txtDni_790MY.Text            = string.Empty;
+            cmbEstado_790MY.SelectedIndex = 0;
+            BuscarReservas();
+        }
+
         private void btnCancelarReserva_790MY_Click(object sender, EventArgs e)
         {
             if (!(dgvReservas_790MY.CurrentRow?.DataBoundItem is Reserva_790MY seleccionada))

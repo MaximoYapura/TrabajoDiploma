@@ -55,6 +55,9 @@
             this.ReservasDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.registrarReservaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.consultarReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reporteReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnReportes_790MY = new FontAwesome.Sharp.IconButton();
+            this.ReportesDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,6 +73,7 @@
             this.AdministrativoDropDownMenu.SuspendLayout();
             this.MaestrosDropDownMenu.SuspendLayout();
             this.ReservasDropDownMenu.SuspendLayout();
+            this.ReportesDropDownMenu.SuspendLayout();
             this.PerfilDropDownMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -245,6 +249,7 @@
             this.flowLayoutPanel1.Controls.Add(this.btnAdministrativo);
             this.flowLayoutPanel1.Controls.Add(this.btnMaestros);
             this.flowLayoutPanel1.Controls.Add(this.btnReservar);
+            this.flowLayoutPanel1.Controls.Add(this.btnReportes_790MY);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 57);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
@@ -341,13 +346,37 @@
             this.btnReservar.Padding = new System.Windows.Forms.Padding(4, 0, 15, 0);
             this.btnReservar.Size = new System.Drawing.Size(244, 49);
             this.btnReservar.TabIndex = 5;
-            this.btnReservar.Tag = "btnReservar";
+            this.btnReservar.Tag = "btnReservas";
             this.btnReservar.Text = "Reservar";
             this.btnReservar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnReservar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnReservar.UseVisualStyleBackColor = true;
             this.btnReservar.Click += new System.EventHandler(this.btnReservar_Click);
-            // 
+            //
+            // btnReportes_790MY
+            //
+            this.btnReportes_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnReportes_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReportes_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnReportes_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            this.btnReportes_790MY.IconChar = FontAwesome.Sharp.IconChar.ChartBar;
+            this.btnReportes_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            this.btnReportes_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.btnReportes_790MY.IconSize = 30;
+            this.btnReportes_790MY.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnReportes_790MY.Location = new System.Drawing.Point(2, 214);
+            this.btnReportes_790MY.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnReportes_790MY.Name = "btnReportes_790MY";
+            this.btnReportes_790MY.Padding = new System.Windows.Forms.Padding(4, 0, 15, 0);
+            this.btnReportes_790MY.Size = new System.Drawing.Size(244, 49);
+            this.btnReportes_790MY.TabIndex = 8;
+            this.btnReportes_790MY.Tag = "menuReportes";
+            this.btnReportes_790MY.Text = "Reportes";
+            this.btnReportes_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnReportes_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnReportes_790MY.UseVisualStyleBackColor = true;
+            this.btnReportes_790MY.Click += new System.EventHandler(this.btnReportes_790MY_Click);
+            //
             // panel3
             // 
             this.panel3.Controls.Add(this.btnCerrarSesion);
@@ -561,7 +590,27 @@
             this.consultarReservasToolStripMenuItem.Tag = "menuConsultarReservas";
             this.consultarReservasToolStripMenuItem.Text = "Consultar / Cancelar Reservas";
             this.consultarReservasToolStripMenuItem.Click += new System.EventHandler(this.consultarReservasToolStripMenuItem_Click);
-            // 
+            //
+            // ReportesDropDownMenu
+            //
+            this.ReportesDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.ReportesDropDownMenu.IsMainMenu = false;
+            this.ReportesDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reporteReservasToolStripMenuItem});
+            this.ReportesDropDownMenu.MenuItemHeight = 25;
+            this.ReportesDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
+            this.ReportesDropDownMenu.Name = "dropdownMenuStrip_08YS_Reportes";
+            this.ReportesDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
+            this.ReportesDropDownMenu.Size = new System.Drawing.Size(231, 26);
+            //
+            // reporteReservasToolStripMenuItem
+            //
+            this.reporteReservasToolStripMenuItem.Name = "reporteReservasToolStripMenuItem";
+            this.reporteReservasToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.reporteReservasToolStripMenuItem.Tag = "menuReporteReservas";
+            this.reporteReservasToolStripMenuItem.Text = "Reporte de Reservas";
+            this.reporteReservasToolStripMenuItem.Click += new System.EventHandler(this.reporteReservasToolStripMenuItem_Click);
+            //
             // PerfilDropDownMenu
             // 
             this.PerfilDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -628,6 +677,7 @@
             this.AdministrativoDropDownMenu.ResumeLayout(false);
             this.MaestrosDropDownMenu.ResumeLayout(false);
             this.ReservasDropDownMenu.ResumeLayout(false);
+            this.ReportesDropDownMenu.ResumeLayout(false);
             this.PerfilDropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -675,5 +725,8 @@
         private DropdownMenuStrip_08YS ReservasDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem registrarReservaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem consultarReservasToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reporteReservasToolStripMenuItem;
+        private FontAwesome.Sharp.IconButton btnReportes_790MY;
+        private DropdownMenuStrip_08YS ReportesDropDownMenu;
     }
 }
