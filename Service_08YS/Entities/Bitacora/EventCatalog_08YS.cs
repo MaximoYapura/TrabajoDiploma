@@ -46,7 +46,9 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.MesaModificada,         new EventoMetadata_08YS(Modulo.Mesas,    Criticidad.Medio) },
                 { Evento.MesaEliminada,          new EventoMetadata_08YS(Modulo.Mesas,    Criticidad.Alto)  },
                 { Evento.ReservaCancelada,       new EventoMetadata_08YS(Modulo.Reservas, Criticidad.Medio) },
-                { Evento.ReservaRegistrada,      new EventoMetadata_08YS(Modulo.Reservas, Criticidad.Medio) }
+                { Evento.ReservaRegistrada,      new EventoMetadata_08YS(Modulo.Reservas, Criticidad.Medio) },
+                { Evento.MesaEstadoActualizado,  new EventoMetadata_08YS(Modulo.Mesas,    Criticidad.Medio) },
+                { Evento.RecalculoDVFallido,     new EventoMetadata_08YS(Modulo.Sistema,  Criticidad.Critico) }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];

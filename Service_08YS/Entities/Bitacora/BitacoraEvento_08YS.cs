@@ -21,7 +21,8 @@ namespace Service_08YS.Entities.Bitacora
         Perfiles,
         Clientes,
         Mesas,
-        Reservas
+        Reservas,
+        Sistema
     }
 
     public enum Evento
@@ -49,7 +50,9 @@ namespace Service_08YS.Entities.Bitacora
         MesaModificada = 24,
         MesaEliminada = 25,
         ReservaCancelada = 26,
-        ReservaRegistrada = 27
+        ReservaRegistrada = 27,
+        RecalculoDVFallido = 28,
+        MesaEstadoActualizado = 29
     }
 
     public class BitacoraEvento_08YS

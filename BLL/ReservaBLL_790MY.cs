@@ -6,6 +6,7 @@ using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Bitacora;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BLL_08YS
 {
@@ -13,12 +14,15 @@ namespace BLL_08YS
     {
         private readonly IReservaRepository_790MY _reservaRepository;
         private readonly IClienteRepository_790MY _clienteRepository;
+        private readonly IMesaRepository_790MY _mesaRepository;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository, BitacoraBLL_08YS bitacoraBll)
+        public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository,
+                                IMesaRepository_790MY mesaRepository, BitacoraBLL_08YS bitacoraBll)
         {
             _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
             _clienteRepository = clienteRepository ?? throw new ArgumentNullException(nameof(clienteRepository));
+            _mesaRepository = mesaRepository ?? throw new ArgumentNullException(nameof(mesaRepository));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -45,6 +49,19 @@ namespace BLL_08YS
                 throw new ArgumentException("La fecha y hora de la reserva deben ser posteriores al momento actual.");
 
             var reserva = new Reserva_790MY(clienteDni, mesa.NroMesa, fecha.Date, hora, comensales, EstadoReserva_790MY.Confirmada);
+
+            // Re-validacion de disponibilidad inmediatamente antes de persistir: la mesa
+            // se eligio en FormSeleccionarMesa_790MY, pero entre esa consulta y este punto
+            // otro puesto de recepcion pudo haber confirmado una reserva para la misma
+            // mesa, fecha y turno. Se consulta el repositorio directamente (y no MesaBLL)
+            // para no exigir el permiso VerMesas a quien solo tiene RegistrarReserva.
+            bool sigueDisponible = _mesaRepository
+                .GetDisponibles(fecha.Date, hora, comensales)
+                .Any(m => m.NroMesa == mesa.NroMesa);
+
+            if (!sigueDisponible)
+                throw new ArgumentException(
+                    $"La mesa {mesa.NroMesa} acaba de ser ocupada por otro usuario para ese turno. Seleccione otra mesa.");
 
             _reservaRepository.Add(reserva);
 

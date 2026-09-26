@@ -1,6 +1,7 @@
 using DAL_08YS.Interfaces_Repositories;
 using Service_08YS;
 using Service_08YS.Entities;
+using Service_08YS.Entities.Bitacora;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,8 +19,40 @@ namespace BLL_08YS
 
         public static void Recalcular()
         {
-            try { _bll?.Recalcular(); }
-            catch { }
+            try
+            {
+                _bll?.Recalcular();
+            }
+            catch (Exception ex)
+            {
+                // No se relanza: Recalcular() se invoca DESPUES de que la operacion de
+                // negocio ya fue persistida. Relanzar haria que la GUI informe un error
+                // sobre un dato que si se guardo (y el usuario podria reintentar y
+                // duplicarlo). En cambio se deja constancia en la bitacora con
+                // criticidad Critico: la inconsistencia de DV que se detectara en el
+                // proximo login queda explicada por este registro.
+                RegistrarFalloRecalculo(ex);
+            }
+        }
+
+        private static void RegistrarFalloRecalculo(Exception ex)
+        {
+            try
+            {
+                // TargetUsername es nvarchar(50): se registra el tipo de excepcion, truncado.
+                string detalle = $"Recalculo DV: {ex.GetType().Name}";
+                if (detalle.Length > 50) detalle = detalle.Substring(0, 50);
+
+                BLLFactory_08YS.CreateBitacoraBLL()
+                    .RegistrarEvento(Evento.RecalculoDVFallido, targetUsername: detalle);
+            }
+            catch (Exception exBitacora)
+            {
+                // Si tampoco se puede escribir la bitacora (p. ej. la base no responde),
+                // se deja traza del diagnostico en lugar de ocultarlo.
+                System.Diagnostics.Trace.TraceError(
+                    $"Fallo el recalculo de DV ({ex}) y no se pudo registrar en bitacora ({exBitacora.Message}).");
+            }
         }
 
         public static bool VerificarConsistencia()

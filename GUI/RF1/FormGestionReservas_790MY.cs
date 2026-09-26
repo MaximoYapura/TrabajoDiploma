@@ -1,6 +1,8 @@
 using BE_08YS;
 using BLL_08YS;
+using Service_08YS.Entities.Acceso;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Service_08YS;
 
@@ -9,6 +11,12 @@ namespace GUI_08YS.RF1
     public partial class FormGestionReservas_790MY : Form, IIdiomaObserver_08YS
     {
         private readonly ReservaBLL_790MY _reservaBll;
+
+        private static readonly Dictionary<string, Permisos> _mapaPermisos =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(btnCancelarReserva_790MY), Permisos.CancelarReserva },
+            };
 
         /// <summary>
         /// Wrapper para los ítems del ComboBox de estado. Permite mostrar el texto
@@ -31,6 +39,8 @@ namespace GUI_08YS.RF1
 
         private void FormGestionReservas_790MY_Load(object sender, EventArgs e)
         {
+            PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
+
             dtpDesde_790MY.Checked = false;
             dtpHasta_790MY.Checked = false;
 
@@ -148,6 +158,11 @@ namespace GUI_08YS.RF1
                 MessageBox.Show(t.GetTexto("msg_gr_cancelada_ok"), t.GetTexto("exito"),
                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 BuscarReservas();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(t.GetTexto("msg_acceso_denegado"), t.GetTexto("acceso_denegado"),
+                                 MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             catch (ArgumentException ex)
             {

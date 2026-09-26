@@ -97,6 +97,8 @@ namespace BLL_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
             _mesaRepository.UpdateEstado(nroMesa, estado);
+            DVManager_08YS.Recalcular();
+            _bitacoraBll.RegistrarEvento(Evento.MesaEstadoActualizado, targetUsername: $"Mesa {nroMesa} - {estado}");
         }
 
         private static void ValidarDatos(int numero, int capacidad)

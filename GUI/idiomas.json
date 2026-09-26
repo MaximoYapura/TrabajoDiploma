@@ -436,7 +436,9 @@
     "REP_pdf_total": "Total de registros",
     "menuReporteReservas": "Reporte de Reservas",
     "btnReservas": "Reservas",
-    "menuReportes": "Reportes"
+    "menuReportes": "Reportes",
+    "msg_dv_inconsistente": "Se ha detectado una alteración externa en la integridad de los datos (DV).",
+    "msg_acceso_denegado": "No tiene permisos para realizar esta operación."
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -874,6 +876,8 @@
     "REP_pdf_total": "Total records",
     "menuReporteReservas": "Reservations Report",
     "btnReservas": "Reservations",
-    "menuReportes": "Reports"
+    "menuReportes": "Reports",
+    "msg_dv_inconsistente": "External alteration detected in data integrity (DV).",
+    "msg_acceso_denegado": "You do not have permission to perform this operation."
   }
 }
