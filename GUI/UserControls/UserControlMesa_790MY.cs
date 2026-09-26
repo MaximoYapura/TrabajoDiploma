@@ -112,11 +112,10 @@ namespace CustomControls
                 }
             }
 
-            // Las etiquetas se obtienen del sistema i18n para que reflejen el idioma activo.
             string texto = _mesa != null
                 ? string.Format(TraductorManager_08YS.Instance.GetTexto("UC_mesa_lblMesa"), _mesa.NroMesa)
-                  + "\n" +
-                  string.Format(TraductorManager_08YS.Instance.GetTexto("UC_mesa_lblPersonas"), _mesa.Capacidad)
+                  + "\n"
+                  + string.Format(TraductorManager_08YS.Instance.GetTexto("UC_mesa_lblPersonas"), _mesa.Capacidad)
                 : string.Empty;
 
             var flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak;

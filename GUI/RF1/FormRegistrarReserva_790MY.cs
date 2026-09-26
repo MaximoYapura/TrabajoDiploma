@@ -1,7 +1,9 @@
 using BE_08YS;
 using Service_08YS;
 using BLL_08YS;
+using Service_08YS.Entities.Acceso;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using GUI_08YS.Maestros;
 namespace GUI_08YS.RF1
@@ -13,6 +15,12 @@ namespace GUI_08YS.RF1
 
         private Cliente_790MY _clienteActual;
         private Mesa_790MY _mesaSeleccionada;
+
+        private static readonly Dictionary<string, Permisos> _mapaPermisos =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(btnConfirmar_790MY), Permisos.RegistrarReserva },
+            };
 
         private class TurnoItem
         {
@@ -33,6 +41,8 @@ namespace GUI_08YS.RF1
 
         private void FormRegistrarReserva_790MY_Load(object sender, EventArgs e)
         {
+            PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
+
             dtpFecha_790MY.MinDate = DateTime.Today;
             dtpFecha_790MY.Value = DateTime.Today;
 
@@ -61,12 +71,12 @@ namespace GUI_08YS.RF1
 
         private void btnBuscarCliente_790MY_Click(object sender, EventArgs e)
         {
-            var t = TraductorManager_08YS.Instance;
-
             if (!int.TryParse(txtDniCliente_790MY.Text.Trim(), out int dni))
             {
-                MessageBox.Show(t.GetTexto("msg_rr_dni_invalido"), t.GetTexto("titulo_dato_invalido"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    TraductorManager_08YS.Instance.GetTexto("msg_rr_dni_invalido"),
+                    TraductorManager_08YS.Instance.GetTexto("titulo_dato_invalido"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -86,8 +96,8 @@ namespace GUI_08YS.RF1
                 if (_clienteBll.Exists(dni))
                 {
                     MessageBox.Show(
-                        t.GetTexto("msg_rr_cliente_inactivo"),
-                        t.GetTexto("titulo_cliente_inactivo"),
+                        TraductorManager_08YS.Instance.GetTexto("msg_rr_cliente_inactivo"),
+                        TraductorManager_08YS.Instance.GetTexto("titulo_cliente_inactivo"),
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return;
@@ -95,8 +105,9 @@ namespace GUI_08YS.RF1
 
                 // Escenario 3: DNI no existe en absoluto — ofrecer registro rápido.
                 var respuesta = MessageBox.Show(
-                    t.GetTexto("msg_rr_cliente_no_encontrado"),
-                    t.GetTexto("titulo_cliente_no_encontrado"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    TraductorManager_08YS.Instance.GetTexto("msg_rr_cliente_no_encontrado_preg"),
+                    TraductorManager_08YS.Instance.GetTexto("titulo_cliente_no_encontrado"),
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (respuesta != DialogResult.Yes) return;
 
@@ -111,8 +122,10 @@ namespace GUI_08YS.RF1
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format(t.GetTexto("msg_rr_error_buscar_cliente"), ex.Message),
-                                 t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    string.Format(TraductorManager_08YS.Instance.GetTexto("msg_rr_error_buscar_cliente"), ex.Message),
+                    TraductorManager_08YS.Instance.GetTexto("error"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -125,12 +138,12 @@ namespace GUI_08YS.RF1
 
         private void btnSeleccionarMesa_790MY_Click(object sender, EventArgs e)
         {
-            var t = TraductorManager_08YS.Instance;
-
             if (cmbHora_790MY.SelectedItem == null)
             {
-                MessageBox.Show(t.GetTexto("msg_rr_falta_turno"), t.GetTexto("titulo_falta_turno"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_turno"),
+                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_turno"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -143,35 +156,38 @@ namespace GUI_08YS.RF1
                 {
                     _mesaSeleccionada = frmMesa.MesaSeleccionada;
                     lblMesaSeleccionada_790MY.Text = string.Format(
-                        t.GetTexto("RR_lblMesaSeleccionada"),
-                        _mesaSeleccionada.NroMesa,
-                        _mesaSeleccionada.Capacidad);
+                        TraductorManager_08YS.Instance.GetTexto("RR_lblMesaSeleccionada"),
+                        _mesaSeleccionada.NroMesa, _mesaSeleccionada.Capacidad);
                 }
             }
         }
 
         private void btnConfirmar_790MY_Click(object sender, EventArgs e)
         {
-            var t = TraductorManager_08YS.Instance;
-
             if (_clienteActual == null)
             {
-                MessageBox.Show(t.GetTexto("msg_rr_falta_cliente"), t.GetTexto("titulo_falta_cliente"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_cliente"),
+                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_cliente"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (_mesaSeleccionada == null)
             {
-                MessageBox.Show(t.GetTexto("msg_rr_falta_mesa"), t.GetTexto("titulo_falta_mesa_sel"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_mesa"),
+                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_mesa_sel"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (cmbHora_790MY.SelectedItem == null)
             {
-                MessageBox.Show(t.GetTexto("msg_rr_falta_turno"), t.GetTexto("titulo_falta_turno"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_turno2"),
+                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_turno"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -182,20 +198,25 @@ namespace GUI_08YS.RF1
             {
                 _reservaBll.RegistrarReserva(_clienteActual.DNI, _mesaSeleccionada, dtpFecha_790MY.Value, hora, comensales);
 
-                MessageBox.Show(t.GetTexto("msg_rr_registrada_ok"), t.GetTexto("exito"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    TraductorManager_08YS.Instance.GetTexto("msg_reserva_registrada"),
+                    TraductorManager_08YS.Instance.GetTexto("exito"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 LimpiarFormulario();
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, t.GetTexto("titulo_datos_invalidos"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message,
+                    TraductorManager_08YS.Instance.GetTexto("titulo_datos_invalidos"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format(t.GetTexto("msg_rr_error_registrar"), ex.Message),
-                                 t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    string.Format(TraductorManager_08YS.Instance.GetTexto("msg_rr_error_registrar"), ex.Message),
+                    TraductorManager_08YS.Instance.GetTexto("error"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -218,35 +239,26 @@ namespace GUI_08YS.RF1
         #region i18n
         public void UpdateIdioma()
         {
-            TraducirControles(this);
+            AplicarTraducciones(this);
 
-            // lblMesaSeleccionada_790MY tiene Tag "RR_lblMesaSinSeleccionar" y TraducirControles
-            // ya lo tradujo al texto "sin seleccionar". Si hay una mesa elegida, restauramos
-            // el texto formateado con los datos reales.
-            if (_mesaSeleccionada != null)
-                lblMesaSeleccionada_790MY.Text = string.Format(
+            // Refrescar textos dinámicos no cubiertos por Tags: el label de mesa
+            // seleccionada puede mostrar un texto formateado o el placeholder
+            // "sin seleccionar", y ambos deben cambiar al cambiar de idioma.
+            lblMesaSeleccionada_790MY.Text = _mesaSeleccionada != null
+                ? string.Format(
                     TraductorManager_08YS.Instance.GetTexto("RR_lblMesaSeleccionada"),
-                    _mesaSeleccionada.NroMesa,
-                    _mesaSeleccionada.Capacidad);
-
-            // lblClienteInfo_790MY no tiene Tag; si hay cliente activo restauramos su nombre.
-            if (_clienteActual != null)
-                lblClienteInfo_790MY.Text = $"{_clienteActual.Nombre} {_clienteActual.Apellido}";
+                    _mesaSeleccionada.NroMesa, _mesaSeleccionada.Capacidad)
+                : TraductorManager_08YS.Instance.GetTexto("RR_lblMesaSinSeleccionar");
         }
 
-        private void TraducirControles(Control contenedor)
+        private void AplicarTraducciones(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
-                // Omitir TextBox y RichTextBox: son entradas editables por el usuario
-                if (c is TextBox || c is RichTextBox)
-                    continue;
-
                 if (c.Tag is string clave && !string.IsNullOrWhiteSpace(clave))
                     c.Text = TraductorManager_08YS.Instance.GetTexto(clave);
-
                 if (c.HasChildren)
-                    TraducirControles(c);
+                    AplicarTraducciones(c);
             }
         }
         #endregion
