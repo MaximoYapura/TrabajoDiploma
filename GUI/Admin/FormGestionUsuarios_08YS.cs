@@ -39,6 +39,41 @@ namespace GUI
         {
             TraducirControles(this);
             TraducirColumnas();
+            RefrescarMensajeModo();
+            cmbRol.Refresh();
+        }
+
+        /// <summary>
+        /// Re-aplica el mensaje de modo operativo en el idioma activo, sin cambiar el estado.
+        /// </summary>
+        private void RefrescarMensajeModo()
+        {
+            switch (_estadoActual)
+            {
+                case EstadoUI.Consulta:
+                    txtMensaje.Text = TraductorManager_08YS.Instance.GetTexto("modo_consulta_msg");
+                    break;
+                case EstadoUI.Insertando:
+                    txtMensaje.Text = TraductorManager_08YS.Instance.GetTexto("modo_insercion_msg");
+                    break;
+                case EstadoUI.Editando:
+                    txtMensaje.Text = TraductorManager_08YS.Instance.GetTexto("modo_edicion_msg");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Formatea el elemento del ComboBox de roles usando la clave "rol_&lt;Nombre&gt;" del JSON de idiomas.
+        /// Si la clave no existe, se muestra el nombre original del rol como fallback.
+        /// </summary>
+        private void CmbRol_Format(object sender, ListControlConvertEventArgs e)
+        {
+            if (e.ListItem is Rol_08YS rol)
+            {
+                string key = "rol_" + rol.Nombre;
+                string traduccion = TraductorManager_08YS.Instance.GetTexto(key);
+                e.Value = string.IsNullOrEmpty(traduccion) ? rol.Nombre : traduccion;
+            }
         }
 
         private void TraducirColumnas()
@@ -80,8 +115,10 @@ namespace GUI
         {
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
 
-            cmbRol.ValueMember = "RolID";       // La propiedad ID del objeto Rol_08YS
-            cmbRol.DisplayMember = "Nombre";    // La propiedad con el texto a mostrar en el objeto Rol_08YS
+            cmbRol.ValueMember = "RolID";            // La propiedad ID del objeto Rol_08YS
+            cmbRol.DisplayMember = "Nombre";         // La propiedad con el texto a mostrar en el objeto Rol_08YS
+            cmbRol.FormattingEnabled = true;         // Habilita el evento Format para traducción dinámica
+            cmbRol.Format += CmbRol_Format;          // Traduce cada elemento con la clave "rol_<Nombre>"
             cmbRol.DataSource = _bllRol.GetAllPlano(); // Trae los roles disponibles del sistema
             CargarGrilla();
            

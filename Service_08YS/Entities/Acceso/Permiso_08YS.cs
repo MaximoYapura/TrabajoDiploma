@@ -33,7 +33,9 @@ namespace Service_08YS.Entities.Acceso
         CrearMesa,
         VerReservas,
         CancelarReserva,
-        RegistrarReserva
+        RegistrarReserva,
+        VerMaestros,   // visibilidad del botón lateral Maestros
+        VerReportes    // visibilidad del botón lateral Reportes
     }
 
     public class Permiso_08YS : AccessComponent_08YS

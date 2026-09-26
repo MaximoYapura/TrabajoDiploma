@@ -437,8 +437,15 @@
     "menuReporteReservas": "Reporte de Reservas",
     "btnReservas": "Reservas",
     "menuReportes": "Reportes",
-    "msg_dv_inconsistente": "Se ha detectado una alteración externa en la integridad de los datos (DV).",
-    "msg_acceso_denegado": "No tiene permisos para realizar esta operación."
+    "VerMaestros": "Ver Maestros",
+    "VerReportes": "Ver Reportes",
+    "msg_dv_inconsistente": "Se ha detectado una inconsistencia de integridad en la base de datos (Dígitos Verificadores).",
+    "rol_SuperAdmin": "SuperAdmin",
+    "rol_Supervisor": "Supervisor",
+    "rol_Gestor de accesos": "Gestor de accesos",
+    "rol_Recepcionista": "Recepcionista",
+    "rol_Gerente": "Gerente",
+    "btnCancelarReserva": "Cancelar Reserva"
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -877,7 +884,14 @@
     "menuReporteReservas": "Reservations Report",
     "btnReservas": "Reservations",
     "menuReportes": "Reports",
-    "msg_dv_inconsistente": "External alteration detected in data integrity (DV).",
-    "msg_acceso_denegado": "You do not have permission to perform this operation."
+    "VerMaestros": "View Masters",
+    "VerReportes": "View Reports",
+    "msg_dv_inconsistente": "A data integrity inconsistency has been detected in the database (Verification Digits).",
+    "rol_SuperAdmin": "SuperAdmin",
+    "rol_Supervisor": "Supervisor",
+    "rol_Gestor de accesos": "Access Manager",
+    "rol_Recepcionista": "Receptionist",
+    "rol_Gerente": "Manager",
+    "btnCancelarReserva": "Cancel Reservation"
   }
 }

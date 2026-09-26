@@ -53,6 +53,17 @@ namespace GUI_08YS
                 { nameof(reporteReservasToolStripMenuItem), Permisos.VerReservas },
             };
 
+        // Perfil: Relogin solo para roles con acceso administrativo (VerUsuarios).
+        // VerBitacora implica el mismo nivel de privilegio, pero PermissionFilter mapea
+        // un ítem a un único permiso; usamos VerUsuarios como permiso representativo del
+        // perfil admin. Si tu modelo de roles separa VerBitacora de VerUsuarios, considera
+        // añadir lógica OR directa debajo del AplicarMenuStrip.
+        private static readonly Dictionary<string, Permisos> _mapaMenuPerfil =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(ReLoginToolStripMenuItem), Permisos.VerUsuarios },
+            };
+
         public event Action CerrarSesion;
         private UserBLL_08YS _userBLL;
 
@@ -114,8 +125,8 @@ namespace GUI_08YS
 
             PermissionFilter_08YS.AplicarMenuStrip(AdministrativoDropDownMenu, _mapaMenuAdmin);
 
-            btnMaestros.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerClientes)
-                               || SessionManager_08YS.Instance.HasPermission(Permisos.VerMesas);
+            // Maestros: visible si el rol tiene acceso al módulo de maestros
+            btnMaestros.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerMaestros);
 
             PermissionFilter_08YS.AplicarMenuStrip(MaestrosDropDownMenu, _mapaMenuMaestros);
 
@@ -125,16 +136,32 @@ namespace GUI_08YS
 
             PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
 
-            // Reportes: visible si tiene permiso de ver reservas
-            btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReservas);
+            // Reportes: visible si el rol tiene acceso al módulo de reportes
+            btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReportes);
 
             PermissionFilter_08YS.AplicarMenuStrip(ReportesDropDownMenu, _mapaMenuReportes);
+
+            // Perfil: aplica filtro de permisos sobre el ContextMenuStrip del Perfil.
+            // _mapaMenuPerfil mapea Relogin → VerUsuarios.
+            // Si el rol también habilita Relogin por VerBitacora (sin VerUsuarios),
+            // la línea siguiente restaura la visibilidad para ese caso.
+            PermissionFilter_08YS.AplicarMenuStrip(PerfilDropDownMenu, _mapaMenuPerfil);
+            if (SessionManager_08YS.Instance.HasPermission(Permisos.VerBitacora))
+                ReLoginToolStripMenuItem.Visible = true;
         }
 
         #region idioma
         public void UpdateIdioma()
         {
             TraducirControles(this);
+
+            // lblRolSistema no tiene Tag; traducirlo explícitamente con la clave "rol_<Nombre>"
+            var rolNombre = SessionManager_08YS.Instance.Current?.Rol?.Nombre;
+            if (!string.IsNullOrEmpty(rolNombre))
+            {
+                string rolTrad = TraductorManager_08YS.Instance.GetTexto("rol_" + rolNombre);
+                lblRolSistema.Text = string.IsNullOrEmpty(rolTrad) ? rolNombre : rolTrad;
+            }
 
             if (AdministrativoDropDownMenu != null)
                 TraducirMenuFlotanteCustom(AdministrativoDropDownMenu);

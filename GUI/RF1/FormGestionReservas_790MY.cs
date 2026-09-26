@@ -181,6 +181,9 @@ namespace GUI_08YS.RF1
         {
             TraducirControles(this);
 
+            // btnCancelarReserva_790MY no tiene Tag en el Designer; traducirlo explícitamente
+            btnCancelarReserva_790MY.Text = TraductorManager_08YS.Instance.GetTexto("btnCancelarReserva");
+
             // Refrescar el ComboBox de estado con los nuevos textos traducidos
             CargarEstados();
 
