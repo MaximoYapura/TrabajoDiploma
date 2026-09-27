@@ -21,7 +21,7 @@ namespace BLL_08YS
         // tiene permisos de escritura en rutas del disco del sistema.
         // Documents o rutas de usuario pueden no tener esos permisos.
         public static string CarpetaDefault
-            => @"C:\HorizonHotel\Backups";
+            => @"C:\ElFogonDelSur\Backups";
 
         public BackupBLL_08YS(IBackupRepository_08YS repo) => _repo = repo;
 

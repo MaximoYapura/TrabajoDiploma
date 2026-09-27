@@ -56,7 +56,7 @@ namespace GUI_08YS
                 {
                     var img = System.Drawing.Image.FromFile(logoPath);
                     pictureBox2.Image = img;  // Logo grande panel izquierdo
-                    pictureBox1.Image = img;  // Logo miniatura barra superior
+                    // pictureBox1 (barra superior) se mantiene limpio — sin miniatura duplicada
                 }
             }
             catch { /* Si no se puede cargar el logo, el panel queda en bordó */ }

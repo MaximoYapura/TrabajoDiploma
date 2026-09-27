@@ -96,7 +96,7 @@ namespace GUI
             this.lblActivo.AutoSize = true;
             this.lblActivo.BackColor = System.Drawing.Color.Transparent;
             this.lblActivo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblActivo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblActivo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblActivo.Location = new System.Drawing.Point(16, 682);
             this.lblActivo.Name = "lblActivo";
             this.lblActivo.Size = new System.Drawing.Size(44, 16);
@@ -109,7 +109,7 @@ namespace GUI
             this.lblBloqueado.AutoSize = true;
             this.lblBloqueado.BackColor = System.Drawing.Color.Transparent;
             this.lblBloqueado.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBloqueado.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblBloqueado.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblBloqueado.Location = new System.Drawing.Point(16, 646);
             this.lblBloqueado.Name = "lblBloqueado";
             this.lblBloqueado.Size = new System.Drawing.Size(74, 16);
@@ -122,7 +122,7 @@ namespace GUI
             this.lblLogin.AutoSize = true;
             this.lblLogin.BackColor = System.Drawing.Color.Transparent;
             this.lblLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLogin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblLogin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblLogin.Location = new System.Drawing.Point(16, 609);
             this.lblLogin.Name = "lblLogin";
             this.lblLogin.Size = new System.Drawing.Size(70, 16);
@@ -135,7 +135,7 @@ namespace GUI
             this.lblRol.AutoSize = true;
             this.lblRol.BackColor = System.Drawing.Color.Transparent;
             this.lblRol.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRol.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblRol.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblRol.Location = new System.Drawing.Point(16, 570);
             this.lblRol.Name = "lblRol";
             this.lblRol.Size = new System.Drawing.Size(28, 16);
@@ -148,7 +148,7 @@ namespace GUI
             this.lblNombres.AutoSize = true;
             this.lblNombres.BackColor = System.Drawing.Color.Transparent;
             this.lblNombres.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNombres.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblNombres.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblNombres.Location = new System.Drawing.Point(16, 496);
             this.lblNombres.Name = "lblNombres";
             this.lblNombres.Size = new System.Drawing.Size(63, 16);
@@ -161,7 +161,7 @@ namespace GUI
             this.lblEmail.AutoSize = true;
             this.lblEmail.BackColor = System.Drawing.Color.Transparent;
             this.lblEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEmail.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblEmail.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblEmail.Location = new System.Drawing.Point(16, 531);
             this.lblEmail.Name = "lblEmail";
             this.lblEmail.Size = new System.Drawing.Size(41, 16);
@@ -173,7 +173,7 @@ namespace GUI
             this.lblApellidos.AutoSize = true;
             this.lblApellidos.BackColor = System.Drawing.Color.Transparent;
             this.lblApellidos.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblApellidos.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblApellidos.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblApellidos.Location = new System.Drawing.Point(16, 456);
             this.lblApellidos.Name = "lblApellidos";
             this.lblApellidos.Size = new System.Drawing.Size(64, 16);
@@ -186,7 +186,7 @@ namespace GUI
             this.lblDNI.AutoSize = true;
             this.lblDNI.BackColor = System.Drawing.Color.Transparent;
             this.lblDNI.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDNI.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblDNI.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblDNI.Location = new System.Drawing.Point(16, 410);
             this.lblDNI.Name = "lblDNI";
             this.lblDNI.Size = new System.Drawing.Size(30, 16);
@@ -253,113 +253,106 @@ namespace GUI
             // 
             // btnSalir
             // 
-            this.btnSalir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(235)))), ((int)(((byte)(228)))));
-            this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSalir.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnSalir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnSalir.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSalir.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(30)))), ((int)(((byte)(20)))));
             this.btnSalir.Location = new System.Drawing.Point(868, 601);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(98, 46);
             this.btnSalir.TabIndex = 43;
             this.btnSalir.Tag = "btnSalir";
             this.btnSalir.Text = "Salir";
+            this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalir.ForeColor = System.Drawing.Color.White;
             this.btnSalir.UseVisualStyleBackColor = false;
             this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
             // 
             // btnCancelar
             // 
-            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(235)))), ((int)(((byte)(228)))));
-            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancelar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancelar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(30)))), ((int)(((byte)(20)))));
             this.btnCancelar.Location = new System.Drawing.Point(868, 513);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(98, 46);
             this.btnCancelar.TabIndex = 42;
             this.btnCancelar.Tag = "btnCancelar";
             this.btnCancelar.Text = "Cancelar";
+            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancelar.ForeColor = System.Drawing.Color.White;
             this.btnCancelar.UseVisualStyleBackColor = false;
             this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
             // 
             // btnAplicar
             // 
             this.btnAplicar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnAplicar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAplicar.FlatAppearance.BorderSize = 0;
             this.btnAplicar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAplicar.ForeColor = System.Drawing.Color.White;
             this.btnAplicar.Location = new System.Drawing.Point(868, 421);
             this.btnAplicar.Name = "btnAplicar";
             this.btnAplicar.Size = new System.Drawing.Size(98, 46);
             this.btnAplicar.TabIndex = 41;
             this.btnAplicar.Tag = "btnAplicar";
             this.btnAplicar.Text = "Aplicar";
+            this.btnAplicar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAplicar.ForeColor = System.Drawing.Color.White;
             this.btnAplicar.UseVisualStyleBackColor = false;
             this.btnAplicar.Click += new System.EventHandler(this.btnAplicar_Click);
             // 
             // btnActDes
             // 
             this.btnActDes.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnActDes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnActDes.FlatAppearance.BorderSize = 0;
             this.btnActDes.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnActDes.ForeColor = System.Drawing.Color.White;
             this.btnActDes.Location = new System.Drawing.Point(868, 328);
             this.btnActDes.Name = "btnActDes";
             this.btnActDes.Size = new System.Drawing.Size(98, 46);
             this.btnActDes.TabIndex = 40;
             this.btnActDes.Tag = "btnActivarDesactivar";
             this.btnActDes.Text = "Act./Desact.";
+            this.btnActDes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnActDes.ForeColor = System.Drawing.Color.White;
             this.btnActDes.UseVisualStyleBackColor = false;
             this.btnActDes.Click += new System.EventHandler(this.btnActDes_Click);
             // 
             // btnModificar
             // 
             this.btnModificar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnModificar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnModificar.FlatAppearance.BorderSize = 0;
             this.btnModificar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnModificar.ForeColor = System.Drawing.Color.White;
             this.btnModificar.Location = new System.Drawing.Point(868, 237);
             this.btnModificar.Name = "btnModificar";
             this.btnModificar.Size = new System.Drawing.Size(98, 46);
             this.btnModificar.TabIndex = 39;
             this.btnModificar.Tag = "btnModificar";
             this.btnModificar.Text = "Modificar";
+            this.btnModificar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnModificar.ForeColor = System.Drawing.Color.White;
             this.btnModificar.UseVisualStyleBackColor = false;
             this.btnModificar.Click += new System.EventHandler(this.btnModificar_Click);
             // 
             // btnDesbloquear
             // 
             this.btnDesbloquear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnDesbloquear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDesbloquear.FlatAppearance.BorderSize = 0;
             this.btnDesbloquear.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDesbloquear.ForeColor = System.Drawing.Color.White;
             this.btnDesbloquear.Location = new System.Drawing.Point(868, 145);
             this.btnDesbloquear.Name = "btnDesbloquear";
             this.btnDesbloquear.Size = new System.Drawing.Size(98, 46);
             this.btnDesbloquear.TabIndex = 38;
             this.btnDesbloquear.Tag = "btnDesbloquear";
             this.btnDesbloquear.Text = "Desbloquear";
+            this.btnDesbloquear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDesbloquear.ForeColor = System.Drawing.Color.White;
             this.btnDesbloquear.UseVisualStyleBackColor = false;
             this.btnDesbloquear.Click += new System.EventHandler(this.btnDesbloquear_Click);
             // 
             // btnCrear
             // 
             this.btnCrear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnCrear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCrear.FlatAppearance.BorderSize = 0;
             this.btnCrear.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCrear.ForeColor = System.Drawing.Color.White;
             this.btnCrear.Location = new System.Drawing.Point(868, 61);
             this.btnCrear.Name = "btnCrear";
             this.btnCrear.Size = new System.Drawing.Size(98, 46);
             this.btnCrear.TabIndex = 37;
             this.btnCrear.Tag = "btnCrear";
             this.btnCrear.Text = "Crear";
+            this.btnCrear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCrear.ForeColor = System.Drawing.Color.White;
             this.btnCrear.UseVisualStyleBackColor = false;
             this.btnCrear.Click += new System.EventHandler(this.btnCrear_Click);
             // 
@@ -413,7 +406,7 @@ namespace GUI
             this.dgvUsuarios.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.dgvUsuarios.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvUsuarios.EnableHeadersVisualStyles = false;
-            this.dgvUsuarios.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(195)))), ((int)(((byte)(180)))), ((int)(((byte)(165)))));
+            this.dgvUsuarios.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.dgvUsuarios.Location = new System.Drawing.Point(10, 79);
             this.dgvUsuarios.MultiSelect = false;
             this.dgvUsuarios.Name = "dgvUsuarios";
@@ -475,9 +468,7 @@ namespace GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
-            this.BackgroundImage = null;
-            this.ClientSize = new System.Drawing.Size(1089, 743);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));            this.ClientSize = new System.Drawing.Size(1089, 743);
             this.Controls.Add(this.iconPictureBox1);
             this.Controls.Add(this.cmbRol);
             this.Controls.Add(this.rbBloqueados);

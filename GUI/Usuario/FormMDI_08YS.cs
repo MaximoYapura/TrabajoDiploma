@@ -70,6 +70,7 @@ namespace GUI_08YS
         public FormMDI_08YS()
         {
             InitializeComponent();
+            CargarLogoMDI();
             _userBLL = BLLFactory_08YS.CreateUserBLL();
             lblRolSistema.Text = SessionManager_08YS.Instance.Current.Rol.Nombre;
             lblNombreApellido.Text= SessionManager_08YS.Instance.Current.Nombre + " " + SessionManager_08YS.Instance.Current.Apellido;
@@ -79,6 +80,26 @@ namespace GUI_08YS
             TraductorManager_08YS.Instance.Suscribir(this);
             SessionManager_08YS.Instance.SesionInvalidada += OnSesionInvalidada;
             UpdateIdioma();
+        }
+
+        private void CargarLogoMDI()
+        {
+            try
+            {
+                string logoPath = System.IO.Path.Combine(
+                    System.Windows.Forms.Application.StartupPath, "Resources", "logo_fogon.png");
+                if (System.IO.File.Exists(logoPath))
+                {
+                    var logoImg = System.Drawing.Image.FromFile(logoPath);
+                    pictureBox1.Image = logoImg;
+                    pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+
+                    // Marca de agua: logo centrado en el área de contenido del MDI
+                    panel2.BackgroundImage       = logoImg;
+                    panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+                }
+            }
+            catch { /* Si no se puede cargar el logo, los controles quedan sin imagen */ }
         }
 
         private void OnSesionInvalidada()
@@ -233,11 +254,28 @@ namespace GUI_08YS
 
         private void FormMDI_Load(object sender, EventArgs e)
         {
-            AdministrativoDropDownMenu.IsMainMenu = true;
-            MaestrosDropDownMenu.IsMainMenu = true;
-            ReservasDropDownMenu.IsMainMenu = true;
-            ReportesDropDownMenu.IsMainMenu = true;
-            PerfilDropDownMenu.IsMainMenu = true;
+            System.Drawing.Color primaryColorBordo = System.Drawing.Color.FromArgb(120, 25, 25);
+            System.Drawing.Color textColorCrema    = System.Drawing.Color.FromArgb(253, 246, 227);
+
+            AdministrativoDropDownMenu.PrimaryColor     = primaryColorBordo;
+            AdministrativoDropDownMenu.MenuItemTextColor = textColorCrema;
+            AdministrativoDropDownMenu.IsMainMenu       = true;
+
+            MaestrosDropDownMenu.PrimaryColor     = primaryColorBordo;
+            MaestrosDropDownMenu.MenuItemTextColor = textColorCrema;
+            MaestrosDropDownMenu.IsMainMenu       = true;
+
+            ReservasDropDownMenu.PrimaryColor     = primaryColorBordo;
+            ReservasDropDownMenu.MenuItemTextColor = textColorCrema;
+            ReservasDropDownMenu.IsMainMenu       = true;
+
+            ReportesDropDownMenu.PrimaryColor     = primaryColorBordo;
+            ReportesDropDownMenu.MenuItemTextColor = textColorCrema;
+            ReportesDropDownMenu.IsMainMenu       = true;
+
+            PerfilDropDownMenu.PrimaryColor     = primaryColorBordo;
+            PerfilDropDownMenu.MenuItemTextColor = textColorCrema;
+            PerfilDropDownMenu.IsMainMenu       = true;
         }
 
         private void FormMDI_FormClosing(object sender, FormClosingEventArgs e)

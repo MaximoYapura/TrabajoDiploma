@@ -22,9 +22,9 @@ namespace GUI_08YS
         {
             if (isMainMenu)
             {
-                backColor = Color.FromArgb(37, 39, 60);
-                leftColumnColor = Color.FromArgb(32, 33, 51);
-                borderColor = Color.FromArgb(32, 33, 51);
+                backColor = Color.FromArgb(56, 17, 17);
+                leftColumnColor = Color.FromArgb(56, 17, 17);
+                borderColor = Color.FromArgb(120, 25, 25);
                 menuItemBorderColor = primaryColor;
                 menuItemSelectedColor = primaryColor;
             }

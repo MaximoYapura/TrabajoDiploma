@@ -197,9 +197,9 @@ namespace GUI_08YS
             this.iconPictureBox2.TabIndex = 0;
             this.iconPictureBox2.TabStop = false;
             //
-            // panel2  — Panel lateral izquierdo (bordó primario)
+            // panel2  — Panel lateral izquierdo (tono logo #4A1212)
             //
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(18)))), ((int)(((byte)(18)))));
             this.panel2.Controls.Add(this.iconPictureBox1);
             this.panel2.Controls.Add(this.pictureBox2);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
@@ -212,7 +212,7 @@ namespace GUI_08YS
             //
             // iconPictureBox1  — Icono usuario panel izquierdo
             //
-            this.iconPictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            this.iconPictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(18)))), ((int)(((byte)(18)))));
             this.iconPictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.iconPictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.iconPictureBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
@@ -230,7 +230,7 @@ namespace GUI_08YS
             //
             // pictureBox2  — Logo grande panel izquierdo (carga en runtime)
             //
-            this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(18)))), ((int)(((byte)(18)))));
             this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.pictureBox2.Image = null;

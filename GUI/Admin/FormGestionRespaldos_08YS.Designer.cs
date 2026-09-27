@@ -87,7 +87,7 @@
             this.lblTitulo.AutoSize = true;
             this.lblTitulo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblTitulo.Font = new System.Drawing.Font("Segoe UI", 28.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitulo.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblTitulo.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.lblTitulo.Location = new System.Drawing.Point(120, 15);
             this.lblTitulo.Name = "lblTitulo";
             this.lblTitulo.Size = new System.Drawing.Size(496, 62);
@@ -100,9 +100,9 @@
             // 
             this.iconPictureBox1.BackColor = System.Drawing.Color.Transparent;
             this.iconPictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.iconPictureBox1.ForeColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox1.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.iconPictureBox1.IconChar = FontAwesome.Sharp.IconChar.Database;
-            this.iconPictureBox1.IconColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox1.IconColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.iconPictureBox1.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconPictureBox1.IconSize = 100;
             this.iconPictureBox1.Location = new System.Drawing.Point(20, 15);
@@ -153,13 +153,13 @@
             // 
             // btnRealizarBackUp
             // 
-            this.btnRealizarBackUp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnRealizarBackUp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnRealizarBackUp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnRealizarBackUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRealizarBackUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRealizarBackUp.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnRealizarBackUp.ForeColor = System.Drawing.Color.White;
             this.btnRealizarBackUp.IconChar = FontAwesome.Sharp.IconChar.FloppyDisk;
-            this.btnRealizarBackUp.IconColor = System.Drawing.Color.Gold;
+            this.btnRealizarBackUp.IconColor = System.Drawing.Color.White;
             this.btnRealizarBackUp.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnRealizarBackUp.IconSize = 38;
             this.btnRealizarBackUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -179,7 +179,7 @@
             this.lblNombreArchivo.AutoSize = true;
             this.lblNombreArchivo.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblNombreArchivo.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNombreArchivo.ForeColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.lblNombreArchivo.ForeColor = System.Drawing.Color.FromArgb(45, 42, 40);
             this.lblNombreArchivo.Location = new System.Drawing.Point(30, 210);
             this.lblNombreArchivo.Name = "lblNombreArchivo";
             this.lblNombreArchivo.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
@@ -192,7 +192,7 @@
             this.lblNombreLabel.AutoSize = true;
             this.lblNombreLabel.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblNombreLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNombreLabel.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblNombreLabel.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.lblNombreLabel.Location = new System.Drawing.Point(30, 153);
             this.lblNombreLabel.Name = "lblNombreLabel";
             this.lblNombreLabel.Padding = new System.Windows.Forms.Padding(0, 25, 0, 0);
@@ -214,21 +214,21 @@
             // 
             // txtCarpetaDestino
             // 
-            this.txtCarpetaDestino.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtCarpetaDestino.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtCarpetaDestino.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtCarpetaDestino.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtCarpetaDestino.BorderColor = System.Drawing.Color.FromArgb(120, 25, 25);
+            this.txtCarpetaDestino.BorderFocusColor = System.Drawing.Color.FromArgb(211, 84, 0);
             this.txtCarpetaDestino.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtCarpetaDestino.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCarpetaDestino.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtCarpetaDestino.ForeColor = System.Drawing.Color.FromArgb(45, 42, 40);
             this.txtCarpetaDestino.IconAlignment = CustomControls.IconTextBoxAlignment.Right;
-            this.txtCarpetaDestino.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtCarpetaDestino.IconColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.txtCarpetaDestino.IconColorRight = System.Drawing.Color.DimGray;
             this.txtCarpetaDestino.IconPadding = 10;
             this.txtCarpetaDestino.IconSize = 30;
             this.txtCarpetaDestino.Location = new System.Drawing.Point(0, 10);
             this.txtCarpetaDestino.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtCarpetaDestino.Name = "txtCarpetaDestino";
-            this.txtCarpetaDestino.PlaceholderColor = System.Drawing.Color.LightGray;
+            this.txtCarpetaDestino.PlaceholderColor = System.Drawing.Color.FromArgb(110, 100, 95);
             this.txtCarpetaDestino.ReadOnly = true;
             this.txtCarpetaDestino.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.txtCarpetaDestino.Size = new System.Drawing.Size(615, 45);
@@ -237,13 +237,13 @@
             // 
             // btnSeleccionarCarpetaBackup
             // 
-            this.btnSeleccionarCarpetaBackup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnSeleccionarCarpetaBackup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnSeleccionarCarpetaBackup.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnSeleccionarCarpetaBackup.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSeleccionarCarpetaBackup.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSeleccionarCarpetaBackup.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnSeleccionarCarpetaBackup.ForeColor = System.Drawing.Color.White;
             this.btnSeleccionarCarpetaBackup.IconChar = FontAwesome.Sharp.IconChar.FolderOpen;
-            this.btnSeleccionarCarpetaBackup.IconColor = System.Drawing.Color.Gold;
+            this.btnSeleccionarCarpetaBackup.IconColor = System.Drawing.Color.White;
             this.btnSeleccionarCarpetaBackup.IconFont = FontAwesome.Sharp.IconFont.Regular;
             this.btnSeleccionarCarpetaBackup.IconSize = 38;
             this.btnSeleccionarCarpetaBackup.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -263,7 +263,7 @@
             this.lblBackupDesc.AutoSize = true;
             this.lblBackupDesc.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblBackupDesc.Font = new System.Drawing.Font("Segoe UI Semibold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBackupDesc.ForeColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.lblBackupDesc.ForeColor = System.Drawing.Color.FromArgb(45, 42, 40);
             this.lblBackupDesc.Location = new System.Drawing.Point(30, 58);
             this.lblBackupDesc.Name = "lblBackupDesc";
             this.lblBackupDesc.Padding = new System.Windows.Forms.Padding(0, 15, 0, 0);
@@ -277,7 +277,7 @@
             this.lblBackupTitulo.AutoSize = true;
             this.lblBackupTitulo.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblBackupTitulo.Font = new System.Drawing.Font("Segoe UI Semibold", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBackupTitulo.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblBackupTitulo.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.lblBackupTitulo.Location = new System.Drawing.Point(30, 20);
             this.lblBackupTitulo.Margin = new System.Windows.Forms.Padding(3, 0, 3, 50);
             this.lblBackupTitulo.Name = "lblBackupTitulo";
@@ -298,13 +298,13 @@
             // 
             // btnRealizarRestore
             // 
-            this.btnRealizarRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnRealizarRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnRealizarRestore.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnRealizarRestore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRealizarRestore.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRealizarRestore.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnRealizarRestore.ForeColor = System.Drawing.Color.White;
             this.btnRealizarRestore.IconChar = FontAwesome.Sharp.IconChar.History;
-            this.btnRealizarRestore.IconColor = System.Drawing.Color.Gold;
+            this.btnRealizarRestore.IconColor = System.Drawing.Color.White;
             this.btnRealizarRestore.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnRealizarRestore.IconSize = 38;
             this.btnRealizarRestore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -348,9 +348,9 @@
             // 
             this.iconPictureBox3.BackColor = System.Drawing.Color.Transparent;
             this.iconPictureBox3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.iconPictureBox3.ForeColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox3.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.iconPictureBox3.IconChar = FontAwesome.Sharp.IconChar.CircleInfo;
-            this.iconPictureBox3.IconColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox3.IconColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.iconPictureBox3.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconPictureBox3.IconSize = 60;
             this.iconPictureBox3.Location = new System.Drawing.Point(0, 15);
@@ -373,21 +373,21 @@
             // 
             // txtArchivoRestore
             // 
-            this.txtArchivoRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtArchivoRestore.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtArchivoRestore.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtArchivoRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtArchivoRestore.BorderColor = System.Drawing.Color.FromArgb(120, 25, 25);
+            this.txtArchivoRestore.BorderFocusColor = System.Drawing.Color.FromArgb(211, 84, 0);
             this.txtArchivoRestore.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtArchivoRestore.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtArchivoRestore.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtArchivoRestore.ForeColor = System.Drawing.Color.FromArgb(45, 42, 40);
             this.txtArchivoRestore.IconAlignment = CustomControls.IconTextBoxAlignment.Right;
-            this.txtArchivoRestore.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtArchivoRestore.IconColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.txtArchivoRestore.IconColorRight = System.Drawing.Color.DimGray;
             this.txtArchivoRestore.IconPadding = 10;
             this.txtArchivoRestore.IconSize = 30;
             this.txtArchivoRestore.Location = new System.Drawing.Point(0, 10);
             this.txtArchivoRestore.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtArchivoRestore.Name = "txtArchivoRestore";
-            this.txtArchivoRestore.PlaceholderColor = System.Drawing.Color.LightGray;
+            this.txtArchivoRestore.PlaceholderColor = System.Drawing.Color.FromArgb(110, 100, 95);
             this.txtArchivoRestore.ReadOnly = true;
             this.txtArchivoRestore.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.txtArchivoRestore.Size = new System.Drawing.Size(641, 45);
@@ -396,13 +396,13 @@
             // 
             // btnSeleccionarArchivoRestore
             // 
-            this.btnSeleccionarArchivoRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnSeleccionarArchivoRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnSeleccionarArchivoRestore.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnSeleccionarArchivoRestore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSeleccionarArchivoRestore.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSeleccionarArchivoRestore.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnSeleccionarArchivoRestore.ForeColor = System.Drawing.Color.White;
             this.btnSeleccionarArchivoRestore.IconChar = FontAwesome.Sharp.IconChar.FolderOpen;
-            this.btnSeleccionarArchivoRestore.IconColor = System.Drawing.Color.Gold;
+            this.btnSeleccionarArchivoRestore.IconColor = System.Drawing.Color.White;
             this.btnSeleccionarArchivoRestore.IconFont = FontAwesome.Sharp.IconFont.Regular;
             this.btnSeleccionarArchivoRestore.IconSize = 38;
             this.btnSeleccionarArchivoRestore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -422,7 +422,7 @@
             this.lblRestoreLabel.AutoSize = true;
             this.lblRestoreLabel.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblRestoreLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRestoreLabel.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblRestoreLabel.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.lblRestoreLabel.Location = new System.Drawing.Point(20, 168);
             this.lblRestoreLabel.Name = "lblRestoreLabel";
             this.lblRestoreLabel.Padding = new System.Windows.Forms.Padding(0, 25, 0, 0);
@@ -447,7 +447,7 @@
             this.lblWarning.AutoSize = true;
             this.lblWarning.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblWarning.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblWarning.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.lblWarning.ForeColor = System.Drawing.Color.FromArgb(45, 42, 40);
             this.lblWarning.Location = new System.Drawing.Point(60, 15);
             this.lblWarning.Margin = new System.Windows.Forms.Padding(3, 0, 3, 50);
             this.lblWarning.Name = "lblWarning";
@@ -462,9 +462,9 @@
             // 
             this.iconPictureBox2.BackColor = System.Drawing.Color.Transparent;
             this.iconPictureBox2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.iconPictureBox2.ForeColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox2.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.iconPictureBox2.IconChar = FontAwesome.Sharp.IconChar.ExclamationTriangle;
-            this.iconPictureBox2.IconColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox2.IconColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.iconPictureBox2.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconPictureBox2.IconSize = 60;
             this.iconPictureBox2.Location = new System.Drawing.Point(0, 15);
@@ -479,7 +479,7 @@
             this.lblRestoreTitulo.AutoSize = true;
             this.lblRestoreTitulo.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblRestoreTitulo.Font = new System.Drawing.Font("Segoe UI Semibold", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRestoreTitulo.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblRestoreTitulo.ForeColor = System.Drawing.Color.FromArgb(120, 25, 25);
             this.lblRestoreTitulo.Location = new System.Drawing.Point(20, 20);
             this.lblRestoreTitulo.Margin = new System.Windows.Forms.Padding(3, 0, 3, 50);
             this.lblRestoreTitulo.Name = "lblRestoreTitulo";
@@ -492,8 +492,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackgroundImage = global::GUI_08YS.Properties.Resources.BackGroundHorizon;
-            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.BackColor = System.Drawing.Color.FromArgb(250, 248, 245);
             this.ClientSize = new System.Drawing.Size(1470, 920);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.pnlHeader);

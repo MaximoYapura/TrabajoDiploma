@@ -56,7 +56,7 @@
             this.lblTitulo.AutoSize = true;
             this.lblTitulo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblTitulo.Font = new System.Drawing.Font("Segoe UI", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitulo.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblTitulo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.lblTitulo.Location = new System.Drawing.Point(111, 0);
             this.lblTitulo.Name = "lblTitulo";
             this.lblTitulo.Padding = new System.Windows.Forms.Padding(0, 25, 0, 0);
@@ -68,7 +68,7 @@
             // 
             // iconPictureBox1
             // 
-            this.iconPictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.iconPictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.iconPictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.iconPictureBox1.ForeColor = System.Drawing.Color.DarkOrange;
             this.iconPictureBox1.IconChar = FontAwesome.Sharp.IconChar.ExclamationTriangle;
@@ -86,7 +86,7 @@
             this.lblDescripcion.AutoSize = true;
             this.lblDescripcion.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblDescripcion.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDescripcion.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.lblDescripcion.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.lblDescripcion.Location = new System.Drawing.Point(0, 110);
             this.lblDescripcion.Name = "lblDescripcion";
             this.lblDescripcion.Padding = new System.Windows.Forms.Padding(15);
@@ -118,9 +118,9 @@
             this.btnSalir.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSalir.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSalir.ForeColor = System.Drawing.Color.Gold;
+            this.btnSalir.ForeColor = System.Drawing.Color.White;
             this.btnSalir.IconChar = FontAwesome.Sharp.IconChar.SignOut;
-            this.btnSalir.IconColor = System.Drawing.Color.Gold;
+            this.btnSalir.IconColor = System.Drawing.Color.White;
             this.btnSalir.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnSalir.IconSize = 30;
             this.btnSalir.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -134,7 +134,8 @@
             this.btnSalir.Text = "Salir";
             this.btnSalir.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSalir.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnSalir.UseVisualStyleBackColor = true;
+            this.btnSalir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnSalir.UseVisualStyleBackColor = false;
             this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
             // 
             // btnRestore
@@ -142,9 +143,9 @@
             this.btnRestore.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnRestore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRestore.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRestore.ForeColor = System.Drawing.Color.Gold;
+            this.btnRestore.ForeColor = System.Drawing.Color.White;
             this.btnRestore.IconChar = FontAwesome.Sharp.IconChar.Database;
-            this.btnRestore.IconColor = System.Drawing.Color.Gold;
+            this.btnRestore.IconColor = System.Drawing.Color.White;
             this.btnRestore.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnRestore.IconSize = 30;
             this.btnRestore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -158,7 +159,8 @@
             this.btnRestore.Text = "Restaurar";
             this.btnRestore.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnRestore.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnRestore.UseVisualStyleBackColor = true;
+            this.btnRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnRestore.UseVisualStyleBackColor = false;
             this.btnRestore.Click += new System.EventHandler(this.btnRestaurar_Click);
             // 
             // btnRecalcular
@@ -166,9 +168,9 @@
             this.btnRecalcular.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnRecalcular.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRecalcular.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRecalcular.ForeColor = System.Drawing.Color.Gold;
+            this.btnRecalcular.ForeColor = System.Drawing.Color.White;
             this.btnRecalcular.IconChar = FontAwesome.Sharp.IconChar.Sync;
-            this.btnRecalcular.IconColor = System.Drawing.Color.Gold;
+            this.btnRecalcular.IconColor = System.Drawing.Color.White;
             this.btnRecalcular.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnRecalcular.IconSize = 30;
             this.btnRecalcular.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -182,14 +184,15 @@
             this.btnRecalcular.Text = "Recalcular";
             this.btnRecalcular.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnRecalcular.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnRecalcular.UseVisualStyleBackColor = true;
+            this.btnRecalcular.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnRecalcular.UseVisualStyleBackColor = false;
             this.btnRecalcular.Click += new System.EventHandler(this.btnRecalcular_Click);
             // 
             // FormInconsistenciaDB_08YS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.ClientSize = new System.Drawing.Size(670, 230);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.lblDescripcion);

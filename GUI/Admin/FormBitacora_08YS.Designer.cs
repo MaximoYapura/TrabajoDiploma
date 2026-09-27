@@ -61,7 +61,7 @@
             this.lblCriticidad.AutoSize = true;
             this.lblCriticidad.BackColor = System.Drawing.Color.Transparent;
             this.lblCriticidad.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCriticidad.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblCriticidad.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblCriticidad.Location = new System.Drawing.Point(16, 823);
             this.lblCriticidad.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCriticidad.Name = "lblCriticidad";
@@ -74,7 +74,7 @@
             // 
             this.lblFechaFin.BackColor = System.Drawing.Color.Transparent;
             this.lblFechaFin.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFechaFin.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblFechaFin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblFechaFin.Location = new System.Drawing.Point(1121, 719);
             this.lblFechaFin.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFechaFin.Name = "lblFechaFin";
@@ -88,7 +88,7 @@
             this.lblEvento.AutoSize = true;
             this.lblEvento.BackColor = System.Drawing.Color.Transparent;
             this.lblEvento.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEvento.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblEvento.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblEvento.Location = new System.Drawing.Point(561, 716);
             this.lblEvento.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblEvento.Name = "lblEvento";
@@ -102,7 +102,7 @@
             this.lblModulo.AutoSize = true;
             this.lblModulo.BackColor = System.Drawing.Color.Transparent;
             this.lblModulo.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblModulo.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblModulo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblModulo.Location = new System.Drawing.Point(16, 716);
             this.lblModulo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblModulo.Name = "lblModulo";
@@ -115,7 +115,7 @@
             // 
             this.lblFechaIni.BackColor = System.Drawing.Color.Transparent;
             this.lblFechaIni.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFechaIni.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblFechaIni.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblFechaIni.Location = new System.Drawing.Point(1121, 636);
             this.lblFechaIni.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFechaIni.Name = "lblFechaIni";
@@ -129,7 +129,7 @@
             this.lblLogin.AutoSize = true;
             this.lblLogin.BackColor = System.Drawing.Color.Transparent;
             this.lblLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLogin.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblLogin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblLogin.Location = new System.Drawing.Point(16, 602);
             this.lblLogin.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblLogin.Name = "lblLogin";
@@ -141,9 +141,9 @@
             // iconPictureBox1
             // 
             this.iconPictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.iconPictureBox1.ForeColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.iconPictureBox1.IconChar = FontAwesome.Sharp.IconChar.FileInvoice;
-            this.iconPictureBox1.IconColor = System.Drawing.Color.Goldenrod;
+            this.iconPictureBox1.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.iconPictureBox1.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconPictureBox1.IconSize = 111;
             this.iconPictureBox1.Location = new System.Drawing.Point(48, 27);
@@ -158,7 +158,7 @@
             this.lblTitulo.AutoSize = true;
             this.lblTitulo.BackColor = System.Drawing.Color.Transparent;
             this.lblTitulo.Font = new System.Drawing.Font("Microsoft Sans Serif", 42F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitulo.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblTitulo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblTitulo.Location = new System.Drawing.Point(175, 27);
             this.lblTitulo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTitulo.Name = "lblTitulo";
@@ -172,15 +172,15 @@
             this.dgvEventos.AllowUserToAddRows = false;
             this.dgvEventos.AllowUserToDeleteRows = false;
             this.dgvEventos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvEventos.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(10)))), ((int)(((byte)(40)))));
+            this.dgvEventos.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.dgvEventos.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvEventos.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(25)))), ((int)(((byte)(50)))));
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(25)))), ((int)(((byte)(50)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlLightLight;
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dgvEventos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvEventos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -194,7 +194,7 @@
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvEventos.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvEventos.EnableHeadersVisualStyles = false;
-            this.dgvEventos.GridColor = System.Drawing.Color.Goldenrod;
+            this.dgvEventos.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.dgvEventos.Location = new System.Drawing.Point(13, 148);
             this.dgvEventos.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvEventos.MultiSelect = false;
@@ -202,9 +202,9 @@
             this.dgvEventos.ReadOnly = true;
             this.dgvEventos.RowHeadersVisible = false;
             this.dgvEventos.RowHeadersWidth = 51;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(10)))), ((int)(((byte)(30)))));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(5)))), ((int)(((byte)(100)))));
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.dgvEventos.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvEventos.RowTemplate.Height = 30;
             this.dgvEventos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -214,12 +214,12 @@
             // 
             // btnLimpiar
             // 
-            this.btnLimpiar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnLimpiar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnLimpiar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLimpiar.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLimpiar.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnLimpiar.ForeColor = System.Drawing.Color.White;
             this.btnLimpiar.IconChar = FontAwesome.Sharp.IconChar.Broom;
-            this.btnLimpiar.IconColor = System.Drawing.Color.Gold;
+            this.btnLimpiar.IconColor = System.Drawing.Color.White;
             this.btnLimpiar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnLimpiar.IconSize = 40;
             this.btnLimpiar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -238,12 +238,12 @@
             // 
             // btnFiltrar
             // 
-            this.btnFiltrar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnFiltrar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnFiltrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFiltrar.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnFiltrar.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnFiltrar.ForeColor = System.Drawing.Color.White;
             this.btnFiltrar.IconChar = FontAwesome.Sharp.IconChar.Filter;
-            this.btnFiltrar.IconColor = System.Drawing.Color.Gold;
+            this.btnFiltrar.IconColor = System.Drawing.Color.White;
             this.btnFiltrar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnFiltrar.IconSize = 40;
             this.btnFiltrar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -262,12 +262,12 @@
             // 
             // btnExportar
             // 
-            this.btnExportar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
+            this.btnExportar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnExportar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExportar.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExportar.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnExportar.ForeColor = System.Drawing.Color.White;
             this.btnExportar.IconChar = FontAwesome.Sharp.IconChar.FilePdf;
-            this.btnExportar.IconColor = System.Drawing.Color.Gold;
+            this.btnExportar.IconColor = System.Drawing.Color.White;
             this.btnExportar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnExportar.IconSize = 38;
             this.btnExportar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -289,7 +289,7 @@
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Goldenrod;
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.label1.Location = new System.Drawing.Point(1120, 587);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
@@ -303,7 +303,7 @@
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.Goldenrod;
+            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.label2.Location = new System.Drawing.Point(561, 602);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
@@ -314,21 +314,21 @@
             // 
             // txtTargetUsername
             // 
-            this.txtTargetUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtTargetUsername.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtTargetUsername.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtTargetUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtTargetUsername.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.txtTargetUsername.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.txtTargetUsername.BorderWidth = 2;
             this.txtTargetUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTargetUsername.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtTargetUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.txtTargetUsername.IconChar = FontAwesome.Sharp.IconChar.User;
-            this.txtTargetUsername.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtTargetUsername.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.txtTargetUsername.IconColorRight = System.Drawing.Color.DimGray;
             this.txtTargetUsername.IconPadding = 4;
             this.txtTargetUsername.IconSize = 30;
             this.txtTargetUsername.Location = new System.Drawing.Point(567, 642);
             this.txtTargetUsername.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtTargetUsername.Name = "txtTargetUsername";
-            this.txtTargetUsername.PlaceholderColor = System.Drawing.Color.LightGray;
+            this.txtTargetUsername.PlaceholderColor = System.Drawing.Color.FromArgb(((int)(((byte)(110)))), ((int)(((byte)(100)))), ((int)(((byte)(95)))));
             this.txtTargetUsername.PlaceholderText = "Ingrese un username o parte de él";
             this.txtTargetUsername.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.txtTargetUsername.Size = new System.Drawing.Size(524, 46);
@@ -336,22 +336,22 @@
             // 
             // comboBoxEvento
             // 
-            this.comboBoxEvento.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.comboBoxEvento.BorderColor = System.Drawing.Color.Goldenrod;
-            this.comboBoxEvento.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxEvento.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.comboBoxEvento.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.comboBoxEvento.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.comboBoxEvento.BorderWidth = 2;
             this.comboBoxEvento.Cursor = System.Windows.Forms.Cursors.PanSouth;
-            this.comboBoxEvento.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.comboBoxEvento.DropDownBorderColor = System.Drawing.Color.Goldenrod;
-            this.comboBoxEvento.DropDownForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.comboBoxEvento.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(5)))), ((int)(((byte)(100)))));
-            this.comboBoxEvento.DropDownHighlightForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.comboBoxEvento.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.comboBoxEvento.DropDownBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.comboBoxEvento.DropDownForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.comboBoxEvento.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
+            this.comboBoxEvento.DropDownHighlightForeColor = System.Drawing.Color.White;
             this.comboBoxEvento.DropDownItemHeight = 32;
             this.comboBoxEvento.DropDownMaxHeight = 160;
             this.comboBoxEvento.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxEvento.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.comboBoxEvento.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.comboBoxEvento.IconChar = FontAwesome.Sharp.IconChar.ScrewdriverWrench;
-            this.comboBoxEvento.IconColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxEvento.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.comboBoxEvento.IconSize = 25;
             this.comboBoxEvento.Location = new System.Drawing.Point(567, 754);
             this.comboBoxEvento.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -364,23 +364,23 @@
             // 
             // comboBoxCriticidad
             // 
-            this.comboBoxCriticidad.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.comboBoxCriticidad.BorderColor = System.Drawing.Color.Goldenrod;
-            this.comboBoxCriticidad.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxCriticidad.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.comboBoxCriticidad.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.comboBoxCriticidad.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.comboBoxCriticidad.BorderWidth = 2;
             this.comboBoxCriticidad.Cursor = System.Windows.Forms.Cursors.PanSouth;
-            this.comboBoxCriticidad.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.comboBoxCriticidad.DropDownBorderColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxCriticidad.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.comboBoxCriticidad.DropDownBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.comboBoxCriticidad.DropDownFont = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxCriticidad.DropDownForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.comboBoxCriticidad.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(5)))), ((int)(((byte)(100)))));
-            this.comboBoxCriticidad.DropDownHighlightForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.comboBoxCriticidad.DropDownForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.comboBoxCriticidad.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
+            this.comboBoxCriticidad.DropDownHighlightForeColor = System.Drawing.Color.White;
             this.comboBoxCriticidad.DropDownItemHeight = 28;
             this.comboBoxCriticidad.DropDownMaxHeight = 140;
             this.comboBoxCriticidad.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxCriticidad.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.comboBoxCriticidad.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.comboBoxCriticidad.IconChar = FontAwesome.Sharp.IconChar.ExclamationTriangle;
-            this.comboBoxCriticidad.IconColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxCriticidad.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.comboBoxCriticidad.IconSize = 25;
             this.comboBoxCriticidad.Location = new System.Drawing.Point(21, 863);
             this.comboBoxCriticidad.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -393,22 +393,22 @@
             // 
             // comboBoxModulo
             // 
-            this.comboBoxModulo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.comboBoxModulo.BorderColor = System.Drawing.Color.Goldenrod;
-            this.comboBoxModulo.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxModulo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.comboBoxModulo.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.comboBoxModulo.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.comboBoxModulo.BorderWidth = 2;
             this.comboBoxModulo.Cursor = System.Windows.Forms.Cursors.PanSouth;
-            this.comboBoxModulo.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.comboBoxModulo.DropDownBorderColor = System.Drawing.Color.Goldenrod;
-            this.comboBoxModulo.DropDownForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.comboBoxModulo.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(5)))), ((int)(((byte)(100)))));
-            this.comboBoxModulo.DropDownHighlightForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.comboBoxModulo.DropDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.comboBoxModulo.DropDownBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.comboBoxModulo.DropDownForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.comboBoxModulo.DropDownHighlightBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
+            this.comboBoxModulo.DropDownHighlightForeColor = System.Drawing.Color.White;
             this.comboBoxModulo.DropDownItemHeight = 32;
             this.comboBoxModulo.DropDownMaxHeight = 160;
             this.comboBoxModulo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxModulo.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.comboBoxModulo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.comboBoxModulo.IconChar = FontAwesome.Sharp.IconChar.Kaaba;
-            this.comboBoxModulo.IconColor = System.Drawing.Color.Goldenrod;
+            this.comboBoxModulo.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.comboBoxModulo.IconSize = 30;
             this.comboBoxModulo.Location = new System.Drawing.Point(21, 754);
             this.comboBoxModulo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -421,20 +421,20 @@
             // 
             // dtpHasta
             // 
-            this.dtpHasta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.dtpHasta.BorderColor = System.Drawing.Color.Goldenrod;
-            this.dtpHasta.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.dtpHasta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.dtpHasta.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.dtpHasta.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.dtpHasta.BorderWidth = 2;
-            this.dtpHasta.CalendarBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.dtpHasta.CalendarForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.dtpHasta.CalendarTitleBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.dtpHasta.CalendarBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.dtpHasta.CalendarForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.dtpHasta.CalendarTitleBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.dtpHasta.CalendarTitleForeColor = System.Drawing.Color.White;
             this.dtpHasta.CalendarTrailingForeColor = System.Drawing.Color.Silver;
             this.dtpHasta.Cursor = System.Windows.Forms.Cursors.Hand;
             this.dtpHasta.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dtpHasta.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.dtpHasta.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.dtpHasta.IconChar = FontAwesome.Sharp.IconChar.CalendarDay;
-            this.dtpHasta.IconColor = System.Drawing.Color.Goldenrod;
+            this.dtpHasta.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.dtpHasta.IconSize = 19;
             this.dtpHasta.Location = new System.Drawing.Point(1125, 754);
             this.dtpHasta.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -448,20 +448,20 @@
             // 
             // dtpDesde
             // 
-            this.dtpDesde.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.dtpDesde.BorderColor = System.Drawing.Color.Goldenrod;
-            this.dtpDesde.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.dtpDesde.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.dtpDesde.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.dtpDesde.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.dtpDesde.BorderWidth = 2;
-            this.dtpDesde.CalendarBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.dtpDesde.CalendarForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.dtpDesde.CalendarTitleBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.dtpDesde.CalendarBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.dtpDesde.CalendarForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.dtpDesde.CalendarTitleBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.dtpDesde.CalendarTitleForeColor = System.Drawing.Color.White;
             this.dtpDesde.CalendarTrailingForeColor = System.Drawing.Color.Silver;
             this.dtpDesde.Cursor = System.Windows.Forms.Cursors.Hand;
             this.dtpDesde.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dtpDesde.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.dtpDesde.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.dtpDesde.IconChar = FontAwesome.Sharp.IconChar.CalendarDay;
-            this.dtpDesde.IconColor = System.Drawing.Color.Goldenrod;
+            this.dtpDesde.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.dtpDesde.IconSize = 19;
             this.dtpDesde.Location = new System.Drawing.Point(1125, 668);
             this.dtpDesde.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -475,21 +475,21 @@
             // 
             // txtUsername
             // 
-            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtUsername.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtUsername.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtUsername.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.txtUsername.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.txtUsername.BorderWidth = 2;
             this.txtUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtUsername.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.txtUsername.IconChar = FontAwesome.Sharp.IconChar.User;
-            this.txtUsername.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtUsername.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.txtUsername.IconColorRight = System.Drawing.Color.DimGray;
             this.txtUsername.IconPadding = 4;
             this.txtUsername.IconSize = 30;
             this.txtUsername.Location = new System.Drawing.Point(21, 642);
             this.txtUsername.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.PlaceholderColor = System.Drawing.Color.LightGray;
+            this.txtUsername.PlaceholderColor = System.Drawing.Color.FromArgb(((int)(((byte)(110)))), ((int)(((byte)(100)))), ((int)(((byte)(95)))));
             this.txtUsername.PlaceholderText = "Ingrese un username o parte de él";
             this.txtUsername.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.txtUsername.Size = new System.Drawing.Size(524, 46);
@@ -499,10 +499,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.BackgroundImage = global::GUI_08YS.Properties.Resources.BackGroundHorizon;
-            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(1469, 921);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));            this.ClientSize = new System.Drawing.Size(1469, 921);
             this.Controls.Add(this.txtTargetUsername);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.comboBoxEvento);

@@ -43,7 +43,7 @@
             this.lblContraseñaActual.AutoSize = true;
             this.lblContraseñaActual.BackColor = System.Drawing.Color.Transparent;
             this.lblContraseñaActual.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblContraseñaActual.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblContraseñaActual.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.lblContraseñaActual.Location = new System.Drawing.Point(92, 72);
             this.lblContraseñaActual.Name = "lblContraseñaActual";
             this.lblContraseñaActual.Size = new System.Drawing.Size(104, 15);
@@ -56,7 +56,7 @@
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.Goldenrod;
+            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.label2.Location = new System.Drawing.Point(92, 167);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(104, 15);
@@ -69,7 +69,7 @@
             this.lblConfirmarContraseña.AutoSize = true;
             this.lblConfirmarContraseña.BackColor = System.Drawing.Color.Transparent;
             this.lblConfirmarContraseña.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblConfirmarContraseña.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblConfirmarContraseña.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.lblConfirmarContraseña.Location = new System.Drawing.Point(92, 261);
             this.lblConfirmarContraseña.Name = "lblConfirmarContraseña";
             this.lblConfirmarContraseña.Size = new System.Drawing.Size(124, 15);
@@ -82,7 +82,7 @@
             this.lblUsuario.AutoSize = true;
             this.lblUsuario.BackColor = System.Drawing.Color.Transparent;
             this.lblUsuario.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUsuario.ForeColor = System.Drawing.Color.Goldenrod;
+            this.lblUsuario.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.lblUsuario.Location = new System.Drawing.Point(92, 41);
             this.lblUsuario.Name = "lblUsuario";
             this.lblUsuario.Size = new System.Drawing.Size(50, 15);
@@ -92,12 +92,12 @@
             // 
             // btnCambiarContraseña
             // 
-            this.btnCambiarContraseña.BackColor = System.Drawing.Color.Transparent;
+            this.btnCambiarContraseña.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnCambiarContraseña.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCambiarContraseña.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCambiarContraseña.ForeColor = System.Drawing.Color.Goldenrod;
+            this.btnCambiarContraseña.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(246)))), ((int)(((byte)(227)))));
             this.btnCambiarContraseña.IconChar = FontAwesome.Sharp.IconChar.FloppyDisk;
-            this.btnCambiarContraseña.IconColor = System.Drawing.Color.Gold;
+            this.btnCambiarContraseña.IconColor = System.Drawing.Color.White;
             this.btnCambiarContraseña.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnCambiarContraseña.IconSize = 30;
             this.btnCambiarContraseña.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -116,14 +116,14 @@
             // 
             // txtConfirmarContraseña
             // 
-            this.txtConfirmarContraseña.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtConfirmarContraseña.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtConfirmarContraseña.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtConfirmarContraseña.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtConfirmarContraseña.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.txtConfirmarContraseña.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.txtConfirmarContraseña.BorderWidth = 2;
-            this.txtConfirmarContraseña.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtConfirmarContraseña.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.txtConfirmarContraseña.IconAlignment = CustomControls.IconTextBoxAlignment.Right;
             this.txtConfirmarContraseña.IconChar = FontAwesome.Sharp.IconChar.EyeSlash;
-            this.txtConfirmarContraseña.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtConfirmarContraseña.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.txtConfirmarContraseña.IconColorRight = System.Drawing.Color.DimGray;
             this.txtConfirmarContraseña.IconSize = 25;
             this.txtConfirmarContraseña.Location = new System.Drawing.Point(95, 280);
@@ -139,14 +139,14 @@
             // 
             // txtNuevaContraseña
             // 
-            this.txtNuevaContraseña.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtNuevaContraseña.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtNuevaContraseña.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtNuevaContraseña.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtNuevaContraseña.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.txtNuevaContraseña.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.txtNuevaContraseña.BorderWidth = 2;
-            this.txtNuevaContraseña.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtNuevaContraseña.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.txtNuevaContraseña.IconAlignment = CustomControls.IconTextBoxAlignment.Right;
             this.txtNuevaContraseña.IconChar = FontAwesome.Sharp.IconChar.EyeSlash;
-            this.txtNuevaContraseña.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtNuevaContraseña.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.txtNuevaContraseña.IconColorRight = System.Drawing.Color.DimGray;
             this.txtNuevaContraseña.IconSize = 25;
             this.txtNuevaContraseña.Location = new System.Drawing.Point(95, 185);
@@ -162,14 +162,14 @@
             // 
             // txtContraseñaActual
             // 
-            this.txtContraseñaActual.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(15)))), ((int)(((byte)(45)))));
-            this.txtContraseñaActual.BorderColor = System.Drawing.Color.Goldenrod;
-            this.txtContraseñaActual.BorderFocusColor = System.Drawing.Color.Goldenrod;
+            this.txtContraseñaActual.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            this.txtContraseñaActual.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.txtContraseñaActual.BorderFocusColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(84)))), ((int)(((byte)(0)))));
             this.txtContraseñaActual.BorderWidth = 2;
-            this.txtContraseñaActual.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.txtContraseñaActual.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.txtContraseñaActual.IconAlignment = CustomControls.IconTextBoxAlignment.Right;
             this.txtContraseñaActual.IconChar = FontAwesome.Sharp.IconChar.EyeSlash;
-            this.txtContraseñaActual.IconColor = System.Drawing.Color.Goldenrod;
+            this.txtContraseñaActual.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.txtContraseñaActual.IconColorRight = System.Drawing.Color.DimGray;
             this.txtContraseñaActual.IconSize = 25;
             this.txtContraseñaActual.Location = new System.Drawing.Point(95, 91);
@@ -187,9 +187,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.BackgroundImage = global::GUI_08YS.Properties.Resources.ChatGPT_Image_19_may_2026__22_23_23;
-            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.ClientSize = new System.Drawing.Size(347, 414);
             this.Controls.Add(this.btnCambiarContraseña);
             this.Controls.Add(this.txtConfirmarContraseña);

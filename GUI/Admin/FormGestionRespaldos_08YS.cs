@@ -18,11 +18,13 @@ namespace GUI_08YS.Admin
     {
         private readonly BackupBLL_08YS _bll;
 
-        private static readonly Color ColorFondo = Color.FromArgb(5, 15, 45);
-        private static readonly Color ColorOro = Color.Goldenrod;
-        private static readonly Color ColorTexto = Color.White;
-        private static readonly Color ColorExito = Color.LimeGreen;
-        private static readonly Color ColorError = Color.OrangeRed;
+        // Paleta El Fogón del Sur
+        private static readonly Color ColorFondo   = Color.FromArgb(120, 25, 25);   // Bordó primario
+        private static readonly Color ColorHover   = Color.FromArgb(250, 248, 245); // Crema pergamino
+        private static readonly Color ColorIcono   = Color.White;                   // Ícono/texto sobre bordó
+        private static readonly Color ColorTexto   = Color.White;
+        private static readonly Color ColorExito   = Color.FromArgb(39, 174, 96);   // Verde éxito
+        private static readonly Color ColorError   = Color.OrangeRed;
 
         public FormGestionRespaldos_08YS()
         {
@@ -312,24 +314,28 @@ namespace GUI_08YS.Admin
                 { btnSeleccionarCarpetaBackup, btnSeleccionarArchivoRestore, btnRealizarBackUp, btnRealizarRestore })
             {
                 btn.BackColor = ColorFondo;
-                btn.ForeColor = ColorOro;
-                btn.IconColor = ColorOro;
+                btn.ForeColor = ColorIcono;
+                btn.IconColor = ColorIcono;
                 btn.FlatStyle = FlatStyle.Flat;
-                btn.FlatAppearance.BorderColor = ColorOro;
-                btn.FlatAppearance.BorderSize = 1;
+                btn.FlatAppearance.BorderColor = ColorFondo;
+                btn.FlatAppearance.BorderSize = 0;
 
                 btn.MouseEnter += (s, _) => {
                     var b = (FontAwesome.Sharp.IconButton)s;
                     if (!b.Enabled) return;
-                    b.BackColor = ColorOro;
+                    b.BackColor = ColorHover;
                     b.ForeColor = ColorFondo;
                     b.IconColor = ColorFondo;
+                    b.FlatAppearance.BorderColor = ColorFondo;
+                    b.FlatAppearance.BorderSize = 1;
                 };
                 btn.MouseLeave += (s, _) => {
                     var b = (FontAwesome.Sharp.IconButton)s;
                     b.BackColor = ColorFondo;
-                    b.ForeColor = ColorOro;
-                    b.IconColor = ColorOro;
+                    b.ForeColor = ColorIcono;
+                    b.IconColor = ColorIcono;
+                    b.FlatAppearance.BorderColor = ColorFondo;
+                    b.FlatAppearance.BorderSize = 0;
                 };
             }
         }

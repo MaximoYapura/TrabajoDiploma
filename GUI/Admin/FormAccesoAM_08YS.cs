@@ -436,10 +436,10 @@ namespace GUI_08YS.Admin
             bool seleccionado = (e.State & TreeNodeStates.Selected) != 0;
 
             Color colorFondo = seleccionado
-                ? Color.FromArgb(5, 5, 100)
-                : Color.FromArgb(5, 10, 40);
+                ? Color.FromArgb(211, 84, 0)
+                : Color.FromArgb(250, 248, 245);
 
-            Color colorTexto = seleccionado ? Color.Gold : Color.White;
+            Color colorTexto = seleccionado ? Color.FromArgb(253, 246, 227) : Color.FromArgb(45, 42, 40);
 
             using (var brush = new SolidBrush(colorFondo))
                 e.Graphics.FillRectangle(brush, e.Bounds);
