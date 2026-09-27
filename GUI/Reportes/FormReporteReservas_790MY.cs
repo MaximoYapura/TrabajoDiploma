@@ -163,69 +163,111 @@ namespace GUI_08YS.Reportes
 
         private void GenerarPDF(string rutaArchivo)
         {
-            var t = TraductorManager_08YS.Instance;
+            var t       = TraductorManager_08YS.Instance;
+            var session = SessionManager_08YS.Instance;
 
-            // Documento A4 horizontal (landscape)
+            // ── Paleta de colores y fuentes ──
+            var colorBordo  = new BaseColor(120, 25, 25);
+            var colorGris   = new BaseColor(80, 80, 80);
+            var colorCrema  = new BaseColor(250, 248, 245);
+
+            var fuenteTitulo = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 16f,
+                                                         iTextSharp.text.Font.BOLD, colorBordo);
+            var fuenteSub    = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 9f,
+                                                         iTextSharp.text.Font.NORMAL, colorGris);
+            var fuenteAudit  = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8.5f,
+                                                         iTextSharp.text.Font.NORMAL, colorGris);
+            var fuenteAuditB = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8.5f,
+                                                         iTextSharp.text.Font.BOLD, colorGris);
+            var fuenteEnc    = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 9f,
+                                                         iTextSharp.text.Font.BOLD, BaseColor.WHITE);
+            var fuenteDato   = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8.5f,
+                                                         iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+
+            // ── Documento A4 horizontal (landscape) ──
             var doc = new Document(PageSize.A4.Rotate(), 30f, 30f, 40f, 30f);
             PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
             doc.Open();
 
+            // ── Encabezado: logo (izq.) + auditoría (der.) ──
+            var tablaEnc = new PdfPTable(2) { WidthPercentage = 100f, SpacingAfter = 6f };
+            tablaEnc.SetWidths(new float[] { 1.6f, 2.4f });
+
+            // Celda logo
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_fogon.png");
+            PdfPCell celdaLogo;
+            if (File.Exists(logoPath))
+            {
+                var img = iTextSharp.text.Image.GetInstance(logoPath);
+                img.ScaleToFit(135f, 55f);
+                celdaLogo = new PdfPCell { Border = PdfPCell.NO_BORDER, VerticalAlignment = Element.ALIGN_MIDDLE, PaddingBottom = 2f };
+                celdaLogo.AddElement(img);
+            }
+            else
+            {
+                celdaLogo = new PdfPCell(new Phrase("El Fogón del Sur", fuenteTitulo))
+                { Border = PdfPCell.NO_BORDER, VerticalAlignment = Element.ALIGN_MIDDLE };
+            }
+            tablaEnc.AddCell(celdaLogo);
+
+            // Celda auditoría
+            string usuario = session.Current != null
+                ? $"{session.Current.Nombre} {session.Current.Apellido} ({session.Current.Rol?.Nombre})"
+                : "-";
+
+            var phraseAudit = new Phrase();
+            phraseAudit.Add(new Chunk(t.GetTexto("REP_pdf_generadoPor") + ": ", fuenteAuditB));
+            phraseAudit.Add(new Chunk(usuario + "\n", fuenteAudit));
+            phraseAudit.Add(new Chunk(t.GetTexto("REP_pdf_fechaEmision") + ": ", fuenteAuditB));
+            phraseAudit.Add(new Chunk(DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fuenteAudit));
+
+            tablaEnc.AddCell(new PdfPCell(phraseAudit)
+            {
+                Border              = PdfPCell.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                VerticalAlignment   = Element.ALIGN_MIDDLE,
+                PaddingBottom       = 2f
+            });
+
+            doc.Add(tablaEnc);
+
             // ── Título ──
-            var fuenteTitulo = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 16f,
-                                                         iTextSharp.text.Font.BOLD,
-                                                         new BaseColor(120, 25, 25));
             doc.Add(new Paragraph(t.GetTexto("REP_pdf_titulo"), fuenteTitulo)
             {
-                Alignment   = Element.ALIGN_CENTER,
-                SpacingAfter = 4f
-            });
-
-            // ── Subtítulo: fecha de generación ──
-            var fuenteSub = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 9f,
-                                                      iTextSharp.text.Font.NORMAL,
-                                                      new BaseColor(80, 80, 80));
-            doc.Add(new Paragraph(
-                $"{t.GetTexto("REP_pdf_generado")}: {DateTime.Now:dd/MM/yyyy HH:mm}", fuenteSub)
-            {
                 Alignment    = Element.ALIGN_CENTER,
-                SpacingAfter = 10f
+                SpacingAfter = 6f
             });
 
-            // ── Tabla (8 columnas) ──
+            // ── Tabla de datos (8 columnas) ──
             float[] anchos = { 0.6f, 1.1f, 2.5f, 0.7f, 1.2f, 1.0f, 1.1f, 1.2f };
             var tabla = new PdfPTable(8) { WidthPercentage = 100f, SpacingBefore = 4f };
             tabla.SetWidths(anchos);
 
-            // Encabezados
-            var fuenteEnc = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 9f,
-                                                      iTextSharp.text.Font.BOLD, BaseColor.WHITE);
-            var colorEnc = new BaseColor(120, 25, 25);
+            // Encabezados con fondo bordó y borde bordó
             string[] encabezados =
             {
-                t.GetTexto("REP_colNro"), t.GetTexto("REP_colDni"), t.GetTexto("REP_colCliente"),
-                t.GetTexto("REP_colMesa"), t.GetTexto("REP_colFecha"), t.GetTexto("REP_colHora"),
-                t.GetTexto("REP_colComensales"), t.GetTexto("REP_colEstado")
+                t.GetTexto("REP_colNro"),        t.GetTexto("REP_colDni"),         t.GetTexto("REP_colCliente"),
+                t.GetTexto("REP_colMesa"),        t.GetTexto("REP_colFecha"),       t.GetTexto("REP_colHora"),
+                t.GetTexto("REP_colComensales"),  t.GetTexto("REP_colEstado")
             };
 
             foreach (var enc in encabezados)
             {
                 tabla.AddCell(new PdfPCell(new Phrase(enc, fuenteEnc))
                 {
-                    BackgroundColor     = colorEnc,
+                    BackgroundColor     = colorBordo,
                     HorizontalAlignment = Element.ALIGN_CENTER,
-                    Padding             = 5f
+                    Padding             = 5f,
+                    BorderColor         = colorBordo,
+                    BorderWidth         = 0.5f
                 });
             }
 
-            // Filas de datos
-            var fuenteDato = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8.5f,
-                                                       iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
-            var colorPar = new BaseColor(250, 248, 245);
-
+            // Filas de datos con bordes bordó
             for (int i = 0; i < _ultimoResultado.Count; i++)
             {
                 var r  = _ultimoResultado[i];
-                var bg = (i % 2 == 0) ? BaseColor.WHITE : colorPar;
+                var bg = (i % 2 == 0) ? BaseColor.WHITE : colorCrema;
 
                 string nombre = string.IsNullOrWhiteSpace(r.ClienteNombreCompleto)
                                 ? r.ClienteDNI.ToString()
@@ -237,7 +279,13 @@ namespace GUI_08YS.Reportes
 
                 void Ag(string texto, int alin = Element.ALIGN_CENTER) =>
                     tabla.AddCell(new PdfPCell(new Phrase(texto, fuenteDato))
-                    { BackgroundColor = bg, HorizontalAlignment = alin, Padding = 4f });
+                    {
+                        BackgroundColor     = bg,
+                        HorizontalAlignment = alin,
+                        Padding             = 4f,
+                        BorderColor         = colorBordo,
+                        BorderWidth         = 0.5f
+                    });
 
                 Ag(r.ReservaID.ToString());
                 Ag(r.ClienteDNI.ToString());
@@ -255,7 +303,7 @@ namespace GUI_08YS.Reportes
             doc.Add(new Paragraph(
                 $"{t.GetTexto("REP_pdf_total")}: {_ultimoResultado.Count}", fuenteSub)
             {
-                Alignment    = Element.ALIGN_RIGHT,
+                Alignment     = Element.ALIGN_RIGHT,
                 SpacingBefore = 6f
             });
 

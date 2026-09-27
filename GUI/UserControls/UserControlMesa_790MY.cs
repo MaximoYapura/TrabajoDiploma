@@ -100,7 +100,7 @@ namespace CustomControls
                 using (var brush = new SolidBrush(ColorDeFondo()))
                     g.FillPath(brush, path);
 
-                Color colorBorde = Seleccionada ? Color.FromArgb(6, 20, 90) : Color.FromArgb(120, 120, 120);
+                Color colorBorde = Seleccionada ? Color.FromArgb(211, 84, 0) : Color.FromArgb(150, 120, 100); // cobre #D35400 al seleccionar
                 int grosorBorde = Seleccionada ? 3 : 1;
                 using (var pen = new Pen(colorBorde, grosorBorde))
                     g.DrawPath(pen, path);
@@ -119,7 +119,8 @@ namespace CustomControls
                 : string.Empty;
 
             var flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak;
-            TextRenderer.DrawText(g, texto, Font, ClientRectangle, Color.FromArgb(30, 30, 30), flags);
+            // Texto blanco sobre fondos oscuros semánticos (olive/wine/amber)
+            TextRenderer.DrawText(g, texto, Font, ClientRectangle, Color.White, flags);
         }
 
         private Color ColorDeFondo()
@@ -127,13 +128,13 @@ namespace CustomControls
             switch (EstadoVisual)
             {
                 case EstadoMesa_790MY.Libre:
-                    return Color.FromArgb(198, 239, 206); // verde suave
+                    return Color.FromArgb(107, 138, 74);  // olive    #6B8A4A
                 case EstadoMesa_790MY.Ocupada:
-                    return Color.FromArgb(255, 199, 206); // rojo suave
+                    return Color.FromArgb(120, 25, 40);   // wine     #781928
                 case EstadoMesa_790MY.Reservada:
-                    return Color.FromArgb(255, 235, 156); // amarillo suave
+                    return Color.FromArgb(184, 138, 32);  // amber    #B88A20
                 default:
-                    return Color.Gainsboro;
+                    return Color.FromArgb(100, 90, 80);   // gris cálido
             }
         }
 

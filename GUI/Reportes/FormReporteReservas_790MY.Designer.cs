@@ -88,12 +88,12 @@ namespace GUI_08YS.Reportes
             this.lblDesde.Text = "Desde:";
 
             // ── dtpDesde_790MY ──
+            this.dtpDesde_790MY.ShowCheckBox = true;
             this.dtpDesde_790MY.Checked = false;
             this.dtpDesde_790MY.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpDesde_790MY.Location = new System.Drawing.Point(63, 24);
+            this.dtpDesde_790MY.Location = new System.Drawing.Point(63, 21);
             this.dtpDesde_790MY.Name = "dtpDesde_790MY";
-            this.dtpDesde_790MY.ShowCheckBox = true;
-            this.dtpDesde_790MY.Size = new System.Drawing.Size(165, 20);
+            this.dtpDesde_790MY.Size = new System.Drawing.Size(165, 26);
             this.dtpDesde_790MY.TabIndex = 1;
 
             // ── lblHasta ──
@@ -107,12 +107,12 @@ namespace GUI_08YS.Reportes
             this.lblHasta.Text = "Hasta:";
 
             // ── dtpHasta_790MY ──
+            this.dtpHasta_790MY.ShowCheckBox = true;
             this.dtpHasta_790MY.Checked = false;
             this.dtpHasta_790MY.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpHasta_790MY.Location = new System.Drawing.Point(291, 24);
+            this.dtpHasta_790MY.Location = new System.Drawing.Point(291, 21);
             this.dtpHasta_790MY.Name = "dtpHasta_790MY";
-            this.dtpHasta_790MY.ShowCheckBox = true;
-            this.dtpHasta_790MY.Size = new System.Drawing.Size(165, 20);
+            this.dtpHasta_790MY.Size = new System.Drawing.Size(165, 26);
             this.dtpHasta_790MY.TabIndex = 3;
 
             // ── lblDni ──

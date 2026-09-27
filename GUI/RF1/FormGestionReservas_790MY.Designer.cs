@@ -114,12 +114,16 @@
             //
             // btnBuscar_790MY
             //
+            this.btnBuscar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnBuscar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBuscar_790MY.FlatAppearance.BorderSize = 0;
+            this.btnBuscar_790MY.ForeColor = System.Drawing.Color.White;
             this.btnBuscar_790MY.Location = new System.Drawing.Point(450, 89);
             this.btnBuscar_790MY.Name = "btnBuscar_790MY";
             this.btnBuscar_790MY.Size = new System.Drawing.Size(90, 26);
             this.btnBuscar_790MY.Tag = "btnBuscar";
             this.btnBuscar_790MY.Text = "Buscar";
-            this.btnBuscar_790MY.UseVisualStyleBackColor = true;
+            this.btnBuscar_790MY.UseVisualStyleBackColor = false;
             this.btnBuscar_790MY.Click += new System.EventHandler(this.btnBuscar_790MY_Click);
             //
             // btnLimpiar_790MY
@@ -146,7 +150,7 @@
             this.dgvReservas_790MY.MultiSelect = false;
             this.dgvReservas_790MY.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.dgvReservas_790MY.EnableHeadersVisualStyles = false;
-            this.dgvReservas_790MY.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
+            this.dgvReservas_790MY.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.dgvReservas_790MY.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.dgvReservas_790MY.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.dgvReservas_790MY.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
@@ -232,6 +236,7 @@
             this.btnCancelarReserva_790MY.Location = new System.Drawing.Point(20, 425);
             this.btnCancelarReserva_790MY.Name = "btnCancelarReserva_790MY";
             this.btnCancelarReserva_790MY.Size = new System.Drawing.Size(160, 32);
+            this.btnCancelarReserva_790MY.Tag = "btnCancelarReserva";
             this.btnCancelarReserva_790MY.Text = "Cancelar Reserva";
             this.btnCancelarReserva_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelarReserva_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));

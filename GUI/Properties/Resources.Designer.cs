@@ -93,6 +93,16 @@ namespace GUI_08YS.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ChatGPT_Image_26_sept_2026__21_21_47 {
+            get {
+                object obj = ResourceManager.GetObject("ChatGPT Image 26 sept 2026, 21_21_47", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap HorizonLogoPuro {
             get {
                 object obj = ResourceManager.GetObject("HorizonLogoPuro", resourceCulture);
@@ -106,6 +116,16 @@ namespace GUI_08YS.Properties {
         internal static System.Drawing.Bitmap HorizonLogoPuro1 {
             get {
                 object obj = ResourceManager.GetObject("HorizonLogoPuro1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap logo_fogon {
+            get {
+                object obj = ResourceManager.GetObject("logo_fogon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

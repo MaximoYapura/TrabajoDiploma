@@ -54,8 +54,8 @@ namespace CustomControls
         // ──────────────────────────────────────────────────────────────────
         // Borde
         // ──────────────────────────────────────────────────────────────────
-        private Color _borderColor = Color.FromArgb(180, 180, 180);
-        private Color _borderFocusColor = Color.FromArgb(100, 149, 237);
+        private Color _borderColor = Color.FromArgb(195, 180, 165);
+        private Color _borderFocusColor = Color.FromArgb(211, 84, 0);  // cobre #D35400
         private int _borderWidth = 1;
         private int _cornerRadius = 0;
         private bool _isFocused = false;
@@ -70,11 +70,12 @@ namespace CustomControls
         // ──────────────────────────────────────────────────────────────────
         // Colores del calendario — ahora sí funcionan porque pintamos a mano
         // ──────────────────────────────────────────────────────────────────
-        private Color _calBackColor = SystemColors.Window;
-        private Color _calForeColor = SystemColors.WindowText;
-        private Color _calTitleBackColor = Color.FromArgb(0, 120, 215);
-        private Color _calTitleForeColor = Color.White;
-        private Color _calTrailingForeColor = Color.Silver;
+        // Paleta "El Fogón del Sur" — defaults para el calendario desplegable
+        private Color _calBackColor = Color.FromArgb(250, 248, 245);   // crema #FAF8F5
+        private Color _calForeColor = Color.FromArgb(45, 30, 20);
+        private Color _calTitleBackColor = Color.FromArgb(120, 25, 25); // bordó #781919
+        private Color _calTitleForeColor = Color.FromArgb(253, 246, 227);
+        private Color _calTrailingForeColor = Color.FromArgb(190, 170, 155);
 
         // ══════════════════════════════════════════════════════════════════
         // Eventos

@@ -31,6 +31,7 @@ namespace GUI_08YS
         public FormLogin_08YS(bool modoRelogin = false)
         {
             InitializeComponent();
+            CargarLogo();
             ModoRelogin = modoRelogin;
             _userBLL = BLLFactory_08YS.CreateUserBLL();
             ConfigurarCombo();
@@ -43,6 +44,22 @@ namespace GUI_08YS
             // 2. Ejecutamos la carga inicial de traducciones
             UpdateIdioma();
 
+        }
+
+        private void CargarLogo()
+        {
+            try
+            {
+                string logoPath = System.IO.Path.Combine(
+                    System.Windows.Forms.Application.StartupPath, "Resources", "logo_fogon.png");
+                if (System.IO.File.Exists(logoPath))
+                {
+                    var img = System.Drawing.Image.FromFile(logoPath);
+                    pictureBox2.Image = img;  // Logo grande panel izquierdo
+                    pictureBox1.Image = img;  // Logo miniatura barra superior
+                }
+            }
+            catch { /* Si no se puede cargar el logo, el panel queda en bordó */ }
         }
 
         #region Idioma
@@ -337,7 +354,7 @@ namespace GUI_08YS
                 if (_userTienePlaceholder)
                 {
                     txtUsername.Text = "";
-                    txtUsername.ForeColor = Color.White;
+                    txtUsername.ForeColor = Color.FromArgb(45, 42, 40);
                     _userTienePlaceholder = false;
                 }
             };
@@ -355,7 +372,7 @@ namespace GUI_08YS
                 if (_passTienePlaceholder)
                 {
                     txtPassword.Text = "";
-                    txtPassword.ForeColor = Color.White;
+                    txtPassword.ForeColor = Color.FromArgb(45, 42, 40);
                     txtPassword.MaskedInput = true; // Activamos máscara al escribir
                     _passTienePlaceholder = false;
                 }

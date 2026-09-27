@@ -308,6 +308,7 @@
 
     "SM_titulo": "Seleccionar Mesa",
     "SM_lblSinResultados": "No hay mesas disponibles para ese turno.",
+    "SM_lblPlano": "Plano del local",
 
     "LS_btnQuitar": "Quitar",
 
@@ -439,13 +440,13 @@
     "menuReportes": "Reportes",
     "VerMaestros": "Ver Maestros",
     "VerReportes": "Ver Reportes",
-    "msg_dv_inconsistente": "Se ha detectado una inconsistencia de integridad en la base de datos (Dígitos Verificadores).",
+    "btnCancelarReserva": "Cancelar Reserva",
     "rol_SuperAdmin": "SuperAdmin",
     "rol_Supervisor": "Supervisor",
-    "rol_Gestor de accesos": "Gestor de accesos",
+    "rol_Gestor de accesos": "Gestor de Accesos",
     "rol_Recepcionista": "Recepcionista",
     "rol_Gerente": "Gerente",
-    "btnCancelarReserva": "Cancelar Reserva"
+    "lblEslogan_Fogon": "Sabores que cuentan historias"
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -755,6 +756,7 @@
 
     "SM_titulo": "Select Table",
     "SM_lblSinResultados": "No tables available for that shift.",
+    "SM_lblPlano": "Restaurant floor plan",
 
     "LS_btnQuitar": "Remove",
 
@@ -886,12 +888,12 @@
     "menuReportes": "Reports",
     "VerMaestros": "View Masters",
     "VerReportes": "View Reports",
-    "msg_dv_inconsistente": "A data integrity inconsistency has been detected in the database (Verification Digits).",
+    "btnCancelarReserva": "Cancel Reservation",
     "rol_SuperAdmin": "SuperAdmin",
     "rol_Supervisor": "Supervisor",
     "rol_Gestor de accesos": "Access Manager",
     "rol_Recepcionista": "Receptionist",
     "rol_Gerente": "Manager",
-    "btnCancelarReserva": "Cancel Reservation"
+    "lblEslogan_Fogon": "Flavors that tell stories"
   }
 }

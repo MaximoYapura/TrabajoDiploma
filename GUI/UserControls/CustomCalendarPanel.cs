@@ -57,20 +57,21 @@ namespace CustomControls
         // ──────────────────────────────────────────────────────────────────
         // Colores
         // ──────────────────────────────────────────────────────────────────
-        private Color _titleBackColor = Color.FromArgb(0, 120, 215);
-        private Color _titleForeColor = Color.White;
-        private Color _dayNameForeColor = Color.FromArgb(180, 180, 180);
-        private Color _dayForeColor = SystemColors.WindowText;
-        private Color _trailingForeColor = Color.Silver;
-        private Color _todayHighlightColor = Color.FromArgb(0, 120, 215);
-        private Color _selectedBackColor = Color.FromArgb(0, 120, 215);
+        // Paleta "El Fogón del Sur": bordó #781919 · cobre #D35400 · crema #FAF8F5
+        private Color _titleBackColor = Color.FromArgb(120, 25, 25);    // bordó #781919
+        private Color _titleForeColor = Color.FromArgb(253, 246, 227);  // crema dorada
+        private Color _dayNameForeColor = Color.FromArgb(150, 110, 90);
+        private Color _dayForeColor = Color.FromArgb(45, 30, 20);
+        private Color _trailingForeColor = Color.FromArgb(190, 170, 155);
+        private Color _todayHighlightColor = Color.FromArgb(211, 84, 0);   // cobre #D35400
+        private Color _selectedBackColor = Color.FromArgb(211, 84, 0);    // cobre #D35400
         private Color _selectedForeColor = Color.White;
-        private Color _hoverBackColor = Color.FromArgb(220, 235, 252);
-        private Color _hoverForeColor = SystemColors.WindowText;
-        private Color _disabledForeColor = Color.FromArgb(160, 160, 160);
-        private Color _footerForeColor = SystemColors.WindowText;
-        private Color _separatorColor = Color.FromArgb(200, 200, 200);
-        private Color _navButtonHoverColor = Color.FromArgb(180, 210, 245);
+        private Color _hoverBackColor = Color.FromArgb(239, 235, 228);    // crema-madera #EFEBE4
+        private Color _hoverForeColor = Color.FromArgb(45, 30, 20);
+        private Color _disabledForeColor = Color.FromArgb(190, 175, 165);
+        private Color _footerForeColor = Color.FromArgb(90, 70, 55);
+        private Color _separatorColor = Color.FromArgb(215, 205, 195);
+        private Color _navButtonHoverColor = Color.FromArgb(180, 100, 60); // cobre oscuro nav-hover
 
         // ──────────────────────────────────────────────────────────────────
         // Opciones
@@ -122,8 +123,8 @@ namespace CustomControls
             _yearRangeStart = DateTime.Today.Year - 5;
 
             Font = new Font("Segoe UI", 9.5f);
-            BackColor = SystemColors.Window;
-            ForeColor = SystemColors.WindowText;
+            BackColor = Color.FromArgb(250, 248, 245);  // crema pergamino #FAF8F5
+            ForeColor = Color.FromArgb(45, 30, 20);
 
             RecalcLayout();
             Size = PreferredSize;

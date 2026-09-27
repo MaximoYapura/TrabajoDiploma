@@ -245,6 +245,10 @@
     <Content Include="idiomas.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\ChatGPT Image 26 sept 2026, 21_21_47.png" />
+    <Content Include="Resources\logo_fogon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\AppIcon.ico" />
     <Content Include="script.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

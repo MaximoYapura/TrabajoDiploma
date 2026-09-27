@@ -63,12 +63,16 @@ namespace GUI_08YS.RF1
             //
             // btnBuscarCliente_790MY
             //
+            this.btnBuscarCliente_790MY.BackColor = System.Drawing.Color.FromArgb(239, 235, 228);
+            this.btnBuscarCliente_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBuscarCliente_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(120, 25, 25);
+            this.btnBuscarCliente_790MY.ForeColor = System.Drawing.Color.FromArgb(45, 30, 20);
             this.btnBuscarCliente_790MY.Location = new System.Drawing.Point(270, 55);
             this.btnBuscarCliente_790MY.Name = "btnBuscarCliente_790MY";
             this.btnBuscarCliente_790MY.Size = new System.Drawing.Size(80, 25);
             this.btnBuscarCliente_790MY.Text = "Buscar";
             this.btnBuscarCliente_790MY.Tag = "btnBuscar";
-            this.btnBuscarCliente_790MY.UseVisualStyleBackColor = true;
+            this.btnBuscarCliente_790MY.UseVisualStyleBackColor = false;
             this.btnBuscarCliente_790MY.Click += new System.EventHandler(this.btnBuscarCliente_790MY_Click);
             //
             // lblClienteInfo_790MY
@@ -92,10 +96,10 @@ namespace GUI_08YS.RF1
             // dtpFecha_790MY
             //
             this.dtpFecha_790MY.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFecha_790MY.Location = new System.Drawing.Point(110, 96);
+            this.dtpFecha_790MY.Location = new System.Drawing.Point(110, 93);
             this.dtpFecha_790MY.Name = "dtpFecha_790MY";
-            this.dtpFecha_790MY.Size = new System.Drawing.Size(150, 20);
-            this.dtpFecha_790MY.ValueChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
+            this.dtpFecha_790MY.Size = new System.Drawing.Size(160, 26);
+this.dtpFecha_790MY.ValueChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
             //
             // lblHora_790MY
             //
@@ -134,12 +138,16 @@ namespace GUI_08YS.RF1
             //
             // btnSeleccionarMesa_790MY
             //
+            this.btnSeleccionarMesa_790MY.BackColor = System.Drawing.Color.FromArgb(239, 235, 228);
+            this.btnSeleccionarMesa_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSeleccionarMesa_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(120, 25, 25);
+            this.btnSeleccionarMesa_790MY.ForeColor = System.Drawing.Color.FromArgb(45, 30, 20);
             this.btnSeleccionarMesa_790MY.Location = new System.Drawing.Point(20, 225);
             this.btnSeleccionarMesa_790MY.Name = "btnSeleccionarMesa_790MY";
             this.btnSeleccionarMesa_790MY.Size = new System.Drawing.Size(140, 28);
             this.btnSeleccionarMesa_790MY.Text = "Seleccionar Mesa";
             this.btnSeleccionarMesa_790MY.Tag = "RR_btnSeleccionarMesa";
-            this.btnSeleccionarMesa_790MY.UseVisualStyleBackColor = true;
+            this.btnSeleccionarMesa_790MY.UseVisualStyleBackColor = false;
             this.btnSeleccionarMesa_790MY.Click += new System.EventHandler(this.btnSeleccionarMesa_790MY_Click);
             //
             // lblMesaSeleccionada_790MY
