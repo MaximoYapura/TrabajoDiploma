@@ -57,6 +57,7 @@ namespace GUI_08YS.Maestros
 
         private void FormClientes_790MY_Load(object sender, EventArgs e)
         {
+            CargarGrilla();
             UpdateIdioma(); // Aplicar traducciones al abrir (modo normal y modal)
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
 
@@ -482,12 +483,30 @@ namespace GUI_08YS.Maestros
                 this.Text = TraductorManager_08YS.Instance.GetTexto("FC_titulo_registro_rapido");
 
             // Encabezados de columnas del DGV (no son Controls, deben traducirse explícitamente)
-            colDni_790MY.HeaderText       = TraductorManager_08YS.Instance.GetTexto("FC_colDni");
-            colApellidos_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colApellidos");
-            colNombres_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("FC_colNombres");
-            colEmail_790MY.HeaderText     = TraductorManager_08YS.Instance.GetTexto("FC_colEmail");
-            colCelular_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("FC_colCelular");
-            colDireccion_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDireccion");
+            //colDni_790MY.HeaderText       = TraductorManager_08YS.Instance.GetTexto("FC_colDni");
+            //colApellidos_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colApellidos");
+            //colNombres_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("FC_colNombres");
+            //colEmail_790MY.HeaderText     = TraductorManager_08YS.Instance.GetTexto("FC_colEmail");
+            //colCelular_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("FC_colCelular");
+            //colDireccion_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDireccion");
+            if (dgvClientes_790MY.Columns.Count > 0)
+            {
+                if (dgvClientes_790MY.Columns.Contains("colDni_790MY"))
+                    dgvClientes_790MY.Columns["colDni_790MY"].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDni");
+                else if (dgvClientes_790MY.Columns.Contains("DNI"))
+                    dgvClientes_790MY.Columns["DNI"].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDni");
+
+                // O traduciendo directamente por índice (0: DNI, 1: Apellidos, 2: Nombres, 3: Email, 4: Celular, 5: Dirección):
+                if (dgvClientes_790MY.Columns.Count >= 6)
+                {
+                    dgvClientes_790MY.Columns[0].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDni");
+                    dgvClientes_790MY.Columns[1].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colApellidos");
+                    dgvClientes_790MY.Columns[2].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colNombres");
+                    dgvClientes_790MY.Columns[3].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colEmail");
+                    dgvClientes_790MY.Columns[4].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colCelular");
+                    dgvClientes_790MY.Columns[5].HeaderText = TraductorManager_08YS.Instance.GetTexto("FC_colDireccion");
+                }
+            }
         }
 
         private void TraducirControles(Control contenedor)

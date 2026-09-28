@@ -447,7 +447,9 @@
     "aviso_titulo": "Aviso",
     "SM_footer_comensales": "Comensales",
     "SM_footer_fecha": "Fecha",
-    "SM_footer_hora": "Hora"
+    "SM_footer_hora": "Hora",
+    "lblTituloConsultaReservas": "Consultar / Cancelar Reservas"
+
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -897,6 +899,7 @@
     "aviso_titulo": "Notice",
     "SM_footer_comensales": "Diners",
     "SM_footer_fecha": "Date",
-    "SM_footer_hora": "Time"
+    "SM_footer_hora": "Time",
+    "lblTituloConsultaReservas": "Consult/Cancel Reservations"
   }
 }

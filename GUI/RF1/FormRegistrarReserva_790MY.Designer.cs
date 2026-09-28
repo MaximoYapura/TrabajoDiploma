@@ -33,151 +33,172 @@ namespace GUI_08YS.RF1
             this.btnConfirmar_790MY = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudComensales_790MY)).BeginInit();
             this.SuspendLayout();
-            //
+            // 
             // lblTitulo_790MY
-            //
+            // 
             this.lblTitulo_790MY.AutoSize = true;
             this.lblTitulo_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.lblTitulo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblTitulo_790MY.Location = new System.Drawing.Point(20, 15);
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
-            this.lblTitulo_790MY.Size = new System.Drawing.Size(180, 25);
-            this.lblTitulo_790MY.Text = "Registrar Reserva";
+            this.lblTitulo_790MY.Size = new System.Drawing.Size(142, 21);
+            this.lblTitulo_790MY.TabIndex = 13;
             this.lblTitulo_790MY.Tag = "RR_titulo";
-            //
+            this.lblTitulo_790MY.Text = "Registrar Reserva";
+            // 
             // lblDniCliente_790MY
-            //
+            // 
             this.lblDniCliente_790MY.AutoSize = true;
+            this.lblDniCliente_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDniCliente_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblDniCliente_790MY.Location = new System.Drawing.Point(20, 60);
+            this.lblDniCliente_790MY.Location = new System.Drawing.Point(57, 65);
             this.lblDniCliente_790MY.Name = "lblDniCliente_790MY";
-            this.lblDniCliente_790MY.Size = new System.Drawing.Size(70, 15);
-            this.lblDniCliente_790MY.Text = "DNI Cliente:";
+            this.lblDniCliente_790MY.Size = new System.Drawing.Size(94, 20);
+            this.lblDniCliente_790MY.TabIndex = 12;
             this.lblDniCliente_790MY.Tag = "RR_lblDniCliente";
-            //
+            this.lblDniCliente_790MY.Text = "DNI Cliente:";
+            // 
             // txtDniCliente_790MY
-            //
-            this.txtDniCliente_790MY.Location = new System.Drawing.Point(110, 57);
+            // 
+            this.txtDniCliente_790MY.Location = new System.Drawing.Point(210, 65);
             this.txtDniCliente_790MY.Name = "txtDniCliente_790MY";
-            this.txtDniCliente_790MY.Size = new System.Drawing.Size(150, 20);
-            //
+            this.txtDniCliente_790MY.Size = new System.Drawing.Size(555, 20);
+            this.txtDniCliente_790MY.TabIndex = 11;
+            // 
             // btnBuscarCliente_790MY
-            //
-            this.btnBuscarCliente_790MY.BackColor = System.Drawing.Color.FromArgb(239, 235, 228);
+            // 
+            this.btnBuscarCliente_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(235)))), ((int)(((byte)(228)))));
+            this.btnBuscarCliente_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnBuscarCliente_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnBuscarCliente_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(120, 25, 25);
-            this.btnBuscarCliente_790MY.ForeColor = System.Drawing.Color.FromArgb(45, 30, 20);
-            this.btnBuscarCliente_790MY.Location = new System.Drawing.Point(270, 55);
+            this.btnBuscarCliente_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBuscarCliente_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(30)))), ((int)(((byte)(20)))));
+            this.btnBuscarCliente_790MY.Location = new System.Drawing.Point(848, 57);
             this.btnBuscarCliente_790MY.Name = "btnBuscarCliente_790MY";
-            this.btnBuscarCliente_790MY.Size = new System.Drawing.Size(80, 25);
-            this.btnBuscarCliente_790MY.Text = "Buscar";
+            this.btnBuscarCliente_790MY.Size = new System.Drawing.Size(171, 36);
+            this.btnBuscarCliente_790MY.TabIndex = 10;
             this.btnBuscarCliente_790MY.Tag = "btnBuscar";
+            this.btnBuscarCliente_790MY.Text = "Buscar";
             this.btnBuscarCliente_790MY.UseVisualStyleBackColor = false;
             this.btnBuscarCliente_790MY.Click += new System.EventHandler(this.btnBuscarCliente_790MY_Click);
-            //
+            // 
             // lblClienteInfo_790MY
-            //
+            // 
             this.lblClienteInfo_790MY.AutoSize = true;
             this.lblClienteInfo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.lblClienteInfo_790MY.Location = new System.Drawing.Point(365, 60);
             this.lblClienteInfo_790MY.Name = "lblClienteInfo_790MY";
-            this.lblClienteInfo_790MY.Size = new System.Drawing.Size(0, 15);
-            //
+            this.lblClienteInfo_790MY.Size = new System.Drawing.Size(0, 13);
+            this.lblClienteInfo_790MY.TabIndex = 9;
+            // 
             // lblFecha_790MY
-            //
+            // 
             this.lblFecha_790MY.AutoSize = true;
+            this.lblFecha_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblFecha_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblFecha_790MY.Location = new System.Drawing.Point(20, 100);
+            this.lblFecha_790MY.Location = new System.Drawing.Point(150, 193);
             this.lblFecha_790MY.Name = "lblFecha_790MY";
-            this.lblFecha_790MY.Size = new System.Drawing.Size(40, 15);
-            this.lblFecha_790MY.Text = "Fecha:";
+            this.lblFecha_790MY.Size = new System.Drawing.Size(58, 20);
+            this.lblFecha_790MY.TabIndex = 8;
             this.lblFecha_790MY.Tag = "RR_lblFecha";
-            //
+            this.lblFecha_790MY.Text = "Fecha:";
+            // 
             // dtpFecha_790MY
-            //
+            // 
             this.dtpFecha_790MY.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFecha_790MY.Location = new System.Drawing.Point(110, 93);
+            this.dtpFecha_790MY.Location = new System.Drawing.Point(232, 192);
             this.dtpFecha_790MY.Name = "dtpFecha_790MY";
-            this.dtpFecha_790MY.Size = new System.Drawing.Size(160, 26);
-this.dtpFecha_790MY.ValueChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
-            //
+            this.dtpFecha_790MY.Size = new System.Drawing.Size(160, 20);
+            this.dtpFecha_790MY.TabIndex = 7;
+            this.dtpFecha_790MY.ValueChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
+            // 
             // lblHora_790MY
-            //
+            // 
             this.lblHora_790MY.AutoSize = true;
+            this.lblHora_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblHora_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblHora_790MY.Location = new System.Drawing.Point(20, 140);
+            this.lblHora_790MY.Location = new System.Drawing.Point(150, 282);
             this.lblHora_790MY.Name = "lblHora_790MY";
-            this.lblHora_790MY.Size = new System.Drawing.Size(60, 15);
-            this.lblHora_790MY.Text = "Turno:";
+            this.lblHora_790MY.Size = new System.Drawing.Size(54, 20);
+            this.lblHora_790MY.TabIndex = 6;
             this.lblHora_790MY.Tag = "RR_lblHora";
-            //
+            this.lblHora_790MY.Text = "Turno:";
+            // 
             // cmbHora_790MY
-            //
+            // 
             this.cmbHora_790MY.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbHora_790MY.Location = new System.Drawing.Point(110, 136);
+            this.cmbHora_790MY.Location = new System.Drawing.Point(232, 281);
             this.cmbHora_790MY.Name = "cmbHora_790MY";
-            this.cmbHora_790MY.Size = new System.Drawing.Size(150, 21);
+            this.cmbHora_790MY.Size = new System.Drawing.Size(160, 21);
+            this.cmbHora_790MY.TabIndex = 5;
             this.cmbHora_790MY.SelectedIndexChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
-            //
+            // 
             // lblComensales_790MY
-            //
+            // 
             this.lblComensales_790MY.AutoSize = true;
+            this.lblComensales_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblComensales_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblComensales_790MY.Location = new System.Drawing.Point(20, 180);
+            this.lblComensales_790MY.Location = new System.Drawing.Point(506, 187);
             this.lblComensales_790MY.Name = "lblComensales_790MY";
-            this.lblComensales_790MY.Size = new System.Drawing.Size(90, 15);
-            this.lblComensales_790MY.Text = "Comensales:";
+            this.lblComensales_790MY.Size = new System.Drawing.Size(101, 20);
+            this.lblComensales_790MY.TabIndex = 4;
             this.lblComensales_790MY.Tag = "RR_lblComensales";
-            //
+            this.lblComensales_790MY.Text = "Comensales:";
+            // 
             // nudComensales_790MY
-            //
-            this.nudComensales_790MY.Location = new System.Drawing.Point(110, 178);
+            // 
+            this.nudComensales_790MY.Location = new System.Drawing.Point(636, 187);
             this.nudComensales_790MY.Name = "nudComensales_790MY";
-            this.nudComensales_790MY.Size = new System.Drawing.Size(80, 20);
+            this.nudComensales_790MY.Size = new System.Drawing.Size(148, 20);
+            this.nudComensales_790MY.TabIndex = 3;
             this.nudComensales_790MY.ValueChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
-            //
+            // 
             // btnSeleccionarMesa_790MY
-            //
-            this.btnSeleccionarMesa_790MY.BackColor = System.Drawing.Color.FromArgb(239, 235, 228);
+            // 
+            this.btnSeleccionarMesa_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(235)))), ((int)(((byte)(228)))));
+            this.btnSeleccionarMesa_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnSeleccionarMesa_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSeleccionarMesa_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(120, 25, 25);
-            this.btnSeleccionarMesa_790MY.ForeColor = System.Drawing.Color.FromArgb(45, 30, 20);
-            this.btnSeleccionarMesa_790MY.Location = new System.Drawing.Point(20, 225);
+            this.btnSeleccionarMesa_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSeleccionarMesa_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(30)))), ((int)(((byte)(20)))));
+            this.btnSeleccionarMesa_790MY.Location = new System.Drawing.Point(510, 274);
             this.btnSeleccionarMesa_790MY.Name = "btnSeleccionarMesa_790MY";
-            this.btnSeleccionarMesa_790MY.Size = new System.Drawing.Size(140, 28);
-            this.btnSeleccionarMesa_790MY.Text = "Seleccionar Mesa";
+            this.btnSeleccionarMesa_790MY.Size = new System.Drawing.Size(171, 36);
+            this.btnSeleccionarMesa_790MY.TabIndex = 2;
             this.btnSeleccionarMesa_790MY.Tag = "RR_btnSeleccionarMesa";
+            this.btnSeleccionarMesa_790MY.Text = "Seleccionar Mesa";
             this.btnSeleccionarMesa_790MY.UseVisualStyleBackColor = false;
             this.btnSeleccionarMesa_790MY.Click += new System.EventHandler(this.btnSeleccionarMesa_790MY_Click);
-            //
+            // 
             // lblMesaSeleccionada_790MY
-            //
+            // 
             this.lblMesaSeleccionada_790MY.AutoSize = true;
-            this.lblMesaSeleccionada_790MY.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.lblMesaSeleccionada_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMesaSeleccionada_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblMesaSeleccionada_790MY.Location = new System.Drawing.Point(175, 232);
+            this.lblMesaSeleccionada_790MY.Location = new System.Drawing.Point(734, 277);
             this.lblMesaSeleccionada_790MY.Name = "lblMesaSeleccionada_790MY";
-            this.lblMesaSeleccionada_790MY.Size = new System.Drawing.Size(110, 15);
-            this.lblMesaSeleccionada_790MY.Text = "(sin seleccionar)";
+            this.lblMesaSeleccionada_790MY.Size = new System.Drawing.Size(134, 21);
+            this.lblMesaSeleccionada_790MY.TabIndex = 1;
             this.lblMesaSeleccionada_790MY.Tag = "RR_lblMesaSinSeleccionar";
-            //
+            this.lblMesaSeleccionada_790MY.Text = "(sin seleccionar)";
+            // 
             // btnConfirmar_790MY
-            //
-            this.btnConfirmar_790MY.Location = new System.Drawing.Point(20, 280);
-            this.btnConfirmar_790MY.Name = "btnConfirmar_790MY";
-            this.btnConfirmar_790MY.Size = new System.Drawing.Size(140, 32);
-            this.btnConfirmar_790MY.Text = "Confirmar Reserva";
-            this.btnConfirmar_790MY.Tag = "RR_btnConfirmar";
-            this.btnConfirmar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            // 
             this.btnConfirmar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnConfirmar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfirmar_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnConfirmar_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnConfirmar_790MY.Location = new System.Drawing.Point(436, 415);
+            this.btnConfirmar_790MY.Name = "btnConfirmar_790MY";
+            this.btnConfirmar_790MY.Size = new System.Drawing.Size(171, 36);
+            this.btnConfirmar_790MY.TabIndex = 0;
+            this.btnConfirmar_790MY.Tag = "RR_btnConfirmar";
+            this.btnConfirmar_790MY.Text = "Confirmar Reserva";
             this.btnConfirmar_790MY.UseVisualStyleBackColor = false;
             this.btnConfirmar_790MY.Click += new System.EventHandler(this.btnConfirmar_790MY_Click);
-            //
+            // 
             // FormRegistrarReserva_790MY
-            //
+            // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(500, 340);
+            this.ClientSize = new System.Drawing.Size(1073, 704);
             this.Controls.Add(this.btnConfirmar_790MY);
             this.Controls.Add(this.lblMesaSeleccionada_790MY);
             this.Controls.Add(this.btnSeleccionarMesa_790MY);

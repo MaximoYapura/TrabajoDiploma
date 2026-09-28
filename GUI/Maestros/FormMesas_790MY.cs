@@ -57,6 +57,7 @@ namespace GUI_08YS.Maestros
         {
             dgvMesas_790MY.DataSource = null;
             dgvMesas_790MY.DataSource = _mesaBll.GetAll();
+            dgvMesas_790MY.Columns[3].Visible = false; // Ocultar columna Estado (solo se muestra en detalle)
         }
 
         private void dgvMesas_790MY_SelectionChanged(object sender, EventArgs e)
@@ -225,9 +226,23 @@ namespace GUI_08YS.Maestros
         public void UpdateIdioma()
         {
             TraducirControles(this);
-            colNumero_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colNumero");
-            colCapacidad_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colCapacidad");
-            colEstado_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colEstado");
+
+            if (dgvMesas_790MY.Columns.Count > 0)
+            {
+                if (dgvMesas_790MY.Columns.Contains("FM_colNumero"))
+                    dgvMesas_790MY.Columns["FM_colNumero"].HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colNumero");
+                else if (dgvMesas_790MY.Columns.Contains("Número"))
+                    dgvMesas_790MY.Columns["Número"].HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colNumero");
+
+              
+                if (dgvMesas_790MY.Columns.Count >= 3)
+                {
+                    dgvMesas_790MY.Columns[0].HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colNumero");
+                    dgvMesas_790MY.Columns[1].HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colCapacidad");
+                    dgvMesas_790MY.Columns[2].HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colEstado");
+                }
+            }
+            
             this.Text = TraductorManager_08YS.Instance.GetTexto("FM_titulo");
         }
 

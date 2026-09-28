@@ -43,9 +43,10 @@ namespace GUI_08YS.RF1
 
             dtpDesde_790MY.Checked = false;
             dtpHasta_790MY.Checked = false;
-
+            
             CargarEstados();
             BuscarReservas();
+            UpdateIdioma();
         }
 
         /// <summary>
@@ -187,21 +188,35 @@ namespace GUI_08YS.RF1
             // Refrescar el ComboBox de estado con los nuevos textos traducidos
             CargarEstados();
 
-            // Encabezados de columnas del DGV (no son Controls, deben traducirse explícitamente)
-            colReservaID_790MY.HeaderText   = TraductorManager_08YS.Instance.GetTexto("GR_colNro");
-            colDniCliente_790MY.HeaderText  = TraductorManager_08YS.Instance.GetTexto("GR_colDni");
-            colCliente_790MY.HeaderText     = TraductorManager_08YS.Instance.GetTexto("GR_colCliente");
-            colMesa_790MY.HeaderText        = TraductorManager_08YS.Instance.GetTexto("GR_colMesa");
-            colFecha_790MY.HeaderText       = TraductorManager_08YS.Instance.GetTexto("GR_colFecha");
-            colHora_790MY.HeaderText        = TraductorManager_08YS.Instance.GetTexto("GR_colHora");
-            colComensales_790MY.HeaderText  = TraductorManager_08YS.Instance.GetTexto("GR_colComensales");
-            colEstado_790MY.HeaderText      = TraductorManager_08YS.Instance.GetTexto("GR_colEstado");
+            
+
+            if (dgvReservas_790MY.Columns.Count > 0)
+            {
+                if (dgvReservas_790MY.Columns.Contains("GR_colNro"))
+                    dgvReservas_790MY.Columns["GR_colNro"].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colNro");
+                else if (dgvReservas_790MY.Columns.Contains("DNI"))
+                    dgvReservas_790MY.Columns["DNI"].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colDni");
+
+
+                if (dgvReservas_790MY.Columns.Count >= 8)
+                {
+                    dgvReservas_790MY.Columns[0].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colNro");
+                    dgvReservas_790MY.Columns[1].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colDni");
+                    dgvReservas_790MY.Columns[2].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colCliente");
+                    dgvReservas_790MY.Columns[3].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colMesa");
+                    dgvReservas_790MY.Columns[4].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colFecha");
+                    dgvReservas_790MY.Columns[5].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colHora");
+                    dgvReservas_790MY.Columns[6].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colComensales");
+                    dgvReservas_790MY.Columns[7].HeaderText = TraductorManager_08YS.Instance.GetTexto("GR_colEstado");
+                }
+            }
         }
 
         private void TraducirControles(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
             {
+                //this.lblTituloConsultaReservas.Text = TraductorManager_08YS.Instance.GetTexto("lblTituloConsultaReservas");
                 // Omitir TextBox y RichTextBox: son entradas editables por el usuario
                 if (c is TextBox || c is RichTextBox)
                     continue;

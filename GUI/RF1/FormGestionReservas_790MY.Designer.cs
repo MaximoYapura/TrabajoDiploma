@@ -17,7 +17,9 @@
 
         private void InitializeComponent()
         {
-            this.lblTitulo_790MY = new System.Windows.Forms.Label();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.lblTituloConsultaReservas = new System.Windows.Forms.Label();
             this.lblDesde_790MY = new System.Windows.Forms.Label();
             this.dtpDesde_790MY = new System.Windows.Forms.DateTimePicker();
             this.lblHasta_790MY = new System.Windows.Forms.Label();
@@ -28,226 +30,190 @@
             this.cmbEstado_790MY = new System.Windows.Forms.ComboBox();
             this.btnBuscar_790MY = new System.Windows.Forms.Button();
             this.dgvReservas_790MY = new System.Windows.Forms.DataGridView();
-            this.colReservaID_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDniCliente_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCliente_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMesa_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colFecha_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHora_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colComensales_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEstado_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnLimpiar_790MY = new System.Windows.Forms.Button();
             this.btnCancelarReserva_790MY = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReservas_790MY)).BeginInit();
             this.SuspendLayout();
-            //
-            // lblTitulo_790MY
-            //
-            this.lblTitulo_790MY.AutoSize = true;
-            this.lblTitulo_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.lblTitulo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblTitulo_790MY.Location = new System.Drawing.Point(20, 15);
-            this.lblTitulo_790MY.Name = "lblTitulo_790MY";
-            this.lblTitulo_790MY.Size = new System.Drawing.Size(260, 25);
-            this.lblTitulo_790MY.Text = "Consultar / Cancelar Reservas";
-            //
+            // 
+            // lblTituloConsultaReservas
+            // 
+            this.lblTituloConsultaReservas.AutoSize = true;
+            this.lblTituloConsultaReservas.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTituloConsultaReservas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            this.lblTituloConsultaReservas.Location = new System.Drawing.Point(20, 15);
+            this.lblTituloConsultaReservas.Name = "lblTituloConsultaReservas";
+            this.lblTituloConsultaReservas.Size = new System.Drawing.Size(235, 21);
+            this.lblTituloConsultaReservas.TabIndex = 12;
+            this.lblTituloConsultaReservas.Tag = "GR_titulo";
+            this.lblTituloConsultaReservas.Text = "Consultar / Cancelar Reservas";
+            // 
             // lblDesde_790MY
-            //
+            // 
             this.lblDesde_790MY.AutoSize = true;
+            this.lblDesde_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDesde_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblDesde_790MY.Location = new System.Drawing.Point(20, 60);
+            this.lblDesde_790MY.Location = new System.Drawing.Point(254, 56);
             this.lblDesde_790MY.Name = "lblDesde_790MY";
+            this.lblDesde_790MY.Size = new System.Drawing.Size(60, 20);
+            this.lblDesde_790MY.TabIndex = 11;
+            this.lblDesde_790MY.Tag = "GR_lblDesde";
             this.lblDesde_790MY.Text = "Desde:";
-            //
+            // 
             // dtpDesde_790MY
-            //
+            // 
             this.dtpDesde_790MY.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpDesde_790MY.Location = new System.Drawing.Point(80, 57);
+            this.dtpDesde_790MY.Location = new System.Drawing.Point(330, 56);
             this.dtpDesde_790MY.Name = "dtpDesde_790MY";
             this.dtpDesde_790MY.ShowCheckBox = true;
-            this.dtpDesde_790MY.Size = new System.Drawing.Size(140, 20);
-            //
+            this.dtpDesde_790MY.Size = new System.Drawing.Size(235, 20);
+            this.dtpDesde_790MY.TabIndex = 10;
+            // 
             // lblHasta_790MY
-            //
+            // 
             this.lblHasta_790MY.AutoSize = true;
+            this.lblHasta_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblHasta_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblHasta_790MY.Location = new System.Drawing.Point(235, 60);
+            this.lblHasta_790MY.Location = new System.Drawing.Point(259, 120);
             this.lblHasta_790MY.Name = "lblHasta_790MY";
+            this.lblHasta_790MY.Size = new System.Drawing.Size(56, 20);
+            this.lblHasta_790MY.TabIndex = 9;
+            this.lblHasta_790MY.Tag = "GR_lblHasta";
             this.lblHasta_790MY.Text = "Hasta:";
-            //
+            // 
             // dtpHasta_790MY
-            //
+            // 
             this.dtpHasta_790MY.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpHasta_790MY.Location = new System.Drawing.Point(290, 57);
+            this.dtpHasta_790MY.Location = new System.Drawing.Point(330, 120);
             this.dtpHasta_790MY.Name = "dtpHasta_790MY";
             this.dtpHasta_790MY.ShowCheckBox = true;
-            this.dtpHasta_790MY.Size = new System.Drawing.Size(140, 20);
-            //
+            this.dtpHasta_790MY.Size = new System.Drawing.Size(235, 20);
+            this.dtpHasta_790MY.TabIndex = 8;
+            // 
             // lblDni_790MY
-            //
+            // 
             this.lblDni_790MY.AutoSize = true;
+            this.lblDni_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDni_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblDni_790MY.Location = new System.Drawing.Point(20, 95);
+            this.lblDni_790MY.Location = new System.Drawing.Point(594, 55);
             this.lblDni_790MY.Name = "lblDni_790MY";
+            this.lblDni_790MY.Size = new System.Drawing.Size(91, 20);
+            this.lblDni_790MY.TabIndex = 7;
+            this.lblDni_790MY.Tag = "GR_lblDni";
             this.lblDni_790MY.Text = "DNI cliente:";
-            //
+            // 
             // txtDni_790MY
-            //
-            this.txtDni_790MY.Location = new System.Drawing.Point(100, 92);
+            // 
+            this.txtDni_790MY.Location = new System.Drawing.Point(718, 57);
             this.txtDni_790MY.Name = "txtDni_790MY";
-            this.txtDni_790MY.Size = new System.Drawing.Size(120, 20);
-            //
+            this.txtDni_790MY.Size = new System.Drawing.Size(343, 20);
+            this.txtDni_790MY.TabIndex = 6;
+            // 
             // lblEstado_790MY
-            //
+            // 
             this.lblEstado_790MY.AutoSize = true;
+            this.lblEstado_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEstado_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.lblEstado_790MY.Location = new System.Drawing.Point(240, 95);
+            this.lblEstado_790MY.Location = new System.Drawing.Point(98, 57);
             this.lblEstado_790MY.Name = "lblEstado_790MY";
+            this.lblEstado_790MY.Size = new System.Drawing.Size(64, 20);
+            this.lblEstado_790MY.TabIndex = 5;
+            this.lblEstado_790MY.Tag = "GR_lblEstado";
             this.lblEstado_790MY.Text = "Estado:";
-            //
+            // 
             // cmbEstado_790MY
-            //
+            // 
             this.cmbEstado_790MY.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbEstado_790MY.Location = new System.Drawing.Point(300, 91);
+            this.cmbEstado_790MY.Location = new System.Drawing.Point(24, 95);
             this.cmbEstado_790MY.Name = "cmbEstado_790MY";
-            this.cmbEstado_790MY.Size = new System.Drawing.Size(130, 21);
-            //
+            this.cmbEstado_790MY.Size = new System.Drawing.Size(213, 21);
+            this.cmbEstado_790MY.TabIndex = 4;
+            // 
             // btnBuscar_790MY
-            //
+            // 
             this.btnBuscar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnBuscar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBuscar_790MY.FlatAppearance.BorderSize = 0;
+            this.btnBuscar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBuscar_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBuscar_790MY.ForeColor = System.Drawing.Color.White;
-            this.btnBuscar_790MY.Location = new System.Drawing.Point(450, 89);
+            this.btnBuscar_790MY.Location = new System.Drawing.Point(598, 95);
             this.btnBuscar_790MY.Name = "btnBuscar_790MY";
-            this.btnBuscar_790MY.Size = new System.Drawing.Size(90, 26);
+            this.btnBuscar_790MY.Size = new System.Drawing.Size(215, 45);
+            this.btnBuscar_790MY.TabIndex = 3;
             this.btnBuscar_790MY.Tag = "btnBuscar";
             this.btnBuscar_790MY.Text = "Buscar";
             this.btnBuscar_790MY.UseVisualStyleBackColor = false;
             this.btnBuscar_790MY.Click += new System.EventHandler(this.btnBuscar_790MY_Click);
-            //
+            // 
+            // dgvReservas_790MY
+            // 
+            this.dgvReservas_790MY.AllowUserToAddRows = false;
+            this.dgvReservas_790MY.AllowUserToDeleteRows = false;
+            this.dgvReservas_790MY.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvReservas_790MY.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
+            this.dgvReservas_790MY.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvReservas_790MY.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvReservas_790MY.DefaultCellStyle = dataGridViewCellStyle14;
+            this.dgvReservas_790MY.EnableHeadersVisualStyles = false;
+            this.dgvReservas_790MY.Location = new System.Drawing.Point(20, 160);
+            this.dgvReservas_790MY.MultiSelect = false;
+            this.dgvReservas_790MY.Name = "dgvReservas_790MY";
+            this.dgvReservas_790MY.ReadOnly = true;
+            this.dgvReservas_790MY.RowHeadersVisible = false;
+            this.dgvReservas_790MY.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dgvReservas_790MY.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvReservas_790MY.Size = new System.Drawing.Size(1041, 481);
+            this.dgvReservas_790MY.TabIndex = 1;
+            this.dgvReservas_790MY.SelectionChanged += new System.EventHandler(this.dgvReservas_790MY_SelectionChanged);
+            // 
             // btnLimpiar_790MY
-            //
+            // 
             this.btnLimpiar_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnLimpiar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLimpiar_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLimpiar_790MY.ForeColor = System.Drawing.Color.White;
-            this.btnLimpiar_790MY.Location = new System.Drawing.Point(555, 89);
+            this.btnLimpiar_790MY.Location = new System.Drawing.Point(846, 95);
             this.btnLimpiar_790MY.Name = "btnLimpiar_790MY";
-            this.btnLimpiar_790MY.Size = new System.Drawing.Size(100, 26);
+            this.btnLimpiar_790MY.Size = new System.Drawing.Size(215, 45);
+            this.btnLimpiar_790MY.TabIndex = 2;
             this.btnLimpiar_790MY.Tag = "btnLimpiar";
             this.btnLimpiar_790MY.Text = "Limpiar";
             this.btnLimpiar_790MY.UseVisualStyleBackColor = false;
             this.btnLimpiar_790MY.Click += new System.EventHandler(this.btnLimpiar_790MY_Click);
-            //
-            // dgvReservas_790MY
-            //
-            this.dgvReservas_790MY.AllowUserToAddRows = false;
-            this.dgvReservas_790MY.AllowUserToDeleteRows = false;
-            this.dgvReservas_790MY.ReadOnly = true;
-            this.dgvReservas_790MY.RowHeadersVisible = false;
-            this.dgvReservas_790MY.AutoGenerateColumns = false;
-            this.dgvReservas_790MY.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvReservas_790MY.MultiSelect = false;
-            this.dgvReservas_790MY.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
-            this.dgvReservas_790MY.EnableHeadersVisualStyles = false;
-            this.dgvReservas_790MY.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
-            this.dgvReservas_790MY.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
-            this.dgvReservas_790MY.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
-            this.dgvReservas_790MY.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
-            this.dgvReservas_790MY.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colReservaID_790MY,
-            this.colDniCliente_790MY,
-            this.colCliente_790MY,
-            this.colMesa_790MY,
-            this.colFecha_790MY,
-            this.colHora_790MY,
-            this.colComensales_790MY,
-            this.colEstado_790MY});
-            this.dgvReservas_790MY.Location = new System.Drawing.Point(20, 130);
-            this.dgvReservas_790MY.Name = "dgvReservas_790MY";
-            this.dgvReservas_790MY.Size = new System.Drawing.Size(720, 280);
-            this.dgvReservas_790MY.SelectionChanged += new System.EventHandler(this.dgvReservas_790MY_SelectionChanged);
-            //
-            // colReservaID_790MY
-            //
-            this.colReservaID_790MY.DataPropertyName = "ReservaID";
-            this.colReservaID_790MY.HeaderText = "Nro.";
-            this.colReservaID_790MY.Name = "colReservaID_790MY";
-            this.colReservaID_790MY.ReadOnly = true;
-            this.colReservaID_790MY.Width = 50;
-            //
-            // colDniCliente_790MY
-            //
-            this.colDniCliente_790MY.DataPropertyName = "ClienteDNI";
-            this.colDniCliente_790MY.HeaderText = "DNI";
-            this.colDniCliente_790MY.Name = "colDniCliente_790MY";
-            this.colDniCliente_790MY.ReadOnly = true;
-            this.colDniCliente_790MY.Width = 80;
-            //
-            // colCliente_790MY
-            //
-            this.colCliente_790MY.DataPropertyName = "ClienteNombreCompleto";
-            this.colCliente_790MY.HeaderText = "Cliente";
-            this.colCliente_790MY.Name = "colCliente_790MY";
-            this.colCliente_790MY.ReadOnly = true;
-            this.colCliente_790MY.Width = 160;
-            //
-            // colMesa_790MY
-            //
-            this.colMesa_790MY.DataPropertyName = "MesaNumero";
-            this.colMesa_790MY.HeaderText = "Mesa";
-            this.colMesa_790MY.Name = "colMesa_790MY";
-            this.colMesa_790MY.ReadOnly = true;
-            this.colMesa_790MY.Width = 60;
-            //
-            // colFecha_790MY
-            //
-            this.colFecha_790MY.DataPropertyName = "Fecha";
-            this.colFecha_790MY.HeaderText = "Fecha";
-            this.colFecha_790MY.Name = "colFecha_790MY";
-            this.colFecha_790MY.ReadOnly = true;
-            this.colFecha_790MY.DefaultCellStyle.Format = "dd/MM/yyyy";
-            //
-            // colHora_790MY
-            //
-            this.colHora_790MY.DataPropertyName = "Hora";
-            this.colHora_790MY.HeaderText = "Hora";
-            this.colHora_790MY.Name = "colHora_790MY";
-            this.colHora_790MY.ReadOnly = true;
-            this.colHora_790MY.DefaultCellStyle.Format = "hh\\:mm";
-            //
-            // colComensales_790MY
-            //
-            this.colComensales_790MY.DataPropertyName = "CantidadComensales";
-            this.colComensales_790MY.HeaderText = "Comensales";
-            this.colComensales_790MY.Name = "colComensales_790MY";
-            this.colComensales_790MY.ReadOnly = true;
-            //
-            // colEstado_790MY
-            //
-            this.colEstado_790MY.DataPropertyName = "Estado";
-            this.colEstado_790MY.HeaderText = "Estado";
-            this.colEstado_790MY.Name = "colEstado_790MY";
-            this.colEstado_790MY.ReadOnly = true;
-            //
+            // 
             // btnCancelarReserva_790MY
-            //
+            // 
+            this.btnCancelarReserva_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.btnCancelarReserva_790MY.Enabled = false;
-            this.btnCancelarReserva_790MY.Location = new System.Drawing.Point(20, 425);
+            this.btnCancelarReserva_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancelarReserva_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancelarReserva_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnCancelarReserva_790MY.Location = new System.Drawing.Point(846, 647);
             this.btnCancelarReserva_790MY.Name = "btnCancelarReserva_790MY";
-            this.btnCancelarReserva_790MY.Size = new System.Drawing.Size(160, 32);
+            this.btnCancelarReserva_790MY.Size = new System.Drawing.Size(215, 45);
+            this.btnCancelarReserva_790MY.TabIndex = 0;
             this.btnCancelarReserva_790MY.Tag = "btnCancelarReserva";
             this.btnCancelarReserva_790MY.Text = "Cancelar Reserva";
-            this.btnCancelarReserva_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancelarReserva_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnCancelarReserva_790MY.ForeColor = System.Drawing.Color.White;
             this.btnCancelarReserva_790MY.UseVisualStyleBackColor = false;
             this.btnCancelarReserva_790MY.Click += new System.EventHandler(this.btnCancelarReserva_790MY_Click);
-            //
+            // 
             // FormGestionReservas_790MY
-            //
+            // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(760, 480);
+            this.ClientSize = new System.Drawing.Size(1073, 704);
             this.Controls.Add(this.btnCancelarReserva_790MY);
             this.Controls.Add(this.dgvReservas_790MY);
             this.Controls.Add(this.btnLimpiar_790MY);
@@ -260,7 +226,7 @@
             this.Controls.Add(this.lblHasta_790MY);
             this.Controls.Add(this.dtpDesde_790MY);
             this.Controls.Add(this.lblDesde_790MY);
-            this.Controls.Add(this.lblTitulo_790MY);
+            this.Controls.Add(this.lblTituloConsultaReservas);
             this.Name = "FormGestionReservas_790MY";
             this.Text = "Consultar / Cancelar Reservas";
             this.Load += new System.EventHandler(this.FormGestionReservas_790MY_Load);
@@ -272,7 +238,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label lblTitulo_790MY;
+        private System.Windows.Forms.Label lblTituloConsultaReservas;
         private System.Windows.Forms.Label lblDesde_790MY;
         private System.Windows.Forms.DateTimePicker dtpDesde_790MY;
         private System.Windows.Forms.Label lblHasta_790MY;
