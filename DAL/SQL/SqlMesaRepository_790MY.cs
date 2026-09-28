@@ -1,4 +1,4 @@
-﻿using BE_08YS;
+using BE_08YS;
 using DAL_08YS.Interfaces_Repositories;
 using System;
 using System.Collections.Generic;
@@ -12,161 +12,195 @@ namespace DAL_08YS.SQL
         private readonly string _connectionString;
 
         public SqlMesaRepository_790MY()
-            : this(SqlDbFactory_08YS.ConnectionString)
         {
+            _connectionString = SqlDbFactory_08YS.ConnectionString;
         }
 
         public SqlMesaRepository_790MY(string connectionString)
         {
-            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            _connectionString = connectionString;
         }
+
+        // ─── Helpers ─────────────────────────────────────────────────────────
+
+        private Mesa_790MY MapearMesa(SqlDataReader reader)
+        {
+            var mesa = new Mesa_790MY();
+            mesa.NroMesa   = (int)reader["NroMesa"];
+            mesa.Capacidad = (int)reader["Capacidad"];
+            mesa.Estado    = (EstadoMesa_790MY)Enum.Parse(typeof(EstadoMesa_790MY), reader["Estado"].ToString());
+            mesa.Activo    = (bool)reader["Activo"];
+            return mesa;
+        }
+
+        // ─── IMesaRepository_790MY ───────────────────────────────────────────
 
         public bool Exists(int nroMesa)
         {
-            const string sql = "SELECT COUNT(1) FROM Mesas WHERE NroMesa = @NroMesa";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(
+                "SELECT COUNT(1) FROM Mesas WHERE NroMesa = @NroMesa", con))
             {
-                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = nroMesa;
-                connection.Open();
-                return (int)command.ExecuteScalar() > 0;
+                cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
+                con.Open();
+                return (int)cmd.ExecuteScalar() > 0;
             }
         }
 
         public List<Mesa_790MY> GetAll()
         {
-            const string sql = "SELECT NroMesa, Capacidad, Estado, Activo FROM Mesas WHERE Activo = 1";
-            var resultado = new List<Mesa_790MY>();
+            var lista = new List<Mesa_790MY>();
+            const string sql =
+                "SELECT NroMesa, Capacidad, Estado, Activo " +
+                "FROM Mesas " +
+                "ORDER BY NroMesa";
 
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
             {
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                con.Open();
+                using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
-                    {
-                        resultado.Add(MapearMesa(reader));
-                    }
+                        lista.Add(MapearMesa(reader));
                 }
             }
-
-            return resultado;
+            return lista;
         }
 
         public List<Mesa_790MY> GetDisponibles(DateTime fecha, TimeSpan hora, int comensales)
         {
-            const string sql = @"
-                SELECT m.NroMesa, m.Capacidad, m.Estado, m.Activo
-                FROM Mesas m
-                WHERE m.Activo = 1
-                  AND m.Capacidad >= @Comensales
-                  AND NOT EXISTS (
-                        SELECT 1
-                        FROM Reservas r
-                        WHERE r.MesaNumero = m.NroMesa
-                          AND r.Fecha = @Fecha
-                          AND r.Hora = @Hora
-                          AND r.Estado = @EstadoConfirmada
-                  )
-                ORDER BY m.Capacidad, m.NroMesa";
+            var lista = new List<Mesa_790MY>();
+            const string sql =
+                "SELECT m.NroMesa, m.Capacidad, m.Estado, m.Activo " +
+                "FROM Mesas m " +
+                "WHERE m.Capacidad >= @Comensales " +
+                "  AND m.NroMesa NOT IN ( " +
+                "      SELECT r.MesaNumero FROM Reservas r " +
+                "      WHERE r.Fecha = @Fecha AND r.Hora = @Hora " +
+                "        AND r.Estado = @EstadoConfirmada " +
+                "  ) " +
+                "ORDER BY m.Capacidad, m.NroMesa";
 
-            var resultado = new List<Mesa_790MY>();
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
             {
-                command.Parameters.Add("@Comensales", SqlDbType.Int).Value = comensales;
-                command.Parameters.Add("@Fecha", SqlDbType.Date).Value = fecha.Date;
-                command.Parameters.Add("@Hora", SqlDbType.Time).Value = hora;
-                command.Parameters.Add("@EstadoConfirmada", SqlDbType.NVarChar, 20).Value = EstadoReserva_790MY.Confirmada.ToString();
-
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                cmd.Parameters.AddWithValue("@Fecha",            fecha.Date);
+                cmd.Parameters.AddWithValue("@Hora",             hora);
+                cmd.Parameters.AddWithValue("@Comensales",       comensales);
+                cmd.Parameters.AddWithValue("@EstadoConfirmada", EstadoReserva_790MY.Confirmada.ToString());
+                con.Open();
+                using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
-                    {
-                        resultado.Add(MapearMesa(reader));
-                    }
+                        lista.Add(MapearMesa(reader));
                 }
             }
-
-            return resultado;
+            return lista;
         }
 
         public void Add(Mesa_790MY mesa)
         {
-            const string sql = @"INSERT INTO Mesas (NroMesa, Capacidad, Estado, Activo)
-                                  VALUES (@NroMesa, @Capacidad, @Estado, @Activo)";
+            const string sql =
+                "INSERT INTO Mesas (NroMesa, Capacidad, Estado, Activo) " +
+                "VALUES (@NroMesa, @Capacidad, @Estado, @Activo)";
 
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
             {
-                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = mesa.NroMesa;
-                command.Parameters.Add("@Capacidad", SqlDbType.Int).Value = mesa.Capacidad;
-                command.Parameters.Add("@Estado", SqlDbType.NVarChar, 20).Value = mesa.Estado.ToString();
-                command.Parameters.Add("@Activo", SqlDbType.Bit).Value = mesa.Activo;
-
-                connection.Open();
-                command.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@NroMesa",   mesa.NroMesa);
+                cmd.Parameters.AddWithValue("@Capacidad", mesa.Capacidad);
+                cmd.Parameters.AddWithValue("@Estado",    mesa.Estado.ToString());
+                cmd.Parameters.AddWithValue("@Activo",    mesa.Activo);
+                con.Open();
+                cmd.ExecuteNonQuery();
             }
         }
 
         public void Update(Mesa_790MY mesa)
         {
-            // No actualiza NroMesa (clave) ni Activo (eso lo maneja DeleteLogico).
-            const string sql = @"UPDATE Mesas SET Capacidad = @Capacidad, Estado = @Estado WHERE NroMesa = @NroMesa";
+            const string sql =
+                "UPDATE Mesas " +
+                "SET Capacidad = @Capacidad, Estado = @Estado, Activo = @Activo " +
+                "WHERE NroMesa = @NroMesa";
 
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
             {
-                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = mesa.NroMesa;
-                command.Parameters.Add("@Capacidad", SqlDbType.Int).Value = mesa.Capacidad;
-                command.Parameters.Add("@Estado", SqlDbType.NVarChar, 20).Value = mesa.Estado.ToString();
-
-                connection.Open();
-                command.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@NroMesa",   mesa.NroMesa);
+                cmd.Parameters.AddWithValue("@Capacidad", mesa.Capacidad);
+                cmd.Parameters.AddWithValue("@Estado",    mesa.Estado.ToString());
+                cmd.Parameters.AddWithValue("@Activo",    mesa.Activo);
+                con.Open();
+                cmd.ExecuteNonQuery();
             }
         }
 
-        public void DeleteLogico(int nroMesa)
+        public void Delete(int nroMesa)
         {
-            const string sql = "UPDATE Mesas SET Activo = 0 WHERE NroMesa = @NroMesa";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(
+                "DELETE FROM Mesas WHERE NroMesa = @NroMesa", con))
             {
-                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = nroMesa;
-                connection.Open();
-                command.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public bool TieneReservasActivas(int nroMesa)
+        {
+            const string sql =
+                "SELECT COUNT(1) FROM Reservas " +
+                "WHERE MesaNumero = @NroMesa " +
+                "  AND Fecha >= @Hoy " +
+                "  AND Estado != @EstadoCancelada";
+
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@NroMesa",         nroMesa);
+                cmd.Parameters.AddWithValue("@Hoy",             DateTime.Today);
+                cmd.Parameters.AddWithValue("@EstadoCancelada", EstadoReserva_790MY.Cancelada.ToString());
+                con.Open();
+                return (int)cmd.ExecuteScalar() > 0;
             }
         }
 
         public void UpdateEstado(int nroMesa, EstadoMesa_790MY estado)
         {
-            const string sql = "UPDATE Mesas SET Estado = @Estado WHERE NroMesa = @NroMesa";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(
+                "UPDATE Mesas SET Estado = @Estado WHERE NroMesa = @NroMesa", con))
             {
-                command.Parameters.Add("@Estado", SqlDbType.NVarChar, 20).Value = estado.ToString();
-                command.Parameters.Add("@NroMesa", SqlDbType.Int).Value = nroMesa;
-
-                connection.Open();
-                command.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
+                cmd.Parameters.AddWithValue("@Estado",  estado.ToString());
+                con.Open();
+                cmd.ExecuteNonQuery();
             }
         }
 
-        private static Mesa_790MY MapearMesa(SqlDataReader reader)
+        public ISet<int> GetNumerosOcupadosEnTurno(DateTime fecha, TimeSpan hora)
         {
-            return new Mesa_790MY
+            var ocupadas = new HashSet<int>();
+            const string sql =
+                "SELECT DISTINCT MesaNumero FROM Reservas " +
+                "WHERE Fecha = @Fecha AND Hora = @Hora AND Estado = @EstadoConfirmada";
+
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
             {
-                NroMesa = reader.GetInt32(reader.GetOrdinal("NroMesa")),
-                Capacidad = reader.GetInt32(reader.GetOrdinal("Capacidad")),
-                Estado = (EstadoMesa_790MY)Enum.Parse(typeof(EstadoMesa_790MY), reader.GetString(reader.GetOrdinal("Estado"))),
-                Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
-            };
+                cmd.Parameters.AddWithValue("@Fecha",            fecha.Date);
+                cmd.Parameters.AddWithValue("@Hora",             hora);
+                cmd.Parameters.AddWithValue("@EstadoConfirmada", EstadoReserva_790MY.Confirmada.ToString());
+                con.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                        ocupadas.Add((int)reader["MesaNumero"]);
+                }
+            }
+            return ocupadas;
         }
     }
 }

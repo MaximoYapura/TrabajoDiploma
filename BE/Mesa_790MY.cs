@@ -1,4 +1,4 @@
-﻿namespace BE_08YS
+namespace BE_08YS
 {
     public enum EstadoMesa_790MY
     {
@@ -16,37 +16,18 @@
 
         public Mesa_790MY(int nroMesa, int capacidad, EstadoMesa_790MY estado, bool activo = true)
         {
-            _nroMesa = nroMesa;
+            _nroMesa   = nroMesa;
             _capacidad = capacidad;
-            _estado = estado;
-            _activo = activo;
+            _estado    = estado;
+            _activo    = activo;
         }
 
         public Mesa_790MY() { }
 
-        public int NroMesa
-        {
-            get { return _nroMesa; }
-            set { _nroMesa = value; }
-        }
-
-        public int Capacidad
-        {
-            get { return _capacidad; }
-            set { _capacidad = value; }
-        }
-
-        public EstadoMesa_790MY Estado
-        {
-            get { return _estado; }
-            set { _estado = value; }
-        }
-
-        public bool Activo
-        {
-            get { return _activo; }
-            set { _activo = value; }
-        }
+        public int NroMesa { get { return _nroMesa; } set { _nroMesa = value; } }
+        public int Capacidad { get { return _capacidad; } set { _capacidad = value; } }
+        public EstadoMesa_790MY Estado { get { return _estado; } set { _estado = value; } }
+        public bool Activo { get { return _activo; } set { _activo = value; } }
 
         public override bool Equals(object obj)
         {

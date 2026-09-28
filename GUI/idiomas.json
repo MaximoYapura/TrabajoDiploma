@@ -157,14 +157,12 @@
     "msg_nombre_vacio": "Error de validación: El campo de nombre de la entidad es obligatorio.",
     "msg_sin_componentes": "Error de validación: Debe asignar al menos un componente en la lista de la izquierda para guardar.",
     "msg_guardado_exito": "Los cambios se registraron de forma exitosa en el repositorio de accesos.",
-
     "bll_composite_conflicto": "No se puede agregar '{0}' porque genera conflictos con permisos ({1}) que ya están presentes en la lista actual dentro de otras familias.",
     "bll_composite_sugerencia": "Al agregar '{0}' se reemplazarán {1}, que ya están contenidos en él. ¿Desea continuar?",
     "bll_val_nombre_vacio": "El nombre no puede estar vacío.",
     "bll_val_sin_componentes": "Debe contener al menos un permiso o familia.",
     "bll_propagacion_conflicto_encabezado": "Este cambio generaría permisos duplicados en estructuras que dependen de esta familia:",
     "bll_propagacion_conflicto_linea": "• {0} '{1}': '{2}' y '{3}' quedarían con permisos repetidos.",
-
     "activar": "activar",
     "desactivar": "desactivar",
     "familia": "Familia",
@@ -183,17 +181,14 @@
     "msg_familia_en_uso": "No se puede eliminar: la familia está siendo utilizada por un rol u otra familia.",
     "msg_familia_nombre_duplicado": "Ya existe una familia con el mismo nombre.",
     "msg_familia_permisos_duplicados": "Ya existe una familia con exactamente el mismo conjunto de permisos.",
-
     "msg_pwd_changed": "Contraseña Cambiada",
     "msg_nombre_acceso_duplicado": "Ya existe un rol o familia con el mismo nombre registrado.",
     "msg_permisos_identicos_error": "No se puede guardar porque ya existe una configuración con los mismos permisos.",
-
     "no_se_puede_agregar": "No se puede agregar",
     "modo_insercion_msg": "Modo Insercion",
     "modo_consulta_msg": "Modo Consulta",
     "modo_edicion_msg": "Modo edicion",
     "msg_componente_en_uso_error": "Componente en uso",
-
     "dv_titulo": "Inconsistencia en la base de datos",
     "dv_descripcion": "Se detectaron modificaciones directas sobre la base de datos. Seleccione una acción:",
     "dv_btn_recalcular": "Recalcular",
@@ -205,7 +200,6 @@
     "dv_restore_confirm": "Se restaurará la base de datos desde:\n\nArchivo: {0}\nTamaño: {1} MB\nFecha: {2}\n\nEsta operación reemplazará completamente la base de datos actual y no puede deshacerse. El sistema se reiniciará al finalizar.\n\n¿Desea continuar?",
     "dv_restore_ok": "Base de datos restaurada correctamente. El sistema se reiniciará.",
     "dv_restore_error": "Error al restaurar el backup.",
-
     "backup_titulo": "Gestión de Respaldos",
     "backup_crear_titulo": "Crear respaldo",
     "backup_crear_desc": "Seleccioná la carpeta donde se guardará el archivo de backup",
@@ -237,24 +231,19 @@
     "restore_archivo_en_uso": "El archivo de backup está siendo usado por otro proceso.",
     "restore_error_archivo_invalido": "El archivo seleccionado no es un backup válido de esta base de datos.",
     "restore_error_sql": "Error al restaurar ({0}): {1}",
-
     "idioma_es": "Español",
     "idioma_en": "Inglés",
     "txtUsername_hint": "Ingrese nombre de usuario",
     "txtPassword_hint": "Ingrese contraseña",
-
     "txtPwdActual_hint": "Ingrese su contraseña actual",
     "txtPwdNueva_hint": "Ingrese su nueva contraseña",
     "txtPwdConfirmar_hint": "Ingrese su nueva contraseña",
     "txtNombreAcceso_hint": "Ingrese el nombre",
-
     "Texto_GestionDe": "Gestión de",
     "Entidad_Familias": "Familias",
     "Entidad_Roles": "Roles",
-
     "btnAnadir": "Añadir",
     "btnBuscar": "Buscar",
-
     "RR_titulo": "Registrar Reserva",
     "RR_lblDniCliente": "DNI Cliente:",
     "RR_lblFecha": "Fecha:",
@@ -263,7 +252,6 @@
     "RR_btnSeleccionarMesa": "Seleccionar Mesa",
     "RR_btnConfirmar": "Confirmar Reserva",
     "RR_lblMesaSinSeleccionar": "(sin seleccionar)",
-
     "GR_titulo": "Consultar / Cancelar Reservas",
     "GR_lblDesde": "Desde:",
     "GR_lblHasta": "Hasta:",
@@ -278,7 +266,6 @@
     "GR_colHora": "Hora",
     "GR_colComensales": "Comensales",
     "GR_colEstado": "Estado",
-
     "FC_titulo": "Clientes",
     "FC_lblDni": "DNI:",
     "FC_lblApellidos": "Apellidos:",
@@ -298,20 +285,17 @@
     "FC_colEmail": "Email",
     "FC_colCelular": "Celular",
     "FC_colDireccion": "Dirección",
-
     "FM_titulo": "Mesas",
     "FM_lblNumero": "Número:",
     "FM_lblCapacidad": "Capacidad:",
     "FM_colNumero": "Número",
     "FM_colCapacidad": "Capacidad",
     "FM_colEstado": "Estado",
-
     "SM_titulo": "Seleccionar Mesa",
+    "SM_comensales": "comensales",
     "SM_lblSinResultados": "No hay mesas disponibles para ese turno.",
     "SM_lblPlano": "Plano del local",
-
     "LS_btnQuitar": "Quitar",
-
     "msg_reserva_registrada": "Reserva registrada correctamente.",
     "msg_reserva_cancelada": "Reserva cancelada.",
     "msg_confirmar_cancelar_reserva": "¿Desea cancelar la reserva seleccionada?",
@@ -332,7 +316,7 @@
     "msg_seleccionar_mesa": "Seleccione una mesa de la lista.",
     "msg_nro_mesa_duplicado": "Ya existe una mesa con ese número.",
     "msg_nro_mesa_invalido": "El número de mesa debe ser un entero positivo.",
-    "msg_capacidad_invalida": "La capacidad debe ser un entero positivo.",
+    "msg_capacidad_invalida": "La capacidad de la mesa debe estar entre 1 y 12 personas.",
     "msg_serializar_ok": "Clientes exportados correctamente.",
     "msg_deserializar_ok": "Clientes importados correctamente.",
     "msg_seleccionar_archivo_serializar": "Seleccione el archivo de destino para la exportación.",
@@ -340,7 +324,6 @@
     "msg_valor_duplicado": "Ese valor ya está en la lista.",
     "msg_seleccionar_valor": "Seleccioná un valor de la lista para quitar.",
     "msg_sin_seleccion_lista": "Sin selección",
-
     "titulo_dato_invalido": "Dato inválido",
     "titulo_datos_invalidos": "Datos inválidos",
     "titulo_confirmar_baja": "Confirmar baja",
@@ -446,7 +429,25 @@
     "rol_Gestor de accesos": "Gestor de Accesos",
     "rol_Recepcionista": "Recepcionista",
     "rol_Gerente": "Gerente",
-    "lblEslogan_Fogon": "Sabores que cuentan historias"
+    "capacidad_invalida_titulo": "Capacidad Inválida",
+    "lblEslogan_Fogon": "Sabores que cuentan historias",
+    "msg_dv_inconsistente": "Se detectó una inconsistencia en la integridad de la base de datos (Dígito Verificador).",
+    "msg_limite_mesas_alcanzado": "Se ha alcanzado el límite máximo de 12 mesas para el salón.",
+    "msg_seleccionar_mesa_titulo": "Seleccionar Mesa",
+    "msg_subtitulo_seleccionar_mesa": "Elegí la mesa que mejor se adapte a tu reserva",
+    "SM_leyenda_titulo": "Leyenda",
+    "SM_leyenda_recomendada": "⭐ Recomendada",
+    "SM_leyenda_disponible": "Disponible",
+    "SM_leyenda_ocupada": "Ocupada 🔒",
+    "SM_leyenda_incompatible": "Sin capacidad suficiente",
+    "SM_leyenda_seleccionada": "Seleccionada",
+    "SM_info_mesa_titulo": "Mesa seleccionada:",
+    "msg_personas": "personas",
+    "msg_mejor_opcion": "Mejor opción ⭐",
+    "aviso_titulo": "Aviso",
+    "SM_footer_comensales": "Comensales",
+    "SM_footer_fecha": "Fecha",
+    "SM_footer_hora": "Hora"
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -606,14 +607,12 @@
     "msg_nombre_vacio": "Validation Error: The entity name field is required.",
     "msg_sin_componentes": "Validation Error: You must assign at least one component in the left list to save.",
     "msg_guardado_exito": "Changes were successfully registered in the access repository.",
-
     "bll_composite_conflicto": "Cannot add '{0}' because it conflicts with permissions ({1}) already present in the current list within other families.",
     "bll_composite_sugerencia": "Adding '{0}' will replace {1}, which are already contained within it. Do you wish to proceed?",
     "bll_val_nombre_vacio": "The name cannot be empty.",
     "bll_val_sin_componentes": "It must contain at least one permission or family.",
     "bll_propagacion_conflicto_encabezado": "This change would create duplicate permissions in structures that depend on this family:",
     "bll_propagacion_conflicto_linea": "• {0} '{1}': '{2}' and '{3}' would end up with repeated permissions.",
-
     "activar": "activate",
     "desactivar": "deactivate",
     "familia": "Family",
@@ -632,7 +631,6 @@
     "msg_familia_en_uso": "Cannot delete: the family is being used by a role or another family.",
     "msg_familia_nombre_duplicado": "A family with the same name already exists.",
     "msg_familia_permisos_duplicados": "A family with exactly the same set of permissions already exists.",
-
     "msg_pwd_changed": "Password Changed",
     "msg_nombre_acceso_duplicado": "A role or family with the same name already exists.",
     "msg_permisos_identicos_error": "Cannot save because a configuration with identical permissions already exists.",
@@ -641,7 +639,6 @@
     "modo_insercion_msg": "Insert Mode",
     "modo_consulta_msg": "View Mode",
     "modo_edicion_msg": "Edit Mode",
-
     "dv_titulo": "Database inconsistency",
     "dv_descripcion": "Direct modifications to the database were detected. Please select an action:",
     "dv_btn_recalcular": "Recalculate",
@@ -653,7 +650,6 @@
     "dv_restore_confirm": "The database will be restored from:\n\nFile: {0}\nSize: {1} MB\nDate: {2}\n\nThis operation will completely replace the current database and cannot be undone. The system will restart when the process is complete.\n\nDo you want to continue?",
     "dv_restore_ok": "Database restored successfully. The system will restart.",
     "dv_restore_error": "An error occurred while restoring the backup.",
-
     "backup_titulo": "Backup Management",
     "backup_crear_titulo": "Create backup",
     "backup_crear_desc": "Select the folder where the backup file will be saved",
@@ -685,24 +681,19 @@
     "restore_archivo_en_uso": "The backup file is being used by another process.",
     "restore_error_archivo_invalido": "The selected file is not a valid backup of this database.",
     "restore_error_sql": "Error while restoring ({0}): {1}",
-
     "idioma_es": "Spanish",
     "idioma_en": "English",
     "txtUsername_hint": "Enter your username",
     "txtPassword_hint": "Enter your password",
-
     "txtPwdActual_hint": "Enter your current password",
     "txtPwdNueva_hint": "Enter your new password",
     "txtPwdConfirmar_hint": "Enter your new password",
     "txtNombreAcceso_hint": "Enter the name",
-
     "Texto_GestionDe": "Management of",
     "Entidad_Familias": "Families",
     "Entidad_Roles": "Roles",
-
     "btnAnadir": "Add",
     "btnBuscar": "Search",
-
     "RR_titulo": "New Reservation",
     "RR_lblDniCliente": "Customer DNI:",
     "RR_lblFecha": "Date:",
@@ -711,7 +702,6 @@
     "RR_btnSeleccionarMesa": "Select Table",
     "RR_btnConfirmar": "Confirm Reservation",
     "RR_lblMesaSinSeleccionar": "(not selected)",
-
     "GR_titulo": "View / Cancel Reservations",
     "GR_lblDesde": "From:",
     "GR_lblHasta": "To:",
@@ -726,7 +716,6 @@
     "GR_colHora": "Time",
     "GR_colComensales": "Diners",
     "GR_colEstado": "Status",
-
     "FC_titulo": "Customers",
     "FC_lblDni": "DNI:",
     "FC_lblApellidos": "Surnames:",
@@ -746,20 +735,17 @@
     "FC_colEmail": "Email",
     "FC_colCelular": "Mobile",
     "FC_colDireccion": "Address",
-
     "FM_titulo": "Tables",
     "FM_lblNumero": "Number:",
     "FM_lblCapacidad": "Capacity:",
     "FM_colNumero": "Number",
     "FM_colCapacidad": "Capacity",
     "FM_colEstado": "Status",
-
     "SM_titulo": "Select Table",
+    "SM_comensales": "guests",
     "SM_lblSinResultados": "No tables available for that shift.",
     "SM_lblPlano": "Restaurant floor plan",
-
     "LS_btnQuitar": "Remove",
-
     "msg_reserva_registrada": "Reservation successfully registered.",
     "msg_reserva_cancelada": "Reservation cancelled.",
     "msg_confirmar_cancelar_reserva": "Do you want to cancel the selected reservation?",
@@ -780,7 +766,7 @@
     "msg_seleccionar_mesa": "Please select a table from the list.",
     "msg_nro_mesa_duplicado": "A table with that number already exists.",
     "msg_nro_mesa_invalido": "The table number must be a positive integer.",
-    "msg_capacidad_invalida": "Capacity must be a positive integer.",
+    "msg_capacidad_invalida": "Table capacity must be between 1 and 12 guests.",
     "msg_serializar_ok": "Customers exported successfully.",
     "msg_deserializar_ok": "Customers imported successfully.",
     "msg_seleccionar_archivo_serializar": "Select the destination file for the export.",
@@ -788,7 +774,6 @@
     "msg_valor_duplicado": "That value is already in the list.",
     "msg_seleccionar_valor": "Select a value from the list to remove.",
     "msg_sin_seleccion_lista": "No selection",
-
     "titulo_dato_invalido": "Invalid Data",
     "titulo_datos_invalidos": "Invalid Data",
     "titulo_confirmar_baja": "Confirm Deletion",
@@ -894,6 +879,24 @@
     "rol_Gestor de accesos": "Access Manager",
     "rol_Recepcionista": "Receptionist",
     "rol_Gerente": "Manager",
-    "lblEslogan_Fogon": "Flavors that tell stories"
+    "capacidad_invalida_titulo": "Invalid Capacity",
+    "lblEslogan_Fogon": "Flavors that tell stories",
+    "msg_dv_inconsistente": "A database integrity inconsistency was detected (Checksum/DV).",
+    "msg_limite_mesas_alcanzado": "Maximum limit of 12 tables reached for the dining room.",
+    "msg_seleccionar_mesa_titulo": "Select Table",
+    "msg_subtitulo_seleccionar_mesa": "Choose the table that best fits your reservation",
+    "SM_leyenda_titulo": "Legend",
+    "SM_leyenda_recomendada": "⭐ Recommended",
+    "SM_leyenda_disponible": "Available",
+    "SM_leyenda_ocupada": "Occupied 🔒",
+    "SM_leyenda_incompatible": "Insufficient capacity",
+    "SM_leyenda_seleccionada": "Selected",
+    "SM_info_mesa_titulo": "Selected table:",
+    "msg_personas": "people",
+    "msg_mejor_opcion": "Best option ⭐",
+    "aviso_titulo": "Notice",
+    "SM_footer_comensales": "Diners",
+    "SM_footer_fecha": "Date",
+    "SM_footer_hora": "Time"
   }
 }

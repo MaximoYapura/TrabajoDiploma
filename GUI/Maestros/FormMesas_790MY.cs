@@ -34,8 +34,16 @@ namespace GUI_08YS.Maestros
             _mesaBll = BLLFactory_790MY.CreateMesaBLL();
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
-            this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
-            
+            this.Text = TraductorManager_08YS.Instance.GetTexto("FM_titulo");
+
+            // Icono corporativo (seguro: el recurso puede no existir aún en la Build actual)
+            try
+            {
+                var icon = global::GUI_08YS.Properties.Resources.ResourceManager
+                               .GetObject("FogonIcon") as System.Drawing.Icon;
+                if (icon != null) this.Icon = icon;
+            }
+            catch { }
         }
 
         private void FormMesas_790MY_Load(object sender, EventArgs e)
@@ -69,13 +77,17 @@ namespace GUI_08YS.Maestros
             _modo = modo;
             bool editando = modo != ModoEdicion.Reposo;
 
-            txtNumero_790MY.Enabled = modo == ModoEdicion.Alta;
-            txtCapacidad_790MY.Enabled = editando;
+            // NroMesa siempre es de solo lectura: se auto-asigna en Alta
+            // y no se permite cambiar la PK en Modificación.
+            txtNumero_790MY.Enabled  = editando;
+            txtNumero_790MY.ReadOnly = true;
 
-            btnAplicar_790MY.Enabled = editando;
+            nudCapacidad_790MY.Enabled = editando;
+
+            btnAplicar_790MY.Enabled  = editando;
             btnCancelar_790MY.Enabled = editando;
 
-            dgvMesas_790MY.Enabled = !editando;
+            dgvMesas_790MY.Enabled  = !editando;
             btnAnadir_790MY.Enabled = !editando;
 
             if (!editando)
@@ -87,15 +99,27 @@ namespace GUI_08YS.Maestros
         private void LimpiarCampos()
         {
             txtNumero_790MY.Clear();
-            txtCapacidad_790MY.Clear();
+            nudCapacidad_790MY.Value = 1;
             _estadoEdicion = EstadoMesa_790MY.Libre;
         }
 
         private void btnAnadir_790MY_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+
+            // Auto-asignar el próximo número disponible (Max + 1)
+            try
+            {
+                int siguiente = _mesaBll.GetProximoNumero();
+                txtNumero_790MY.Text = siguiente.ToString();
+            }
+            catch
+            {
+                txtNumero_790MY.Text = "1";
+            }
+
             EstablecerModo(ModoEdicion.Alta);
-            txtNumero_790MY.Focus();
+            nudCapacidad_790MY.Focus();
         }
 
         private void btnModificar_790MY_Click(object sender, EventArgs e)
@@ -103,9 +127,9 @@ namespace GUI_08YS.Maestros
             if (!(dgvMesas_790MY.CurrentRow?.DataBoundItem is Mesa_790MY seleccionada))
                 return;
 
-            txtNumero_790MY.Text = seleccionada.NroMesa.ToString();
-            txtCapacidad_790MY.Text = seleccionada.Capacidad.ToString();
-            _estadoEdicion = seleccionada.Estado;
+            txtNumero_790MY.Text       = seleccionada.NroMesa.ToString();
+            nudCapacidad_790MY.Value   = seleccionada.Capacidad;
+            _estadoEdicion             = seleccionada.Estado;
 
             EstablecerModo(ModoEdicion.Modificacion);
         }
@@ -152,12 +176,7 @@ namespace GUI_08YS.Maestros
                 return;
             }
 
-            if (!int.TryParse(txtCapacidad_790MY.Text.Trim(), out int capacidad))
-            {
-                MessageBox.Show(t.GetTexto("msg_fm_capacidad_invalida_num"), t.GetTexto("titulo_dato_invalido"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            int capacidad = (int)nudCapacidad_790MY.Value;
 
             try
             {
@@ -179,11 +198,10 @@ namespace GUI_08YS.Maestros
                 CargarGrilla();
                 EstablecerModo(ModoEdicion.Reposo);
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
-                MessageBox.Show(
-                    string.Format(t.GetTexto("msg_fm_mesa_existente"), numero),
-                    t.GetTexto("titulo_datos_invalidos"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, t.GetTexto("titulo_datos_invalidos"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception)
             {
@@ -207,19 +225,10 @@ namespace GUI_08YS.Maestros
         public void UpdateIdioma()
         {
             TraducirControles(this);
-
-            // Encabezados de columnas del DGV (no son Controls, deben traducirse explícitamente)
             colNumero_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colNumero");
             colCapacidad_790MY.HeaderText = TraductorManager_08YS.Instance.GetTexto("FM_colCapacidad");
             colEstado_790MY.HeaderText    = TraductorManager_08YS.Instance.GetTexto("FM_colEstado");
-            this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
-            string titulo = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
-            this.Text = titulo;
-
-          
-
-            this.Text = TraductorManager_08YS.Instance.GetTexto("SM_titulo");
-
+            this.Text = TraductorManager_08YS.Instance.GetTexto("FM_titulo");
         }
 
         private void TraducirControles(Control contenedor)

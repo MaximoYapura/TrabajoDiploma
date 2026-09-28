@@ -30,8 +30,9 @@ namespace GUI_08YS.Maestros
             this.lblNumero_790MY = new System.Windows.Forms.Label();
             this.txtNumero_790MY = new System.Windows.Forms.TextBox();
             this.lblCapacidad_790MY = new System.Windows.Forms.Label();
-            this.txtCapacidad_790MY = new System.Windows.Forms.TextBox();
+            this.nudCapacidad_790MY = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMesas_790MY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudCapacidad_790MY)).BeginInit();
             this.SuspendLayout();
             //
             // dgvMesas_790MY
@@ -45,7 +46,7 @@ namespace GUI_08YS.Maestros
             this.dgvMesas_790MY.MultiSelect = false;
             this.dgvMesas_790MY.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.dgvMesas_790MY.EnableHeadersVisualStyles = false;
-            this.dgvMesas_790MY.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            this.dgvMesas_790MY.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
             this.dgvMesas_790MY.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.dgvMesas_790MY.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.dgvMesas_790MY.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
@@ -161,9 +162,14 @@ namespace GUI_08YS.Maestros
             this.lblCapacidad_790MY.Text = "Capacidad:";
             this.lblCapacidad_790MY.Tag = "FM_lblCapacidad";
             //
-            this.txtCapacidad_790MY.Location = new System.Drawing.Point(110, 369);
-            this.txtCapacidad_790MY.Name = "txtCapacidad_790MY";
-            this.txtCapacidad_790MY.Size = new System.Drawing.Size(120, 20);
+            // nudCapacidad_790MY
+            //
+            this.nudCapacidad_790MY.Location = new System.Drawing.Point(110, 369);
+            this.nudCapacidad_790MY.Name = "nudCapacidad_790MY";
+            this.nudCapacidad_790MY.Size = new System.Drawing.Size(120, 20);
+            this.nudCapacidad_790MY.Minimum = 1;
+            this.nudCapacidad_790MY.Maximum = 8;
+            this.nudCapacidad_790MY.Value = 1;
             //
             // FormMesas_790MY
             //
@@ -179,11 +185,12 @@ namespace GUI_08YS.Maestros
             this.Controls.Add(this.lblNumero_790MY);
             this.Controls.Add(this.txtNumero_790MY);
             this.Controls.Add(this.lblCapacidad_790MY);
-            this.Controls.Add(this.txtCapacidad_790MY);
+            this.Controls.Add(this.nudCapacidad_790MY);
             this.Name = "FormMesas_790MY";
             this.Text = "Mesas";
             this.Load += new System.EventHandler(this.FormMesas_790MY_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvMesas_790MY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudCapacidad_790MY)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -204,6 +211,6 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.Label lblNumero_790MY;
         private System.Windows.Forms.TextBox txtNumero_790MY;
         private System.Windows.Forms.Label lblCapacidad_790MY;
-        private System.Windows.Forms.TextBox txtCapacidad_790MY;
+        private System.Windows.Forms.NumericUpDown nudCapacidad_790MY;
     }
 }

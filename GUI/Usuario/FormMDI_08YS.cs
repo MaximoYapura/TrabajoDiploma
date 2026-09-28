@@ -1,4 +1,4 @@
-﻿using BLL_08YS;
+using BLL_08YS;
 using FontAwesome.Sharp;
 using GUI;
 using GUI_08YS.Admin;
@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -70,7 +71,6 @@ namespace GUI_08YS
         public FormMDI_08YS()
         {
             InitializeComponent();
-            CargarLogoMDI();
             _userBLL = BLLFactory_08YS.CreateUserBLL();
             lblRolSistema.Text = SessionManager_08YS.Instance.Current.Rol.Nombre;
             lblNombreApellido.Text= SessionManager_08YS.Instance.Current.Nombre + " " + SessionManager_08YS.Instance.Current.Apellido;
@@ -80,26 +80,14 @@ namespace GUI_08YS
             TraductorManager_08YS.Instance.Suscribir(this);
             SessionManager_08YS.Instance.SesionInvalidada += OnSesionInvalidada;
             UpdateIdioma();
-        }
 
-        private void CargarLogoMDI()
-        {
+            // Icono corporativo (seguro: el recurso puede no existir aún en la Build actual)
             try
             {
-                string logoPath = System.IO.Path.Combine(
-                    System.Windows.Forms.Application.StartupPath, "Resources", "logo_fogon.png");
-                if (System.IO.File.Exists(logoPath))
-                {
-                    var logoImg = System.Drawing.Image.FromFile(logoPath);
-                    pictureBox1.Image = logoImg;
-                    pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-
-                    // Marca de agua: logo centrado en el área de contenido del MDI
-                    panel2.BackgroundImage       = logoImg;
-                    panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-                }
+                var icon = Resources.ResourceManager.GetObject("FogonIcon") as System.Drawing.Icon;
+                if (icon != null) this.Icon = icon;
             }
-            catch { /* Si no se puede cargar el logo, los controles quedan sin imagen */ }
+            catch { }
         }
 
         private void OnSesionInvalidada()
@@ -254,28 +242,52 @@ namespace GUI_08YS
 
         private void FormMDI_Load(object sender, EventArgs e)
         {
-            System.Drawing.Color primaryColorBordo = System.Drawing.Color.FromArgb(120, 25, 25);
-            System.Drawing.Color textColorCrema    = System.Drawing.Color.FromArgb(253, 246, 227);
+            AdministrativoDropDownMenu.IsMainMenu = true;
+            MaestrosDropDownMenu.IsMainMenu = true;
+            ReservasDropDownMenu.IsMainMenu = true;
+            ReportesDropDownMenu.IsMainMenu = true;
+            PerfilDropDownMenu.IsMainMenu = true;
 
-            AdministrativoDropDownMenu.PrimaryColor     = primaryColorBordo;
-            AdministrativoDropDownMenu.MenuItemTextColor = textColorCrema;
-            AdministrativoDropDownMenu.IsMainMenu       = true;
+            // Marca de agua corporativa sobre el área de contenido (panel2)
+            panel2.Paint += Panel2_PintarMarcaDeAgua;
+        }
 
-            MaestrosDropDownMenu.PrimaryColor     = primaryColorBordo;
-            MaestrosDropDownMenu.MenuItemTextColor = textColorCrema;
-            MaestrosDropDownMenu.IsMainMenu       = true;
+        /// <summary>
+        /// Dibuja el logo de El Fogón del Sur centrado sobre panel2,
+        /// escalado al 40 % del ancho del área de contenido, con opacidad reducida
+        /// para no interferir con los formularios hijos.
+        /// </summary>
+        private void Panel2_PintarMarcaDeAgua(object sender, PaintEventArgs e)
+        {
+            Bitmap img;
+            try   { img = Resources.LogoElFogon; }
+            catch { return; }
 
-            ReservasDropDownMenu.PrimaryColor     = primaryColorBordo;
-            ReservasDropDownMenu.MenuItemTextColor = textColorCrema;
-            ReservasDropDownMenu.IsMainMenu       = true;
+            if (img == null) return;
 
-            ReportesDropDownMenu.PrimaryColor     = primaryColorBordo;
-            ReportesDropDownMenu.MenuItemTextColor = textColorCrema;
-            ReportesDropDownMenu.IsMainMenu       = true;
+            var panel = (Panel)sender;
 
-            PerfilDropDownMenu.PrimaryColor     = primaryColorBordo;
-            PerfilDropDownMenu.MenuItemTextColor = textColorCrema;
-            PerfilDropDownMenu.IsMainMenu       = true;
+            // Si hay un formulario hijo abierto, no dibujar la marca de agua
+            if (panel.Controls.Count > 0) return;
+
+            int w = (int)(panel.ClientSize.Width * 0.40);
+            if (w <= 0) return;
+            int h = (int)(img.Height * ((float)w / Math.Max(1, img.Width)));
+            int x = (panel.ClientSize.Width  - w) / 2;
+            int y = (panel.ClientSize.Height - h) / 2;
+
+            // Dibujar con opacidad al 12 % (Matrix33 controla el canal alfa)
+            using (var attr = new ImageAttributes())
+            {
+                var cm = new ColorMatrix { Matrix33 = 0.12f };
+                attr.SetColorMatrix(cm);
+                e.Graphics.DrawImage(
+                    img,
+                    new Rectangle(x, y, w, h),
+                    0, 0, img.Width, img.Height,
+                    GraphicsUnit.Pixel,
+                    attr);
+            }
         }
 
         private void FormMDI_FormClosing(object sender, FormClosingEventArgs e)

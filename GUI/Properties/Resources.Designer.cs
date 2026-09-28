@@ -91,11 +91,21 @@ namespace GUI_08YS.Properties {
         }
         
         /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Byte[].
+        /// </summary>
+        internal static byte[] FogonIcon {
+            get {
+                object obj = ResourceManager.GetObject("FogonIcon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ChatGPT_Image_26_sept_2026__21_21_47 {
+        internal static System.Drawing.Bitmap FondoRestauran {
             get {
-                object obj = ResourceManager.GetObject("ChatGPT Image 26 sept 2026, 21_21_47", resourceCulture);
+                object obj = ResourceManager.GetObject("FondoRestauran", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +133,9 @@ namespace GUI_08YS.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap logo_fogon {
+        internal static System.Drawing.Bitmap LogoElFogon {
             get {
-                object obj = ResourceManager.GetObject("logo_fogon", resourceCulture);
+                object obj = ResourceManager.GetObject("LogoElFogon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

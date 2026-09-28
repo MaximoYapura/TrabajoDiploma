@@ -135,6 +135,9 @@
     <Compile Include="RF1\FormRegistrarReserva_790MY.Designer.cs">
       <DependentUpon>FormRegistrarReserva_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="RF1\MesaVisualControl_790MY.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RF1\FormSeleccionarMesa_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -246,6 +249,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\ChatGPT Image 26 sept 2026, 21_21_47.png" />
+    <Content Include="Resources\FogonIcon.ico" />
+    <Content Include="Resources\FondoRestauran.png" />
     <Content Include="Resources\logo_fogon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
