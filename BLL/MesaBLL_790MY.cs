@@ -46,21 +46,21 @@ namespace BLL_08YS
             return max + 1;
         }
 
-        public List<Mesa_790MY> BuscarDisponibles(DateTime fecha, TimeSpan hora, int comensales)
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
+        //public List<Mesa_790MY> BuscarDisponibles(DateTime fecha, TimeSpan hora, int comensales)
+        //{
+        //    SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
 
-            if (fecha.Date < DateTime.Today)
-                throw new ArgumentException("La fecha de la reserva no puede ser anterior a hoy.");
+        //    if (fecha.Date < DateTime.Today)
+        //        throw new ArgumentException("La fecha de la reserva no puede ser anterior a hoy.");
 
-            if (comensales <= 0)
-                throw new ArgumentException("La cantidad de comensales debe ser mayor a cero.");
+        //    if (comensales <= 0)
+        //        throw new ArgumentException("La cantidad de comensales debe ser mayor a cero.");
 
-            if (!TurnosValidos.Contains(hora))
-                throw new ArgumentException("El turno seleccionado no es válido.");
+        //    if (!TurnosValidos.Contains(hora))
+        //        throw new ArgumentException("El turno seleccionado no es válido.");
 
-            return _mesaRepository.GetDisponibles(fecha.Date, hora, comensales);
-        }
+        //    return _mesaRepository.GetDisponibles(fecha.Date, hora, comensales);
+        //}
 
         /// <summary>
         /// Devuelve todas las mesas clasificadas para el mapa del salón según
@@ -168,11 +168,11 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEvento(Evento.MesaEliminada, targetUsername: numero.ToString());
         }
 
-        public void ActualizarEstado(int nroMesa, EstadoMesa_790MY estado)
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
-            _mesaRepository.UpdateEstado(nroMesa, estado);
-        }
+        //public void ActualizarEstado(int nroMesa, EstadoMesa_790MY estado)
+        //{
+        //    SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
+        //    _mesaRepository.UpdateEstado(nroMesa, estado);
+        //}
 
         private static void ValidarDatos(int numero, int capacidad)
         {

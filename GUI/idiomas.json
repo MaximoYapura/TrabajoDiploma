@@ -433,22 +433,23 @@
     "lblEslogan_Fogon": "Sabores que cuentan historias",
     "msg_dv_inconsistente": "Se detectó una inconsistencia en la integridad de la base de datos (Dígito Verificador).",
     "msg_limite_mesas_alcanzado": "Se ha alcanzado el límite máximo de 12 mesas para el salón.",
+    "titulo_sin_disponibilidad": "Sin disponibilidad",
+    "FRR_msg_sin_disponibilidad": "No hay mesas disponibles para la fecha y turno seleccionados. Por favor, seleccione otra fecha u horario.",
+
     "msg_seleccionar_mesa_titulo": "Seleccionar Mesa",
-    "msg_subtitulo_seleccionar_mesa": "Elegí la mesa que mejor se adapte a tu reserva",
-    "SM_leyenda_titulo": "Leyenda",
-    "SM_leyenda_recomendada": "⭐ Recomendada",
+
+    "msg_subtitulo_seleccionar_mesa": "Haga clic en una mesa disponible para asignarla a la reserva",
+
     "SM_leyenda_disponible": "Disponible",
-    "SM_leyenda_ocupada": "Ocupada 🔒",
-    "SM_leyenda_incompatible": "Sin capacidad suficiente",
+    "SM_leyenda_ocupada": "Ocupada / Reservada",
+    "SM_leyenda_incompatible": "Capacidad insuficiente",
     "SM_leyenda_seleccionada": "Seleccionada",
-    "SM_info_mesa_titulo": "Mesa seleccionada:",
-    "msg_personas": "personas",
-    "msg_mejor_opcion": "Mejor opción ⭐",
-    "aviso_titulo": "Aviso",
+    "SM_info_mesa_titulo": "Información de la Mesa",
+
     "SM_footer_comensales": "Comensales",
     "SM_footer_fecha": "Fecha",
-    "SM_footer_hora": "Hora",
-    "lblTituloConsultaReservas": "Consultar / Cancelar Reservas"
+    "SM_footer_hora": "Hora"
+
 
   },
   "en": {
@@ -885,21 +886,20 @@
     "lblEslogan_Fogon": "Flavors that tell stories",
     "msg_dv_inconsistente": "A database integrity inconsistency was detected (Checksum/DV).",
     "msg_limite_mesas_alcanzado": "Maximum limit of 12 tables reached for the dining room.",
+    "titulo_sin_disponibilidad": "No Availability",
+    "FRR_msg_sin_disponibilidad": "No tables available for the selected date and shift. Please select another date or time.",
+    "-": null,
     "msg_seleccionar_mesa_titulo": "Select Table",
-    "msg_subtitulo_seleccionar_mesa": "Choose the table that best fits your reservation",
-    "SM_leyenda_titulo": "Legend",
-    "SM_leyenda_recomendada": "⭐ Recommended",
+    "msg_subtitulo_seleccionar_mesa": "Click on an available table to assign it to the reservation",
+
     "SM_leyenda_disponible": "Available",
-    "SM_leyenda_ocupada": "Occupied 🔒",
-    "SM_leyenda_incompatible": "Insufficient capacity",
+    "SM_leyenda_ocupada": "Occupied / Reserved",
+    "SM_leyenda_incompatible": "Insufficient Capacity",
     "SM_leyenda_seleccionada": "Selected",
-    "SM_info_mesa_titulo": "Selected table:",
-    "msg_personas": "people",
-    "msg_mejor_opcion": "Best option ⭐",
-    "aviso_titulo": "Notice",
-    "SM_footer_comensales": "Diners",
+    "SM_info_mesa_titulo": "Table Information",
+    "SM_footer_comensales": "Guests",
     "SM_footer_fecha": "Date",
-    "SM_footer_hora": "Time",
-    "lblTituloConsultaReservas": "Consult/Cancel Reservations"
+    "SM_footer_hora": "Hour"
+
   }
 }

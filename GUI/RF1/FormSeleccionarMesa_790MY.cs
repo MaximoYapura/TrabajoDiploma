@@ -78,6 +78,7 @@ namespace GUI_08YS.RF1
 
         private void FormSeleccionarMesa_790MY_Load(object sender, EventArgs e)
         {
+            UpdateIdioma();
             CargarMesasMapa();
         }
 
@@ -188,7 +189,7 @@ namespace GUI_08YS.RF1
             // Leyenda title
             _lblLeyendaTitulo = new Label
             {
-                Text      = "Leyenda",
+                Text      = TraductorManager_08YS.Instance.GetTexto("SM_leyenda_titulo") ?? "Leyenda",
                 Font      = new Font("Segoe UI", 9f, FontStyle.Bold),
                 ForeColor = ClrTextoOscuro,
                 AutoSize  = true,
@@ -204,13 +205,14 @@ namespace GUI_08YS.RF1
                 ClrGris,
                 ClrCobre
             };
+            var t18n = TraductorManager_08YS.Instance;
             var leyendaTextos = new string[]
             {
-                "⭐ Recomendada",
-                "Disponible",
-                "Ocupada 🔒",
-                "Incompatible",
-                "Seleccionada"
+                t18n.GetTexto("SM_leyenda_recomendada")  ?? "⭐ Recomendada",
+                t18n.GetTexto("SM_leyenda_disponible")   ?? "Disponible",
+                t18n.GetTexto("SM_leyenda_ocupada")      ?? "Ocupada / Reservada",
+                t18n.GetTexto("SM_leyenda_incompatible") ?? "Incompatible",
+                t18n.GetTexto("SM_leyenda_seleccionada") ?? "Seleccionada",
             };
 
             _lblsLeyenda = new Label[leyendaColors.Length];
@@ -246,7 +248,7 @@ namespace GUI_08YS.RF1
 
             _lblInfoTituloDetalle = new Label
             {
-                Text      = "Mesa seleccionada:",
+                Text      = TraductorManager_08YS.Instance.GetTexto("SM_info_mesa_titulo") ?? "Mesa seleccionada:",
                 Font      = new Font("Segoe UI", 8f, FontStyle.Bold),
                 ForeColor = ClrTextoOscuro,
                 AutoSize  = true,
@@ -286,7 +288,7 @@ namespace GUI_08YS.RF1
 
             _lblPista = new Label
             {
-                Text      = "(ninguna seleccionada)",
+                Text      = TraductorManager_08YS.Instance.GetTexto("msg_sm_falta_seleccion") ?? "Seleccioná una mesa del plano",
                 Font      = new Font("Segoe UI", 7.5f, FontStyle.Italic),
                 ForeColor = Color.Gray,
                 AutoSize  = false,
@@ -513,7 +515,8 @@ namespace GUI_08YS.RF1
                 MessageBox.Show(
                     TraductorManager_08YS.Instance.GetTexto("msg_sm_falta_seleccion")
                         ?? "Seleccioná una mesa del plano",
-                    "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    TraductorManager_08YS.Instance.GetTexto("aviso_titulo") ?? "Aviso",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             DialogResult = DialogResult.OK;

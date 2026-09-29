@@ -1,9 +1,10 @@
 using BE_08YS;
-using Service_08YS;
 using BLL_08YS;
+using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using GUI_08YS.Maestros;
 namespace GUI_08YS.RF1
@@ -12,6 +13,7 @@ namespace GUI_08YS.RF1
     {
         private readonly ClienteBLL_790MY _clienteBll;
         private readonly ReservaBLL_790MY _reservaBll;
+        private readonly MesaBLL_790MY    _mesaBll;
 
         private Cliente_790MY _clienteActual;
         private Mesa_790MY _mesaSeleccionada;
@@ -35,6 +37,7 @@ namespace GUI_08YS.RF1
 
             _clienteBll = BLLFactory_790MY.CreateClienteBLL();
             _reservaBll = BLLFactory_790MY.CreateReservaBLL();
+            _mesaBll    = BLLFactory_790MY.CreateMesaBLL();
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
@@ -147,10 +150,37 @@ namespace GUI_08YS.RF1
                 return;
             }
 
-            TimeSpan hora = ((TurnoItem)cmbHora_790MY.SelectedItem).Hora;
-            int comensales = (int)nudComensales_790MY.Value;
+            TimeSpan hora       = ((TurnoItem)cmbHora_790MY.SelectedItem).Hora;
+            int      comensales = (int)nudComensales_790MY.Value;
+            DateTime fecha = dtpFecha_790MY.Value.Date;
 
-            using (var frmMesa = new FormSeleccionarMesa_790MY(dtpFecha_790MY.Value, hora, comensales))
+            // ── Verificar disponibilidad antes de abrir el plano ──────────────
+            // Se consulta el mapa para el mismo contexto que usará FormSeleccionarMesa.
+            // Si ninguna mesa resulta seleccionable, se informa al usuario y se
+            // cancela la apertura del modal preservando todos los campos del formulario.
+            try
+            {
+                var mesas = _mesaBll.ObtenerMesasMapa(fecha, hora, comensales);
+                if (mesas == null || !mesas.Any(m => m.EsSeleccionable))
+                {
+                    MessageBox.Show(
+                        TraductorManager_08YS.Instance.GetTexto("FRR_msg_sin_disponibilidad"),
+                        TraductorManager_08YS.Instance.GetTexto("titulo_sin_disponibilidad"),
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    TraductorManager_08YS.Instance.GetTexto("error"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            // ─────────────────────────────────────────────────────────────────
+
+            using (var frmMesa = new FormSeleccionarMesa_790MY(fecha, hora, comensales))
             {
                 if (frmMesa.ShowDialog(this.FindForm()) == DialogResult.OK)
                 {
@@ -196,7 +226,7 @@ namespace GUI_08YS.RF1
 
             try
             {
-                _reservaBll.RegistrarReserva(_clienteActual.DNI, _mesaSeleccionada, dtpFecha_790MY.Value, hora, comensales);
+                _reservaBll.RegistrarReserva(_clienteActual.DNI, _mesaSeleccionada, dtpFecha_790MY.Value.Date, hora, comensales);
 
                 MessageBox.Show(
                     TraductorManager_08YS.Instance.GetTexto("msg_reserva_registrada"),
