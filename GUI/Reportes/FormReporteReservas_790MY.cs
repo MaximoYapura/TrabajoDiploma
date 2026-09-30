@@ -16,6 +16,18 @@ namespace GUI_08YS.Reportes
         private readonly ReservaBLL_790MY _reservaBll;
         private List<Reserva_790MY> _ultimoResultado;
 
+        // ── Últimos filtros aplicados (para incluirlos en el PDF) ─────────────
+        private DateTime? _filtroDesde;
+        private DateTime? _filtroHasta;
+        private int?      _filtroDni;
+
+        // ── Panel de resumen de filtros aplicados ───────────────────────────
+        private Panel  _pnlResumenFiltros;
+        private Label  _lblPrefFechas;
+        private Label  _lblValFechas;
+        private Label  _lblPrefCliente;
+        private Label  _lblValCliente;
+
         /// <summary>
         /// Wrapper para los ítems del ComboBox de estado.
         /// </summary>
@@ -40,6 +52,111 @@ namespace GUI_08YS.Reportes
             dtpHasta_790MY.Checked = false;
             CargarEstados();
             btnGenerarPDF_790MY.Enabled = false;
+            InicializarPanelResumen();
+        }
+
+        /// <summary>
+        /// Crea programáticamente el panel de resumen de filtros aplicados,
+        /// que se muestra entre el panel de filtros y el DataGridView.
+        /// </summary>
+        private void InicializarPanelResumen()
+        {
+            var t = TraductorManager_08YS.Instance;
+
+            _pnlResumenFiltros = new Panel
+            {
+                Dock      = DockStyle.Top,
+                Height    = 34,
+                BackColor = System.Drawing.Color.FromArgb(240, 235, 228),
+                Padding   = new Padding(8, 0, 8, 0)
+            };
+
+            // Prefijo "Filtro Fechas:"
+            _lblPrefFechas = new Label
+            {
+                AutoSize  = true,
+                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f, System.Drawing.FontStyle.Bold),
+                ForeColor = System.Drawing.Color.FromArgb(80, 40, 40),
+                Location  = new System.Drawing.Point(8, 10),
+                Text      = t.GetTexto("REP_lbl_filtro_fechas") ?? "Filtro Fechas:"
+            };
+
+            // Valor dinámico de fechas
+            _lblValFechas = new Label
+            {
+                AutoSize  = true,
+                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f),
+                ForeColor = System.Drawing.Color.FromArgb(60, 60, 60),
+                Location  = new System.Drawing.Point(106, 10),
+                Text      = "—"
+            };
+
+            // Separador vertical: simple Label con "|"
+            var lblSep = new Label
+            {
+                AutoSize  = true,
+                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f),
+                ForeColor = System.Drawing.Color.FromArgb(160, 140, 120),
+                Location  = new System.Drawing.Point(340, 10),
+                Text      = "|"
+            };
+
+            // Prefijo "Filtro Cliente:"
+            _lblPrefCliente = new Label
+            {
+                AutoSize  = true,
+                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f, System.Drawing.FontStyle.Bold),
+                ForeColor = System.Drawing.Color.FromArgb(80, 40, 40),
+                Location  = new System.Drawing.Point(360, 10),
+                Text      = t.GetTexto("REP_lbl_filtro_cliente") ?? "Filtro Cliente:"
+            };
+
+            // Valor dinámico de cliente
+            _lblValCliente = new Label
+            {
+                AutoSize  = true,
+                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f),
+                ForeColor = System.Drawing.Color.FromArgb(60, 60, 60),
+                Location  = new System.Drawing.Point(460, 10),
+                Text      = "—"
+            };
+
+            _pnlResumenFiltros.Controls.AddRange(new System.Windows.Forms.Control[]
+                { _lblPrefFechas, _lblValFechas, lblSep, _lblPrefCliente, _lblValCliente });
+
+            // Insertar DESPUÉS de pnlFiltros (ambos son DockStyle.Top; el último en
+            // añadirse aparece justo debajo del primero en el z-order de docking).
+            this.Controls.Add(_pnlResumenFiltros);
+        }
+
+        /// <summary>
+        /// Actualiza las etiquetas del resumen con los filtros que se acaban de aplicar.
+        /// </summary>
+        private void ActualizarResumenFiltros(DateTime? desde, DateTime? hasta, int? dni)
+        {
+            var t = TraductorManager_08YS.Instance;
+            string todos = t.GetTexto("REP_txt_todos") ?? "Todos";
+
+            // Rango de fechas
+            if (desde.HasValue || hasta.HasValue)
+            {
+                string dDesde = desde.HasValue ? desde.Value.ToString("dd/MM/yyyy") : "—";
+                string dHasta = hasta.HasValue ? hasta.Value.ToString("dd/MM/yyyy") : "—";
+                _lblValFechas.Text = $"{dDesde}  →  {dHasta}";
+            }
+            else
+            {
+                _lblValFechas.Text = todos;
+            }
+
+            // Cliente
+            _lblValCliente.Text = dni.HasValue ? dni.Value.ToString() : todos;
+        }
+
+        private void LimpiarResumenFiltros()
+        {
+            if (_lblValFechas  != null) _lblValFechas.Text  = "—";
+            if (_lblValCliente != null) _lblValCliente.Text = "—";
         }
 
         // ───────────────────────────── ComboBox de estado ─────────────────────────────
@@ -93,6 +210,12 @@ namespace GUI_08YS.Reportes
                 dgvReporteReservas_790MY.DataSource = null;
                 dgvReporteReservas_790MY.DataSource = _ultimoResultado;
                 btnGenerarPDF_790MY.Enabled = _ultimoResultado != null && _ultimoResultado.Count > 0;
+
+                // Mostrar resumen de filtros en el panel descriptivo y guardarlos para el PDF
+                ActualizarResumenFiltros(desde, hasta, dni);
+                _filtroDesde = desde;
+                _filtroHasta = hasta;
+                _filtroDni   = dni;
             }
             catch (Exception ex)
             {
@@ -215,10 +338,11 @@ namespace GUI_08YS.Reportes
                 ? $"{session.Current.Nombre} {session.Current.Apellido} ({session.Current.Rol?.Nombre})"
                 : "-";
 
+            // Las claves ya contienen el texto completo (ej. "Generado por:"), sin ": " extra.
             var phraseAudit = new Phrase();
-            phraseAudit.Add(new Chunk(t.GetTexto("REP_pdf_generadoPor") + ": ", fuenteAuditB));
+            phraseAudit.Add(new Chunk((t.GetTexto("REP_pdf_generadoPor") ?? "Generado por:") + " ", fuenteAuditB));
             phraseAudit.Add(new Chunk(usuario + "\n", fuenteAudit));
-            phraseAudit.Add(new Chunk(t.GetTexto("REP_pdf_fechaEmision") + ": ", fuenteAuditB));
+            phraseAudit.Add(new Chunk((t.GetTexto("REP_pdf_fechaEmision") ?? "Fecha de emisión:") + " ", fuenteAuditB));
             phraseAudit.Add(new Chunk(DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fuenteAudit));
 
             tablaEnc.AddCell(new PdfPCell(phraseAudit)
@@ -235,8 +359,58 @@ namespace GUI_08YS.Reportes
             doc.Add(new Paragraph(t.GetTexto("REP_pdf_titulo"), fuenteTitulo)
             {
                 Alignment    = Element.ALIGN_CENTER,
-                SpacingAfter = 6f
+                SpacingAfter = 4f
             });
+
+            // ── Bloque informativo: filtros aplicados ─────────────────────────
+            {
+                string todos      = t.GetTexto("REP_pdf_todos")         ?? "Todos";
+                string lblPeriodo = t.GetTexto("REP_pdf_periodo")        ?? "Período:";
+                string lblCliente = t.GetTexto("REP_pdf_filtro_cliente") ?? "Cliente DNI:";
+
+                string valPeriodo;
+                if (_filtroDesde.HasValue || _filtroHasta.HasValue)
+                {
+                    string dDesde = _filtroDesde.HasValue ? _filtroDesde.Value.ToString("dd/MM/yyyy") : "—";
+                    string dHasta = _filtroHasta.HasValue ? _filtroHasta.Value.ToString("dd/MM/yyyy") : "—";
+                    valPeriodo = $"{dDesde}  –  {dHasta}";
+                }
+                else
+                {
+                    valPeriodo = todos;
+                }
+
+                string valCliente = _filtroDni.HasValue ? _filtroDni.Value.ToString() : todos;
+
+                var fuenteFiltroB = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8.5f,
+                                        iTextSharp.text.Font.BOLD,   new BaseColor(120, 25, 25));
+                var fuenteFiltroN = new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8.5f,
+                                        iTextSharp.text.Font.NORMAL, new BaseColor(50, 50, 50));
+
+                var colorFiltro = new BaseColor(248, 243, 238);
+                var borderFiltro = new BaseColor(200, 180, 160);
+
+                var tablaFiltros = new PdfPTable(4) { WidthPercentage = 100f, SpacingAfter = 6f };
+                tablaFiltros.SetWidths(new float[] { 1.1f, 2.9f, 1.4f, 2.6f });
+
+                PdfPCell CeldaFiltro(string texto, iTextSharp.text.Font fuente, int align = Element.ALIGN_LEFT) =>
+                    new PdfPCell(new Phrase(texto, fuente))
+                    {
+                        BackgroundColor     = colorFiltro,
+                        BorderColor         = borderFiltro,
+                        BorderWidth         = 0.5f,
+                        Padding             = 4f,
+                        HorizontalAlignment = align,
+                        VerticalAlignment   = Element.ALIGN_MIDDLE
+                    };
+
+                tablaFiltros.AddCell(CeldaFiltro(lblPeriodo, fuenteFiltroB, Element.ALIGN_RIGHT));
+                tablaFiltros.AddCell(CeldaFiltro(valPeriodo, fuenteFiltroN));
+                tablaFiltros.AddCell(CeldaFiltro(lblCliente, fuenteFiltroB, Element.ALIGN_RIGHT));
+                tablaFiltros.AddCell(CeldaFiltro(valCliente, fuenteFiltroN));
+
+                doc.Add(tablaFiltros);
+            }
 
             // ── Tabla de datos (8 columnas) ──
             float[] anchos = { 0.6f, 1.1f, 2.5f, 0.7f, 1.2f, 1.0f, 1.1f, 1.2f };
@@ -326,6 +500,10 @@ namespace GUI_08YS.Reportes
             dgvReporteReservas_790MY.DataSource = null;
             _ultimoResultado               = null;
             btnGenerarPDF_790MY.Enabled    = false;
+            _filtroDesde = null;
+            _filtroHasta = null;
+            _filtroDni   = null;
+            LimpiarResumenFiltros();
         }
 
         // ───────────────────────────── Cerrar ─────────────────────────────
@@ -343,6 +521,12 @@ namespace GUI_08YS.Reportes
             TraducirControles(this);
             CargarEstados();
             this.Text = TraductorManager_08YS.Instance.GetTexto("REP_titulo");
+
+            // Traducir prefijos del panel de resumen de filtros
+            if (_lblPrefFechas  != null)
+                _lblPrefFechas.Text  = TraductorManager_08YS.Instance.GetTexto("REP_lbl_filtro_fechas")  ?? "Filtro Fechas:";
+            if (_lblPrefCliente != null)
+                _lblPrefCliente.Text = TraductorManager_08YS.Instance.GetTexto("REP_lbl_filtro_cliente") ?? "Filtro Cliente:";
 
             // Encabezados de columnas del DGV (no son Controls, deben traducirse explícitamente)
             colRepID_790MY.HeaderText          = TraductorManager_08YS.Instance.GetTexto("REP_colNro");

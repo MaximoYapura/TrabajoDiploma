@@ -4,7 +4,8 @@ namespace BE_08YS
     {
         Libre,
         Ocupada,
-        Reservada
+        Reservada,
+        FueraDeServicio
     }
 
     public class Mesa_790MY

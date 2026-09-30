@@ -44,8 +44,7 @@ namespace GUI_08YS
         private static readonly Dictionary<string, Permisos> _mapaMenuReservas =
             new Dictionary<string, Permisos>
             {
-                { nameof(registrarReservaToolStripMenuItem),  Permisos.RegistrarReserva },
-                { nameof(consultarReservasToolStripMenuItem), Permisos.VerReservas      },
+                { nameof(registrarReservaToolStripMenuItem), Permisos.RegistrarReserva },
             };
 
         private static readonly Dictionary<string, Permisos> _mapaMenuReportes =
@@ -139,9 +138,8 @@ namespace GUI_08YS
 
             PermissionFilter_08YS.AplicarMenuStrip(MaestrosDropDownMenu, _mapaMenuMaestros);
 
-            // Reservar: visible si tiene al menos uno de los dos permisos
-            btnReservar.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarReserva)
-                               || SessionManager_08YS.Instance.HasPermission(Permisos.VerReservas);
+            // Reservar: visible si tiene permiso para registrar reservas
+            btnReservar.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarReserva);
 
             PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
 
@@ -442,11 +440,6 @@ namespace GUI_08YS
             OpenChildForm(new FormRegistrarReserva_790MY());
         }
 
-        private void consultarReservasToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
-            OpenChildForm(new FormGestionReservas_790MY());
-        }
         #endregion
 
         #region Reportes

@@ -4,10 +4,8 @@ using BLL_08YS.Exceptions;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Windows.Forms;
 using Service_08YS;
-using System.Xml.Serialization;
 
 namespace GUI_08YS.Maestros
 {
@@ -403,11 +401,7 @@ namespace GUI_08YS.Maestros
 
             try
             {
-                var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
-                using (var writer = new StreamWriter(txtRutaSerializar_790MY.Text))
-                {
-                    serializer.Serialize(writer, aSerializar);
-                }
+                _clienteBll.SerializarXML(aSerializar, txtRutaSerializar_790MY.Text);
 
                 MessageBox.Show(
                     string.Format(t.GetTexto("msg_fc_serializacion_ok"), aSerializar.Count),
@@ -434,13 +428,7 @@ namespace GUI_08YS.Maestros
 
             try
             {
-                var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
-                List<Cliente_790MY> resultado;
-
-                using (var reader = new StreamReader(txtRutaDeserializar_790MY.Text))
-                {
-                    resultado = (List<Cliente_790MY>)serializer.Deserialize(reader);
-                }
+                List<Cliente_790MY> resultado = _clienteBll.DeserializarXML(txtRutaDeserializar_790MY.Text);
 
                 lstDeserializados_790MY.Items.Clear();
 

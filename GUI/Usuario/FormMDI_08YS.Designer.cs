@@ -54,7 +54,6 @@
             this.mesasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReservasDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.registrarReservaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.consultarReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reporteReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReportesDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
@@ -553,8 +552,7 @@
             this.ReservasDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.ReservasDropDownMenu.IsMainMenu = false;
             this.ReservasDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.registrarReservaToolStripMenuItem,
-            this.consultarReservasToolStripMenuItem});
+            this.registrarReservaToolStripMenuItem});
             this.ReservasDropDownMenu.MenuItemHeight = 25;
             this.ReservasDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.ReservasDropDownMenu.Name = "dropdownMenuStrip_08YS_Reservas";
@@ -568,15 +566,7 @@
             this.registrarReservaToolStripMenuItem.Tag = "menuRegistrarReserva";
             this.registrarReservaToolStripMenuItem.Text = "Registrar Reserva";
             this.registrarReservaToolStripMenuItem.Click += new System.EventHandler(this.registrarReservaToolStripMenuItem_Click);
-            // 
-            // consultarReservasToolStripMenuItem
-            // 
-            this.consultarReservasToolStripMenuItem.Name = "consultarReservasToolStripMenuItem";
-            this.consultarReservasToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.consultarReservasToolStripMenuItem.Tag = "menuConsultarReservas";
-            this.consultarReservasToolStripMenuItem.Text = "Consultar / Cancelar Reservas";
-            this.consultarReservasToolStripMenuItem.Click += new System.EventHandler(this.consultarReservasToolStripMenuItem_Click);
-            // 
+            //
             // reporteReservasToolStripMenuItem
             // 
             this.reporteReservasToolStripMenuItem.Name = "reporteReservasToolStripMenuItem";
@@ -708,7 +698,6 @@
         private System.Windows.Forms.ToolStripMenuItem mesasToolStripMenuItem;
         private DropdownMenuStrip_08YS ReservasDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem registrarReservaToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem consultarReservasToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reporteReservasToolStripMenuItem;
         private FontAwesome.Sharp.IconButton btnReportes_790MY;
         private DropdownMenuStrip_08YS ReportesDropDownMenu;

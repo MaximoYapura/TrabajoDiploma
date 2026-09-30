@@ -77,10 +77,14 @@ namespace BLL_08YS
             return _reservaRepository.Buscar(desde, hasta, clienteDni, estado);
         }
 
+        /// <summary>
+        /// Método de dominio interno: cancela una reserva existente.
+        /// La validación de permiso fue eliminada junto con el formulario de Consulta/Cancelación
+        /// de reservas (refactoring 790MY). Este método se conserva para uso desde otros
+        /// contextos de negocio que puedan invocar la cancelación internamente.
+        /// </summary>
         public void CancelarReserva(int reservaId)
         {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.CancelarReserva);
-
             _reservaRepository.CancelarReserva(reservaId);
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.ReservaCancelada, targetUsername: reservaId.ToString());

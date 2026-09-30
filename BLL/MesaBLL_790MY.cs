@@ -20,13 +20,17 @@ namespace BLL_08YS
             new TimeSpan(22, 0, 0)
         };
 
-        private readonly IMesaRepository_790MY _mesaRepository;
-        private readonly BitacoraBLL_08YS _bitacoraBll;
+        private readonly IMesaRepository_790MY    _mesaRepository;
+        private readonly IReservaRepository_790MY  _reservaRepository;
+        private readonly BitacoraBLL_08YS          _bitacoraBll;
 
-        public MesaBLL_790MY(IMesaRepository_790MY mesaRepository, BitacoraBLL_08YS bitacoraBll)
+        public MesaBLL_790MY(IMesaRepository_790MY mesaRepository,
+                             IReservaRepository_790MY reservaRepository,
+                             BitacoraBLL_08YS bitacoraBll)
         {
-            _mesaRepository = mesaRepository ?? throw new ArgumentNullException(nameof(mesaRepository));
-            _bitacoraBll    = bitacoraBll    ?? throw new ArgumentNullException(nameof(bitacoraBll));
+            _mesaRepository    = mesaRepository    ?? throw new ArgumentNullException(nameof(mesaRepository));
+            _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
+            _bitacoraBll       = bitacoraBll       ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
         public List<Mesa_790MY> GetAll()
@@ -46,23 +50,7 @@ namespace BLL_08YS
             return max + 1;
         }
 
-        //public List<Mesa_790MY> BuscarDisponibles(DateTime fecha, TimeSpan hora, int comensales)
-        //{
-        //    SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
-
-        //    if (fecha.Date < DateTime.Today)
-        //        throw new ArgumentException("La fecha de la reserva no puede ser anterior a hoy.");
-
-        //    if (comensales <= 0)
-        //        throw new ArgumentException("La cantidad de comensales debe ser mayor a cero.");
-
-        //    if (!TurnosValidos.Contains(hora))
-        //        throw new ArgumentException("El turno seleccionado no es válido.");
-
-        //    return _mesaRepository.GetDisponibles(fecha.Date, hora, comensales);
-        //}
-
-        /// <summary>
+         /// <summary>
         /// Devuelve todas las mesas clasificadas para el mapa del salón según
         /// el turno y la cantidad de comensales solicitados.
         /// </summary>
@@ -160,19 +148,26 @@ namespace BLL_08YS
             if (!_mesaRepository.Exists(numero))
                 throw new ArgumentException("La mesa que intenta eliminar no existe.");
 
-            if (_mesaRepository.TieneReservasActivas(numero))
-                throw new ArgumentException("No se puede eliminar la mesa porque tiene reservas activas o futuras asociadas.");
+            // ── Integridad referencial: historial completo (activas + pasadas) ──────────
+            // Se consulta el repositorio de reservas para verificar si existen reservas
+            // asociadas a esta mesa, sin importar su estado ni fecha.
+            // Si las hay, se prohíbe la eliminación y se informa al usuario.
+            var todasLasReservas = _reservaRepository.Buscar(null, null, null, null);
+            bool tieneHistorial  = todasLasReservas != null &&
+                                   todasLasReservas.Any(r => r.MesaNumero == numero);
 
-            _mesaRepository.Delete(numero);
+            if (tieneHistorial)
+                throw new ArgumentException(
+                    TraductorManager_08YS.Instance.GetTexto("msg_error_eliminar_mesa_con_reservas")
+                    ?? "No se puede eliminar la mesa porque posee reservas asociadas en el historial.");
+
+            // ── Baja por estado: FueraDeServicio (no DELETE físico) ──────────────────────
+            // La mesa no tiene reservas en absoluto: se marca como FueraDeServicio
+            // en lugar de eliminarse físicamente, para preservar la integridad del modelo.
+            _mesaRepository.UpdateEstado(numero, EstadoMesa_790MY.FueraDeServicio);
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.MesaEliminada, targetUsername: numero.ToString());
         }
-
-        //public void ActualizarEstado(int nroMesa, EstadoMesa_790MY estado)
-        //{
-        //    SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
-        //    _mesaRepository.UpdateEstado(nroMesa, estado);
-        //}
 
         private static void ValidarDatos(int numero, int capacidad)
         {

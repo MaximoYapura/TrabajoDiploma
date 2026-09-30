@@ -60,6 +60,9 @@ namespace GUI_08YS.Admin
             ConfigurarBotones();
             PrecargarCarpetaDefault();
             ActualizarPreviewNombre();
+
+            // El botón Restaurar se habilita sólo cuando hay un archivo .bak seleccionado
+            btnRealizarRestore.Enabled = false;
         }
 
         private void PrecargarCarpetaDefault()
@@ -171,8 +174,16 @@ namespace GUI_08YS.Admin
 
                 string rutaCreada = _bll.RealizarBackup(carpeta);
 
+                // Aviso explícito al usuario — MostrarResultadoBackup está deshabilitado visualmente
+                var t = TraductorManager_08YS.Instance;
+                MessageBox.Show(
+                    t.GetTexto("msg_backup_exito") ?? "Copia de seguridad realizada con éxito.",
+                    t.GetTexto("titulo_backup")    ?? "Backup",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
                 MostrarResultadoBackup(true,
-                    $"{TraductorManager_08YS.Instance.GetTexto("backup_ok")}\n{Path.GetFileName(rutaCreada)}");
+                    $"{t.GetTexto("backup_ok")}\n{Path.GetFileName(rutaCreada)}");
             }
             catch (InvalidOperationException ex)
             {
@@ -227,8 +238,13 @@ namespace GUI_08YS.Admin
 
                 if (dialog.ShowDialog() != DialogResult.OK) return;
 
+                // IconPlaceholderTextBox tiene ReadOnly=true en el Designer para evitar
+                // edición manual; la asignación programática requiere habilitarlo brevemente.
+                txtArchivoRestore.ReadOnly = false;
                 txtArchivoRestore.Text = dialog.FileName;
-                btnRealizarRestore.Enabled = true;
+                txtArchivoRestore.ReadOnly = true;
+
+                btnRealizarRestore.Enabled = !string.IsNullOrWhiteSpace(txtArchivoRestore.Text);
 
                 // Mostrar info del archivo seleccionado
                 var info = new FileInfo(dialog.FileName);

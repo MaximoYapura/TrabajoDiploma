@@ -123,12 +123,6 @@
     <Compile Include="Reportes\FormReporteReservas_790MY.Designer.cs">
       <DependentUpon>FormReporteReservas_790MY.cs</DependentUpon>
     </Compile>
-    <Compile Include="RF1\FormGestionReservas_790MY.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RF1\FormGestionReservas_790MY.Designer.cs">
-      <DependentUpon>FormGestionReservas_790MY.cs</DependentUpon>
-    </Compile>
     <Compile Include="RF1\FormRegistrarReserva_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -220,9 +214,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reportes\FormReporteReservas_790MY.resx">
       <DependentUpon>FormReporteReservas_790MY.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="RF1\FormGestionReservas_790MY.resx">
-      <DependentUpon>FormGestionReservas_790MY.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RF1\FormRegistrarReserva_790MY.resx">
       <DependentUpon>FormRegistrarReserva_790MY.cs</DependentUpon>

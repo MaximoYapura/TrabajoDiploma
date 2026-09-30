@@ -7,10 +7,12 @@ using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Bitacora;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 namespace BLL_08YS
 {
     public class ClienteBLL_790MY
@@ -42,9 +44,7 @@ namespace BLL_08YS
 
             _clienteRepository.Create(cliente);
 
-            // DV: no existe un DVH por registro en este proyecto (IDvRepository_08YS solo
-            // maneja un digito por TABLA completa via GetTodasLasTablas/GuardarDVTabla).
-            // Recalcular() ya recorre las 9 tablas monitoreadas, Clientes incluida.
+          
             DVManager_08YS.Recalcular();
 
             _bitacoraBll.RegistrarEvento(Evento.ClienteRegistrado, targetUsername: dni.ToString());
@@ -92,6 +92,35 @@ namespace BLL_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             return _clienteRepository.GetByDni(dni);
+        }
+
+        // ── Serialización / Deserialización XML ─────────────────────────────
+
+        /// <summary>
+        /// Serializa la lista de clientes al archivo XML indicado.
+        /// No requiere permiso adicional: el llamador ya lo validó en la GUI.
+        /// </summary>
+        public void SerializarXML(List<Cliente_790MY> clientes, string rutaArchivo)
+        {
+            if (clientes == null) throw new ArgumentNullException(nameof(clientes));
+            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
+
+            var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
+            using (var writer = new StreamWriter(rutaArchivo, append: false, encoding: System.Text.Encoding.UTF8))
+                serializer.Serialize(writer, clientes);
+        }
+
+        /// <summary>
+        /// Deserializa y retorna la lista de clientes desde el archivo XML indicado.
+        /// </summary>
+        public List<Cliente_790MY> DeserializarXML(string rutaArchivo)
+        {
+            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
+            if (!File.Exists(rutaArchivo)) throw new ArgumentException($"El archivo '{rutaArchivo}' no existe.");
+
+            var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
+            using (var reader = new StreamReader(rutaArchivo, System.Text.Encoding.UTF8))
+                return (List<Cliente_790MY>)serializer.Deserialize(reader);
         }
 
         private static void ValidarDatos(int dni, string nombre, string apellido, string email, string telefono)

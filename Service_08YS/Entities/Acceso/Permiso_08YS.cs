@@ -32,7 +32,6 @@ namespace Service_08YS.Entities.Acceso
         VerMesas,
         CrearMesa,
         VerReservas,
-        CancelarReserva,
         RegistrarReserva,
         VerMaestros,   // visibilidad del botón lateral Maestros
         VerReportes    // visibilidad del botón lateral Reportes
