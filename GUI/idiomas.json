@@ -510,7 +510,8 @@
     "CR_mail_saludo": "Hola {0},",
     "CR_mail_cuerpo": "Tu reserva está confirmada. Te dejamos el detalle y adjuntamos el comprobante en PDF.",
     "CR_mail_pie": "Si necesitás modificar o cancelar la reserva, respondé a este correo o comunicate con el restaurante.",
-    "CR_mail_firma": "El equipo de El Fogón del Sur"
+    "CR_mail_firma": "El equipo de El Fogón del Sur",
+    "CR_email_sin_datos": "No hay datos de la reserva o del cliente para enviar el comprobante."
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -1024,6 +1025,7 @@
     "CR_mail_saludo": "Hi {0},",
     "CR_mail_cuerpo": "Your reservation is confirmed. Here are the details, and the PDF voucher is attached.",
     "CR_mail_pie": "If you need to change or cancel your reservation, reply to this email or contact the restaurant.",
-    "CR_mail_firma": "The El Fogón del Sur team"
+    "CR_mail_firma": "The El Fogón del Sur team",
+    "CR_email_sin_datos": "There is no reservation or customer data to send the voucher."
   }
 }

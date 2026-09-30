@@ -4,9 +4,11 @@ using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.draw;
 using Service_08YS;
 using System;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Net.Configuration;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.Text;
@@ -386,49 +388,103 @@ namespace BLL_08YS
         #region Envío por email
 
         /// <summary>
+        /// Indica si el envío de emails está configurado: la sección
+        /// &lt;system.net&gt;&lt;mailSettings&gt; del App.config existe (no está comentada)
+        /// y define un host SMTP y un remitente. Nunca lanza excepciones.
+        /// </summary>
+        public static bool EmailConfigurado()
+        {
+            try
+            {
+                SmtpSection seccion = LeerSeccionSmtp();
+                return seccion != null
+                    && !string.IsNullOrWhiteSpace(seccion.Network?.Host)
+                    && !string.IsNullOrWhiteSpace(seccion.From);
+            }
+            catch (Exception)
+            {
+                // Sección mailSettings mal formada o ilegible: se considera no configurado.
+                return false;
+            }
+        }
+
+        // Lee <system.net><mailSettings><smtp> del App.config (null si está comentada).
+        private static SmtpSection LeerSeccionSmtp()
+            => ConfigurationManager.GetSection("system.net/mailSettings/smtp") as SmtpSection;
+
+        /// <summary>
         /// Envía el comprobante en PDF adjunto al email principal del cliente usando
         /// System.Net.Mail. La configuración SMTP (host, puerto, SSL, credenciales y
         /// remitente) se toma de la sección &lt;system.net&gt;&lt;mailSettings&gt; del App.config.
-        /// Es sincrónico a propósito: la GUI lo invoca en segundo plano con Task.Run
-        /// para no bloquear la interfaz y poder informar el resultado.
+        /// <para>
+        /// Tolerante a fallos: NUNCA lanza excepciones. Si falta el email del cliente,
+        /// si la configuración SMTP no existe o está incompleta, o si el servidor
+        /// rechaza la conexión o las credenciales, devuelve <c>false</c> y describe el
+        /// motivo en <paramref name="mensaje"/> (ya traducido cuando es un motivo conocido).
+        /// </para>
+        /// Es sincrónico a propósito: la GUI lo invoca en segundo plano con Task.Run.
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// El cliente no tiene email o el SMTP no está configurado (mensaje ya traducido).
-        /// </exception>
-        public void EnviarComprobanteEmail(Cliente_790MY cliente, Reserva_790MY reserva)
+        /// <returns><c>true</c> si el correo se entregó al servidor SMTP.</returns>
+        public bool EnviarComprobanteEmail(Cliente_790MY cliente, Reserva_790MY reserva, out string mensaje)
         {
-            if (cliente == null) throw new ArgumentNullException(nameof(cliente));
-            if (reserva == null) throw new ArgumentNullException(nameof(reserva));
-
+            mensaje = null;
             var t = TraductorManager_08YS.Instance;
 
-            if (string.IsNullOrWhiteSpace(cliente.Email))
-                throw new InvalidOperationException(t.GetTexto("CR_email_sin_destinatario"));
-
-            byte[] pdf = GenerarComprobantePDF(reserva, cliente);
-            string nro = FormatearNumeroReserva(reserva.ReservaID);
-
-            using (var smtp = new SmtpClient { Timeout = 30000 })
-            using (var mensaje = new MailMessage())
+            if (cliente == null || reserva == null)
             {
-                // SmtpClient() y MailMessage() leen host/puerto/credenciales y el
-                // remitente ("from") de mailSettings; si faltan, no está configurado.
-                if (string.IsNullOrWhiteSpace(smtp.Host) || mensaje.From == null)
-                    throw new InvalidOperationException(t.GetTexto("CR_email_no_configurado"));
+                mensaje = t.GetTexto("CR_email_sin_datos");
+                return false;
+            }
 
-                string nombreCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
-                mensaje.To.Add(new MailAddress(cliente.Email.Trim(), nombreCompleto));
-                mensaje.Subject         = string.Format(t.GetTexto("CR_mail_asunto"), nro);
-                mensaje.SubjectEncoding = Encoding.UTF8;
-                mensaje.Body            = ConstruirCuerpoHtml(cliente, reserva);
-                mensaje.BodyEncoding    = Encoding.UTF8;
-                mensaje.IsBodyHtml      = true;
+            if (string.IsNullOrWhiteSpace(cliente.Email))
+            {
+                mensaje = t.GetTexto("CR_email_sin_destinatario");
+                return false;
+            }
 
-                // MailMessage.Dispose libera el adjunto y, con él, el MemoryStream.
-                mensaje.Attachments.Add(new Attachment(new MemoryStream(pdf),
-                                                       NombreArchivoComprobante(reserva),
-                                                       MediaTypeNames.Application.Pdf));
-                smtp.Send(mensaje);
+            if (!EmailConfigurado())
+            {
+                mensaje = t.GetTexto("CR_email_no_configurado");
+                return false;
+            }
+
+            try
+            {
+                byte[] pdf = GenerarComprobantePDF(reserva, cliente);
+                string nro = FormatearNumeroReserva(reserva.ReservaID);
+
+                // SmtpClient() toma host, puerto, SSL y credenciales de mailSettings;
+                // el remitente se asigna explícitamente desde la misma sección.
+                using (var smtp = new SmtpClient { Timeout = 30000 })
+                using (var correo = new MailMessage())
+                {
+                    correo.From = new MailAddress(LeerSeccionSmtp().From);
+
+                    string nombreCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
+                    correo.To.Add(new MailAddress(cliente.Email.Trim(), nombreCompleto));
+                    correo.Subject         = string.Format(t.GetTexto("CR_mail_asunto"), nro);
+                    correo.SubjectEncoding = Encoding.UTF8;
+                    correo.Body            = ConstruirCuerpoHtml(cliente, reserva);
+                    correo.BodyEncoding    = Encoding.UTF8;
+                    correo.IsBodyHtml      = true;
+
+                    // MailMessage.Dispose libera el adjunto y, con él, el MemoryStream.
+                    correo.Attachments.Add(new Attachment(new MemoryStream(pdf),
+                                                          NombreArchivoComprobante(reserva),
+                                                          MediaTypeNames.Application.Pdf));
+                    smtp.Send(correo);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Conexión rechazada, credenciales inválidas, timeout, email con formato
+                // inválido, etc. SmtpException suele traer la causa real en InnerException.
+                mensaje = ex is SmtpException && ex.InnerException != null
+                    ? ex.InnerException.Message
+                    : ex.Message;
+                return false;
             }
         }
 

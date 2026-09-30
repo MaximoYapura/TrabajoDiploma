@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -90,11 +89,17 @@ namespace GUI_08YS.RF1
         // ve la vista previa de inmediato y el estado del email se actualiza en vivo.
         private async void FormComprobanteReserva_790MY_Shown(object sender, EventArgs e)
         {
-            //await EnviarEmailAsync();
+            await EnviarEmailAsync();
         }
 
         #region Email en segundo plano
 
+        /// <summary>
+        /// Envía el comprobante sin bloquear la ventana. Cualquier resultado (enviado,
+        /// sin configuración SMTP, sin email del cliente o error de conexión) solo se
+        /// refleja en el indicador de estado: la vista previa y "Guardar PDF" siguen
+        /// funcionando en todos los casos.
+        /// </summary>
         private async Task EnviarEmailAsync()
         {
             var t = TraductorManager_08YS.Instance;
@@ -107,27 +112,41 @@ namespace GUI_08YS.RF1
                 return;
             }
 
+            if (!ReservaBLL_790MY.EmailConfigurado())
+            {
+                // Sin <mailSettings> en el App.config: no se intenta la conexión y
+                // reintentar no cambiaría nada, por eso no se ofrece el botón.
+                _detalleEmail = t.GetTexto("CR_email_no_configurado");
+                MostrarEstadoEmail(EstadoEmail.NoEnviado);
+                return;
+            }
+
             MostrarEstadoEmail(EstadoEmail.Enviando);
 
+            bool enviado;
+            string detalle = null;
             try
             {
-                await Task.Run(() => _reservaBll.EnviarComprobanteEmail(_cliente, _reserva));
-                if (IsDisposed) return;
-                MostrarEstadoEmail(EstadoEmail.Enviado);
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Falta de configuración SMTP: reintentar no cambia nada.
-                if (IsDisposed) return;
-                _detalleEmail = ex.Message;
-                MostrarEstadoEmail(EstadoEmail.NoEnviado);
+                enviado = await Task.Run(() => _reservaBll.EnviarComprobanteEmail(_cliente, _reserva, out detalle));
             }
             catch (Exception ex)
             {
-                if (IsDisposed) return;
-                _detalleEmail = ex is SmtpException && ex.InnerException != null
-                    ? ex.InnerException.Message
-                    : ex.Message;
+                // Red de seguridad: el BLL no lanza excepciones, pero un async void
+                // (Shown / Click) nunca debe dejar escapar una y cerrar la aplicación.
+                enviado = false;
+                detalle = ex.Message;
+            }
+
+            if (IsDisposed) return;   // el usuario cerró el modal mientras se enviaba
+
+            if (enviado)
+            {
+                MostrarEstadoEmail(EstadoEmail.Enviado);
+            }
+            else
+            {
+                // Error de conexión, credenciales o timeout: vale la pena reintentar.
+                _detalleEmail = detalle;
                 MostrarEstadoEmail(EstadoEmail.Error);
                 btnReenviar_790MY.Visible = true;
             }
