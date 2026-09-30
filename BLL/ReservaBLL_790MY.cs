@@ -10,7 +10,9 @@ using System.Linq;
 
 namespace BLL_08YS
 {
-    public class ReservaBLL_790MY
+    // Clase parcial: la generación del comprobante (PDF + email) vive en
+    // ReservaBLL_790MY.Comprobante.cs para no mezclarla con las reglas de dominio.
+    public partial class ReservaBLL_790MY
     {
         private readonly IReservaRepository_790MY _reservaRepository;
         private readonly IClienteRepository_790MY _clienteRepository;
@@ -26,7 +28,11 @@ namespace BLL_08YS
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
-        public void RegistrarReserva(int clienteDni, Mesa_790MY mesa, DateTime fecha, TimeSpan hora, int comensales)
+        /// <summary>
+        /// Registra la reserva y la devuelve con su ReservaID ya asignado por el
+        /// repositorio, para que la capa de presentación pueda emitir el comprobante.
+        /// </summary>
+        public Reserva_790MY RegistrarReserva(int clienteDni, Mesa_790MY mesa, DateTime fecha, TimeSpan hora, int comensales)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
 
@@ -69,6 +75,8 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEvento(
                 Evento.ReservaRegistrada,
                 targetUsername: $"Reserva {reserva.ReservaID} - Cliente DNI {clienteDni}");
+
+            return reserva;
         }
 
         public List<Reserva_790MY> Buscar(DateTime? desde, DateTime? hasta, int? clienteDni, EstadoReserva_790MY? estado)

@@ -1,6 +1,7 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,26 @@ namespace Service_08YS
 
         public static TraductorManager_08YS Instance
             => _instance ?? (_instance = new TraductorManager_08YS());
+
+        /// <summary>Código del idioma activo ("es", "en").</summary>
+        public string IdiomaActual => _idiomaActual;
+
+        /// <summary>
+        /// Cultura asociada al idioma activo, para formatear fechas y números
+        /// (p. ej. el nombre del día en el comprobante de reserva).
+        /// </summary>
+        public CultureInfo CulturaActual
+        {
+            get
+            {
+                switch (_idiomaActual)
+                {
+                    case "en": return CultureInfo.GetCultureInfo("en-US");
+                    case "es": return CultureInfo.GetCultureInfo("es-AR");
+                    default:   return CultureInfo.CurrentCulture;
+                }
+            }
+        }
 
         private void CargarJson()
         {
