@@ -80,7 +80,7 @@ namespace GUI_08YS.Maestros
             this.dgvClientes_790MY.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvClientes_790MY.EnableHeadersVisualStyles = false;
             this.dgvClientes_790MY.Location = new System.Drawing.Point(20, 20);
-            this.dgvClientes_790MY.MultiSelect = false;
+            this.dgvClientes_790MY.MultiSelect = true;
             this.dgvClientes_790MY.Name = "dgvClientes_790MY";
             this.dgvClientes_790MY.ReadOnly = true;
             this.dgvClientes_790MY.RowHeadersVisible = false;

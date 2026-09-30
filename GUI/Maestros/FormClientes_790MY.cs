@@ -4,6 +4,7 @@ using BLL_08YS.Exceptions;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using Service_08YS;
 
@@ -100,7 +101,10 @@ namespace GUI_08YS.Maestros
 
         private void ActualizarHabilitacionBotonesAccion()
         {
-            bool haySeleccion = dgvClientes_790MY.CurrentRow?.DataBoundItem is Cliente_790MY;
+            // Con multiselección, Modificar/Eliminar actúan sobre un único cliente:
+            // se habilitan solo si hay exactamente una fila seleccionada.
+            bool haySeleccion = dgvClientes_790MY.SelectedRows.Count == 1
+                             && dgvClientes_790MY.CurrentRow?.DataBoundItem is Cliente_790MY;
             btnModificar_790MY.Enabled = haySeleccion;
             btnEliminar_790MY.Enabled = haySeleccion;
         }
@@ -361,7 +365,13 @@ namespace GUI_08YS.Maestros
 
         private void btnExaminarSerializar_790MY_Click(object sender, EventArgs e)
         {
-            using (var dialogo = new SaveFileDialog { Filter = "Archivos XML (*.xml)|*.xml", FileName = "Clientes.xml" })
+            using (var dialogo = new SaveFileDialog
+            {
+                Filter       = TraductorManager_08YS.Instance.GetTexto("FC_filtro_xml"),
+                DefaultExt   = "xml",
+                AddExtension = true,
+                FileName     = "Clientes.xml"
+            })
             {
                 if (dialogo.ShowDialog(this) == DialogResult.OK)
                     txtRutaSerializar_790MY.Text = dialogo.FileName;
@@ -370,7 +380,10 @@ namespace GUI_08YS.Maestros
 
         private void btnExaminarDeserializar_790MY_Click(object sender, EventArgs e)
         {
-            using (var dialogo = new OpenFileDialog { Filter = "Archivos XML (*.xml)|*.xml" })
+            using (var dialogo = new OpenFileDialog
+            {
+                Filter = TraductorManager_08YS.Instance.GetTexto("FC_filtro_xml")
+            })
             {
                 if (dialogo.ShowDialog(this) == DialogResult.OK)
                     txtRutaDeserializar_790MY.Text = dialogo.FileName;
@@ -381,6 +394,23 @@ namespace GUI_08YS.Maestros
         {
             var t = TraductorManager_08YS.Instance;
 
+            // Se exportan exactamente las filas seleccionadas (1 o N). Sin selección
+            // no se exporta nada: se pide al usuario que elija al menos un registro.
+            List<Cliente_790MY> aSerializar = dgvClientes_790MY.SelectedRows
+                .Cast<DataGridViewRow>()
+                .OrderBy(fila => fila.Index)              // mismo orden que en la grilla
+                .Select(fila => fila.DataBoundItem as Cliente_790MY)
+                .Where(cliente => cliente != null)
+                .ToList();
+
+            if (aSerializar.Count == 0)
+            {
+                MessageBox.Show(t.GetTexto("msg_fc_seleccionar_para_exportar"), t.GetTexto("titulo_fc_sin_seleccion"),
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dgvClientes_790MY.Focus();
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(txtRutaSerializar_790MY.Text))
             {
                 MessageBox.Show(t.GetTexto("msg_fc_falta_ruta_serializar"), t.GetTexto("titulo_falta_ruta"),
@@ -388,20 +418,10 @@ namespace GUI_08YS.Maestros
                 return;
             }
 
-            // Si hay una fila seleccionada se serializa solo esa (la grilla es de
-            // seleccion unica); si no hay seleccion, se serializa la lista completa
-            // que está cargada actualmente.
-            List<Cliente_790MY> aSerializar;
-            if (dgvClientes_790MY.CurrentRow?.DataBoundItem is Cliente_790MY seleccionado)
-                aSerializar = new List<Cliente_790MY> { seleccionado };
-            else if (dgvClientes_790MY.DataSource is List<Cliente_790MY> todos)
-                aSerializar = todos;
-            else
-                aSerializar = new List<Cliente_790MY>();
-
             try
             {
-                _clienteBll.SerializarXML(aSerializar, txtRutaSerializar_790MY.Text);
+                string ruta = txtRutaSerializar_790MY.Text.Trim();
+                _clienteBll.SerializarArchivoXML(aSerializar, ruta);
 
                 MessageBox.Show(
                     string.Format(t.GetTexto("msg_fc_serializacion_ok"), aSerializar.Count),
@@ -428,13 +448,14 @@ namespace GUI_08YS.Maestros
 
             try
             {
-                List<Cliente_790MY> resultado = _clienteBll.DeserializarXML(txtRutaDeserializar_790MY.Text);
+                string ruta = txtRutaDeserializar_790MY.Text.Trim();
+                List<Cliente_790MY> resultado = _clienteBll.DeserializarArchivoXML(ruta);
 
                 lstDeserializados_790MY.Items.Clear();
 
-                if (resultado == null || resultado.Count == 0)
+                if (resultado.Count == 0)
                 {
-                    lstDeserializados_790MY.Items.Add(TraductorManager_08YS.Instance.GetTexto("msg_fc_archivo_sin_clientes"));
+                    lstDeserializados_790MY.Items.Add(t.GetTexto("msg_fc_archivo_sin_clientes"));
                     return;
                 }
 

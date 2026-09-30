@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 namespace BLL_08YS
@@ -94,33 +95,88 @@ namespace BLL_08YS
             return _clienteRepository.GetByDni(dni);
         }
 
-        // ── Serialización / Deserialización XML ─────────────────────────────
+        // ── Serialización / Deserialización XML de colecciones ──────────────
+        //
+        // Formato único: XML nativo de .NET (System.Xml.Serialization.XmlSerializer).
+        // Todas las operaciones trabajan SIEMPRE sobre List<Cliente_790MY>: exportar
+        // 1 cliente o N clientes produce el mismo documento (<ArrayOfCliente_790MY>),
+        // y al importar se acepta tanto esa colección como un único <Cliente_790MY>
+        // suelto, que se devuelve como lista de 1 elemento. No requieren permiso
+        // adicional: el llamador ya lo validó en la GUI.
 
-        /// <summary>
-        /// Serializa la lista de clientes al archivo XML indicado.
-        /// No requiere permiso adicional: el llamador ya lo validó en la GUI.
-        /// </summary>
-        public void SerializarXML(List<Cliente_790MY> clientes, string rutaArchivo)
+        private static readonly XmlSerializer _serializerLista   = new XmlSerializer(typeof(List<Cliente_790MY>));
+        private static readonly XmlSerializer _serializerCliente = new XmlSerializer(typeof(Cliente_790MY));
+
+        /// <summary>Serializa la lista de clientes a una cadena XML bien formada (UTF-8).</summary>
+        /// <exception cref="ArgumentNullException">La lista es null.</exception>
+        /// <exception cref="ArgumentException">La lista está vacía.</exception>
+        public string SerializarClientesXML(List<Cliente_790MY> clientes)
         {
             if (clientes == null) throw new ArgumentNullException(nameof(clientes));
-            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
+            if (clientes.Count == 0) throw new ArgumentException("Debe indicar al menos un cliente para serializar.");
 
-            var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
-            using (var writer = new StreamWriter(rutaArchivo, append: false, encoding: System.Text.Encoding.UTF8))
-                serializer.Serialize(writer, clientes);
+            using (var writer = new Utf8StringWriter())
+            {
+                _serializerLista.Serialize(writer, clientes);
+                return writer.ToString();
+            }
         }
 
         /// <summary>
-        /// Deserializa y retorna la lista de clientes desde el archivo XML indicado.
+        /// Deserializa el contenido XML a una lista de clientes. Admite una colección
+        /// (&lt;ArrayOfCliente_790MY&gt;) o un único cliente (&lt;Cliente_790MY&gt;).
         /// </summary>
-        public List<Cliente_790MY> DeserializarXML(string rutaArchivo)
+        /// <exception cref="ArgumentException">El contenido está vacío o no es un XML válido de clientes.</exception>
+        public List<Cliente_790MY> DeserializarClientesXML(string contenidoXml)
+        {
+            if (string.IsNullOrWhiteSpace(contenidoXml))
+                throw new ArgumentException("El contenido XML a deserializar está vacío.");
+
+            string texto = contenidoXml.Trim();
+            try
+            {
+                using (var reader = XmlReader.Create(new StringReader(texto)))
+                {
+                    if (_serializerLista.CanDeserialize(reader))
+                        return (List<Cliente_790MY>)_serializerLista.Deserialize(reader) ?? new List<Cliente_790MY>();
+                }
+
+                using (var reader = XmlReader.Create(new StringReader(texto)))
+                {
+                    if (_serializerCliente.CanDeserialize(reader))
+                        return new List<Cliente_790MY> { (Cliente_790MY)_serializerCliente.Deserialize(reader) };
+                }
+            }
+            catch (Exception ex) when (ex is XmlException || ex is InvalidOperationException)
+            {
+                // XML mal formado o con tipos de datos incorrectos.
+                throw new ArgumentException($"El contenido no es un XML válido de clientes: {ex.Message}", ex);
+            }
+
+            throw new ArgumentException("El XML no contiene clientes con el formato esperado.");
+        }
+
+        /// <summary>Serializa la lista de clientes y la guarda en el archivo XML indicado.</summary>
+        public void SerializarArchivoXML(List<Cliente_790MY> clientes, string rutaArchivo)
+        {
+            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
+            string xml = SerializarClientesXML(clientes);
+            File.WriteAllText(rutaArchivo, xml, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        }
+
+        /// <summary>Lee el archivo XML indicado y devuelve la lista de clientes que contiene.</summary>
+        public List<Cliente_790MY> DeserializarArchivoXML(string rutaArchivo)
         {
             if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
             if (!File.Exists(rutaArchivo)) throw new ArgumentException($"El archivo '{rutaArchivo}' no existe.");
+            return DeserializarClientesXML(File.ReadAllText(rutaArchivo, Encoding.UTF8));
+        }
 
-            var serializer = new XmlSerializer(typeof(List<Cliente_790MY>));
-            using (var reader = new StreamReader(rutaArchivo, System.Text.Encoding.UTF8))
-                return (List<Cliente_790MY>)serializer.Deserialize(reader);
+        // StringWriter declara "utf-16" en el encabezado XML; este declara "utf-8",
+        // que es la codificación con la que efectivamente se guarda el archivo.
+        private sealed class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding => new UTF8Encoding(false);
         }
 
         private static void ValidarDatos(int dni, string nombre, string apellido, string email, string telefono)

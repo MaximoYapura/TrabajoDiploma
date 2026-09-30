@@ -511,7 +511,10 @@
     "CR_mail_cuerpo": "Tu reserva está confirmada. Te dejamos el detalle y adjuntamos el comprobante en PDF.",
     "CR_mail_pie": "Si necesitás modificar o cancelar la reserva, respondé a este correo o comunicate con el restaurante.",
     "CR_mail_firma": "El equipo de El Fogón del Sur",
-    "CR_email_sin_datos": "No hay datos de la reserva o del cliente para enviar el comprobante."
+    "CR_email_sin_datos": "No hay datos de la reserva o del cliente para enviar el comprobante.",
+    "FC_filtro_xml": "Archivos XML (*.xml)|*.xml",
+    "msg_fc_seleccionar_para_exportar": "Seleccioná al menos un cliente en la grilla antes de exportar.\n(Ctrl + clic o Shift + clic para elegir varios; Ctrl + A para todos.)",
+    "titulo_fc_sin_seleccion": "Sin selección"
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -1026,6 +1029,9 @@
     "CR_mail_cuerpo": "Your reservation is confirmed. Here are the details, and the PDF voucher is attached.",
     "CR_mail_pie": "If you need to change or cancel your reservation, reply to this email or contact the restaurant.",
     "CR_mail_firma": "The El Fogón del Sur team",
-    "CR_email_sin_datos": "There is no reservation or customer data to send the voucher."
+    "CR_email_sin_datos": "There is no reservation or customer data to send the voucher.",
+    "FC_filtro_xml": "XML files (*.xml)|*.xml",
+    "msg_fc_seleccionar_para_exportar": "Select at least one customer in the grid before exporting.\n(Ctrl + click or Shift + click to pick several; Ctrl + A for all.)",
+    "titulo_fc_sin_seleccion": "No selection"
   }
 }
