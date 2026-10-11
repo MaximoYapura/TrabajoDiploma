@@ -53,8 +53,17 @@ namespace GUI_08YS.Reportes
             this.btnGenerarPDF_790MY = new System.Windows.Forms.Button();
             this.btnCerrar_790MY     = new System.Windows.Forms.Button();
 
+            // Panel de resumen de filtros aplicados
+            this._pnlResumenFiltros = new System.Windows.Forms.Panel();
+            this._lblPrefFechas     = new System.Windows.Forms.Label();
+            this._lblValFechas      = new System.Windows.Forms.Label();
+            this._lblSepFiltros     = new System.Windows.Forms.Label();
+            this._lblPrefCliente    = new System.Windows.Forms.Label();
+            this._lblValCliente     = new System.Windows.Forms.Label();
+
             this.pnlFiltros.SuspendLayout();
             this.pnlBotones.SuspendLayout();
+            this._pnlResumenFiltros.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReporteReservas_790MY)).BeginInit();
             this.SuspendLayout();
 
@@ -324,6 +333,58 @@ namespace GUI_08YS.Reportes
             this.colRepEstado_790MY.ReadOnly          = true;
             this.colRepEstado_790MY.Width             = 100;
 
+            // ── _pnlResumenFiltros (resumen de filtros aplicados) ───────────────────────
+            this._pnlResumenFiltros.BackColor = System.Drawing.Color.FromArgb(240, 235, 228);
+            this._pnlResumenFiltros.Controls.Add(this._lblPrefFechas);
+            this._pnlResumenFiltros.Controls.Add(this._lblValFechas);
+            this._pnlResumenFiltros.Controls.Add(this._lblSepFiltros);
+            this._pnlResumenFiltros.Controls.Add(this._lblPrefCliente);
+            this._pnlResumenFiltros.Controls.Add(this._lblValCliente);
+            this._pnlResumenFiltros.Dock = System.Windows.Forms.DockStyle.Top;
+            this._pnlResumenFiltros.Name = "_pnlResumenFiltros";
+            this._pnlResumenFiltros.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._pnlResumenFiltros.Size = new System.Drawing.Size(1000, 34);
+
+            // ── _lblPrefFechas (prefijo "Filtro Fechas:") ──
+            this._lblPrefFechas.AutoSize = true;
+            this._lblPrefFechas.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this._lblPrefFechas.ForeColor = System.Drawing.Color.FromArgb(80, 40, 40);
+            this._lblPrefFechas.Location = new System.Drawing.Point(8, 10);
+            this._lblPrefFechas.Name = "_lblPrefFechas";
+            this._lblPrefFechas.Text = "Filtro Fechas:";
+
+            // ── _lblValFechas (valor dinámico de fechas) ──
+            this._lblValFechas.AutoSize = true;
+            this._lblValFechas.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this._lblValFechas.ForeColor = System.Drawing.Color.FromArgb(60, 60, 60);
+            this._lblValFechas.Location = new System.Drawing.Point(106, 10);
+            this._lblValFechas.Name = "_lblValFechas";
+            this._lblValFechas.Text = "—";
+
+            // ── _lblSepFiltros (separador vertical "|") ──
+            this._lblSepFiltros.AutoSize = true;
+            this._lblSepFiltros.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this._lblSepFiltros.ForeColor = System.Drawing.Color.FromArgb(160, 140, 120);
+            this._lblSepFiltros.Location = new System.Drawing.Point(340, 10);
+            this._lblSepFiltros.Name = "_lblSepFiltros";
+            this._lblSepFiltros.Text = "|";
+
+            // ── _lblPrefCliente (prefijo "Filtro Cliente:") ──
+            this._lblPrefCliente.AutoSize = true;
+            this._lblPrefCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this._lblPrefCliente.ForeColor = System.Drawing.Color.FromArgb(80, 40, 40);
+            this._lblPrefCliente.Location = new System.Drawing.Point(360, 10);
+            this._lblPrefCliente.Name = "_lblPrefCliente";
+            this._lblPrefCliente.Text = "Filtro Cliente:";
+
+            // ── _lblValCliente (valor dinámico de cliente) ──
+            this._lblValCliente.AutoSize = true;
+            this._lblValCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this._lblValCliente.ForeColor = System.Drawing.Color.FromArgb(60, 60, 60);
+            this._lblValCliente.Location = new System.Drawing.Point(460, 10);
+            this._lblValCliente.Name = "_lblValCliente";
+            this._lblValCliente.Text = "—";
+
             // ── FormReporteReservas_790MY ────────────────────────────────────────────────
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode       = System.Windows.Forms.AutoScaleMode.Font;
@@ -332,6 +393,8 @@ namespace GUI_08YS.Reportes
             this.Controls.Add(this.dgvReporteReservas_790MY);
             this.Controls.Add(this.pnlBotones);
             this.Controls.Add(this.pnlFiltros);
+            // Se agrega último, igual que en la versión original (se creaba en Load).
+            this.Controls.Add(this._pnlResumenFiltros);
             this.Name            = "FormReporteReservas_790MY";
             this.Text            = "Reporte de Reservas";
             this.Load           += new System.EventHandler(this.FormReporteReservas_790MY_Load);
@@ -339,6 +402,8 @@ namespace GUI_08YS.Reportes
             this.pnlFiltros.ResumeLayout(false);
             this.pnlFiltros.PerformLayout();
             this.pnlBotones.ResumeLayout(false);
+            this._pnlResumenFiltros.ResumeLayout(false);
+            this._pnlResumenFiltros.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReporteReservas_790MY)).EndInit();
             this.ResumeLayout(false);
         }
@@ -368,5 +433,11 @@ namespace GUI_08YS.Reportes
         private System.Windows.Forms.Button                      btnLimpiar_790MY;
         private System.Windows.Forms.Button                      btnGenerarPDF_790MY;
         private System.Windows.Forms.Button                      btnCerrar_790MY;
+        private System.Windows.Forms.Panel                       _pnlResumenFiltros;
+        private System.Windows.Forms.Label                       _lblPrefFechas;
+        private System.Windows.Forms.Label                       _lblValFechas;
+        private System.Windows.Forms.Label                       _lblSepFiltros;
+        private System.Windows.Forms.Label                       _lblPrefCliente;
+        private System.Windows.Forms.Label                       _lblValCliente;
     }
 }

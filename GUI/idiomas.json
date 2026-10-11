@@ -514,7 +514,8 @@
     "CR_email_sin_datos": "No hay datos de la reserva o del cliente para enviar el comprobante.",
     "FC_filtro_xml": "Archivos XML (*.xml)|*.xml",
     "msg_fc_seleccionar_para_exportar": "Seleccioná al menos un cliente en la grilla antes de exportar.\n(Ctrl + clic o Shift + clic para elegir varios; Ctrl + A para todos.)",
-    "titulo_fc_sin_seleccion": "Sin selección"
+    "titulo_fc_sin_seleccion": "Sin selección",
+    "msg_personas": "personas"
   },
   "en": {
     "btn_Aceptar": "Accept",
@@ -1032,6 +1033,7 @@
     "CR_email_sin_datos": "There is no reservation or customer data to send the voucher.",
     "FC_filtro_xml": "XML files (*.xml)|*.xml",
     "msg_fc_seleccionar_para_exportar": "Select at least one customer in the grid before exporting.\n(Ctrl + click or Shift + click to pick several; Ctrl + A for all.)",
-    "titulo_fc_sin_seleccion": "No selection"
+    "titulo_fc_sin_seleccion": "No selection",
+    "msg_personas": "people"
   }
 }

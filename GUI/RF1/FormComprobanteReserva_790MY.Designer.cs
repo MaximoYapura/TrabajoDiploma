@@ -139,6 +139,8 @@
             this.btnGuardarPdf_790MY.Text = "Guardar PDF";
             this.btnGuardarPdf_790MY.UseVisualStyleBackColor = false;
             this.btnGuardarPdf_790MY.Click += new System.EventHandler(this.btnGuardarPdf_790MY_Click);
+            this.btnGuardarPdf_790MY.MouseEnter += new System.EventHandler(this.btnGuardarPdf_790MY_MouseEnter);
+            this.btnGuardarPdf_790MY.MouseLeave += new System.EventHandler(this.btnGuardarPdf_790MY_MouseLeave);
             //
             // btnCerrar_790MY
             //

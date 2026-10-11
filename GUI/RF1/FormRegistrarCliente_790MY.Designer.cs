@@ -147,6 +147,8 @@
             this.btnAplicar_790MY.Text = "Aplicar";
             this.btnAplicar_790MY.UseVisualStyleBackColor = false;
             this.btnAplicar_790MY.Click += new System.EventHandler(this.btnAplicar_790MY_Click);
+            this.btnAplicar_790MY.MouseEnter += new System.EventHandler(this.btnAplicar_790MY_MouseEnter);
+            this.btnAplicar_790MY.MouseLeave += new System.EventHandler(this.btnAplicar_790MY_MouseLeave);
             //
             // pnlCuerpo_790MY
             //

@@ -167,6 +167,7 @@ namespace GUI_08YS.Maestros
             // 
             this.txtNumero_790MY.Location = new System.Drawing.Point(785, 142);
             this.txtNumero_790MY.Name = "txtNumero_790MY";
+            this.txtNumero_790MY.ReadOnly = true;
             this.txtNumero_790MY.Size = new System.Drawing.Size(165, 20);
             this.txtNumero_790MY.TabIndex = 8;
             // 
@@ -226,10 +227,26 @@ namespace GUI_08YS.Maestros
             ((System.ComponentModel.ISupportInitialize)(this.nudCapacidad_790MY)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+            this.AplicarIconoCorporativo();
 
         }
 
         #endregion
+
+        /// <summary>
+        /// Icono corporativo (seguro: el recurso puede no existir aún en la Build actual).
+        /// Invocado desde InitializeComponent().
+        /// </summary>
+        private void AplicarIconoCorporativo()
+        {
+            try
+            {
+                var icon = global::GUI_08YS.Properties.Resources.ResourceManager
+                               .GetObject("FogonIcon") as System.Drawing.Icon;
+                if (icon != null) this.Icon = icon;
+            }
+            catch { }
+        }
 
         private System.Windows.Forms.DataGridView dgvMesas_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNumero_790MY;

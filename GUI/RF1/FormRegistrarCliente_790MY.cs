@@ -35,10 +35,6 @@ namespace GUI_08YS.RF1
 
             txtDni_790MY.Text = dniPrellenado.ToString();
 
-            // Hover del botón principal (el Designer no expone color de hover).
-            btnAplicar_790MY.MouseEnter += (s, e) => btnAplicar_790MY.BackColor = ColorBordoHover;
-            btnAplicar_790MY.MouseLeave += (s, e) => btnAplicar_790MY.BackColor = ColorBordo;
-
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
@@ -55,6 +51,17 @@ namespace GUI_08YS.RF1
         {
             using (var pen = new Pen(ColorBordeSuave))
                 e.Graphics.DrawLine(pen, 0, 0, pnlFooter_790MY.Width, 0);
+        }
+
+        // Hover del botón principal (el Designer no expone color de hover).
+        private void btnAplicar_790MY_MouseEnter(object sender, EventArgs e)
+        {
+            btnAplicar_790MY.BackColor = ColorBordoHover;
+        }
+
+        private void btnAplicar_790MY_MouseLeave(object sender, EventArgs e)
+        {
+            btnAplicar_790MY.BackColor = ColorBordo;
         }
 
         private void btnEmailsAdicionales_790MY_Click(object sender, EventArgs e)

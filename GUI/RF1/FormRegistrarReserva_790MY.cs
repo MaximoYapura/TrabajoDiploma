@@ -66,9 +66,6 @@ namespace GUI_08YS.RF1
                 _fuenteClienteVacio.Dispose();
             };
 
-            btnConfirmar_790MY.MouseEnter += (s, e) => btnConfirmar_790MY.BackColor = ColorBordoHover;
-            btnConfirmar_790MY.MouseLeave += (s, e) => btnConfirmar_790MY.BackColor = ColorBordo;
-
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
@@ -81,20 +78,17 @@ namespace GUI_08YS.RF1
         {
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
 
-            try { pbLogoResumen_790MY.Image = Properties.Resources.LogoElFogon; }
-            catch (Exception) { pbLogoResumen_790MY.Visible = false; }
+            // El logo se asigna en el Designer; si el recurso no cargó, se oculta.
+            if (pbLogoResumen_790MY.Image == null)
+                pbLogoResumen_790MY.Visible = false;
 
             dtpFecha_790MY.MinDate = DateTime.Today;
             dtpFecha_790MY.Value = DateTime.Today;
 
-            // Los textos de los turnos usan el mismo formato que el comprobante.
-            cmbHora_790MY.DisplayMember = "Display";
+            // Los textos de los turnos usan el mismo formato que el comprobante
+            // (DisplayMember se configura en el Designer).
             foreach (var inicio in new[] { new TimeSpan(18, 0, 0), new TimeSpan(20, 0, 0), new TimeSpan(22, 0, 0) })
                 cmbHora_790MY.Items.Add(new TurnoItem { Display = ReservaBLL_790MY.FormatearTurno(inicio), Hora = inicio });
-
-            nudComensales_790MY.Minimum = 1;
-            nudComensales_790MY.Maximum = 20;
-            nudComensales_790MY.Value = 2;
 
             UpdateIdioma();
             LimpiarFormulario();
@@ -110,6 +104,17 @@ namespace GUI_08YS.RF1
                 e.Graphics.DrawRectangle(borde, 0, 0, panel.Width - 1, panel.Height - 1);
             using (var franja = new SolidBrush(ColorBordo))
                 e.Graphics.FillRectangle(franja, 0, 0, 4, panel.Height);
+        }
+
+        // Hover del botón principal (el Designer no expone color de hover).
+        private void btnConfirmar_790MY_MouseEnter(object sender, EventArgs e)
+        {
+            btnConfirmar_790MY.BackColor = ColorBordoHover;
+        }
+
+        private void btnConfirmar_790MY_MouseLeave(object sender, EventArgs e)
+        {
+            btnConfirmar_790MY.BackColor = ColorBordo;
         }
 
         // Borde punteado: el resumen se lee como un ticket todavía sin emitir.

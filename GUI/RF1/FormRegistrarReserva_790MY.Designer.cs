@@ -340,6 +340,7 @@
             // cmbHora_790MY
             //
             this.cmbHora_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbHora_790MY.DisplayMember = "Display";
             this.cmbHora_790MY.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbHora_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
             this.cmbHora_790MY.Location = new System.Drawing.Point(182, 28);
@@ -354,9 +355,24 @@
             this.nudComensales_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.nudComensales_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
             this.nudComensales_790MY.Location = new System.Drawing.Point(362, 29);
+            this.nudComensales_790MY.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.nudComensales_790MY.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.nudComensales_790MY.Name = "nudComensales_790MY";
             this.nudComensales_790MY.Size = new System.Drawing.Size(174, 27);
             this.nudComensales_790MY.TabIndex = 5;
+            this.nudComensales_790MY.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
             this.nudComensales_790MY.ValueChanged += new System.EventHandler(this.InvalidarMesaSeleccionada);
             //
             // btnSeleccionarMesa_790MY
@@ -609,6 +625,7 @@
             //
             this.pbLogoResumen_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbLogoResumen_790MY.BackColor = System.Drawing.Color.White;
+            this.pbLogoResumen_790MY.Image = global::GUI_08YS.Properties.Resources.LogoElFogon;
             this.pbLogoResumen_790MY.Location = new System.Drawing.Point(364, 9);
             this.pbLogoResumen_790MY.Name = "pbLogoResumen_790MY";
             this.pbLogoResumen_790MY.Padding = new System.Windows.Forms.Padding(3);
@@ -659,6 +676,8 @@
             this.btnConfirmar_790MY.Text = "Confirmar Reserva";
             this.btnConfirmar_790MY.UseVisualStyleBackColor = false;
             this.btnConfirmar_790MY.Click += new System.EventHandler(this.btnConfirmar_790MY_Click);
+            this.btnConfirmar_790MY.MouseEnter += new System.EventHandler(this.btnConfirmar_790MY_MouseEnter);
+            this.btnConfirmar_790MY.MouseLeave += new System.EventHandler(this.btnConfirmar_790MY_MouseLeave);
             //
             // FormRegistrarReserva_790MY
             //

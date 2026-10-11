@@ -35,15 +35,6 @@ namespace GUI_08YS.Maestros
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
             this.Text = TraductorManager_08YS.Instance.GetTexto("FM_titulo");
-
-            // Icono corporativo (seguro: el recurso puede no existir aún en la Build actual)
-            try
-            {
-                var icon = global::GUI_08YS.Properties.Resources.ResourceManager
-                               .GetObject("FogonIcon") as System.Drawing.Icon;
-                if (icon != null) this.Icon = icon;
-            }
-            catch { }
         }
 
         private void FormMesas_790MY_Load(object sender, EventArgs e)
@@ -78,10 +69,9 @@ namespace GUI_08YS.Maestros
             _modo = modo;
             bool editando = modo != ModoEdicion.Reposo;
 
-            // NroMesa siempre es de solo lectura: se auto-asigna en Alta
-            // y no se permite cambiar la PK en Modificación.
+            // NroMesa siempre es de solo lectura (ReadOnly = true en el Designer):
+            // se auto-asigna en Alta y no se permite cambiar la PK en Modificación.
             txtNumero_790MY.Enabled  = editando;
-            txtNumero_790MY.ReadOnly = true;
 
             nudCapacidad_790MY.Enabled = editando;
 

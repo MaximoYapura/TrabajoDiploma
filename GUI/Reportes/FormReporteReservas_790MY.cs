@@ -21,12 +21,8 @@ namespace GUI_08YS.Reportes
         private DateTime? _filtroHasta;
         private int?      _filtroDni;
 
-        // ── Panel de resumen de filtros aplicados ───────────────────────────
-        private Panel  _pnlResumenFiltros;
-        private Label  _lblPrefFechas;
-        private Label  _lblValFechas;
-        private Label  _lblPrefCliente;
-        private Label  _lblValCliente;
+        // El panel de resumen de filtros aplicados (_pnlResumenFiltros y sus labels)
+        // se declara y configura en FormReporteReservas_790MY.Designer.cs.
 
         /// <summary>
         /// Wrapper para los ítems del ComboBox de estado.
@@ -56,77 +52,14 @@ namespace GUI_08YS.Reportes
         }
 
         /// <summary>
-        /// Crea programáticamente el panel de resumen de filtros aplicados,
-        /// que se muestra entre el panel de filtros y el DataGridView.
+        /// Aplica los textos traducidos de los prefijos del panel de resumen de
+        /// filtros. El panel y sus controles se crean en InitializeComponent().
         /// </summary>
         private void InicializarPanelResumen()
         {
             var t = TraductorManager_08YS.Instance;
-
-            _pnlResumenFiltros = new Panel
-            {
-                Dock      = DockStyle.Top,
-                Height    = 34,
-                BackColor = System.Drawing.Color.FromArgb(240, 235, 228),
-                Padding   = new Padding(8, 0, 8, 0)
-            };
-
-            // Prefijo "Filtro Fechas:"
-            _lblPrefFechas = new Label
-            {
-                AutoSize  = true,
-                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f, System.Drawing.FontStyle.Bold),
-                ForeColor = System.Drawing.Color.FromArgb(80, 40, 40),
-                Location  = new System.Drawing.Point(8, 10),
-                Text      = t.GetTexto("REP_lbl_filtro_fechas") ?? "Filtro Fechas:"
-            };
-
-            // Valor dinámico de fechas
-            _lblValFechas = new Label
-            {
-                AutoSize  = true,
-                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f),
-                ForeColor = System.Drawing.Color.FromArgb(60, 60, 60),
-                Location  = new System.Drawing.Point(106, 10),
-                Text      = "—"
-            };
-
-            // Separador vertical: simple Label con "|"
-            var lblSep = new Label
-            {
-                AutoSize  = true,
-                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f),
-                ForeColor = System.Drawing.Color.FromArgb(160, 140, 120),
-                Location  = new System.Drawing.Point(340, 10),
-                Text      = "|"
-            };
-
-            // Prefijo "Filtro Cliente:"
-            _lblPrefCliente = new Label
-            {
-                AutoSize  = true,
-                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f, System.Drawing.FontStyle.Bold),
-                ForeColor = System.Drawing.Color.FromArgb(80, 40, 40),
-                Location  = new System.Drawing.Point(360, 10),
-                Text      = t.GetTexto("REP_lbl_filtro_cliente") ?? "Filtro Cliente:"
-            };
-
-            // Valor dinámico de cliente
-            _lblValCliente = new Label
-            {
-                AutoSize  = true,
-                Font      = new System.Drawing.Font("Microsoft Sans Serif", 8.25f),
-                ForeColor = System.Drawing.Color.FromArgb(60, 60, 60),
-                Location  = new System.Drawing.Point(460, 10),
-                Text      = "—"
-            };
-
-            _pnlResumenFiltros.Controls.AddRange(new System.Windows.Forms.Control[]
-                { _lblPrefFechas, _lblValFechas, lblSep, _lblPrefCliente, _lblValCliente });
-
-            // Insertar DESPUÉS de pnlFiltros (ambos son DockStyle.Top; el último en
-            // añadirse aparece justo debajo del primero en el z-order de docking).
-            this.Controls.Add(_pnlResumenFiltros);
+            _lblPrefFechas.Text  = t.GetTexto("REP_lbl_filtro_fechas")  ?? "Filtro Fechas:";
+            _lblPrefCliente.Text = t.GetTexto("REP_lbl_filtro_cliente") ?? "Filtro Cliente:";
         }
 
         /// <summary>

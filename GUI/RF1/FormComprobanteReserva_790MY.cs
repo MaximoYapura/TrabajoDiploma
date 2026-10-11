@@ -69,9 +69,6 @@ namespace GUI_08YS.RF1
             try { _logo = Properties.Resources.LogoElFogon; }
             catch (Exception) { _logo = null; }
 
-            btnGuardarPdf_790MY.MouseEnter += (s, e) => btnGuardarPdf_790MY.BackColor = BordoHover;
-            btnGuardarPdf_790MY.MouseLeave += (s, e) => btnGuardarPdf_790MY.BackColor = Bordo;
-
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) =>
             {
@@ -237,6 +234,17 @@ namespace GUI_08YS.RF1
         {
             this.DialogResult = DialogResult.OK;
             this.Close();
+        }
+
+        // Hover del botón principal (el Designer no expone color de hover).
+        private void btnGuardarPdf_790MY_MouseEnter(object sender, EventArgs e)
+        {
+            btnGuardarPdf_790MY.BackColor = BordoHover;
+        }
+
+        private void btnGuardarPdf_790MY_MouseLeave(object sender, EventArgs e)
+        {
+            btnGuardarPdf_790MY.BackColor = Bordo;
         }
 
         #endregion
