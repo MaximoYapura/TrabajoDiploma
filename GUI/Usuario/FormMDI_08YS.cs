@@ -3,6 +3,7 @@ using FontAwesome.Sharp;
 using GUI;
 using GUI_08YS.Admin;
 using GUI_08YS.RF1;
+using GUI_08YS.RF2;
 using GUI_08YS.Maestros;
 using GUI_08YS.Reportes;
 using GUI_08YS.Properties;
@@ -45,6 +46,15 @@ namespace GUI_08YS
             new Dictionary<string, Permisos>
             {
                 { nameof(registrarReservaToolStripMenuItem), Permisos.RegistrarReserva },
+            };
+
+        // RF2 Atención en mesa: una patente por caso de uso (CUN-004, CUN-005, CUN-008).
+        private static readonly Dictionary<string, Permisos> _mapaMenuAtencion =
+            new Dictionary<string, Permisos>
+            {
+                { nameof(abrirMesaToolStripMenuItem_790MY),       Permisos.AbrirMesa       },
+                { nameof(registrarPedidoToolStripMenuItem_790MY), Permisos.RegistrarPedido },
+                { nameof(despacharPedidoToolStripMenuItem_790MY), Permisos.DespacharPedido },
             };
 
         private static readonly Dictionary<string, Permisos> _mapaMenuReportes =
@@ -143,6 +153,13 @@ namespace GUI_08YS
 
             PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
 
+            // Atención en Mesa: visible si tiene al menos una de las patentes de RF2
+            btnAtencion_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.AbrirMesa)
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarPedido)
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.DespacharPedido);
+
+            PermissionFilter_08YS.AplicarMenuStrip(AtencionDropDownMenu_790MY, _mapaMenuAtencion);
+
             // Reportes: visible si el rol tiene acceso al módulo de reportes
             btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReportes);
 
@@ -181,6 +198,9 @@ namespace GUI_08YS
 
             if (ReportesDropDownMenu != null)
                 TraducirMenuFlotanteCustom(ReportesDropDownMenu);
+
+            if (AtencionDropDownMenu_790MY != null)
+                TraducirMenuFlotanteCustom(AtencionDropDownMenu_790MY);
 
             if (PerfilDropDownMenu != null)
                 TraducirMenuFlotanteCustom(PerfilDropDownMenu);
@@ -244,6 +264,7 @@ namespace GUI_08YS
             MaestrosDropDownMenu.IsMainMenu = true;
             ReservasDropDownMenu.IsMainMenu = true;
             ReportesDropDownMenu.IsMainMenu = true;
+            AtencionDropDownMenu_790MY.IsMainMenu = true;
             PerfilDropDownMenu.IsMainMenu = true;
 
             // Marca de agua corporativa sobre el área de contenido (panel2)
@@ -440,6 +461,31 @@ namespace GUI_08YS
             OpenChildForm(new FormRegistrarReserva_790MY());
         }
 
+        #endregion
+
+        #region Atención en Mesa
+        private void btnAtencion_790MY_Click(object sender, EventArgs e)
+        {
+            AtencionDropDownMenu_790MY.Show(btnAtencion_790MY, btnAtencion_790MY.Width, 0);
+        }
+
+        private void abrirMesaToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
+            OpenChildForm(new FormAbrirMesa_790MY());
+        }
+
+        private void registrarPedidoToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
+            OpenChildForm(new FormRegistrarPedido_790MY());
+        }
+
+        private void despacharPedidoToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
+            OpenChildForm(new FormCocinaKDS_790MY());
+        }
         #endregion
 
         #region Reportes

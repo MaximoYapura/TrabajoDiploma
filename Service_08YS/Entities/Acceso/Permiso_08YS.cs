@@ -34,7 +34,16 @@ namespace Service_08YS.Entities.Acceso
         VerReservas,
         RegistrarReserva,
         VerMaestros,   // visibilidad del botón lateral Maestros
-        VerReportes    // visibilidad del botón lateral Reportes
+        VerReportes,   // visibilidad del botón lateral Reportes
+
+        // ── RF2 Atención en mesa (790MY) ─────────────────────────────────
+        // El nombre de cada valor debe coincidir con Permisos.Nombre en la BD
+        // (ver Migraciones_790MY/CompletarRF2_AtencionMesa_790MY.sql).
+        AbrirMesa,         // CUN-004: abrir mesa con reserva o Walk-in + asignar camarero
+        CerrarMesa,        // finalizar la atención (reserva Finalizada, mesa Libre)
+        RegistrarPedido,   // CUN-005
+        DespacharPedido,   // CUN-008 (Chef): comandas, iniciar preparación, marcar Listo
+        CrearEmpleado      // alta/modificación de empleados
     }
 
     public class Permiso_08YS : AccessComponent_08YS

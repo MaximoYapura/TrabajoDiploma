@@ -48,7 +48,23 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.ReservaCancelada,       new EventoMetadata_08YS(Modulo.Reservas, Criticidad.Medio) },
                 { Evento.ReservaRegistrada,      new EventoMetadata_08YS(Modulo.Reservas, Criticidad.Medio) },
                 { Evento.MesaEstadoActualizado,  new EventoMetadata_08YS(Modulo.Mesas,    Criticidad.Medio) },
-                { Evento.RecalculoDVFallido,     new EventoMetadata_08YS(Modulo.Sistema,  Criticidad.Critico) }
+                { Evento.RecalculoDVFallido,     new EventoMetadata_08YS(Modulo.Sistema,  Criticidad.Critico) },
+
+                // RF2 Atención en mesa (790MY)
+                { Evento.ReservaAsistida,                new EventoMetadata_08YS(Modulo.Reservas,  Criticidad.Medio) },
+                { Evento.ReservaFinalizada,              new EventoMetadata_08YS(Modulo.Reservas,  Criticidad.Medio) },
+                { Evento.ReservaRechazadaDisponibilidad, new EventoMetadata_08YS(Modulo.Reservas,  Criticidad.Bajo)  },
+                { Evento.MesaAbierta,                    new EventoMetadata_08YS(Modulo.Mesas,     Criticidad.Medio) },
+                { Evento.WalkInRegistrado,               new EventoMetadata_08YS(Modulo.Reservas,  Criticidad.Medio) },
+                { Evento.CamareroAsignado,               new EventoMetadata_08YS(Modulo.Empleados, Criticidad.Bajo)  },
+                { Evento.EmpleadoRegistrado,             new EventoMetadata_08YS(Modulo.Empleados, Criticidad.Medio) },
+                { Evento.EmpleadoModificado,             new EventoMetadata_08YS(Modulo.Empleados, Criticidad.Medio) },
+                { Evento.PedidoRegistrado,               new EventoMetadata_08YS(Modulo.Pedidos,   Criticidad.Medio) },
+                { Evento.PedidoRechazadoStock,           new EventoMetadata_08YS(Modulo.Pedidos,   Criticidad.Bajo)  },
+                { Evento.PedidoEnPreparacion,            new EventoMetadata_08YS(Modulo.Pedidos,   Criticidad.Bajo)  },
+                { Evento.PedidoListo,                    new EventoMetadata_08YS(Modulo.Pedidos,   Criticidad.Medio) },
+                { Evento.StockDescontado,                new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
+                { Evento.StockDescuentoFallido,          new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Alto)  }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];

@@ -150,6 +150,28 @@
     <Compile Include="RF1\FormSeleccionarMesa_790MY.Designer.cs">
       <DependentUpon>FormSeleccionarMesa_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="RF2\EstiloRF2_790MY.cs" />
+    <Compile Include="RF2\PanelRedondeado_790MY.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RF2\FormAbrirMesa_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RF2\FormAbrirMesa_790MY.Designer.cs">
+      <DependentUpon>FormAbrirMesa_790MY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RF2\FormRegistrarPedido_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RF2\FormRegistrarPedido_790MY.Designer.cs">
+      <DependentUpon>FormRegistrarPedido_790MY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RF2\FormCocinaKDS_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RF2\FormCocinaKDS_790MY.Designer.cs">
+      <DependentUpon>FormCocinaKDS_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\CustomCalendarPanel.cs">
       <SubType>Component</SubType>
     </Compile>

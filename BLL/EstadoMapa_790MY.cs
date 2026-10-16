@@ -10,7 +10,7 @@ namespace BLL_08YS
         DisponibleRecomendada,
         /// <summary>Libre en ese turno pero no es el mejor ajuste.</summary>
         Disponible,
-        /// <summary>Tiene una reserva Confirmada para ese turno.</summary>
+        /// <summary>Tiene una reserva Confirmada o Asistida en ese turno (o, en el turno en curso, está físicamente ocupada).</summary>
         Ocupada,
         /// <summary>Activa pero su capacidad es menor a los comensales solicitados.</summary>
         Incompatible

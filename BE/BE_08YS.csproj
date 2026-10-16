@@ -45,6 +45,9 @@
     <Compile Include="Mesa_790MY.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reserva_790MY.cs" />
+    <Compile Include="Empleado_790MY.cs" />
+    <Compile Include="Pedido_790MY.cs" />
+    <Compile Include="Producto_790MY.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

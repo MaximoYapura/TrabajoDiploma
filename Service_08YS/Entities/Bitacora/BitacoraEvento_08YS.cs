@@ -22,7 +22,11 @@ namespace Service_08YS.Entities.Bitacora
         Clientes,
         Mesas,
         Reservas,
-        Sistema
+        Sistema,
+        // RF2 (790MY). Valores explícitos: la columna Bitacora.Modulo guarda el int.
+        Empleados = 7,
+        Pedidos = 8,
+        Stock = 9
     }
 
     public enum Evento
@@ -52,7 +56,24 @@ namespace Service_08YS.Entities.Bitacora
         ReservaCancelada = 26,
         ReservaRegistrada = 27,
         RecalculoDVFallido = 28,
-        MesaEstadoActualizado = 29
+        MesaEstadoActualizado = 29,
+
+        // ── RF2 Atención en mesa (790MY) ─────────────────────────────────
+        // Valores explícitos y nunca reutilizados: Bitacora.Evento persiste el int.
+        ReservaAsistida = 30,
+        ReservaFinalizada = 31,
+        MesaAbierta = 32,
+        WalkInRegistrado = 33,
+        CamareroAsignado = 34,
+        EmpleadoRegistrado = 35,
+        EmpleadoModificado = 36,
+        PedidoRegistrado = 37,
+        PedidoRechazadoStock = 38,
+        PedidoEnPreparacion = 39,
+        PedidoListo = 40,
+        StockDescontado = 41,
+        ReservaRechazadaDisponibilidad = 42,
+        StockDescuentoFallido = 43
     }
 
     public class BitacoraEvento_08YS

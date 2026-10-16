@@ -1,3 +1,4 @@
+using DAL_08YS;
 using DAL_08YS.Interfaces_Repositories;
 using DAL_08YS.SQL;
 
@@ -22,11 +23,32 @@ namespace BLL_08YS
 
         public static ReservaBLL_790MY CreateReservaBLL()
         {
-            IReservaRepository_790MY reservaRepo = new SqlReservaRepository_790MY();
-            IClienteRepository_790MY clienteRepo = new SqlClienteRepository_790MY();
-            IMesaRepository_790MY mesaRepo = new SqlMesaRepository_790MY();
-            BitacoraBLL_08YS bitacoraBll = BLLFactory_08YS.CreateBitacoraBLL();
-            return new ReservaBLL_790MY(reservaRepo, clienteRepo, mesaRepo, bitacoraBll);
+            IReservaRepository_790MY  reservaRepo  = new SqlReservaRepository_790MY();
+            IClienteRepository_790MY  clienteRepo  = new SqlClienteRepository_790MY();
+            IMesaRepository_790MY     mesaRepo     = new SqlMesaRepository_790MY();
+            IEmpleadoRepository_790MY empleadoRepo = new SqlEmpleadoRepository_790MY();
+            IPedidoRepository_790MY   pedidoRepo   = new SqlPedidoRepository_790MY();
+            BitacoraBLL_08YS          bitacoraBll  = BLLFactory_08YS.CreateBitacoraBLL();
+            return new ReservaBLL_790MY(reservaRepo, clienteRepo, mesaRepo, empleadoRepo, pedidoRepo, bitacoraBll);
+        }
+
+        public static EmpleadoBLL_790MY CreateEmpleadoBLL()
+        {
+            IDbFactory_08YS factory = new SqlDbFactory_08YS();
+            return new EmpleadoBLL_790MY(
+                new SqlEmpleadoRepository_790MY(),
+                new SqlUserRepository_08YS(factory),
+                BLLFactory_08YS.CreateBitacoraBLL());
+        }
+
+        public static PedidoBLL_790MY CreatePedidoBLL()
+        {
+            return new PedidoBLL_790MY(
+                new SqlPedidoRepository_790MY(),
+                new SqlProductoRepository_790MY(),
+                new SqlReservaRepository_790MY(),
+                new SqlEmpleadoRepository_790MY(),
+                BLLFactory_08YS.CreateBitacoraBLL());
         }
     }
 }

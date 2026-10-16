@@ -103,9 +103,16 @@ namespace GUI_08YS.Reportes
             cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbEstadoTodos"), Valor = null });
             cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbConfirmada"),  Valor = EstadoReserva_790MY.Confirmada });
             cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbCancelada"),   Valor = EstadoReserva_790MY.Cancelada });
+            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbAsistida"),    Valor = EstadoReserva_790MY.Asistida });
+            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbFinalizada"),  Valor = EstadoReserva_790MY.Finalizada });
 
             cboEstado_790MY.SelectedIndex = (idx >= 0 && idx < cboEstado_790MY.Items.Count) ? idx : 0;
         }
+
+        // Clave de traducción por estado: REP_cmbConfirmada, REP_cmbCancelada,
+        // REP_cmbAsistida, REP_cmbFinalizada (antes solo se distinguían dos estados).
+        private static string TextoEstado(EstadoReserva_790MY estado)
+            => TraductorManager_08YS.Instance.GetTexto("REP_cmb" + estado);
 
         // ───────────────────────────── Búsqueda ─────────────────────────────
 
@@ -171,10 +178,7 @@ namespace GUI_08YS.Reportes
             }
             else if (e.ColumnIndex == colRepEstado_790MY.Index && e.Value is EstadoReserva_790MY estado)
             {
-                var t = TraductorManager_08YS.Instance;
-                e.Value = estado == EstadoReserva_790MY.Confirmada
-                    ? t.GetTexto("REP_cmbConfirmada")
-                    : t.GetTexto("REP_cmbCancelada");
+                e.Value = TextoEstado(estado);
                 e.FormattingApplied = true;
             }
         }
@@ -380,9 +384,7 @@ namespace GUI_08YS.Reportes
                                 ? r.ClienteDNI.ToString()
                                 : r.ClienteNombreCompleto;
 
-                string estadoTexto = r.Estado == EstadoReserva_790MY.Confirmada
-                                     ? t.GetTexto("REP_cmbConfirmada")
-                                     : t.GetTexto("REP_cmbCancelada");
+                string estadoTexto = TextoEstado(r.Estado);
 
                 void Ag(string texto, int alin = Element.ALIGN_CENTER) =>
                     tabla.AddCell(new PdfPCell(new Phrase(texto, fuenteDato))

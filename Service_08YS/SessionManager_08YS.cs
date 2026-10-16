@@ -41,8 +41,17 @@ namespace Service_08YS
 
         public void ValidatePermission(Permisos permiso)
         {
-            if(!HasPermission(permiso))
-                throw new UnauthorizedAccessException($"El usuario actual no tiene permiso para: {permiso}");
+            if (!HasPermission(permiso))
+            {
+                // Mensaje traducido con el servicio de idiomas existente. Si la clave
+                // no estuviera cargada, GetTexto devuelve "[clave]"; en ese caso se
+                // conserva el texto original para no mostrar un mensaje vacío.
+                string plantilla = TraductorManager_08YS.Instance.GetTexto("msg_permiso_denegado");
+                string mensaje = plantilla.StartsWith("[")
+                    ? $"El usuario actual no tiene permiso para: {permiso}"
+                    : string.Format(plantilla, permiso);
+                throw new UnauthorizedAccessException(mensaje);
+            }
         }
 
         public event Action SesionInvalidada;

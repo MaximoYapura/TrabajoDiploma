@@ -71,24 +71,31 @@ namespace DAL_08YS.SQL
         public List<Mesa_790MY> GetDisponibles(DateTime fecha, TimeSpan hora, int comensales)
         {
             var lista = new List<Mesa_790MY>();
-            const string sql =
-                "SELECT m.NroMesa, m.Capacidad, m.Estado, m.Activo " +
-                "FROM Mesas m " +
-                "WHERE m.Capacidad >= @Comensales " +
-                "  AND m.NroMesa NOT IN ( " +
-                "      SELECT r.MesaNumero FROM Reservas r " +
-                "      WHERE r.Fecha = @Fecha AND r.Hora = @Hora " +
-                "        AND r.Estado = @EstadoConfirmada " +
-                "  ) " +
-                "ORDER BY m.Capacidad, m.NroMesa";
 
             using (var con = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand(sql, con))
+            using (var cmd = new SqlCommand { Connection = con })
             {
-                cmd.Parameters.AddWithValue("@Fecha",            fecha.Date);
-                cmd.Parameters.AddWithValue("@Hora",             hora);
-                cmd.Parameters.AddWithValue("@Comensales",       comensales);
-                cmd.Parameters.AddWithValue("@EstadoConfirmada", EstadoReserva_790MY.Confirmada.ToString());
+                // Ocupan la mesa las reservas Confirmadas y Asistidas del mismo turno
+                // (Reserva_790MY.EstadosQueOcupanMesa). Canceladas y Finalizadas no bloquean.
+                // Las mesas dadas de baja (Activo = 0 / FueraDeServicio) nunca son disponibles.
+                string ocupa = FiltroOcupacionMesa_790MY.CondicionEstado(cmd, "r");
+                cmd.CommandText =
+                    "SELECT m.NroMesa, m.Capacidad, m.Estado, m.Activo " +
+                    "FROM Mesas m " +
+                    "WHERE m.Capacidad >= @Comensales " +
+                    "  AND m.Activo = 1 AND m.Estado <> @FueraDeServicio " +
+                    "  AND NOT EXISTS ( " +
+                    "      SELECT 1 FROM Reservas r " +
+                    "      WHERE r.MesaNumero = m.NroMesa " +
+                    "        AND r.Fecha = @Fecha AND r.Hora = @Hora " +
+                    "        AND " + ocupa +
+                    "  ) " +
+                    "ORDER BY m.Capacidad, m.NroMesa";
+
+                cmd.Parameters.AddWithValue("@Fecha",           fecha.Date);
+                cmd.Parameters.AddWithValue("@Hora",            hora);
+                cmd.Parameters.AddWithValue("@Comensales",      comensales);
+                cmd.Parameters.AddWithValue("@FueraDeServicio", EstadoMesa_790MY.FueraDeServicio.ToString());
                 con.Open();
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -150,18 +157,18 @@ namespace DAL_08YS.SQL
 
         public bool TieneReservasActivas(int nroMesa)
         {
-            const string sql =
-                "SELECT COUNT(1) FROM Reservas " +
-                "WHERE MesaNumero = @NroMesa " +
-                "  AND Fecha >= @Hoy " +
-                "  AND Estado != @EstadoCancelada";
-
             using (var con = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand(sql, con))
+            using (var cmd = new SqlCommand { Connection = con })
             {
-                cmd.Parameters.AddWithValue("@NroMesa",         nroMesa);
-                cmd.Parameters.AddWithValue("@Hoy",             DateTime.Today);
-                cmd.Parameters.AddWithValue("@EstadoCancelada", EstadoReserva_790MY.Cancelada.ToString());
+                string ocupa = FiltroOcupacionMesa_790MY.CondicionEstado(cmd, null);
+                cmd.CommandText =
+                    "SELECT COUNT(1) FROM Reservas " +
+                    "WHERE MesaNumero = @NroMesa " +
+                    "  AND Fecha >= @Hoy " +
+                    "  AND " + ocupa;
+
+                cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
+                cmd.Parameters.AddWithValue("@Hoy",     DateTime.Today);
                 con.Open();
                 return (int)cmd.ExecuteScalar() > 0;
             }
@@ -183,16 +190,18 @@ namespace DAL_08YS.SQL
         public ISet<int> GetNumerosOcupadosEnTurno(DateTime fecha, TimeSpan hora)
         {
             var ocupadas = new HashSet<int>();
-            const string sql =
-                "SELECT DISTINCT MesaNumero FROM Reservas " +
-                "WHERE Fecha = @Fecha AND Hora = @Hora AND Estado = @EstadoConfirmada";
 
             using (var con = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand(sql, con))
+            using (var cmd = new SqlCommand { Connection = con })
             {
-                cmd.Parameters.AddWithValue("@Fecha",            fecha.Date);
-                cmd.Parameters.AddWithValue("@Hora",             hora);
-                cmd.Parameters.AddWithValue("@EstadoConfirmada", EstadoReserva_790MY.Confirmada.ToString());
+                // Confirmadas y Asistidas ocupan el turno; Canceladas y Finalizadas lo liberan.
+                string ocupa = FiltroOcupacionMesa_790MY.CondicionEstado(cmd, null);
+                cmd.CommandText =
+                    "SELECT DISTINCT MesaNumero FROM Reservas " +
+                    "WHERE Fecha = @Fecha AND Hora = @Hora AND " + ocupa;
+
+                cmd.Parameters.AddWithValue("@Fecha", fecha.Date);
+                cmd.Parameters.AddWithValue("@Hora",  hora);
                 con.Open();
                 using (var reader = cmd.ExecuteReader())
                 {

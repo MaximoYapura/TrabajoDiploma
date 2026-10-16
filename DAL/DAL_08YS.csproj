@@ -72,6 +72,13 @@
     <Compile Include="SQL\SqlReservaRepository_790MY.cs" />
     <Compile Include="SQL\SqlRolRepository_08YS.cs" />
     <Compile Include="SQL\SqlUserRepository_08YS.cs" />
+    <Compile Include="Interfaces_Repositories\IEmpleadoRepository_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\IPedidoRepository_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\IProductoRepository_790MY.cs" />
+    <Compile Include="SQL\FiltroOcupacionMesa_790MY.cs" />
+    <Compile Include="SQL\SqlEmpleadoRepository_790MY.cs" />
+    <Compile Include="SQL\SqlPedidoRepository_790MY.cs" />
+    <Compile Include="SQL\SqlProductoRepository_790MY.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BE\BE_08YS.csproj">

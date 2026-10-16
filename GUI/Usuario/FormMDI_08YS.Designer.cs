@@ -36,6 +36,7 @@
             this.btnMaestros = new FontAwesome.Sharp.IconButton();
             this.btnReservar = new FontAwesome.Sharp.IconButton();
             this.btnReportes_790MY = new FontAwesome.Sharp.IconButton();
+            this.btnAtencion_790MY = new FontAwesome.Sharp.IconButton();
             this.panel3 = new System.Windows.Forms.Panel();
             this.btnCerrarSesion = new FontAwesome.Sharp.IconButton();
             this.panelLogo = new System.Windows.Forms.Panel();
@@ -56,6 +57,10 @@
             this.registrarReservaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reporteReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReportesDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
+            this.AtencionDropDownMenu_790MY = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
+            this.abrirMesaToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
+            this.registrarPedidoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
+            this.despacharPedidoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,6 +76,7 @@
             this.MaestrosDropDownMenu.SuspendLayout();
             this.ReservasDropDownMenu.SuspendLayout();
             this.ReportesDropDownMenu.SuspendLayout();
+            this.AtencionDropDownMenu_790MY.SuspendLayout();
             this.PerfilDropDownMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -246,6 +252,7 @@
             this.flowLayoutPanel1.Controls.Add(this.btnAdministrativo);
             this.flowLayoutPanel1.Controls.Add(this.btnMaestros);
             this.flowLayoutPanel1.Controls.Add(this.btnReservar);
+            this.flowLayoutPanel1.Controls.Add(this.btnAtencion_790MY);
             this.flowLayoutPanel1.Controls.Add(this.btnReportes_790MY);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 57);
@@ -361,7 +368,7 @@
             this.btnReportes_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnReportes_790MY.IconSize = 30;
             this.btnReportes_790MY.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnReportes_790MY.Location = new System.Drawing.Point(2, 214);
+            this.btnReportes_790MY.Location = new System.Drawing.Point(2, 267);
             this.btnReportes_790MY.Margin = new System.Windows.Forms.Padding(2);
             this.btnReportes_790MY.Name = "btnReportes_790MY";
             this.btnReportes_790MY.Padding = new System.Windows.Forms.Padding(4, 0, 15, 0);
@@ -373,6 +380,30 @@
             this.btnReportes_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnReportes_790MY.UseVisualStyleBackColor = true;
             this.btnReportes_790MY.Click += new System.EventHandler(this.btnReportes_790MY_Click);
+            //
+            // btnAtencion_790MY
+            //
+            this.btnAtencion_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnAtencion_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAtencion_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAtencion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            this.btnAtencion_790MY.IconChar = FontAwesome.Sharp.IconChar.Utensils;
+            this.btnAtencion_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
+            this.btnAtencion_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.btnAtencion_790MY.IconSize = 30;
+            this.btnAtencion_790MY.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAtencion_790MY.Location = new System.Drawing.Point(2, 214);
+            this.btnAtencion_790MY.Margin = new System.Windows.Forms.Padding(2);
+            this.btnAtencion_790MY.Name = "btnAtencion_790MY";
+            this.btnAtencion_790MY.Padding = new System.Windows.Forms.Padding(4, 0, 15, 0);
+            this.btnAtencion_790MY.Size = new System.Drawing.Size(244, 49);
+            this.btnAtencion_790MY.TabIndex = 9;
+            this.btnAtencion_790MY.Tag = "menuAtencion";
+            this.btnAtencion_790MY.Text = "Atención en Mesa";
+            this.btnAtencion_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAtencion_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnAtencion_790MY.UseVisualStyleBackColor = true;
+            this.btnAtencion_790MY.Click += new System.EventHandler(this.btnAtencion_790MY_Click);
             // 
             // panel3
             // 
@@ -586,6 +617,44 @@
             this.ReportesDropDownMenu.Name = "dropdownMenuStrip_08YS_Reportes";
             this.ReportesDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
             this.ReportesDropDownMenu.Size = new System.Drawing.Size(180, 26);
+            //
+            // AtencionDropDownMenu_790MY
+            //
+            this.AtencionDropDownMenu_790MY.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.AtencionDropDownMenu_790MY.IsMainMenu = false;
+            this.AtencionDropDownMenu_790MY.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.abrirMesaToolStripMenuItem_790MY,
+            this.registrarPedidoToolStripMenuItem_790MY,
+            this.despacharPedidoToolStripMenuItem_790MY});
+            this.AtencionDropDownMenu_790MY.MenuItemHeight = 25;
+            this.AtencionDropDownMenu_790MY.MenuItemTextColor = System.Drawing.Color.Empty;
+            this.AtencionDropDownMenu_790MY.Name = "dropdownMenuStrip_08YS_Atencion";
+            this.AtencionDropDownMenu_790MY.PrimaryColor = System.Drawing.Color.Empty;
+            this.AtencionDropDownMenu_790MY.Size = new System.Drawing.Size(200, 70);
+            //
+            // abrirMesaToolStripMenuItem_790MY
+            //
+            this.abrirMesaToolStripMenuItem_790MY.Name = "abrirMesaToolStripMenuItem_790MY";
+            this.abrirMesaToolStripMenuItem_790MY.Size = new System.Drawing.Size(199, 22);
+            this.abrirMesaToolStripMenuItem_790MY.Tag = "menuAbrirMesa";
+            this.abrirMesaToolStripMenuItem_790MY.Text = "Abrir Mesa";
+            this.abrirMesaToolStripMenuItem_790MY.Click += new System.EventHandler(this.abrirMesaToolStripMenuItem_790MY_Click);
+            //
+            // registrarPedidoToolStripMenuItem_790MY
+            //
+            this.registrarPedidoToolStripMenuItem_790MY.Name = "registrarPedidoToolStripMenuItem_790MY";
+            this.registrarPedidoToolStripMenuItem_790MY.Size = new System.Drawing.Size(199, 22);
+            this.registrarPedidoToolStripMenuItem_790MY.Tag = "menuRegistrarPedido";
+            this.registrarPedidoToolStripMenuItem_790MY.Text = "Registrar Pedido";
+            this.registrarPedidoToolStripMenuItem_790MY.Click += new System.EventHandler(this.registrarPedidoToolStripMenuItem_790MY_Click);
+            //
+            // despacharPedidoToolStripMenuItem_790MY
+            //
+            this.despacharPedidoToolStripMenuItem_790MY.Name = "despacharPedidoToolStripMenuItem_790MY";
+            this.despacharPedidoToolStripMenuItem_790MY.Size = new System.Drawing.Size(199, 22);
+            this.despacharPedidoToolStripMenuItem_790MY.Tag = "menuDespacharPedido";
+            this.despacharPedidoToolStripMenuItem_790MY.Text = "Despachar Pedido";
+            this.despacharPedidoToolStripMenuItem_790MY.Click += new System.EventHandler(this.despacharPedidoToolStripMenuItem_790MY_Click);
             // 
             // PerfilDropDownMenu
             // 
@@ -653,6 +722,7 @@
             this.MaestrosDropDownMenu.ResumeLayout(false);
             this.ReservasDropDownMenu.ResumeLayout(false);
             this.ReportesDropDownMenu.ResumeLayout(false);
+            this.AtencionDropDownMenu_790MY.ResumeLayout(false);
             this.PerfilDropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -701,5 +771,10 @@
         private System.Windows.Forms.ToolStripMenuItem reporteReservasToolStripMenuItem;
         private FontAwesome.Sharp.IconButton btnReportes_790MY;
         private DropdownMenuStrip_08YS ReportesDropDownMenu;
+        private FontAwesome.Sharp.IconButton btnAtencion_790MY;
+        private DropdownMenuStrip_08YS AtencionDropDownMenu_790MY;
+        private System.Windows.Forms.ToolStripMenuItem abrirMesaToolStripMenuItem_790MY;
+        private System.Windows.Forms.ToolStripMenuItem registrarPedidoToolStripMenuItem_790MY;
+        private System.Windows.Forms.ToolStripMenuItem despacharPedidoToolStripMenuItem_790MY;
     }
 }

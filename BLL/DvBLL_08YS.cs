@@ -72,7 +72,10 @@ namespace BLL_08YS
         {
             "Users", "Roles", "Familias", "Permisos",
             "FamiliaPermiso", "FamiliaIntegrada", "RolFamilia", "RolPermiso", "Clientes",
-            "Mesas", "Reservas"
+            "Mesas", "Reservas",
+            // RS11..RS14: RF2 Atención en mesa (790MY), agregadas al SP en
+            // Migraciones_790MY/CompletarRF2_AtencionMesa_790MY.sql.
+            "Empleados", "Productos", "Pedidos", "ItemsPedido"
         };
 
         private readonly IDvRepository_08YS _repo;
@@ -86,6 +89,7 @@ namespace BLL_08YS
         public void Recalcular()
         {
             var tablas = _repo.GetTodasLasTablas();
+            ValidarSincronizacionConSP(tablas.Count);
 
             for (int i = 0; i < tablas.Count; i++)
             {
@@ -108,6 +112,7 @@ namespace BLL_08YS
         public bool VerificarConsistencia()
         {
             var tablas = _repo.GetTodasLasTablas();
+            ValidarSincronizacionConSP(tablas.Count);
             var guardado = _repo.GetDVGuardado()
                                .ToDictionary(e => e.Tabla);
 
@@ -130,6 +135,18 @@ namespace BLL_08YS
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// El SP y TablasMonitoreadas deben devolver la misma cantidad de tablas; si no,
+        /// se asociarian DV a la tabla equivocada (o se produciria IndexOutOfRange).
+        /// </summary>
+        private static void ValidarSincronizacionConSP(int cantidadDevueltaPorSP)
+        {
+            if (cantidadDevueltaPorSP != TablasMonitoreadas.Length)
+                throw new InvalidOperationException(
+                    $"sp_GetAllTablesParaDV devolvio {cantidadDevueltaPorSP} tablas y se esperaban {TablasMonitoreadas.Length}. " +
+                    "Ejecute la migracion de base de datos correspondiente.");
         }
 
         /// <summary>

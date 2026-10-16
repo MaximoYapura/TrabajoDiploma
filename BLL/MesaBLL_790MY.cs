@@ -20,6 +20,39 @@ namespace BLL_08YS
             new TimeSpan(22, 0, 0)
         };
 
+        public static readonly TimeSpan DuracionTurno = TimeSpan.FromHours(2);
+
+        /// <summary>Horas de inicio de los turnos de atención.</summary>
+        public static IReadOnlyList<TimeSpan> Turnos => TurnosValidos;
+
+        /// <summary>
+        /// Turno en curso para el momento indicado (inicio &lt;= hora &lt; inicio + 2h),
+        /// o null si el restaurante está fuera del horario de atención.
+        /// Lo usan la apertura de mesas (CUN-004) y el Walk-in.
+        /// </summary>
+        public static TimeSpan? ObtenerTurnoVigente(DateTime momento)
+        {
+            TimeSpan hora = momento.TimeOfDay;
+            foreach (var inicio in TurnosValidos)
+                if (hora >= inicio && hora < inicio + DuracionTurno)
+                    return inicio;
+            return null;
+        }
+
+        /// <summary>
+        /// Igual que ObtenerTurnoVigente(DateTime.Now) pero lanza una regla de negocio
+        /// traducida si no hay turno en curso. La GUI lo usa para abrir
+        /// FormSeleccionarMesa_790MY en modo Walk-in: new FormSeleccionarMesa_790MY(
+        /// DateTime.Today, mesaBll.ObtenerTurnoVigenteObligatorio(), comensales).
+        /// </summary>
+        public TimeSpan ObtenerTurnoVigenteObligatorio()
+        {
+            TimeSpan? turno = ObtenerTurnoVigente(DateTime.Now);
+            if (!turno.HasValue)
+                throw MensajesBLL_790MY.Regla("msg_rf2_fuera_de_turno");
+            return turno.Value;
+        }
+
         private readonly IMesaRepository_790MY    _mesaRepository;
         private readonly IReservaRepository_790MY  _reservaRepository;
         private readonly BitacoraBLL_08YS          _bitacoraBll;
@@ -59,16 +92,32 @@ namespace BLL_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
 
             if (fecha.Date < DateTime.Today)
-                throw new ArgumentException("La fecha de la reserva no puede ser anterior a hoy.");
+                throw MensajesBLL_790MY.Regla("msg_rf2_fecha_anterior_hoy");
 
             if (comensales <= 0)
-                throw new ArgumentException("La cantidad de comensales debe ser mayor a cero.");
+                throw MensajesBLL_790MY.Regla("msg_rf2_comensales_invalidos");
 
             if (!TurnosValidos.Contains(hora))
-                throw new ArgumentException("El turno seleccionado no es válido.");
+                throw MensajesBLL_790MY.Regla("msg_rf2_turno_invalido");
 
-            var todasLasMesas   = _mesaRepository.GetAll();
-            var numerosOcupados = _mesaRepository.GetNumerosOcupadosEnTurno(fecha.Date, hora);
+            // Las mesas dadas de baja (FueraDeServicio / Activo = 0) no se dibujan en el
+            // plano: no pueden asignarse ni en reservas ni en Walk-in.
+            var todasLasMesas = _mesaRepository.GetAll()
+                .Where(m => m.Activo && m.Estado != EstadoMesa_790MY.FueraDeServicio)
+                .ToList();
+
+            // Ocupación por turno: reservas Confirmadas y Asistidas del mismo (fecha, hora).
+            // Canceladas y Finalizadas no bloquean (Reserva_790MY.EstadosQueOcupanMesa).
+            var numerosOcupados = new HashSet<int>(_mesaRepository.GetNumerosOcupadosEnTurno(fecha.Date, hora));
+
+            // Si se consulta el turno EN CURSO, además se respeta el estado físico de la
+            // mesa: un grupo de un turno anterior que todavía no se retiró (mesa Ocupada,
+            // reserva aún Asistida) no puede recibir a otro grupo. Para turnos futuros
+            // el estado físico actual no aplica.
+            bool esTurnoEnCurso = fecha.Date == DateTime.Today && ObtenerTurnoVigente(DateTime.Now) == hora;
+            if (esTurnoEnCurso)
+                foreach (var mesa in todasLasMesas.Where(m => m.Estado == EstadoMesa_790MY.Ocupada))
+                    numerosOcupados.Add(mesa.NroMesa);
 
             // Mejor ajuste: mínima capacidad entre las mesas libres que pueden alojar a los comensales.
             int minCapacidadLibre = todasLasMesas
