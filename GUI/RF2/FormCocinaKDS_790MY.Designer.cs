@@ -26,6 +26,10 @@ namespace GUI_08YS.RF2
             this.chipPendientes_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
             this.chipPreparacion_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
             this.chipListas_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
+            this.flpSemaforo_790MY = new System.Windows.Forms.FlowLayoutPanel();
+            this.chipATiempo_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
+            this.chipAtencion_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
+            this.chipDemorado_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
             this.lblReloj_790MY = new System.Windows.Forms.Label();
             this.btnActualizar_790MY = new FontAwesome.Sharp.IconButton();
             this.tlpColumnas_790MY = new System.Windows.Forms.TableLayoutPanel();
@@ -54,6 +58,7 @@ namespace GUI_08YS.RF2
             this.tlpMain_790MY.SuspendLayout();
             this.tlpHeader_790MY.SuspendLayout();
             this.flpIndicadores_790MY.SuspendLayout();
+            this.flpSemaforo_790MY.SuspendLayout();
             this.tlpColumnas_790MY.SuspendLayout();
             this.pnlColPendientes_790MY.SuspendLayout();
             this.pnlHeadPendientes_790MY.SuspendLayout();
@@ -92,14 +97,64 @@ namespace GUI_08YS.RF2
             this.tlpHeader_790MY.Controls.Add(this.lblTitulo_790MY, 0, 0);
             this.tlpHeader_790MY.Controls.Add(this.lblSubtitulo_790MY, 0, 1);
             this.tlpHeader_790MY.Controls.Add(this.flpIndicadores_790MY, 1, 0);
+            this.tlpHeader_790MY.Controls.Add(this.flpSemaforo_790MY, 0, 2);
             this.tlpHeader_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlpHeader_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 16);
             this.tlpHeader_790MY.Name = "tlpHeader_790MY";
-            this.tlpHeader_790MY.RowCount = 2;
+            this.tlpHeader_790MY.RowCount = 3;
+            this.tlpHeader_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpHeader_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpHeader_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpHeader_790MY.SetRowSpan(this.flpIndicadores_790MY, 2);
+            this.tlpHeader_790MY.SetColumnSpan(this.flpSemaforo_790MY, 2);
             this.tlpHeader_790MY.TabIndex = 0;
+            //
+            // flpSemaforo_790MY  (leyenda del semáforo por tiempo de espera)
+            //
+            this.flpSemaforo_790MY.AutoSize = true;
+            this.flpSemaforo_790MY.Controls.Add(this.chipATiempo_790MY);
+            this.flpSemaforo_790MY.Controls.Add(this.chipAtencion_790MY);
+            this.flpSemaforo_790MY.Controls.Add(this.chipDemorado_790MY);
+            this.flpSemaforo_790MY.Margin = new System.Windows.Forms.Padding(0, 12, 0, 0);
+            this.flpSemaforo_790MY.Name = "flpSemaforo_790MY";
+            this.flpSemaforo_790MY.TabIndex = 3;
+            this.flpSemaforo_790MY.WrapContents = false;
+            //
+            // chipATiempo_790MY
+            //
+            this.chipATiempo_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(58)))), ((int)(((byte)(40)))));
+            this.chipATiempo_790MY.ColorBorde = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(200)))), ((int)(((byte)(130)))));
+            this.chipATiempo_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Bold);
+            this.chipATiempo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(200)))), ((int)(((byte)(130)))));
+            this.chipATiempo_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 10, 0);
+            this.chipATiempo_790MY.Name = "chipATiempo_790MY";
+            this.chipATiempo_790MY.Padding = new System.Windows.Forms.Padding(12, 6, 12, 6);
+            this.chipATiempo_790MY.TabIndex = 0;
+            this.chipATiempo_790MY.Text = "A tiempo · menos de 10 min · 0";
+            //
+            // chipAtencion_790MY
+            //
+            this.chipAtencion_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(52)))), ((int)(((byte)(28)))));
+            this.chipAtencion_790MY.ColorBorde = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(185)))), ((int)(((byte)(66)))));
+            this.chipAtencion_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Bold);
+            this.chipAtencion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(185)))), ((int)(((byte)(66)))));
+            this.chipAtencion_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 10, 0);
+            this.chipAtencion_790MY.Name = "chipAtencion_790MY";
+            this.chipAtencion_790MY.Padding = new System.Windows.Forms.Padding(12, 6, 12, 6);
+            this.chipAtencion_790MY.TabIndex = 1;
+            this.chipAtencion_790MY.Text = "Atención · 10 a 20 min · 0";
+            //
+            // chipDemorado_790MY
+            //
+            this.chipDemorado_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(72)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.chipDemorado_790MY.ColorBorde = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(110)))), ((int)(((byte)(100)))));
+            this.chipDemorado_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Bold);
+            this.chipDemorado_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(110)))), ((int)(((byte)(100)))));
+            this.chipDemorado_790MY.Margin = new System.Windows.Forms.Padding(0);
+            this.chipDemorado_790MY.Name = "chipDemorado_790MY";
+            this.chipDemorado_790MY.Padding = new System.Windows.Forms.Padding(12, 6, 12, 6);
+            this.chipDemorado_790MY.TabIndex = 2;
+            this.chipDemorado_790MY.Text = "Demorado · más de 20 min · 0";
             //
             // lblTitulo_790MY
             //
@@ -284,12 +339,13 @@ namespace GUI_08YS.RF2
             this.icoPendientes_790MY.IconChar = FontAwesome.Sharp.IconChar.Clock;
             this.icoPendientes_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
             this.icoPendientes_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.icoPendientes_790MY.IconSize = 34;
+            this.icoPendientes_790MY.IconSize = 22;
             this.icoPendientes_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.icoPendientes_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.icoPendientes_790MY.Name = "icoPendientes_790MY";
-            this.icoPendientes_790MY.Padding = new System.Windows.Forms.Padding(4);
-            this.icoPendientes_790MY.Size = new System.Drawing.Size(38, 38);
+            this.icoPendientes_790MY.Padding = new System.Windows.Forms.Padding(0);
+            this.icoPendientes_790MY.Size = new System.Drawing.Size(34, 34);
+            this.icoPendientes_790MY.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.icoPendientes_790MY.TabIndex = 0;
             this.icoPendientes_790MY.TabStop = false;
             //
@@ -377,12 +433,13 @@ namespace GUI_08YS.RF2
             this.icoPreparacion_790MY.IconChar = FontAwesome.Sharp.IconChar.Fire;
             this.icoPreparacion_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
             this.icoPreparacion_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.icoPreparacion_790MY.IconSize = 34;
+            this.icoPreparacion_790MY.IconSize = 22;
             this.icoPreparacion_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.icoPreparacion_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.icoPreparacion_790MY.Name = "icoPreparacion_790MY";
-            this.icoPreparacion_790MY.Padding = new System.Windows.Forms.Padding(4);
-            this.icoPreparacion_790MY.Size = new System.Drawing.Size(38, 38);
+            this.icoPreparacion_790MY.Padding = new System.Windows.Forms.Padding(0);
+            this.icoPreparacion_790MY.Size = new System.Drawing.Size(34, 34);
+            this.icoPreparacion_790MY.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.icoPreparacion_790MY.TabIndex = 0;
             this.icoPreparacion_790MY.TabStop = false;
             //
@@ -470,12 +527,13 @@ namespace GUI_08YS.RF2
             this.icoListas_790MY.IconChar = FontAwesome.Sharp.IconChar.Check;
             this.icoListas_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
             this.icoListas_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.icoListas_790MY.IconSize = 34;
+            this.icoListas_790MY.IconSize = 22;
             this.icoListas_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.icoListas_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.icoListas_790MY.Name = "icoListas_790MY";
-            this.icoListas_790MY.Padding = new System.Windows.Forms.Padding(4);
-            this.icoListas_790MY.Size = new System.Drawing.Size(38, 38);
+            this.icoListas_790MY.Padding = new System.Windows.Forms.Padding(0);
+            this.icoListas_790MY.Size = new System.Drawing.Size(34, 34);
+            this.icoListas_790MY.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.icoListas_790MY.TabIndex = 0;
             this.icoListas_790MY.TabStop = false;
             //
@@ -528,6 +586,8 @@ namespace GUI_08YS.RF2
             this.tlpHeader_790MY.PerformLayout();
             this.flpIndicadores_790MY.ResumeLayout(false);
             this.flpIndicadores_790MY.PerformLayout();
+            this.flpSemaforo_790MY.ResumeLayout(false);
+            this.flpSemaforo_790MY.PerformLayout();
             this.tlpColumnas_790MY.ResumeLayout(false);
             this.pnlColPendientes_790MY.ResumeLayout(false);
             this.tlpHeadPendientes_790MY.ResumeLayout(false);
@@ -555,6 +615,10 @@ namespace GUI_08YS.RF2
         private GUI_08YS.RF2.EtiquetaChip_790MY chipPendientes_790MY;
         private GUI_08YS.RF2.EtiquetaChip_790MY chipPreparacion_790MY;
         private GUI_08YS.RF2.EtiquetaChip_790MY chipListas_790MY;
+        private System.Windows.Forms.FlowLayoutPanel flpSemaforo_790MY;
+        private GUI_08YS.RF2.EtiquetaChip_790MY chipATiempo_790MY;
+        private GUI_08YS.RF2.EtiquetaChip_790MY chipAtencion_790MY;
+        private GUI_08YS.RF2.EtiquetaChip_790MY chipDemorado_790MY;
         private System.Windows.Forms.Label lblReloj_790MY;
         private FontAwesome.Sharp.IconButton btnActualizar_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpColumnas_790MY;

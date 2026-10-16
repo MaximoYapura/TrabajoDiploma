@@ -63,6 +63,8 @@
             this.abrirMesaToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.registrarPedidoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.despacharPedidoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
+            this.cajaCobroToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
+            this.arqueoCajaToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -631,12 +633,21 @@
             this.ReportesDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.ReportesDropDownMenu.IsMainMenu = false;
             this.ReportesDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.reporteReservasToolStripMenuItem});
+            this.reporteReservasToolStripMenuItem,
+            this.arqueoCajaToolStripMenuItem_790MY});
             this.ReportesDropDownMenu.MenuItemHeight = 25;
             this.ReportesDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.ReportesDropDownMenu.Name = "dropdownMenuStrip_08YS_Reportes";
             this.ReportesDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
-            this.ReportesDropDownMenu.Size = new System.Drawing.Size(180, 26);
+            this.ReportesDropDownMenu.Size = new System.Drawing.Size(220, 48);
+            //
+            // arqueoCajaToolStripMenuItem_790MY
+            //
+            this.arqueoCajaToolStripMenuItem_790MY.Name = "arqueoCajaToolStripMenuItem_790MY";
+            this.arqueoCajaToolStripMenuItem_790MY.Size = new System.Drawing.Size(219, 22);
+            this.arqueoCajaToolStripMenuItem_790MY.Tag = "menuArqueoCaja";
+            this.arqueoCajaToolStripMenuItem_790MY.Text = "Arqueo y Cierre de Caja";
+            this.arqueoCajaToolStripMenuItem_790MY.Click += new System.EventHandler(this.arqueoCajaToolStripMenuItem_790MY_Click);
             //
             // AtencionDropDownMenu_790MY
             //
@@ -645,12 +656,21 @@
             this.AtencionDropDownMenu_790MY.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.abrirMesaToolStripMenuItem_790MY,
             this.registrarPedidoToolStripMenuItem_790MY,
-            this.despacharPedidoToolStripMenuItem_790MY});
+            this.despacharPedidoToolStripMenuItem_790MY,
+            this.cajaCobroToolStripMenuItem_790MY});
             this.AtencionDropDownMenu_790MY.MenuItemHeight = 25;
             this.AtencionDropDownMenu_790MY.MenuItemTextColor = System.Drawing.Color.Empty;
             this.AtencionDropDownMenu_790MY.Name = "dropdownMenuStrip_08YS_Atencion";
             this.AtencionDropDownMenu_790MY.PrimaryColor = System.Drawing.Color.Empty;
-            this.AtencionDropDownMenu_790MY.Size = new System.Drawing.Size(200, 70);
+            this.AtencionDropDownMenu_790MY.Size = new System.Drawing.Size(200, 92);
+            //
+            // cajaCobroToolStripMenuItem_790MY
+            //
+            this.cajaCobroToolStripMenuItem_790MY.Name = "cajaCobroToolStripMenuItem_790MY";
+            this.cajaCobroToolStripMenuItem_790MY.Size = new System.Drawing.Size(199, 22);
+            this.cajaCobroToolStripMenuItem_790MY.Tag = "menuCajaCobro";
+            this.cajaCobroToolStripMenuItem_790MY.Text = "Caja y Cobro";
+            this.cajaCobroToolStripMenuItem_790MY.Click += new System.EventHandler(this.cajaCobroToolStripMenuItem_790MY_Click);
             //
             // abrirMesaToolStripMenuItem_790MY
             //
@@ -798,5 +818,7 @@
         private System.Windows.Forms.ToolStripMenuItem abrirMesaToolStripMenuItem_790MY;
         private System.Windows.Forms.ToolStripMenuItem registrarPedidoToolStripMenuItem_790MY;
         private System.Windows.Forms.ToolStripMenuItem despacharPedidoToolStripMenuItem_790MY;
+        private System.Windows.Forms.ToolStripMenuItem cajaCobroToolStripMenuItem_790MY;
+        private System.Windows.Forms.ToolStripMenuItem arqueoCajaToolStripMenuItem_790MY;
     }
 }

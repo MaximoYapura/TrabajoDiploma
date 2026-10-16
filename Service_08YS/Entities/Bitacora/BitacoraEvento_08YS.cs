@@ -26,7 +26,8 @@ namespace Service_08YS.Entities.Bitacora
         // RF2 (790MY). Valores explícitos: la columna Bitacora.Modulo guarda el int.
         Empleados = 7,
         Pedidos = 8,
-        Stock = 9
+        Stock = 9,
+        Facturacion = 10
     }
 
     public enum Evento
@@ -77,7 +78,14 @@ namespace Service_08YS.Entities.Bitacora
         ProductoRegistrado = 44,
         ProductoModificado = 45,
         ProductoDadoDeBaja = 46,
-        EmpleadoDadoDeBaja = 47
+        EmpleadoDadoDeBaja = 47,
+
+        // ── RF2 Facturación y cobro (790MY) ──────────────────────────────
+        FacturaGenerada = 48,
+        FacturaAnulada = 49,
+        PagoRegistrado = 50,
+        PagoRechazado = 51,
+        CierreCajaRealizado = 52
     }
 
     public class BitacoraEvento_08YS

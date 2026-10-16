@@ -20,8 +20,22 @@ namespace GUI_08YS.RF2
     /// </summary>
     public partial class FormCocinaKDS_790MY : Form, IIdiomaObserver_08YS
     {
-        /// <summary>Minutos desde la solicitud a partir de los cuales la comanda se marca demorada.</summary>
+        /// <summary>
+        /// Semáforo por tiempo de espera desde la solicitud (comandas Pendiente / EnPreparación):
+        /// menos de 10 min = verde (a tiempo), 10 a 20 min = amarillo (atención),
+        /// más de 20 min = rojo (demorado).
+        /// </summary>
+        private enum NivelSemaforo { ATiempo, Atencion, Demorado }
+
+        private const int MinutosAtencion = 10;
         private const int MinutosDemora = 20;
+
+        private static readonly Color SemVerde       = Color.FromArgb(120, 200, 130);
+        private static readonly Color SemVerdeFondo  = Color.FromArgb(32, 58, 40);
+        private static readonly Color SemAmbar       = Color.FromArgb(244, 185, 66);
+        private static readonly Color SemAmbarFondo  = Color.FromArgb(64, 52, 28);
+        private static readonly Color SemRojo        = Color.FromArgb(240, 110, 100);
+        private static readonly Color SemRojoFondo   = Color.FromArgb(72, 30, 30);
 
         private readonly PedidoBLL_790MY _pedidoBll;
 
@@ -124,6 +138,11 @@ namespace GUI_08YS.RF2
             chipCntListas_790MY.Text = _listos.Count.ToString();
             lblReloj_790MY.Text = DateTime.Now.ToString("HH:mm");
 
+            var niveles = _comandas.Select(p => Nivel(MinutosEspera(p))).ToList();
+            chipATiempo_790MY.Text = E.T("KDS_sem_a_tiempo", niveles.Count(n => n == NivelSemaforo.ATiempo));
+            chipAtencion_790MY.Text = E.T("KDS_sem_atencion", niveles.Count(n => n == NivelSemaforo.Atencion));
+            chipDemorado_790MY.Text = E.T("KDS_sem_demorado", niveles.Count(n => n == NivelSemaforo.Demorado));
+
             LlenarColumna(flpPendientes_790MY, pendientes, "msg_rf2_sin_comandas");
             LlenarColumna(flpPreparacion_790MY, enPreparacion, "KDS_sin_preparacion");
             LlenarColumna(flpListas_790MY, _listos, "KDS_sin_listas");
@@ -160,13 +179,17 @@ namespace GUI_08YS.RF2
         private Control CrearTicket(Pedido_790MY pedido, int ancho)
         {
             bool listo = pedido.Estado == EstadoPedido_790MY.Listo;
+            int minutos = MinutosEspera(pedido);
+            NivelSemaforo nivel = Nivel(minutos);
 
+            // Las comandas en curso llevan el borde del color del semáforo.
             var card = new PanelRedondeado_790MY
             {
                 Width = ancho,
                 Margin = new Padding(0, 0, 0, 14),
                 BackColor = listo ? Color.FromArgb(38, 56, 44) : E.KdsTarjeta,
-                ColorBorde = listo ? Color.FromArgb(70, 120, 85) : E.KdsBorde,
+                ColorBorde = listo ? Color.FromArgb(70, 120, 85) : ColorSemaforo(nivel),
+                GrosorBorde = listo ? 1f : 2.5f,
                 Radio = 12
             };
 
@@ -191,11 +214,8 @@ namespace GUI_08YS.RF2
                 lblDetalle.Location = new Point(x, y + 4);
                 card.Controls.Add(lblDetalle);
 
-                int minutos = Math.Max(0, (int)(DateTime.Now - (pedido.Fecha.Date + pedido.Hora)).TotalMinutes);
-                bool demorado = minutos >= MinutosDemora;
-                var chipTiempo = demorado
-                    ? E.CrearChip(E.T("KDS_demorado", minutos), E.KdsRojoFondo, E.KdsRojoTexto, _fuenteChip)
-                    : E.CrearChip(E.T("KDS_minutos", minutos), E.KdsColumna, E.KdsTexto, _fuenteChip, E.KdsBorde);
+                var chipTiempo = E.CrearChip(TextoSemaforo(nivel, minutos), FondoSemaforo(nivel),
+                                             ColorSemaforo(nivel), _fuenteChip, ColorSemaforo(nivel));
                 card.Controls.Add(chipTiempo);
                 chipTiempo.Location = new Point(ancho - chipTiempo.PreferredWidth - 18, y);
                 y += 38;
@@ -289,6 +309,48 @@ namespace GUI_08YS.RF2
 
         private static Color ColorAcento(EstadoPedido_790MY estado)
             => estado == EstadoPedido_790MY.Pendiente ? Color.FromArgb(240, 140, 120) : E.KdsAzul;
+
+        // ─── Semáforo por tiempo ─────────────────────────────────────────────
+
+        private static int MinutosEspera(Pedido_790MY pedido)
+            => Math.Max(0, (int)(DateTime.Now - (pedido.Fecha.Date + pedido.Hora)).TotalMinutes);
+
+        private static NivelSemaforo Nivel(int minutos)
+        {
+            if (minutos < MinutosAtencion) return NivelSemaforo.ATiempo;
+            if (minutos <= MinutosDemora) return NivelSemaforo.Atencion;
+            return NivelSemaforo.Demorado;
+        }
+
+        private static Color ColorSemaforo(NivelSemaforo nivel)
+        {
+            switch (nivel)
+            {
+                case NivelSemaforo.ATiempo: return SemVerde;
+                case NivelSemaforo.Atencion: return SemAmbar;
+                default: return SemRojo;
+            }
+        }
+
+        private static Color FondoSemaforo(NivelSemaforo nivel)
+        {
+            switch (nivel)
+            {
+                case NivelSemaforo.ATiempo: return SemVerdeFondo;
+                case NivelSemaforo.Atencion: return SemAmbarFondo;
+                default: return SemRojoFondo;
+            }
+        }
+
+        private static string TextoSemaforo(NivelSemaforo nivel, int minutos)
+        {
+            switch (nivel)
+            {
+                case NivelSemaforo.ATiempo: return E.T("KDS_chip_a_tiempo", minutos);
+                case NivelSemaforo.Atencion: return E.T("KDS_chip_atencion", minutos);
+                default: return E.T("KDS_demorado", minutos);
+            }
+        }
 
         #endregion
 

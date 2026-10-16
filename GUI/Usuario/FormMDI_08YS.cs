@@ -62,7 +62,8 @@ namespace GUI_08YS
         private static readonly Dictionary<string, Permisos> _mapaMenuReportes =
             new Dictionary<string, Permisos>
             {
-                { nameof(reporteReservasToolStripMenuItem), Permisos.VerReservas },
+                { nameof(reporteReservasToolStripMenuItem),  Permisos.VerReservas },
+                { nameof(arqueoCajaToolStripMenuItem_790MY), Permisos.GestionCaja },
             };
 
         // Perfil: Relogin solo para roles con acceso administrativo (VerUsuarios).
@@ -159,14 +160,22 @@ namespace GUI_08YS
             PermissionFilter_08YS.AplicarMenuStrip(ReservasDropDownMenu, _mapaMenuReservas);
 
             // Atención en Mesa: visible si tiene al menos una de las patentes de RF2
+            bool accesoCaja = SessionManager_08YS.Instance.HasPermission(Permisos.GenerarFactura)
+                           || SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarCobro);
+
             btnAtencion_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.AbrirMesa)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarPedido)
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.DespacharPedido);
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.DespacharPedido)
+                                     || accesoCaja;
 
             PermissionFilter_08YS.AplicarMenuStrip(AtencionDropDownMenu_790MY, _mapaMenuAtencion);
 
-            // Reportes: visible si el rol tiene acceso al módulo de reportes
-            btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReportes);
+            // Caja y cobro (CUN-006 / CUN-007): alcanza con cualquiera de las dos patentes.
+            cajaCobroToolStripMenuItem_790MY.Visible = accesoCaja;
+
+            // Reportes: visible si el rol tiene acceso al módulo de reportes o al arqueo de caja
+            btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReportes)
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.GestionCaja);
 
             PermissionFilter_08YS.AplicarMenuStrip(ReportesDropDownMenu, _mapaMenuReportes);
 
@@ -503,6 +512,13 @@ namespace GUI_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
             OpenChildForm(new FormCocinaKDS_790MY());
         }
+
+        private void cajaCobroToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            if (!SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarCobro))
+                SessionManager_08YS.Instance.ValidatePermission(Permisos.GenerarFactura);
+            OpenChildForm(new FormFacturacionCobro_790MY());
+        }
         #endregion
 
         #region Reportes
@@ -515,6 +531,12 @@ namespace GUI_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
             OpenChildForm(new FormReporteReservas_790MY());
+        }
+
+        private void arqueoCajaToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
+            OpenChildForm(new FormArqueoCaja_790MY());
         }
         #endregion
 

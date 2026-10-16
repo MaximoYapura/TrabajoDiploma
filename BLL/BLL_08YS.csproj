@@ -69,6 +69,10 @@
     <Compile Include="MensajesBLL_790MY.cs" />
     <Compile Include="PedidoBLL_790MY.cs" />
     <Compile Include="ProductoBLL_790MY.cs" />
+    <Compile Include="FacturaBLL_790MY.cs" />
+    <Compile Include="PagoBLL_790MY.cs" />
+    <Compile Include="CobroDTOs_790MY.cs" />
+    <Compile Include="Exceptions\PagoRechazadoException_790MY.cs" />
     <Compile Include="Exceptions\StockInsuficienteException_790MY.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Exceptions\UserBloqueadoException_08YS.cs" />

@@ -75,7 +75,10 @@ namespace BLL_08YS
             "Mesas", "Reservas",
             // RS11..RS14: RF2 Atención en mesa (790MY), agregadas al SP en
             // Migraciones_790MY/CompletarRF2_AtencionMesa_790MY.sql.
-            "Empleados", "Productos", "Pedidos", "ItemsPedido"
+            "Empleados", "Productos", "Pedidos", "ItemsPedido",
+            // RS15..RS17: Facturación y cobro (790MY), agregadas al SP en
+            // Migraciones_790MY/CompletarFacturacionCobro_790MY.sql.
+            "Facturas", "ItemsFactura", "Pagos"
         };
 
         private readonly IDvRepository_08YS _repo;

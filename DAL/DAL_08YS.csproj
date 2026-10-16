@@ -79,6 +79,10 @@
     <Compile Include="SQL\SqlEmpleadoRepository_790MY.cs" />
     <Compile Include="SQL\SqlPedidoRepository_790MY.cs" />
     <Compile Include="SQL\SqlProductoRepository_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\IFacturaRepository_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\IPagoRepository_790MY.cs" />
+    <Compile Include="SQL\SqlFacturaRepository_790MY.cs" />
+    <Compile Include="SQL\SqlPagoRepository_790MY.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BE\BE_08YS.csproj">

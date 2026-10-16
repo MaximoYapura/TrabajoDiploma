@@ -142,4 +142,7 @@
   <data name="FogonIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FogonIcon.ico;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="LogoFogonBN" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\logo_fogon_bn.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

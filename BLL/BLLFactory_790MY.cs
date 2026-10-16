@@ -58,5 +58,23 @@ namespace BLL_08YS
                 new SqlEmpleadoRepository_790MY(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
+
+        public static FacturaBLL_790MY CreateFacturaBLL()
+        {
+            return new FacturaBLL_790MY(
+                new SqlFacturaRepository_790MY(),
+                new SqlReservaRepository_790MY(),
+                new SqlPedidoRepository_790MY(),
+                new SqlEmpleadoRepository_790MY(),
+                BLLFactory_08YS.CreateBitacoraBLL());
+        }
+
+        public static PagoBLL_790MY CreatePagoBLL()
+        {
+            return new PagoBLL_790MY(
+                new SqlPagoRepository_790MY(),
+                new SqlFacturaRepository_790MY(),
+                BLLFactory_08YS.CreateBitacoraBLL());
+        }
     }
 }

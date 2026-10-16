@@ -68,7 +68,14 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.ProductoRegistrado,             new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
                 { Evento.ProductoModificado,             new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
                 { Evento.ProductoDadoDeBaja,             new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
-                { Evento.EmpleadoDadoDeBaja,             new EventoMetadata_08YS(Modulo.Empleados, Criticidad.Medio) }
+                { Evento.EmpleadoDadoDeBaja,             new EventoMetadata_08YS(Modulo.Empleados, Criticidad.Medio) },
+
+                // RF2 Facturación y cobro (790MY)
+                { Evento.FacturaGenerada,                new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Medio) },
+                { Evento.FacturaAnulada,                 new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Medio) },
+                { Evento.PagoRegistrado,                 new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Alto)  },
+                { Evento.PagoRechazado,                  new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Medio) },
+                { Evento.CierreCajaRealizado,            new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Alto)  }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];

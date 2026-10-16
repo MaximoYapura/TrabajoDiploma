@@ -44,7 +44,13 @@ namespace Service_08YS.Entities.Acceso
         RegistrarPedido,   // CUN-005
         DespacharPedido,   // CUN-008 (Chef): comandas, iniciar preparación, marcar Listo
         CrearEmpleado,     // alta/modificación de empleados
-        GestionProductos   // ABM de la carta (FormProductos_790MY)
+        GestionProductos,  // ABM de la carta (FormProductos_790MY)
+
+        // ── RF2 Facturación y cobro (790MY) ──────────────────────────────
+        // Ver Migraciones_790MY/CompletarFacturacionCobro_790MY.sql.
+        GenerarFactura,    // CUN-006: cuenta / pre-ticket con importes congelados
+        RegistrarCobro,    // CUN-007: pago, cierre de la reserva y liberación de la mesa
+        GestionCaja        // arqueo y cierre de caja diario (Reportes)
     }
 
     public class Permiso_08YS : AccessComponent_08YS
