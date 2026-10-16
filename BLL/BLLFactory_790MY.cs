@@ -38,6 +38,14 @@ namespace BLL_08YS
             return new EmpleadoBLL_790MY(
                 new SqlEmpleadoRepository_790MY(),
                 new SqlUserRepository_08YS(factory),
+                new SqlReservaRepository_790MY(),
+                BLLFactory_08YS.CreateBitacoraBLL());
+        }
+
+        public static ProductoBLL_790MY CreateProductoBLL()
+        {
+            return new ProductoBLL_790MY(
+                new SqlProductoRepository_790MY(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
 

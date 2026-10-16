@@ -68,6 +68,7 @@
     <Compile Include="EmpleadoBLL_790MY.cs" />
     <Compile Include="MensajesBLL_790MY.cs" />
     <Compile Include="PedidoBLL_790MY.cs" />
+    <Compile Include="ProductoBLL_790MY.cs" />
     <Compile Include="Exceptions\StockInsuficienteException_790MY.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Exceptions\UserBloqueadoException_08YS.cs" />

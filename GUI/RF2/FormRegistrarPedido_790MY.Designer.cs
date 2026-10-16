@@ -256,17 +256,17 @@ namespace GUI_08YS.RF2
             this.flpCategorias_790MY.Name = "flpCategorias_790MY";
             this.flpCategorias_790MY.TabIndex = 1;
             this.flpCategorias_790MY.WrapContents = false;
+            this.flpCategorias_790MY.Resize += new System.EventHandler(this.flpCategorias_790MY_Resize);
             //
             // btnCatEntrada_790MY
             //
-            this.btnCatEntrada_790MY.AutoSize = true;
             this.btnCatEntrada_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCatEntrada_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCatEntrada_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.btnCatEntrada_790MY.Margin = new System.Windows.Forms.Padding(0, 4, 10, 4);
-            this.btnCatEntrada_790MY.MinimumSize = new System.Drawing.Size(110, 44);
+            this.btnCatEntrada_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F);
+            this.btnCatEntrada_790MY.Margin = new System.Windows.Forms.Padding(0, 6, 8, 6);
+            this.btnCatEntrada_790MY.Size = new System.Drawing.Size(110, 44);
             this.btnCatEntrada_790MY.Name = "btnCatEntrada_790MY";
-            this.btnCatEntrada_790MY.Padding = new System.Windows.Forms.Padding(14, 0, 14, 0);
+            this.btnCatEntrada_790MY.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.btnCatEntrada_790MY.TabIndex = 0;
             this.btnCatEntrada_790MY.Tag = "RP_cat_Entrada";
             this.btnCatEntrada_790MY.Text = "Entradas";
@@ -275,14 +275,13 @@ namespace GUI_08YS.RF2
             //
             // btnCatPlatoPrincipal_790MY
             //
-            this.btnCatPlatoPrincipal_790MY.AutoSize = true;
             this.btnCatPlatoPrincipal_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCatPlatoPrincipal_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCatPlatoPrincipal_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.btnCatPlatoPrincipal_790MY.Margin = new System.Windows.Forms.Padding(0, 4, 10, 4);
-            this.btnCatPlatoPrincipal_790MY.MinimumSize = new System.Drawing.Size(110, 44);
+            this.btnCatPlatoPrincipal_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F);
+            this.btnCatPlatoPrincipal_790MY.Margin = new System.Windows.Forms.Padding(0, 6, 8, 6);
+            this.btnCatPlatoPrincipal_790MY.Size = new System.Drawing.Size(110, 44);
             this.btnCatPlatoPrincipal_790MY.Name = "btnCatPlatoPrincipal_790MY";
-            this.btnCatPlatoPrincipal_790MY.Padding = new System.Windows.Forms.Padding(14, 0, 14, 0);
+            this.btnCatPlatoPrincipal_790MY.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.btnCatPlatoPrincipal_790MY.TabIndex = 1;
             this.btnCatPlatoPrincipal_790MY.Tag = "RP_cat_PlatoPrincipal";
             this.btnCatPlatoPrincipal_790MY.Text = "Platos principales";
@@ -291,14 +290,13 @@ namespace GUI_08YS.RF2
             //
             // btnCatPostre_790MY
             //
-            this.btnCatPostre_790MY.AutoSize = true;
             this.btnCatPostre_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCatPostre_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCatPostre_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.btnCatPostre_790MY.Margin = new System.Windows.Forms.Padding(0, 4, 10, 4);
-            this.btnCatPostre_790MY.MinimumSize = new System.Drawing.Size(110, 44);
+            this.btnCatPostre_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F);
+            this.btnCatPostre_790MY.Margin = new System.Windows.Forms.Padding(0, 6, 8, 6);
+            this.btnCatPostre_790MY.Size = new System.Drawing.Size(110, 44);
             this.btnCatPostre_790MY.Name = "btnCatPostre_790MY";
-            this.btnCatPostre_790MY.Padding = new System.Windows.Forms.Padding(14, 0, 14, 0);
+            this.btnCatPostre_790MY.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.btnCatPostre_790MY.TabIndex = 2;
             this.btnCatPostre_790MY.Tag = "RP_cat_Postre";
             this.btnCatPostre_790MY.Text = "Postres";
@@ -307,14 +305,13 @@ namespace GUI_08YS.RF2
             //
             // btnCatBebida_790MY
             //
-            this.btnCatBebida_790MY.AutoSize = true;
             this.btnCatBebida_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCatBebida_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCatBebida_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.btnCatBebida_790MY.Margin = new System.Windows.Forms.Padding(0, 4, 10, 4);
-            this.btnCatBebida_790MY.MinimumSize = new System.Drawing.Size(110, 44);
+            this.btnCatBebida_790MY.Font = new System.Drawing.Font("Segoe UI", 10.5F);
+            this.btnCatBebida_790MY.Margin = new System.Windows.Forms.Padding(0, 6, 8, 6);
+            this.btnCatBebida_790MY.Size = new System.Drawing.Size(110, 44);
             this.btnCatBebida_790MY.Name = "btnCatBebida_790MY";
-            this.btnCatBebida_790MY.Padding = new System.Windows.Forms.Padding(14, 0, 14, 0);
+            this.btnCatBebida_790MY.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.btnCatBebida_790MY.TabIndex = 3;
             this.btnCatBebida_790MY.Tag = "RP_cat_Bebida";
             this.btnCatBebida_790MY.Text = "Bebidas";

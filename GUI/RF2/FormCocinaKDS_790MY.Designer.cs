@@ -32,18 +32,21 @@ namespace GUI_08YS.RF2
             this.pnlColPendientes_790MY = new GUI_08YS.RF2.PanelRedondeado_790MY();
             this.flpPendientes_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlHeadPendientes_790MY = new System.Windows.Forms.Panel();
+            this.tlpHeadPendientes_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.icoPendientes_790MY = new FontAwesome.Sharp.IconPictureBox();
             this.lblColPendientes_790MY = new System.Windows.Forms.Label();
             this.chipCntPendientes_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
             this.pnlColPreparacion_790MY = new GUI_08YS.RF2.PanelRedondeado_790MY();
             this.flpPreparacion_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlHeadPreparacion_790MY = new System.Windows.Forms.Panel();
+            this.tlpHeadPreparacion_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.icoPreparacion_790MY = new FontAwesome.Sharp.IconPictureBox();
             this.lblColPreparacion_790MY = new System.Windows.Forms.Label();
             this.chipCntPreparacion_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
             this.pnlColListas_790MY = new GUI_08YS.RF2.PanelRedondeado_790MY();
             this.flpListas_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlHeadListas_790MY = new System.Windows.Forms.Panel();
+            this.tlpHeadListas_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.icoListas_790MY = new FontAwesome.Sharp.IconPictureBox();
             this.lblColListas_790MY = new System.Windows.Forms.Label();
             this.chipCntListas_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
@@ -54,12 +57,15 @@ namespace GUI_08YS.RF2
             this.tlpColumnas_790MY.SuspendLayout();
             this.pnlColPendientes_790MY.SuspendLayout();
             this.pnlHeadPendientes_790MY.SuspendLayout();
+            this.tlpHeadPendientes_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoPendientes_790MY)).BeginInit();
             this.pnlColPreparacion_790MY.SuspendLayout();
             this.pnlHeadPreparacion_790MY.SuspendLayout();
+            this.tlpHeadPreparacion_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoPreparacion_790MY)).BeginInit();
             this.pnlColListas_790MY.SuspendLayout();
             this.pnlHeadListas_790MY.SuspendLayout();
+            this.tlpHeadListas_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoListas_790MY)).BeginInit();
             this.SuspendLayout();
             //
@@ -248,13 +254,28 @@ namespace GUI_08YS.RF2
             // pnlHeadPendientes_790MY
             //
             this.pnlHeadPendientes_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
-            this.pnlHeadPendientes_790MY.Controls.Add(this.lblColPendientes_790MY);
-            this.pnlHeadPendientes_790MY.Controls.Add(this.chipCntPendientes_790MY);
-            this.pnlHeadPendientes_790MY.Controls.Add(this.icoPendientes_790MY);
+            this.pnlHeadPendientes_790MY.Controls.Add(this.tlpHeadPendientes_790MY);
             this.pnlHeadPendientes_790MY.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeadPendientes_790MY.Name = "pnlHeadPendientes_790MY";
             this.pnlHeadPendientes_790MY.Size = new System.Drawing.Size(360, 54);
             this.pnlHeadPendientes_790MY.TabIndex = 0;
+            // 
+            // tlpHeadPendientes_790MY
+            // 
+            this.tlpHeadPendientes_790MY.ColumnCount = 3;
+            this.tlpHeadPendientes_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpHeadPendientes_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpHeadPendientes_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpHeadPendientes_790MY.Controls.Add(this.icoPendientes_790MY, 0, 0);
+            this.tlpHeadPendientes_790MY.Controls.Add(this.lblColPendientes_790MY, 1, 0);
+            this.tlpHeadPendientes_790MY.Controls.Add(this.chipCntPendientes_790MY, 2, 0);
+            this.tlpHeadPendientes_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpHeadPendientes_790MY.Margin = new System.Windows.Forms.Padding(0);
+            this.tlpHeadPendientes_790MY.Name = "tlpHeadPendientes_790MY";
+            this.tlpHeadPendientes_790MY.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
+            this.tlpHeadPendientes_790MY.RowCount = 1;
+            this.tlpHeadPendientes_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpHeadPendientes_790MY.TabIndex = 0;
             //
             // icoPendientes_790MY
             //
@@ -264,7 +285,8 @@ namespace GUI_08YS.RF2
             this.icoPendientes_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
             this.icoPendientes_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.icoPendientes_790MY.IconSize = 34;
-            this.icoPendientes_790MY.Location = new System.Drawing.Point(0, 8);
+            this.icoPendientes_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.icoPendientes_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.icoPendientes_790MY.Name = "icoPendientes_790MY";
             this.icoPendientes_790MY.Padding = new System.Windows.Forms.Padding(4);
             this.icoPendientes_790MY.Size = new System.Drawing.Size(38, 38);
@@ -273,10 +295,12 @@ namespace GUI_08YS.RF2
             //
             // lblColPendientes_790MY
             //
-            this.lblColPendientes_790MY.AutoSize = true;
+            this.lblColPendientes_790MY.AutoEllipsis = true;
+            this.lblColPendientes_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblColPendientes_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblColPendientes_790MY.Margin = new System.Windows.Forms.Padding(8, 0, 4, 0);
             this.lblColPendientes_790MY.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblColPendientes_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(242)))), ((int)(((byte)(236)))), ((int)(((byte)(230)))));
-            this.lblColPendientes_790MY.Location = new System.Drawing.Point(48, 13);
             this.lblColPendientes_790MY.Name = "lblColPendientes_790MY";
             this.lblColPendientes_790MY.TabIndex = 1;
             this.lblColPendientes_790MY.Tag = "KDS_col_pendientes";
@@ -284,12 +308,12 @@ namespace GUI_08YS.RF2
             //
             // chipCntPendientes_790MY
             //
-            this.chipCntPendientes_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chipCntPendientes_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chipCntPendientes_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.chipCntPendientes_790MY.AutoSize = false;
             this.chipCntPendientes_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(185)))), ((int)(((byte)(66)))));
             this.chipCntPendientes_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
             this.chipCntPendientes_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
-            this.chipCntPendientes_790MY.Location = new System.Drawing.Point(316, 10);
             this.chipCntPendientes_790MY.Name = "chipCntPendientes_790MY";
             this.chipCntPendientes_790MY.Padding = new System.Windows.Forms.Padding(0);
             this.chipCntPendientes_790MY.Size = new System.Drawing.Size(34, 34);
@@ -323,13 +347,28 @@ namespace GUI_08YS.RF2
             // pnlHeadPreparacion_790MY
             //
             this.pnlHeadPreparacion_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
-            this.pnlHeadPreparacion_790MY.Controls.Add(this.lblColPreparacion_790MY);
-            this.pnlHeadPreparacion_790MY.Controls.Add(this.chipCntPreparacion_790MY);
-            this.pnlHeadPreparacion_790MY.Controls.Add(this.icoPreparacion_790MY);
+            this.pnlHeadPreparacion_790MY.Controls.Add(this.tlpHeadPreparacion_790MY);
             this.pnlHeadPreparacion_790MY.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeadPreparacion_790MY.Name = "pnlHeadPreparacion_790MY";
             this.pnlHeadPreparacion_790MY.Size = new System.Drawing.Size(360, 54);
             this.pnlHeadPreparacion_790MY.TabIndex = 0;
+            // 
+            // tlpHeadPreparacion_790MY
+            // 
+            this.tlpHeadPreparacion_790MY.ColumnCount = 3;
+            this.tlpHeadPreparacion_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpHeadPreparacion_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpHeadPreparacion_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpHeadPreparacion_790MY.Controls.Add(this.icoPreparacion_790MY, 0, 0);
+            this.tlpHeadPreparacion_790MY.Controls.Add(this.lblColPreparacion_790MY, 1, 0);
+            this.tlpHeadPreparacion_790MY.Controls.Add(this.chipCntPreparacion_790MY, 2, 0);
+            this.tlpHeadPreparacion_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpHeadPreparacion_790MY.Margin = new System.Windows.Forms.Padding(0);
+            this.tlpHeadPreparacion_790MY.Name = "tlpHeadPreparacion_790MY";
+            this.tlpHeadPreparacion_790MY.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
+            this.tlpHeadPreparacion_790MY.RowCount = 1;
+            this.tlpHeadPreparacion_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpHeadPreparacion_790MY.TabIndex = 0;
             //
             // icoPreparacion_790MY
             //
@@ -339,7 +378,8 @@ namespace GUI_08YS.RF2
             this.icoPreparacion_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
             this.icoPreparacion_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.icoPreparacion_790MY.IconSize = 34;
-            this.icoPreparacion_790MY.Location = new System.Drawing.Point(0, 8);
+            this.icoPreparacion_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.icoPreparacion_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.icoPreparacion_790MY.Name = "icoPreparacion_790MY";
             this.icoPreparacion_790MY.Padding = new System.Windows.Forms.Padding(4);
             this.icoPreparacion_790MY.Size = new System.Drawing.Size(38, 38);
@@ -348,10 +388,12 @@ namespace GUI_08YS.RF2
             //
             // lblColPreparacion_790MY
             //
-            this.lblColPreparacion_790MY.AutoSize = true;
+            this.lblColPreparacion_790MY.AutoEllipsis = true;
+            this.lblColPreparacion_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblColPreparacion_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblColPreparacion_790MY.Margin = new System.Windows.Forms.Padding(8, 0, 4, 0);
             this.lblColPreparacion_790MY.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblColPreparacion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(242)))), ((int)(((byte)(236)))), ((int)(((byte)(230)))));
-            this.lblColPreparacion_790MY.Location = new System.Drawing.Point(48, 13);
             this.lblColPreparacion_790MY.Name = "lblColPreparacion_790MY";
             this.lblColPreparacion_790MY.TabIndex = 1;
             this.lblColPreparacion_790MY.Tag = "KDS_col_preparacion";
@@ -359,12 +401,12 @@ namespace GUI_08YS.RF2
             //
             // chipCntPreparacion_790MY
             //
-            this.chipCntPreparacion_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chipCntPreparacion_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chipCntPreparacion_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.chipCntPreparacion_790MY.AutoSize = false;
             this.chipCntPreparacion_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(99)))), ((int)(((byte)(170)))), ((int)(((byte)(240)))));
             this.chipCntPreparacion_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
             this.chipCntPreparacion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
-            this.chipCntPreparacion_790MY.Location = new System.Drawing.Point(316, 10);
             this.chipCntPreparacion_790MY.Name = "chipCntPreparacion_790MY";
             this.chipCntPreparacion_790MY.Padding = new System.Windows.Forms.Padding(0);
             this.chipCntPreparacion_790MY.Size = new System.Drawing.Size(34, 34);
@@ -398,13 +440,28 @@ namespace GUI_08YS.RF2
             // pnlHeadListas_790MY
             //
             this.pnlHeadListas_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
-            this.pnlHeadListas_790MY.Controls.Add(this.lblColListas_790MY);
-            this.pnlHeadListas_790MY.Controls.Add(this.chipCntListas_790MY);
-            this.pnlHeadListas_790MY.Controls.Add(this.icoListas_790MY);
+            this.pnlHeadListas_790MY.Controls.Add(this.tlpHeadListas_790MY);
             this.pnlHeadListas_790MY.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeadListas_790MY.Name = "pnlHeadListas_790MY";
             this.pnlHeadListas_790MY.Size = new System.Drawing.Size(360, 54);
             this.pnlHeadListas_790MY.TabIndex = 0;
+            // 
+            // tlpHeadListas_790MY
+            // 
+            this.tlpHeadListas_790MY.ColumnCount = 3;
+            this.tlpHeadListas_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpHeadListas_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpHeadListas_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpHeadListas_790MY.Controls.Add(this.icoListas_790MY, 0, 0);
+            this.tlpHeadListas_790MY.Controls.Add(this.lblColListas_790MY, 1, 0);
+            this.tlpHeadListas_790MY.Controls.Add(this.chipCntListas_790MY, 2, 0);
+            this.tlpHeadListas_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpHeadListas_790MY.Margin = new System.Windows.Forms.Padding(0);
+            this.tlpHeadListas_790MY.Name = "tlpHeadListas_790MY";
+            this.tlpHeadListas_790MY.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
+            this.tlpHeadListas_790MY.RowCount = 1;
+            this.tlpHeadListas_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpHeadListas_790MY.TabIndex = 0;
             //
             // icoListas_790MY
             //
@@ -414,7 +471,8 @@ namespace GUI_08YS.RF2
             this.icoListas_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
             this.icoListas_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.icoListas_790MY.IconSize = 34;
-            this.icoListas_790MY.Location = new System.Drawing.Point(0, 8);
+            this.icoListas_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.icoListas_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.icoListas_790MY.Name = "icoListas_790MY";
             this.icoListas_790MY.Padding = new System.Windows.Forms.Padding(4);
             this.icoListas_790MY.Size = new System.Drawing.Size(38, 38);
@@ -423,10 +481,12 @@ namespace GUI_08YS.RF2
             //
             // lblColListas_790MY
             //
-            this.lblColListas_790MY.AutoSize = true;
+            this.lblColListas_790MY.AutoEllipsis = true;
+            this.lblColListas_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblColListas_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblColListas_790MY.Margin = new System.Windows.Forms.Padding(8, 0, 4, 0);
             this.lblColListas_790MY.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblColListas_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(242)))), ((int)(((byte)(236)))), ((int)(((byte)(230)))));
-            this.lblColListas_790MY.Location = new System.Drawing.Point(48, 13);
             this.lblColListas_790MY.Name = "lblColListas_790MY";
             this.lblColListas_790MY.TabIndex = 1;
             this.lblColListas_790MY.Tag = "KDS_col_listas";
@@ -434,12 +494,12 @@ namespace GUI_08YS.RF2
             //
             // chipCntListas_790MY
             //
-            this.chipCntListas_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chipCntListas_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chipCntListas_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.chipCntListas_790MY.AutoSize = false;
             this.chipCntListas_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(200)))), ((int)(((byte)(130)))));
             this.chipCntListas_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
             this.chipCntListas_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(33)))), ((int)(((byte)(31)))));
-            this.chipCntListas_790MY.Location = new System.Drawing.Point(316, 10);
             this.chipCntListas_790MY.Name = "chipCntListas_790MY";
             this.chipCntListas_790MY.Padding = new System.Windows.Forms.Padding(0);
             this.chipCntListas_790MY.Size = new System.Drawing.Size(34, 34);
@@ -470,16 +530,16 @@ namespace GUI_08YS.RF2
             this.flpIndicadores_790MY.PerformLayout();
             this.tlpColumnas_790MY.ResumeLayout(false);
             this.pnlColPendientes_790MY.ResumeLayout(false);
+            this.tlpHeadPendientes_790MY.ResumeLayout(false);
             this.pnlHeadPendientes_790MY.ResumeLayout(false);
-            this.pnlHeadPendientes_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoPendientes_790MY)).EndInit();
             this.pnlColPreparacion_790MY.ResumeLayout(false);
+            this.tlpHeadPreparacion_790MY.ResumeLayout(false);
             this.pnlHeadPreparacion_790MY.ResumeLayout(false);
-            this.pnlHeadPreparacion_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoPreparacion_790MY)).EndInit();
             this.pnlColListas_790MY.ResumeLayout(false);
+            this.tlpHeadListas_790MY.ResumeLayout(false);
             this.pnlHeadListas_790MY.ResumeLayout(false);
-            this.pnlHeadListas_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoListas_790MY)).EndInit();
             this.ResumeLayout(false);
 
@@ -501,18 +561,21 @@ namespace GUI_08YS.RF2
         private GUI_08YS.RF2.PanelRedondeado_790MY pnlColPendientes_790MY;
         private System.Windows.Forms.FlowLayoutPanel flpPendientes_790MY;
         private System.Windows.Forms.Panel pnlHeadPendientes_790MY;
+        private System.Windows.Forms.TableLayoutPanel tlpHeadPendientes_790MY;
         private FontAwesome.Sharp.IconPictureBox icoPendientes_790MY;
         private System.Windows.Forms.Label lblColPendientes_790MY;
         private GUI_08YS.RF2.EtiquetaChip_790MY chipCntPendientes_790MY;
         private GUI_08YS.RF2.PanelRedondeado_790MY pnlColPreparacion_790MY;
         private System.Windows.Forms.FlowLayoutPanel flpPreparacion_790MY;
         private System.Windows.Forms.Panel pnlHeadPreparacion_790MY;
+        private System.Windows.Forms.TableLayoutPanel tlpHeadPreparacion_790MY;
         private FontAwesome.Sharp.IconPictureBox icoPreparacion_790MY;
         private System.Windows.Forms.Label lblColPreparacion_790MY;
         private GUI_08YS.RF2.EtiquetaChip_790MY chipCntPreparacion_790MY;
         private GUI_08YS.RF2.PanelRedondeado_790MY pnlColListas_790MY;
         private System.Windows.Forms.FlowLayoutPanel flpListas_790MY;
         private System.Windows.Forms.Panel pnlHeadListas_790MY;
+        private System.Windows.Forms.TableLayoutPanel tlpHeadListas_790MY;
         private FontAwesome.Sharp.IconPictureBox icoListas_790MY;
         private System.Windows.Forms.Label lblColListas_790MY;
         private GUI_08YS.RF2.EtiquetaChip_790MY chipCntListas_790MY;

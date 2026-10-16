@@ -6,6 +6,7 @@ using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Bitacora;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 namespace BLL_08YS
@@ -29,14 +30,55 @@ namespace BLL_08YS
         /// Turno en curso para el momento indicado (inicio &lt;= hora &lt; inicio + 2h),
         /// o null si el restaurante está fuera del horario de atención.
         /// Lo usan la apertura de mesas (CUN-004) y el Walk-in.
+        /// Fuera de horario, si el modo prueba está activo (App.config), devuelve el
+        /// turno de prueba configurado para poder testear sin depender de la hora.
         /// </summary>
         public static TimeSpan? ObtenerTurnoVigente(DateTime momento)
+        {
+            TimeSpan? real = ObtenerTurnoReal(momento);
+            return real ?? TurnoDePrueba;
+        }
+
+        /// <summary>True si el turno vigente del momento indicado proviene del modo prueba.</summary>
+        public static bool EsTurnoDePrueba(DateTime momento)
+            => !ObtenerTurnoReal(momento).HasValue && TurnoDePrueba.HasValue;
+
+        private static TimeSpan? ObtenerTurnoReal(DateTime momento)
         {
             TimeSpan hora = momento.TimeOfDay;
             foreach (var inicio in TurnosValidos)
                 if (hora >= inicio && hora < inicio + DuracionTurno)
                     return inicio;
             return null;
+        }
+
+        // ─── Modo prueba (solo testing) ──────────────────────────────────────
+        // App.config de la GUI, <appSettings>:
+        //   <add key="ModoPruebaTurno_790MY" value="true" />
+        //   <add key="TurnoPrueba_790MY"     value="22:00" />   (18:00, 20:00 o 22:00)
+        // Con la bandera en false o ausente, el comportamiento es el de producción.
+        private static readonly Lazy<TimeSpan?> _turnoDePrueba = new Lazy<TimeSpan?>(LeerTurnoDePrueba);
+
+        private static TimeSpan? TurnoDePrueba => _turnoDePrueba.Value;
+
+        private static TimeSpan? LeerTurnoDePrueba()
+        {
+            try
+            {
+                if (!bool.TryParse(ConfigurationManager.AppSettings["ModoPruebaTurno_790MY"], out bool activo) || !activo)
+                    return null;
+
+                // Un valor ausente o que no es un inicio de turno válido cae en el último
+                // turno del día, que es el que admite registrar reservas "para hoy" más tarde.
+                return TimeSpan.TryParse(ConfigurationManager.AppSettings["TurnoPrueba_790MY"], out TimeSpan turno)
+                       && TurnosValidos.Contains(turno)
+                    ? turno
+                    : TurnosValidos[TurnosValidos.Length - 1];
+            }
+            catch (ConfigurationErrorsException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

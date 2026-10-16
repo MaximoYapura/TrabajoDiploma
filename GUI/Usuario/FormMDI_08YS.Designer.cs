@@ -53,6 +53,8 @@
             this.MaestrosDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.clientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mesasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.empleadosToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
+            this.productosToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.ReservasDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.registrarReservaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reporteReservasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -555,7 +557,9 @@
             this.MaestrosDropDownMenu.IsMainMenu = false;
             this.MaestrosDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clientesToolStripMenuItem,
-            this.mesasToolStripMenuItem});
+            this.mesasToolStripMenuItem,
+            this.empleadosToolStripMenuItem_790MY,
+            this.productosToolStripMenuItem_790MY});
             this.MaestrosDropDownMenu.MenuItemHeight = 25;
             this.MaestrosDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.MaestrosDropDownMenu.Name = "dropdownMenuStrip_08YS_Maestros";
@@ -577,6 +581,22 @@
             this.mesasToolStripMenuItem.Tag = "menuMesas";
             this.mesasToolStripMenuItem.Text = "Mesas";
             this.mesasToolStripMenuItem.Click += new System.EventHandler(this.mesasToolStripMenuItem_Click);
+            //
+            // empleadosToolStripMenuItem_790MY
+            //
+            this.empleadosToolStripMenuItem_790MY.Name = "empleadosToolStripMenuItem_790MY";
+            this.empleadosToolStripMenuItem_790MY.Size = new System.Drawing.Size(160, 22);
+            this.empleadosToolStripMenuItem_790MY.Tag = "menuEmpleados";
+            this.empleadosToolStripMenuItem_790MY.Text = "Empleados";
+            this.empleadosToolStripMenuItem_790MY.Click += new System.EventHandler(this.empleadosToolStripMenuItem_790MY_Click);
+            //
+            // productosToolStripMenuItem_790MY
+            //
+            this.productosToolStripMenuItem_790MY.Name = "productosToolStripMenuItem_790MY";
+            this.productosToolStripMenuItem_790MY.Size = new System.Drawing.Size(160, 22);
+            this.productosToolStripMenuItem_790MY.Tag = "menuProductos";
+            this.productosToolStripMenuItem_790MY.Text = "Productos";
+            this.productosToolStripMenuItem_790MY.Click += new System.EventHandler(this.productosToolStripMenuItem_790MY_Click);
             // 
             // ReservasDropDownMenu
             // 
@@ -766,6 +786,8 @@
         private DropdownMenuStrip_08YS MaestrosDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem clientesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mesasToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem empleadosToolStripMenuItem_790MY;
+        private System.Windows.Forms.ToolStripMenuItem productosToolStripMenuItem_790MY;
         private DropdownMenuStrip_08YS ReservasDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem registrarReservaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reporteReservasToolStripMenuItem;

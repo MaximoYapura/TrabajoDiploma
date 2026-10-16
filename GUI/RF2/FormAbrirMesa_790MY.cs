@@ -127,6 +127,8 @@ namespace GUI_08YS.RF2
             string turno = _turno.HasValue
                 ? E.T("AM_turno_vigente", ReservaBLL_790MY.FormatearTurno(_turno.Value))
                 : E.T("AM_fuera_de_turno");
+            if (MesaBLL_790MY.EsTurnoDePrueba(DateTime.Now))
+                turno += " " + E.T("AM_modo_prueba");
 
             lblTurno_790MY.Text = $"{dia} · {turno} · {DateTime.Now:HH:mm}";
 

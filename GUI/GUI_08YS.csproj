@@ -116,6 +116,19 @@
     <Compile Include="Maestros\FormMesas_790MY.Designer.cs">
       <DependentUpon>FormMesas_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="Maestros\EstiloMaestros_790MY.cs" />
+    <Compile Include="Maestros\FormEmpleados_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Maestros\FormEmpleados_790MY.Designer.cs">
+      <DependentUpon>FormEmpleados_790MY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Maestros\FormProductos_790MY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Maestros\FormProductos_790MY.Designer.cs">
+      <DependentUpon>FormProductos_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="PermissionFilter_08YS.cs" />
     <Compile Include="Reportes\FormReporteReservas_790MY.cs">
       <SubType>Form</SubType>

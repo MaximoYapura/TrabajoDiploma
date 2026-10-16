@@ -43,7 +43,8 @@ namespace Service_08YS.Entities.Acceso
         CerrarMesa,        // finalizar la atención (reserva Finalizada, mesa Libre)
         RegistrarPedido,   // CUN-005
         DespacharPedido,   // CUN-008 (Chef): comandas, iniciar preparación, marcar Listo
-        CrearEmpleado      // alta/modificación de empleados
+        CrearEmpleado,     // alta/modificación de empleados
+        GestionProductos   // ABM de la carta (FormProductos_790MY)
     }
 
     public class Permiso_08YS : AccessComponent_08YS

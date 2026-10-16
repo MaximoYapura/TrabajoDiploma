@@ -81,6 +81,15 @@
         /// <summary>Porciones que todavia pueden pedirse sin generar sobreventa.</summary>
         public int PorcionesDisponibles => _stockPorciones - PorcionesComprometidas;
 
+        /// <summary>
+        /// False para productos sin control de porciones (p. ej. preparaciones a pedido):
+        /// no se rechazan por stock en CUN-005 ni se descuentan en CUN-008.
+        /// </summary>
+        public bool ControlaStock { get; set; } = true;
+
+        /// <summary>True si se pueden pedir <paramref name="cantidad"/> porciones más.</summary>
+        public bool Admite(int cantidad) => !ControlaStock || PorcionesDisponibles >= cantidad;
+
         public override string ToString() => _nombre;
 
         public override bool Equals(object obj)

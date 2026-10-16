@@ -113,6 +113,7 @@ namespace GUI_08YS.RF2
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
 
             UpdateIdioma();
+            flpCategorias_790MY_Resize(this, EventArgs.Empty);
             CargarTodo();
             timerAvisos_790MY.Start();
         }
@@ -121,11 +122,22 @@ namespace GUI_08YS.RF2
 
         private void CargarTodo()
         {
+            // El catálogo solo depende de la patente: se carga aunque el usuario no
+            // esté vinculado a un camarero, para que la carta siempre sea visible.
+            try
+            {
+                _catalogo = _pedidoBll.ObtenerCatalogo();
+            }
+            catch (Exception ex)
+            {
+                _catalogo = new List<Producto_790MY>();
+                E.MostrarError(VentanaPropietaria, ex);
+            }
+
             try
             {
                 _mesas = _pedidoBll.ObtenerMesasAsignadas();
                 _pedidos = _pedidoBll.ObtenerPedidosDeMisMesas();
-                _catalogo = _pedidoBll.ObtenerCatalogo();
                 _puedeOperar = true;
             }
             catch (Exception ex)
@@ -133,6 +145,7 @@ namespace GUI_08YS.RF2
                 // P. ej. el usuario no está vinculado a un camarero activo.
                 _puedeOperar = false;
                 _mesas = new List<Reserva_790MY>();
+                _pedidos = new List<Pedido_790MY>();
                 E.MostrarError(VentanaPropietaria, ex);
             }
 
@@ -209,30 +222,47 @@ namespace GUI_08YS.RF2
                 Radio = 12
             };
 
-            var lblMesa = E.CrearLabel(E.T("AM_card_mesa", mesa.MesaNumero), _fuenteMesa, E.Texto);
-            lblMesa.Location = new Point(16, 12);
-            var lblPax = E.CrearLabel(E.T("RP_pax", mesa.CantidadComensales), _fuenteNombre, E.Texto);
-            var lblDetalle = E.CrearLabel(E.T("RP_mesa_detalle", mesa.ReservaID, E.Hora(mesa.Hora)), _fuenteDetalle, E.Gris);
-            lblDetalle.Location = new Point(16, 46);
-            var lblCliente = E.CrearLabel(mesa.ClienteNombreCompleto ?? "", _fuenteNombreB, E.Texto);
-            lblCliente.Location = new Point(16, 70);
+            // Grilla interna: título y comensales en la primera fila (izquierda / derecha),
+            // debajo detalle, cliente y estados alineados al mismo margen izquierdo.
+            const int margen = 16;
+            int interior = ancho - margen * 2;
+            var grilla = new TableLayoutPanel
+            {
+                Location = new Point(margen, 12),
+                Width = interior,
+                ColumnCount = 2,
+                BackColor = Color.Transparent,
+                Margin = Padding.Empty,
+                Padding = Padding.Empty
+            };
+            grilla.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            grilla.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-            card.Controls.Add(lblMesa);
-            card.Controls.Add(lblPax);
-            card.Controls.Add(lblDetalle);
-            card.Controls.Add(lblCliente);
-            lblPax.Location = new Point(ancho - lblPax.PreferredWidth - 16, 16);
+            var lblMesa = E.CrearLabel(E.T("AM_card_mesa", mesa.MesaNumero), _fuenteMesa, E.Texto);
+            lblMesa.Anchor = AnchorStyles.Left;
+            var lblPax = E.CrearLabel(E.T("RP_pax", mesa.CantidadComensales), _fuenteNombre, E.Gris);
+            lblPax.Anchor = AnchorStyles.Right;
+            var lblDetalle = FilaTexto(E.T("RP_mesa_detalle", mesa.ReservaID, E.Hora(mesa.Hora)), _fuenteDetalle, E.Gris, interior);
+            lblDetalle.Margin = new Padding(0, 4, 0, 0);
+            var lblCliente = FilaTexto(mesa.ClienteNombreCompleto ?? "", _fuenteNombreB, E.Texto, interior);
+            lblCliente.Margin = new Padding(0, 2, 0, 0);
+
+            grilla.Controls.Add(lblMesa, 0, 0);
+            grilla.Controls.Add(lblPax, 1, 0);
+            grilla.Controls.Add(lblDetalle, 0, 1);
+            grilla.SetColumnSpan(lblDetalle, 2);
+            grilla.Controls.Add(lblCliente, 0, 2);
+            grilla.SetColumnSpan(lblCliente, 2);
 
             // Etiquetas de estado de los pedidos de esa mesa (los más recientes al final).
             var chips = new FlowLayoutPanel
             {
-                Location = new Point(14, 98),
-                Width = ancho - 28,
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                MaximumSize = new Size(ancho - 28, 0),
+                MaximumSize = new Size(interior, 0),
                 BackColor = Color.Transparent,
-                Margin = Padding.Empty
+                Margin = new Padding(0, 8, 0, 0),
+                Padding = Padding.Empty
             };
             foreach (var pedido in _pedidos.Where(p => p.ReservaID == mesa.ReservaID).OrderBy(p => p.NroPedido))
             {
@@ -243,8 +273,15 @@ namespace GUI_08YS.RF2
                 chip.Margin = new Padding(0, 0, 6, 6);
                 chips.Controls.Add(chip);
             }
-            card.Controls.Add(chips);
-            card.Height = chips.Controls.Count > 0 ? 98 + chips.PreferredSize.Height + 8 : 104;
+            if (chips.Controls.Count > 0)
+            {
+                grilla.Controls.Add(chips, 0, 3);
+                grilla.SetColumnSpan(chips, 2);
+            }
+
+            grilla.Height = grilla.GetPreferredSize(new Size(interior, 0)).Height;
+            card.Controls.Add(grilla);
+            card.Height = grilla.Height + 12 + (chips.Controls.Count > 0 ? 6 : 14);
 
             E.PropagarClick(card, (s, e) =>
             {
@@ -255,6 +292,16 @@ namespace GUI_08YS.RF2
                 RenderizarComanda();
             });
             return card;
+        }
+
+        /// <summary>Renglón de texto de ancho fijo que corta con "…" en lugar de desbordar la tarjeta.</summary>
+        private static Label FilaTexto(string texto, Font fuente, Color color, int ancho)
+        {
+            var lbl = E.CrearLabel(texto, fuente, color, autoSize: false);
+            lbl.AutoEllipsis = true;
+            lbl.TextAlign = ContentAlignment.MiddleLeft;
+            lbl.Size = new Size(ancho, TextRenderer.MeasureText("Ag", fuente).Height + 2);
+            return lbl;
         }
 
         private void flpMesas_790MY_Resize(object sender, EventArgs e)
@@ -287,6 +334,23 @@ namespace GUI_08YS.RF2
             }
         }
 
+        // Las cuatro pestañas comparten el ancho disponible en partes iguales: así ninguna
+        // queda recortada aunque el texto traducido sea largo o la columna se angoste.
+        private void flpCategorias_790MY_Resize(object sender, EventArgs e)
+        {
+            var botones = _botonesCategoria?.Keys.ToList();
+            if (botones == null || botones.Count == 0) return;
+
+            int separacion = botones[0].Margin.Horizontal;
+            int ancho = (flpCategorias_790MY.ClientSize.Width - separacion * botones.Count) / botones.Count;
+            if (ancho < 60) return;
+
+            flpCategorias_790MY.SuspendLayout();
+            foreach (var b in botones)
+                b.Width = ancho;
+            flpCategorias_790MY.ResumeLayout();
+        }
+
         private void txtBuscarProducto_790MY_TextChanged(object sender, EventArgs e)
         {
             RenderizarCategorias();
@@ -294,8 +358,10 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>Porciones que todavía pueden agregarse descontando lo ya cargado en la comanda.</summary>
+        private const int MaximoSinControl = 99;
+
         private int DisponibleParaAgregar(Producto_790MY producto)
-            => producto.PorcionesDisponibles - ComandaActual.Where(i => i.Producto.Equals(producto)).Sum(i => i.Cantidad);
+            => (producto.ControlaStock ? producto.PorcionesDisponibles : MaximoSinControl) - ComandaActual.Where(i => i.Producto.Equals(producto)).Sum(i => i.Cantidad);
 
         private void RenderizarProductos()
         {
@@ -356,6 +422,8 @@ namespace GUI_08YS.RF2
             EtiquetaChip_790MY chip;
             if (agotado)
                 chip = E.CrearChip(E.T("RP_agotado"), E.Deshabilitado, E.Texto, _fuenteChip, E.Gris);
+            else if (!producto.ControlaStock)
+                chip = E.CrearChip(E.T("RP_sin_control_stock"), E.ListoFondo, E.ListoTexto, _fuenteChip, E.ListoBorde);
             else if (disponible <= UmbralBajoStock)
                 chip = E.CrearChip(E.T("RP_bajo_stock", disponible), E.PendFondo, E.PendTexto, _fuenteChip, E.PendBorde);
             else

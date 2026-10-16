@@ -73,7 +73,11 @@ namespace Service_08YS.Entities.Bitacora
         PedidoListo = 40,
         StockDescontado = 41,
         ReservaRechazadaDisponibilidad = 42,
-        StockDescuentoFallido = 43
+        StockDescuentoFallido = 43,
+        ProductoRegistrado = 44,
+        ProductoModificado = 45,
+        ProductoDadoDeBaja = 46,
+        EmpleadoDadoDeBaja = 47
     }
 
     public class BitacoraEvento_08YS

@@ -40,6 +40,8 @@ namespace GUI_08YS
             {
                 { nameof(clientesToolStripMenuItem), Permisos.VerClientes },
                 { nameof(mesasToolStripMenuItem),    Permisos.VerMesas    },
+                { nameof(empleadosToolStripMenuItem_790MY), Permisos.CrearEmpleado    },
+                { nameof(productosToolStripMenuItem_790MY), Permisos.GestionProductos },
             };
 
         private static readonly Dictionary<string, Permisos> _mapaMenuReservas =
@@ -144,7 +146,10 @@ namespace GUI_08YS
             PermissionFilter_08YS.AplicarMenuStrip(AdministrativoDropDownMenu, _mapaMenuAdmin);
 
             // Maestros: visible si el rol tiene acceso al módulo de maestros
-            btnMaestros.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerMaestros);
+            // (o si puede gestionar empleados / la carta, aunque no tenga el resto de Maestros)
+            btnMaestros.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerMaestros)
+                               || SessionManager_08YS.Instance.HasPermission(Permisos.CrearEmpleado)
+                               || SessionManager_08YS.Instance.HasPermission(Permisos.GestionProductos);
 
             PermissionFilter_08YS.AplicarMenuStrip(MaestrosDropDownMenu, _mapaMenuMaestros);
 
@@ -446,6 +451,18 @@ namespace GUI_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
             OpenChildForm(new FormMesas_790MY());
+        }
+
+        private void empleadosToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
+            OpenChildForm(new FormEmpleados_790MY());
+        }
+
+        private void productosToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionProductos);
+            OpenChildForm(new FormProductos_790MY());
         }
         #endregion
 

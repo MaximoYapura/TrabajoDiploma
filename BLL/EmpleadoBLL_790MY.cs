@@ -20,13 +20,15 @@ namespace BLL_08YS
 
         private readonly IEmpleadoRepository_790MY _empleadoRepository;
         private readonly IUserRepository_08YS _userRepository;
+        private readonly IReservaRepository_790MY _reservaRepository;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
         public EmpleadoBLL_790MY(IEmpleadoRepository_790MY empleadoRepository, IUserRepository_08YS userRepository,
-                                 BitacoraBLL_08YS bitacoraBll)
+                                 IReservaRepository_790MY reservaRepository, BitacoraBLL_08YS bitacoraBll)
         {
             _empleadoRepository = empleadoRepository ?? throw new ArgumentNullException(nameof(empleadoRepository));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -68,8 +70,15 @@ namespace BLL_08YS
 
             ValidarDatos(empleado);
 
-            if (!_empleadoRepository.Exists(empleado.DNI))
-                throw MensajesBLL_790MY.Regla("msg_rf2_empleado_inexistente", empleado.DNI);
+            Empleado_790MY actual = _empleadoRepository.GetByDni(empleado.DNI)
+                ?? throw MensajesBLL_790MY.Regla("msg_rf2_empleado_inexistente", empleado.DNI);
+
+            // Un camarero con mesas abiertas no puede cambiar de puesto ni quedar inactivo:
+            // esas mesas quedarían sin responsable para Registrar Pedido.
+            bool dejaDeSerCamareroActivo = actual.Puesto == PuestoEmpleado_790MY.Camarero && actual.Activo
+                && (empleado.Puesto != PuestoEmpleado_790MY.Camarero || !empleado.Activo);
+            if (dejaDeSerCamareroActivo)
+                ValidarSinMesasAbiertas(empleado.DNI);
 
             ValidarUsuarioAsociado(empleado);
 
@@ -78,7 +87,54 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.EmpleadoModificado, $"Empleado {empleado.DNI} ({empleado.Puesto})");
         }
 
+        /// <summary>Baja lógica (Activo = 0). Se conserva el registro por las reservas históricas.</summary>
+        public void DarDeBaja(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
+
+            Empleado_790MY empleado = _empleadoRepository.GetByDni(dni)
+                ?? throw MensajesBLL_790MY.Regla("msg_rf2_empleado_inexistente", dni);
+            if (!empleado.Activo)
+                throw MensajesBLL_790MY.Regla("msg_rf2_empleado_ya_inactivo", dni);
+
+            ValidarSinMesasAbiertas(dni);
+
+            empleado.Activo = false;
+            _empleadoRepository.Update(empleado);
+            DVManager_08YS.Recalcular();
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.EmpleadoDadoDeBaja, $"Empleado {dni}");
+        }
+
+        /// <summary>Mesas abiertas (reservas Asistidas) a cargo del empleado.</summary>
+        public int ContarMesasAbiertas(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
+            return _reservaRepository.GetAsistidasPorCamarero(dni).Count;
+        }
+
+        /// <summary>
+        /// Usuarios activos del sistema para el combo "Usuario vinculado". Solo expone los
+        /// datos de identificación necesarios; no requiere el permiso VerUsuarios.
+        /// </summary>
+        public List<User_08YS> ObtenerUsuariosVinculables()
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
+            var lista = new List<User_08YS>();
+            foreach (var u in _userRepository.GetAll())
+                if (u.Activo)
+                    lista.Add(u);
+            lista.Sort((a, b) => string.Compare(a.Username, b.Username, StringComparison.CurrentCultureIgnoreCase));
+            return lista;
+        }
+
         // ─── Validaciones ────────────────────────────────────────────────────
+
+        private void ValidarSinMesasAbiertas(int dni)
+        {
+            int abiertas = _reservaRepository.GetAsistidasPorCamarero(dni).Count;
+            if (abiertas > 0)
+                throw MensajesBLL_790MY.Regla("msg_rf2_empleado_con_mesas_abiertas", abiertas);
+        }
 
         private static void ValidarDatos(Empleado_790MY empleado)
         {

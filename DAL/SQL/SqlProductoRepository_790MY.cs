@@ -29,7 +29,7 @@ namespace DAL_08YS.SQL
         {
             string comprometido = FiltroOcupacionMesa_790MY.CondicionPedidoComprometido(cmd, "pe");
             return
-                "SELECT p.ProductoID, p.Nombre, p.Precio, p.StockPorciones, p.Activo, p.Categoria, " +
+                "SELECT p.ProductoID, p.Nombre, p.Precio, p.StockPorciones, p.Activo, p.Categoria, p.ControlaStock, " +
                 "       ISNULL((SELECT SUM(i.Cantidad) FROM ItemsPedido i " +
                 "               INNER JOIN Pedidos pe ON pe.NroPedido = i.NroPedido " +
                 "               WHERE i.ProductoID = p.ProductoID AND " + comprometido + "), 0) AS Comprometidas " +
@@ -48,6 +48,7 @@ namespace DAL_08YS.SQL
                 Categoria = Enum.TryParse(reader.GetString(reader.GetOrdinal("Categoria")), out CategoriaProducto_790MY categoria)
                     ? categoria
                     : CategoriaProducto_790MY.PlatoPrincipal,
+                ControlaStock = reader.GetBoolean(reader.GetOrdinal("ControlaStock")),
                 PorcionesComprometidas = Convert.ToInt32(reader["Comprometidas"])
             };
         }
@@ -80,6 +81,84 @@ namespace DAL_08YS.SQL
                 using (var reader = cmd.ExecuteReader())
                     return reader.Read() ? Mapear(reader) : null;
             }
+        }
+
+        // ─── ABM (FormProductos_790MY) ───────────────────────────────────────
+
+        public List<Producto_790MY> GetAll()
+        {
+            var lista = new List<Producto_790MY>();
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand { Connection = con })
+            {
+                cmd.CommandText = SelectConComprometidas(cmd, null) + "ORDER BY p.ProductoID";
+                con.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                        lista.Add(Mapear(reader));
+                }
+            }
+            return lista;
+        }
+
+        public bool ExisteNombre(string nombre, int exceptoProductoId)
+        {
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(
+                "SELECT COUNT(1) FROM Productos WHERE Nombre = @Nombre AND ProductoID <> @ProductoID", con))
+            {
+                cmd.Parameters.Add("@Nombre", SqlDbType.NVarChar, 100).Value = nombre;
+                cmd.Parameters.Add("@ProductoID", SqlDbType.Int).Value = exceptoProductoId;
+                con.Open();
+                return (int)cmd.ExecuteScalar() > 0;
+            }
+        }
+
+        public void Add(Producto_790MY producto)
+        {
+            const string sql =
+                "INSERT INTO Productos (Nombre, Precio, StockPorciones, Activo, Categoria, ControlaStock) " +
+                "OUTPUT inserted.ProductoID " +
+                "VALUES (@Nombre, @Precio, @Stock, @Activo, @Categoria, @ControlaStock)";
+
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
+            {
+                CargarParametros(cmd, producto);
+                con.Open();
+                producto.ProductoID = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
+        public void Update(Producto_790MY producto)
+        {
+            const string sql =
+                "UPDATE Productos SET Nombre = @Nombre, Precio = @Precio, StockPorciones = @Stock, " +
+                "Activo = @Activo, Categoria = @Categoria, ControlaStock = @ControlaStock " +
+                "WHERE ProductoID = @ProductoID";
+
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(sql, con))
+            {
+                CargarParametros(cmd, producto);
+                cmd.Parameters.Add("@ProductoID", SqlDbType.Int).Value = producto.ProductoID;
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static void CargarParametros(SqlCommand cmd, Producto_790MY p)
+        {
+            cmd.Parameters.Add("@Nombre", SqlDbType.NVarChar, 100).Value = p.Nombre;
+            var precio = cmd.Parameters.Add("@Precio", SqlDbType.Decimal);
+            precio.Precision = 10;
+            precio.Scale = 2;
+            precio.Value = p.Precio;
+            cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = p.StockPorciones;
+            cmd.Parameters.Add("@Activo", SqlDbType.Bit).Value = p.Activo;
+            cmd.Parameters.Add("@Categoria", SqlDbType.NVarChar, 20).Value = p.Categoria.ToString();
+            cmd.Parameters.Add("@ControlaStock", SqlDbType.Bit).Value = p.ControlaStock;
         }
     }
 }

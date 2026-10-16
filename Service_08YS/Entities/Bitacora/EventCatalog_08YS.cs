@@ -64,7 +64,11 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.PedidoEnPreparacion,            new EventoMetadata_08YS(Modulo.Pedidos,   Criticidad.Bajo)  },
                 { Evento.PedidoListo,                    new EventoMetadata_08YS(Modulo.Pedidos,   Criticidad.Medio) },
                 { Evento.StockDescontado,                new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
-                { Evento.StockDescuentoFallido,          new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Alto)  }
+                { Evento.StockDescuentoFallido,          new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Alto)  },
+                { Evento.ProductoRegistrado,             new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
+                { Evento.ProductoModificado,             new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
+                { Evento.ProductoDadoDeBaja,             new EventoMetadata_08YS(Modulo.Stock,     Criticidad.Medio) },
+                { Evento.EmpleadoDadoDeBaja,             new EventoMetadata_08YS(Modulo.Empleados, Criticidad.Medio) }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];

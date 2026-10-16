@@ -73,7 +73,7 @@ namespace DAL_08YS.SQL
                             }
 
                             int solicitado = solicitadoPorProducto[productoId];
-                            if (producto.PorcionesDisponibles < solicitado)
+                            if (!producto.Admite(solicitado))
                             {
                                 tx.Rollback();
                                 return new ResultadoRegistroPedido_790MY
@@ -295,8 +295,10 @@ namespace DAL_08YS.SQL
                         //    del pedido y se revierte TODO (estado del pedido incluido).
                         int productosDelPedido, productosDescontados, totalPorciones;
                         using (var cmd = new SqlCommand(@"
-                                SELECT COUNT(DISTINCT ProductoID), ISNULL(SUM(Cantidad), 0)
-                                FROM ItemsPedido WHERE NroPedido = @NroPedido", connection, tx))
+                                SELECT COUNT(DISTINCT i.ProductoID), ISNULL(SUM(i.Cantidad), 0)
+                                FROM ItemsPedido i
+                                INNER JOIN Productos p ON p.ProductoID = i.ProductoID
+                                WHERE i.NroPedido = @NroPedido AND p.ControlaStock = 1", connection, tx))
                         {
                             cmd.Parameters.Add("@NroPedido", SqlDbType.Int).Value = nroPedido;
                             using (var reader = cmd.ExecuteReader())
@@ -314,7 +316,7 @@ namespace DAL_08YS.SQL
                                 INNER JOIN (SELECT ProductoID, SUM(Cantidad) AS Total
                                             FROM ItemsPedido WHERE NroPedido = @NroPedido
                                             GROUP BY ProductoID) x ON x.ProductoID = p.ProductoID
-                                WHERE p.StockPorciones >= x.Total", connection, tx))
+                                WHERE p.ControlaStock = 1 AND p.StockPorciones >= x.Total", connection, tx))
                         {
                             cmd.Parameters.Add("@NroPedido", SqlDbType.Int).Value = nroPedido;
                             productosDescontados = cmd.ExecuteNonQuery();

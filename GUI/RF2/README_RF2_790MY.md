@@ -35,17 +35,36 @@ Ejecutar en orden, con la aplicación cerrada:
    (Entrada, PlatoPrincipal, Postre, Bebida), que usan las pestañas del catálogo.
 
 Para probar CUN-005, el usuario logueado tiene que estar vinculado a un empleado con puesto
-Camarero (`Empleados.UsuarioDNI`); ver el ejemplo comentado en la migración RF2.
+Camarero (`Empleados.UsuarioDNI`).
+
+## Testing
+
+- `Migraciones_790MY/DatosPrueba_AtencionMesa_790MY.sql`: productos de ejemplo por categoría
+  (con uno en bajo stock y uno agotado) y vínculo del usuario `@UsuarioCamarero` como Camarero.
+  Ejecutar con `sqlcmd -S <servidor> -E -I -f 65001 -i ...` (UTF-8 y `QUOTED_IDENTIFIER ON`).
+- **Modo prueba de turno** (`GUI/Config/App.config`, `<appSettings>`): con
+  `ModoPruebaTurno_790MY = true`, si la hora actual no cae en un turno real,
+  `MesaBLL_790MY.ObtenerTurnoVigente` devuelve `TurnoPrueba_790MY` (por defecto 22:00).
+  Abrir Mesa muestra "(MODO PRUEBA)" en el encabezado. Para el flujo "Con reserva", la reserva
+  tiene que ser de HOY en ese turno. **Poner la bandera en `false` antes de entregar.**
 
 ## Pendientes (próximo sprint)
 
-- **ABM de Empleados (`Empleado_790MY`)**: la BLL ya existe (`EmpleadoBLL_790MY.RegistrarEmpleado`
-  / `ModificarEmpleado`, patente `CrearEmpleado`). Falta `FormEmpleados_790MY` en *Maestros*.
-  Por ahora los empleados se cargan por SQL.
-- **ABM de Productos (`Producto_790MY`)**: falta repositorio de escritura, BLL y
-  `FormProductos_790MY` (nombre, categoría, precio, stock, activo) en *Maestros*. Por ahora se
-  cargan por SQL.
 - **Retiro del pedido**: "Marcar como retirado" en Registrar Pedido solo oculta el aviso
   durante la sesión de la pantalla. Persistirlo requiere un estado `Entregado` en `Pedidos`.
 - **Cierre de mesa**: `ReservaBLL_790MY.FinalizarReserva` (patente `CerrarMesa`) todavía no
   tiene pantalla; corresponde al registro del pago.
+
+## Maestros: Empleados y Productos
+
+| Opción (Maestros) | Formulario | Patente | BLL |
+|---|---|---|---|
+| Empleados | `GUI/Maestros/FormEmpleados_790MY` | `CrearEmpleado` | `EmpleadoBLL_790MY` (alta, modificación, baja lógica) |
+| Productos | `GUI/Maestros/FormProductos_790MY` | `GestionProductos` | `ProductoBLL_790MY` (alta, modificación, baja lógica) |
+
+- Migración: `Migraciones_790MY/CompletarABM_EmpleadosProductos_790MY.sql` (columna
+  `Productos.ControlaStock`, patente `GestionProductos`, familia "Gestion de carta" para SuperAdmin).
+- Un camarero con mesas abiertas no puede cambiar de cargo ni darse de baja.
+- El stock físico no puede bajarse por debajo de lo comprometido por pedidos sin despachar.
+- Un producto con `ControlaStock = false` no se rechaza por stock en CUN-005 ni se descuenta en CUN-008.
+- Pendiente: historial de precios y stock mínimo configurable (hoy el umbral de "Bajo" es fijo).
