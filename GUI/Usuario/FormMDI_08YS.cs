@@ -33,6 +33,7 @@ namespace GUI_08YS
                 { nameof(familiasToolStripMenuItem),         Permisos.VerFamilias    },
                 { nameof(rolesToolStripMenuItem),            Permisos.VerRoles       },
                 { nameof(gestionRespaldosToolStripMenuItem), Permisos.VerRespaldos   },
+                { nameof(bitacoraCambiosToolStripMenuItem_790MY), Permisos.AuditarProductos },
             };
 
         private static readonly Dictionary<string, Permisos> _mapaMenuMaestros =
@@ -140,7 +141,8 @@ namespace GUI_08YS
             btnAdministrativo.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerUsuarios)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerBitacora)
                                      || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias)
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles);
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles)
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.AuditarProductos);
 
             gestionAccesosToolStripMenuItem.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerRoles)
                                                    || SessionManager_08YS.Instance.HasPermission(Permisos.VerFamilias);
@@ -444,6 +446,12 @@ namespace GUI_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerRespaldos);
             OpenChildForm(new FormGestionRespaldos_08YS());
+        }
+
+        private void bitacoraCambiosToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.AuditarProductos);
+            OpenChildForm(new FormBitacoraCambios_790MY());
         }
         #endregion
 

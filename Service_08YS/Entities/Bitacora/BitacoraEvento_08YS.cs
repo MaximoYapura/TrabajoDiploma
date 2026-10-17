@@ -85,7 +85,10 @@ namespace Service_08YS.Entities.Bitacora
         FacturaAnulada = 49,
         PagoRegistrado = 50,
         PagoRechazado = 51,
-        CierreCajaRealizado = 52
+        CierreCajaRealizado = 52,
+
+        // ── Auditoría de productos (790MY) ───────────────────────────────
+        ProductoVersionRestaurada = 53
     }
 
     public class BitacoraEvento_08YS

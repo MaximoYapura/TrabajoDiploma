@@ -54,7 +54,11 @@ namespace Service_08YS.Entities.Acceso
 
         // ── Reportes inteligentes (790MY) ────────────────────────────────
         // Ver Migraciones_790MY/AgregarPatenteReportePredictivo_790MY.sql.
-        GestionReportePredictivo   // análisis predictivo de canasta (reglas de asociación)
+        GestionReportePredictivo,  // análisis predictivo de canasta (reglas de asociación)
+
+        // ── Auditoría (790MY) ────────────────────────────────────────────
+        // Ver Migraciones_790MY/AgregarBitacoraCambiosProductos_790MY.sql.
+        AuditarProductos           // bitácora de cambios de productos y rollback de versiones
     }
 
     public class Permiso_08YS : AccessComponent_08YS

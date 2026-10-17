@@ -69,6 +69,7 @@
     <Compile Include="MensajesBLL_790MY.cs" />
     <Compile Include="PedidoBLL_790MY.cs" />
     <Compile Include="ProductoBLL_790MY.cs" />
+    <Compile Include="ProductoCBLL_790MY.cs" />
     <Compile Include="FacturaBLL_790MY.cs" />
     <Compile Include="PagoBLL_790MY.cs" />
     <Compile Include="CobroDTOs_790MY.cs" />

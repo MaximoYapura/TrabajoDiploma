@@ -75,7 +75,10 @@ namespace Service_08YS.Entities.Bitacora
                 { Evento.FacturaAnulada,                 new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Medio) },
                 { Evento.PagoRegistrado,                 new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Alto)  },
                 { Evento.PagoRechazado,                  new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Medio) },
-                { Evento.CierreCajaRealizado,            new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Alto)  }
+                { Evento.CierreCajaRealizado,            new EventoMetadata_08YS(Modulo.Facturacion, Criticidad.Alto)  },
+
+                // Auditoría de productos (790MY)
+                { Evento.ProductoVersionRestaurada,      new EventoMetadata_08YS(Modulo.Stock,       Criticidad.Alto)  }
             };
 
         public static EventoMetadata_08YS GetMetadata(Evento evento) => _catalogo[evento];

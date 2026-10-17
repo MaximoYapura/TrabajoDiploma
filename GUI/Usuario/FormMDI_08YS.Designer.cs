@@ -50,6 +50,7 @@
             this.rolesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.familiasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gestionRespaldosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bitacoraCambiosToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.MaestrosDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.clientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mesasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -497,7 +498,8 @@
             this.gestionUsuarioToolStripMenuItem,
             this.bitacoraToolStripMenuItem,
             this.gestionAccesosToolStripMenuItem,
-            this.gestionRespaldosToolStripMenuItem});
+            this.gestionRespaldosToolStripMenuItem,
+            this.bitacoraCambiosToolStripMenuItem_790MY});
             this.AdministrativoDropDownMenu.MenuItemHeight = 25;
             this.AdministrativoDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.AdministrativoDropDownMenu.Name = "dropdownMenuStrip_08YS1";
@@ -553,7 +555,15 @@
             this.gestionRespaldosToolStripMenuItem.Tag = "menuRespaldos";
             this.gestionRespaldosToolStripMenuItem.Text = "Gestion Respaldos";
             this.gestionRespaldosToolStripMenuItem.Click += new System.EventHandler(this.gestionRespaldosToolStripMenuItem_Click);
-            // 
+            //
+            // bitacoraCambiosToolStripMenuItem_790MY
+            //
+            this.bitacoraCambiosToolStripMenuItem_790MY.Name = "bitacoraCambiosToolStripMenuItem_790MY";
+            this.bitacoraCambiosToolStripMenuItem_790MY.Size = new System.Drawing.Size(170, 22);
+            this.bitacoraCambiosToolStripMenuItem_790MY.Tag = "menuBitacoraCambios";
+            this.bitacoraCambiosToolStripMenuItem_790MY.Text = "Bitácora de Cambios";
+            this.bitacoraCambiosToolStripMenuItem_790MY.Click += new System.EventHandler(this.bitacoraCambiosToolStripMenuItem_790MY_Click);
+            //
             // MaestrosDropDownMenu
             // 
             this.MaestrosDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -813,6 +823,7 @@
         private System.Windows.Forms.Panel panel3;
         private FontAwesome.Sharp.IconButton btnCerrarSesion;
         private System.Windows.Forms.ToolStripMenuItem gestionRespaldosToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bitacoraCambiosToolStripMenuItem_790MY;
         private DropdownMenuStrip_08YS MaestrosDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem clientesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mesasToolStripMenuItem;

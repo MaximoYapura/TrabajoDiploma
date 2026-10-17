@@ -79,6 +79,8 @@
     <Compile Include="SQL\SqlEmpleadoRepository_790MY.cs" />
     <Compile Include="SQL\SqlPedidoRepository_790MY.cs" />
     <Compile Include="SQL\SqlProductoRepository_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\IProductoCRepository_790MY.cs" />
+    <Compile Include="SQL\SqlProductoCRepository_790MY.cs" />
     <Compile Include="Interfaces_Repositories\IFacturaRepository_790MY.cs" />
     <Compile Include="Interfaces_Repositories\IPagoRepository_790MY.cs" />
     <Compile Include="SQL\SqlFacturaRepository_790MY.cs" />
