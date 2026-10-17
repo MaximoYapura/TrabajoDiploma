@@ -72,6 +72,7 @@
     <Compile Include="FacturaBLL_790MY.cs" />
     <Compile Include="PagoBLL_790MY.cs" />
     <Compile Include="CobroDTOs_790MY.cs" />
+    <Compile Include="ReportePredictivoBLL_790MY.cs" />
     <Compile Include="Exceptions\PagoRechazadoException_790MY.cs" />
     <Compile Include="Exceptions\StockInsuficienteException_790MY.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -33,5 +33,11 @@ namespace DAL_08YS.Interfaces_Repositories
 
         /// <summary>Factura Abierta vigente de la reserva (null si no hay).</summary>
         Factura_790MY GetAbiertaPorReserva(int reservaId);
+
+        /// <summary>
+        /// Canastas de las facturas Pagadas emitidas desde la fecha indicada: por cada
+        /// factura, el conjunto de productos distintos que incluye (reporte predictivo).
+        /// </summary>
+        List<CanastaFactura_790MY> ObtenerCanastasPagadas(System.DateTime desde);
     }
 }

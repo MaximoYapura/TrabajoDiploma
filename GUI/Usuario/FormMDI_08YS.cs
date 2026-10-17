@@ -64,6 +64,7 @@ namespace GUI_08YS
             {
                 { nameof(reporteReservasToolStripMenuItem),  Permisos.VerReservas },
                 { nameof(arqueoCajaToolStripMenuItem_790MY), Permisos.GestionCaja },
+                { nameof(reportePredictivoToolStripMenuItem_790MY), Permisos.GestionReportePredictivo },
             };
 
         // Perfil: Relogin solo para roles con acceso administrativo (VerUsuarios).
@@ -173,9 +174,11 @@ namespace GUI_08YS
             // Caja y cobro (CUN-006 / CUN-007): alcanza con cualquiera de las dos patentes.
             cajaCobroToolStripMenuItem_790MY.Visible = accesoCaja;
 
-            // Reportes: visible si el rol tiene acceso al módulo de reportes o al arqueo de caja
+            // Reportes: visible si el rol tiene acceso al módulo de reportes, al arqueo de caja
+            // o al análisis predictivo de canasta
             btnReportes_790MY.Visible = SessionManager_08YS.Instance.HasPermission(Permisos.VerReportes)
-                                     || SessionManager_08YS.Instance.HasPermission(Permisos.GestionCaja);
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.GestionCaja)
+                                     || SessionManager_08YS.Instance.HasPermission(Permisos.GestionReportePredictivo);
 
             PermissionFilter_08YS.AplicarMenuStrip(ReportesDropDownMenu, _mapaMenuReportes);
 
@@ -537,6 +540,12 @@ namespace GUI_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
             OpenChildForm(new FormArqueoCaja_790MY());
+        }
+
+        private void reportePredictivoToolStripMenuItem_790MY_Click(object sender, EventArgs e)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionReportePredictivo);
+            OpenChildForm(new FormReportePredictivo_790MY());
         }
         #endregion
 

@@ -50,7 +50,11 @@ namespace Service_08YS.Entities.Acceso
         // Ver Migraciones_790MY/CompletarFacturacionCobro_790MY.sql.
         GenerarFactura,    // CUN-006: cuenta / pre-ticket con importes congelados
         RegistrarCobro,    // CUN-007: pago, cierre de la reserva y liberación de la mesa
-        GestionCaja        // arqueo y cierre de caja diario (Reportes)
+        GestionCaja,       // arqueo y cierre de caja diario (Reportes)
+
+        // ── Reportes inteligentes (790MY) ────────────────────────────────
+        // Ver Migraciones_790MY/AgregarPatenteReportePredictivo_790MY.sql.
+        GestionReportePredictivo   // análisis predictivo de canasta (reglas de asociación)
     }
 
     public class Permiso_08YS : AccessComponent_08YS

@@ -76,5 +76,10 @@ namespace BLL_08YS
                 new SqlFacturaRepository_790MY(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
+
+        public static ReportePredictivoBLL_790MY CreateReportePredictivoBLL()
+        {
+            return new ReportePredictivoBLL_790MY(new SqlFacturaRepository_790MY());
+        }
     }
 }

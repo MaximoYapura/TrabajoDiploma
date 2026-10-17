@@ -29,7 +29,8 @@ namespace GUI_08YS.RF2
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
         private static readonly Color Tinta = Color.FromArgb(30, 28, 26);
         private static readonly Color TintaSuave = Color.FromArgb(95, 90, 85);
-        private static readonly Color Papel = Color.FromArgb(253, 252, 249);
+        private static readonly Color Papel = Color.White;
+        private static readonly Color TintaLogo = Color.Black;
 
         private readonly Factura_790MY _factura;
         private readonly Pago_790MY _pago;
@@ -38,7 +39,8 @@ namespace GUI_08YS.RF2
 
         /// <summary>
         /// Isotipo monocromático (horno con fuego) preparado una sola vez por ejecución:
-        /// recortado a su contenido y binarizado a negro puro, como lo imprime una
+        /// recortado al horno (sin el logotipo de texto ni bloque de color de fondo) y
+        /// binarizado a trazo negro sólido sobre papel blanco, como lo imprime una
         /// comandera térmica de 80 mm. Null si el recurso no está disponible.
         /// </summary>
         private static readonly Lazy<Bitmap> IsotipoTermico = new Lazy<Bitmap>(PrepararIsotipo);
@@ -168,14 +170,15 @@ namespace GUI_08YS.RF2
             t.Espacio(22);
             if (_logo != null)
             {
-                float anchoLogo = 140f;
+                float anchoLogo = 150f;
                 float altoLogo = anchoLogo * _logo.Height / _logo.Width;
                 var destino = new RectangleF(t.X + (t.Ancho - anchoLogo) / 2f, t.Y, anchoLogo, altoLogo);
                 var calidad = t.G.InterpolationMode;
                 t.G.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 t.G.DrawImage(_logo, destino);
                 t.G.InterpolationMode = calidad;
-                t.Espacio(altoLogo + 12);
+                t.Espacio(altoLogo + 10);
+                t.Centrado("EL FOGÓN DEL SUR", t.FNegrita);
             }
             else
             {
@@ -357,14 +360,65 @@ namespace GUI_08YS.RF2
                 t.G.DrawRectangle(lapiz, rect.X, rect.Y, rect.Width, rect.Height);
                 t.G.DrawRectangle(lapiz, rect.X + 4, rect.Y + 4, rect.Width - 8, rect.Height - 8);
             }
+
+            // "PAGADA" / "PAID" según el idioma activo, con espaciado uniforme entre letras.
+            DibujarTextoEspaciado(t.G, E.T("CJ_tk_sello"), t.FSello, t.Pincel,
+                                  new RectangleF(rect.X + 12, rect.Y + 8, rect.Width - 24, 34));
             using (var centro = new StringFormat { Alignment = StringAlignment.Center })
-            {
-                t.G.DrawString("P A G A D A", t.FSello, t.Pincel, new RectangleF(rect.X, rect.Y + 6, rect.Width, 38), centro);
                 t.G.DrawString(E.T("CJ_tk_liquidada", (_pago.FechaHoraPago).ToString("dd/MM/yyyy · HH:mm")),
                                t.FNegritaChica, t.Pincel, new RectangleF(rect.X, rect.Y + 44, rect.Width, 20), centro);
-            }
             t.G.Restore(estado);
             t.Espacio(84);
+        }
+
+        /// <summary>
+        /// Dibuja el texto letra por letra, centrado en el área y con el mismo espacio entre
+        /// cada par de letras. Cada glifo se mide con StringFormat tipográfico (sin el relleno
+        /// que GDI+ agrega por defecto), así "P A G A D A" y "P A I D" no quedan pegadas ni
+        /// desparejas. Si el texto no entra, se reduce primero el espaciado y luego la fuente.
+        /// </summary>
+        private static void DibujarTextoEspaciado(Graphics g, string texto, Font fuente, Brush pincel, RectangleF area)
+        {
+            string letras = new string((texto ?? string.Empty).Where(c => !char.IsWhiteSpace(c)).ToArray())
+                .ToUpper(CultureInfo.CurrentCulture);
+            if (letras.Length == 0) return;
+
+            using (var tipografico = (StringFormat)StringFormat.GenericTypographic.Clone())
+            {
+                Font actual = fuente;
+                try
+                {
+                    float[] anchos = null;
+                    float tracking = 0f, total = 0f;
+                    for (int intento = 0; intento < 12; intento++)
+                    {
+                        Font f = actual;
+                        anchos = letras.Select(c => g.MeasureString(c.ToString(), f, PointF.Empty, tipografico).Width).ToArray();
+                        float soloLetras = anchos.Sum();
+                        float maxTracking = letras.Length > 1 ? (area.Width - soloLetras) / (letras.Length - 1) : 0f;
+                        tracking = Math.Max(0f, Math.Min(f.Size * 0.55f, maxTracking));   // ≈ media letra
+                        total = soloLetras + tracking * (letras.Length - 1);
+                        if (total <= area.Width) break;
+
+                        var menor = new Font(f.FontFamily, f.Size * 0.9f, f.Style);
+                        if (!ReferenceEquals(actual, fuente)) actual.Dispose();
+                        actual = menor;
+                    }
+
+                    float alto = g.MeasureString(letras, actual, PointF.Empty, tipografico).Height;
+                    float x = area.X + (area.Width - total) / 2f;
+                    float y = area.Y + (area.Height - alto) / 2f;
+                    for (int i = 0; i < letras.Length; i++)
+                    {
+                        g.DrawString(letras[i].ToString(), actual, pincel, x, y, tipografico);
+                        x += anchos[i] + tracking;
+                    }
+                }
+                finally
+                {
+                    if (!ReferenceEquals(actual, fuente)) actual.Dispose();
+                }
+            }
         }
 
         /// <summary>Patrón tipo QR derivado del hash (simulación visual, no decodificable).</summary>
@@ -446,12 +500,38 @@ namespace GUI_08YS.RF2
                         }
                 if (maxX < 0) return null;
 
+                // El recurso trae el isotipo (horno con fuego) y debajo el logotipo de texto.
+                // En el ticket va solo el isotipo: se corta en la primera franja horizontal
+                // vacía suficientemente alta que aparece después del dibujo.
+                int franjaMinima = Math.Max(6, alto / 40);
+                int vacias = 0;
+                for (int y = minY; y <= maxY; y++)
+                {
+                    bool filaVacia = true;
+                    for (int x = 0; x < ancho && filaVacia; x++)
+                        if (EsTrazo(pixeles[y * ancho + x])) filaVacia = false;
+
+                    vacias = filaVacia ? vacias + 1 : 0;
+                    if (vacias < franjaMinima) continue;
+
+                    maxY = y - vacias;
+                    minX = ancho; maxX = -1;
+                    for (int yy = minY; yy <= maxY; yy++)
+                        for (int x = 0; x < ancho; x++)
+                            if (EsTrazo(pixeles[yy * ancho + x]))
+                            {
+                                if (x < minX) minX = x;
+                                if (x > maxX) maxX = x;
+                            }
+                    break;
+                }
+
                 minX = Math.Max(0, minX - margen); minY = Math.Max(0, minY - margen);
                 maxX = Math.Min(ancho - 1, maxX + margen); maxY = Math.Min(alto - 1, maxY + margen);
                 int w = maxX - minX + 1, h = maxY - minY + 1;
 
                 var salida = new int[w * h];
-                int negro = Tinta.ToArgb();
+                int negro = TintaLogo.ToArgb();
                 for (int y = 0; y < h; y++)
                     for (int x = 0; x < w; x++)
                         salida[y * w + x] = EsTrazo(pixeles[(y + minY) * ancho + x + minX]) ? negro : 0;

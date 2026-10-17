@@ -65,6 +65,7 @@
             this.despacharPedidoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.cajaCobroToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.arqueoCajaToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
+            this.reportePredictivoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -634,12 +635,13 @@
             this.ReportesDropDownMenu.IsMainMenu = false;
             this.ReportesDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reporteReservasToolStripMenuItem,
-            this.arqueoCajaToolStripMenuItem_790MY});
+            this.arqueoCajaToolStripMenuItem_790MY,
+            this.reportePredictivoToolStripMenuItem_790MY});
             this.ReportesDropDownMenu.MenuItemHeight = 25;
             this.ReportesDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
             this.ReportesDropDownMenu.Name = "dropdownMenuStrip_08YS_Reportes";
             this.ReportesDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
-            this.ReportesDropDownMenu.Size = new System.Drawing.Size(220, 48);
+            this.ReportesDropDownMenu.Size = new System.Drawing.Size(240, 70);
             //
             // arqueoCajaToolStripMenuItem_790MY
             //
@@ -648,6 +650,14 @@
             this.arqueoCajaToolStripMenuItem_790MY.Tag = "menuArqueoCaja";
             this.arqueoCajaToolStripMenuItem_790MY.Text = "Arqueo y Cierre de Caja";
             this.arqueoCajaToolStripMenuItem_790MY.Click += new System.EventHandler(this.arqueoCajaToolStripMenuItem_790MY_Click);
+            //
+            // reportePredictivoToolStripMenuItem_790MY
+            //
+            this.reportePredictivoToolStripMenuItem_790MY.Name = "reportePredictivoToolStripMenuItem_790MY";
+            this.reportePredictivoToolStripMenuItem_790MY.Size = new System.Drawing.Size(239, 22);
+            this.reportePredictivoToolStripMenuItem_790MY.Tag = "menuReportePredictivo";
+            this.reportePredictivoToolStripMenuItem_790MY.Text = "Análisis Predictivo de Canasta";
+            this.reportePredictivoToolStripMenuItem_790MY.Click += new System.EventHandler(this.reportePredictivoToolStripMenuItem_790MY_Click);
             //
             // AtencionDropDownMenu_790MY
             //
@@ -820,5 +830,6 @@
         private System.Windows.Forms.ToolStripMenuItem despacharPedidoToolStripMenuItem_790MY;
         private System.Windows.Forms.ToolStripMenuItem cajaCobroToolStripMenuItem_790MY;
         private System.Windows.Forms.ToolStripMenuItem arqueoCajaToolStripMenuItem_790MY;
+        private System.Windows.Forms.ToolStripMenuItem reportePredictivoToolStripMenuItem_790MY;
     }
 }

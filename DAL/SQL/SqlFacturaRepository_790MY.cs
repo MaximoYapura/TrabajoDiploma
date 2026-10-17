@@ -258,6 +258,46 @@ namespace DAL_08YS.SQL
             return factura;
         }
 
+        // ─── Reporte predictivo de canasta ───────────────────────────────────
+
+        public List<CanastaFactura_790MY> ObtenerCanastasPagadas(DateTime desde)
+        {
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(@"
+                    SELECT f.NroFactura, f.FechaEmision, i.ProductoID, MIN(i.Descripcion) AS Descripcion
+                    FROM Facturas f
+                    INNER JOIN ItemsFactura i ON i.NroFactura = f.NroFactura
+                    WHERE f.Estado = @Pagada AND f.FechaEmision >= @Desde
+                    GROUP BY f.NroFactura, f.FechaEmision, i.ProductoID
+                    ORDER BY f.NroFactura", con))
+            {
+                cmd.Parameters.Add("@Pagada", SqlDbType.NVarChar, 20).Value = EstadoFactura_790MY.Pagada.ToString();
+                cmd.Parameters.Add("@Desde", SqlDbType.DateTime2).Value = desde;
+                con.Open();
+
+                var canastas = new List<CanastaFactura_790MY>();
+                CanastaFactura_790MY actual = null;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    int ordNro = reader.GetOrdinal("NroFactura");
+                    int ordFecha = reader.GetOrdinal("FechaEmision");
+                    int ordProducto = reader.GetOrdinal("ProductoID");
+                    int ordDescripcion = reader.GetOrdinal("Descripcion");
+                    while (reader.Read())
+                    {
+                        int nro = reader.GetInt32(ordNro);
+                        if (actual == null || actual.NroFactura != nro)
+                        {
+                            actual = new CanastaFactura_790MY { NroFactura = nro, FechaEmision = reader.GetDateTime(ordFecha) };
+                            canastas.Add(actual);
+                        }
+                        actual.Productos[reader.GetInt32(ordProducto)] = reader.GetString(ordDescripcion);
+                    }
+                }
+                return canastas;
+            }
+        }
+
         private static Factura_790MY Mapear(SqlDataReader reader)
         {
             int ordCliente = reader.GetOrdinal("ClienteNombre");
