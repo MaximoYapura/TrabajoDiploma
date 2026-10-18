@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using Service_08YS;
 using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
@@ -89,6 +90,8 @@ namespace GUI_08YS.Maestros
         {
             if (_modo != ModoEdicion.Reposo) return;
             _seleccionada = ((MesaCard_790MY)sender).Mesa;
+            // Un aviso sobre la mesa anterior (por ejemplo, una baja rechazada) ya no aplica.
+            bnrAvisos_790MY.Ocultar();
             MarcarSeleccion();
         }
 
@@ -212,6 +215,8 @@ namespace GUI_08YS.Maestros
             else
                 btnModificar_790MY.Enabled = btnEliminar_790MY.Enabled = false;
 
+            bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.Clear();
             ActualizarTituloDetalle();
         }
 
@@ -244,6 +249,12 @@ namespace GUI_08YS.Maestros
         }
 
         private void btnAnadir_790MY_Click(object sender, EventArgs e)
+        {
+            PrepararAlta();
+        }
+
+        /// <summary>Ficha limpia con el próximo número y foco en la capacidad (también tras un alta, E2-D4).</summary>
+        private void PrepararAlta()
         {
             LimpiarCampos();
 
@@ -283,29 +294,28 @@ namespace GUI_08YS.Maestros
                 return;
 
             var t = TraductorManager_08YS.Instance;
-            var respuesta = MessageBox.Show(
-                string.Format(t.GetTexto("msg_fm_confirmar_baja_mesa"), seleccionada.NroMesa),
-                t.GetTexto("titulo_confirmar_baja"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            bool confirmado = ConfirmModal_790MY.Confirmar(this,
+                string.Format(t.GetTexto("FM_confirmar_baja_titulo"), seleccionada.NroMesa),
+                t.GetTexto("msg_fm_confirmar_baja_mesa"),
+                t.GetTexto("FM_confirmar_baja_accion"));
 
-            if (respuesta != DialogResult.Yes) return;
+            if (!confirmado) return;
 
             try
             {
                 _mesaBll.EliminarMesa(seleccionada.NroMesa);
-                MessageBox.Show(t.GetTexto("msg_fm_baja_ok"), t.GetTexto("exito"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                 _seleccionada = null;
                 CargarTablero();
+                ToastHost_790MY.Mostrar(flpTablero_790MY,
+                    string.Format(t.GetTexto("msg_fm_baja_ok"), seleccionada.NroMesa));
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, t.GetTexto("no_se_puede_eliminar"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("FM_err_bll_baja"), ex.Message));
             }
             catch (Exception)
             {
-                MessageBox.Show(t.GetTexto("msg_fm_error_eliminar"), t.GetTexto("error"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(t.GetTexto("msg_fm_error_eliminar"));
             }
         }
 
@@ -313,10 +323,13 @@ namespace GUI_08YS.Maestros
         {
             var t = TraductorManager_08YS.Instance;
 
-            if (!int.TryParse(txtNumero_790MY.Text.Trim(), out int numero))
+            // El número se asigna solo y no se edita; si no es válido, se ofrece reintentar el alta.
+            errValidacion_790MY.SetError(txtNumero_790MY, string.Empty);
+            if (!int.TryParse(txtNumero_790MY.Text.Trim(), out int numero) || numero <= 0)
             {
-                MessageBox.Show(t.GetTexto("msg_fm_nro_invalido"), t.GetTexto("titulo_dato_invalido"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string mensaje = t.GetTexto("msg_fm_nro_invalido");
+                errValidacion_790MY.SetError(txtNumero_790MY, mensaje);
+                bnrAvisos_790MY.Mostrar(mensaje);
                 return;
             }
 
@@ -328,34 +341,45 @@ namespace GUI_08YS.Maestros
                 if (_modo == ModoEdicion.Alta)
                 {
                     _mesaBll.RegistrarMesa(numero, capacidad);
-                    MessageBox.Show(t.GetTexto("msg_fm_registrada_ok"), t.GetTexto("exito"),
-                                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else if (_modo == ModoEdicion.Modificacion)
-                {
-                    var mesa = new Mesa_790MY(numero, capacidad, estado, _activoEdicion);
-                    _mesaBll.ModificarMesa(mesa);
-                    MessageBox.Show(t.GetTexto("msg_fm_modificada_ok"), t.GetTexto("exito"),
-                                     MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Alta (E2-D4): el tablero muestra la mesa nueva y la ficha queda lista para otra.
+                    _seleccionada = null;
+                    _modo = ModoEdicion.Reposo;
+                    CargarTablero();
+                    PrepararAlta();
+                    ToastHost_790MY.Mostrar(flpTablero_790MY,
+                        string.Format(t.GetTexto("msg_fm_registrada_ok"), numero));
+                    return;
                 }
 
-                // Tras guardar queda elegida la mesa recién creada o modificada.
+                // Modificación (E2-D4): queda elegida la mesa con los datos guardados.
+                var mesa = new Mesa_790MY(numero, capacidad, estado, _activoEdicion);
+                _mesaBll.ModificarMesa(mesa);
+
                 _seleccionada = new Mesa_790MY(numero, capacidad, estado);
                 LimpiarCampos();
                 _modo = ModoEdicion.Reposo;
                 CargarTablero();
                 EstablecerModo(ModoEdicion.Reposo);
+                ToastHost_790MY.Mostrar(flpTablero_790MY,
+                    string.Format(t.GetTexto("msg_fm_modificada_ok"), numero));
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, t.GetTexto("titulo_datos_invalidos"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Reglas de la BLL: límite de mesas, número repetido, capacidad, etc.
+                bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("FM_err_bll_guardar"), ex.Message));
             }
             catch (Exception)
             {
-                MessageBox.Show(t.GetTexto("msg_fm_error_guardar"), t.GetTexto("error"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(t.GetTexto("msg_fm_error_guardar"));
             }
+        }
+
+        /// <summary>Error inesperado (base de datos, excepción no prevista): se conserva el MessageBox nativo (E2-D1).</summary>
+        private void MostrarErrorFatal(string mensaje)
+        {
+            MessageBox.Show(this, mensaje, TraductorManager_08YS.Instance.GetTexto("error"),
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnCancelar_790MY_Click(object sender, EventArgs e)

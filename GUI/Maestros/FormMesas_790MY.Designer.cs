@@ -17,6 +17,7 @@ namespace GUI_08YS.Maestros
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.pnlEncabezado_790MY = new System.Windows.Forms.Panel();
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
             this.flpLeyenda_790MY = new System.Windows.Forms.FlowLayoutPanel();
@@ -42,10 +43,13 @@ namespace GUI_08YS.Maestros
             this.btnCancelar_790MY = new System.Windows.Forms.Button();
             this.flpTablero_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.lblSinMesas_790MY = new System.Windows.Forms.Label();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             this.pnlEncabezado_790MY.SuspendLayout();
             this.flpLeyenda_790MY.SuspendLayout();
             this.pnlDetalle_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCapacidad_790MY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.flpTablero_790MY.SuspendLayout();
             this.SuspendLayout();
             //
@@ -352,12 +356,24 @@ namespace GUI_08YS.Maestros
             this.lblSinMesas_790MY.Text = "Todavía no hay mesas cargadas. Usá «Añadir» para crear la primera.";
             this.lblSinMesas_790MY.Visible = false;
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 3;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            //
             // FormMesas_790MY
             //
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(1073, 704);
             this.Controls.Add(this.flpTablero_790MY);
             this.Controls.Add(this.pnlDetalle_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlEncabezado_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Name = "FormMesas_790MY";
@@ -370,6 +386,7 @@ namespace GUI_08YS.Maestros
             this.pnlDetalle_790MY.ResumeLayout(false);
             this.pnlDetalle_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCapacidad_790MY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.flpTablero_790MY.ResumeLayout(false);
             this.flpTablero_790MY.PerformLayout();
             this.ResumeLayout(false);
@@ -400,6 +417,10 @@ namespace GUI_08YS.Maestros
             this.chipLeyendaFuera_790MY.BackColor = GUI_08YS.Estilo.TemaFogon_790MY.FueraFondo;
             this.chipLeyendaFuera_790MY.ForeColor = GUI_08YS.Estilo.TemaFogon_790MY.FueraTexto;
             this.chipLeyendaFuera_790MY.ColorBorde = GUI_08YS.Estilo.TemaFogon_790MY.FueraBorde;
+
+            // Ícono de error dentro del borde derecho: el campo ocupa todo el ancho del panel.
+            this.errValidacion_790MY.SetIconAlignment(this.txtNumero_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.txtNumero_790MY, -20);
         }
 
         /// <summary>
@@ -442,5 +463,7 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.TextBox txtNumero_790MY;
         private System.Windows.Forms.Label lblCapacidad_790MY;
         private System.Windows.Forms.NumericUpDown nudCapacidad_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }
