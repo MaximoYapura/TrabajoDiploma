@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Maestros
@@ -84,7 +85,7 @@ namespace GUI_08YS.Maestros
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             RenderizarGrilla(seleccionarId);
         }
@@ -195,7 +196,10 @@ namespace GUI_08YS.Maestros
 
         private void dgvProductos_790MY_SelectionChanged(object sender, EventArgs e)
         {
-            if (_modo == ModoEdicion.Reposo) MostrarSeleccion();
+            if (_modo != ModoEdicion.Reposo) return;
+            // Un aviso sobre el producto anterior (por ejemplo, una baja rechazada) ya no aplica.
+            bnrAvisos_790MY.Ocultar();
+            MostrarSeleccion();
         }
 
         private void MostrarSeleccion()
@@ -272,6 +276,8 @@ namespace GUI_08YS.Maestros
             chipModo_790MY.ForeColor = editando ? E.Bordo : Color.FromArgb(80, 72, 66);
             lblModo_790MY.Text = E.T("FE_modo", chipModo_790MY.Text);
 
+            bnrAvisos_790MY.Ocultar();
+
             if (editando)
                 btnModificar_790MY.Enabled = btnBaja_790MY.Enabled = false;
             else
@@ -340,14 +346,29 @@ namespace GUI_08YS.Maestros
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
 
-            E.MostrarExito(VentanaPropietaria, E.T(_modo == ModoEdicion.Alta ? "FP_msg_alta_ok" : "FP_msg_modificacion_ok", producto.Nombre));
-            _modo = ModoEdicion.Reposo;
-            Cargar(producto.ProductoID);
-            EstablecerModo(ModoEdicion.Reposo);
+            string exito = E.T(_modo == ModoEdicion.Alta ? "FP_msg_alta_ok" : "FP_msg_modificacion_ok", producto.Nombre);
+            if (_modo == ModoEdicion.Alta)
+            {
+                // Alta (E2-D4): la ficha queda limpia y con foco en el nombre para cargar otro producto.
+                _modo = ModoEdicion.Reposo;
+                Cargar();
+                dgvProductos_790MY.ClearSelection();
+                LimpiarCampos();
+                EstablecerModo(ModoEdicion.Alta);
+                txtNombre_790MY.Focus();
+            }
+            else
+            {
+                // Modificación (E2-D4): queda elegido el producto con los datos guardados.
+                _modo = ModoEdicion.Reposo;
+                Cargar(producto.ProductoID);
+                EstablecerModo(ModoEdicion.Reposo);
+            }
+            E.MostrarExitoToast(dgvProductos_790MY, exito);
         }
 
         private void btnBaja_790MY_Click(object sender, EventArgs e)
@@ -355,9 +376,11 @@ namespace GUI_08YS.Maestros
             var p = Seleccionado;
             if (p == null) return;
 
-            var respuesta = MessageBox.Show(VentanaPropietaria, E.T("FP_msg_confirmar_baja", p.Nombre),
-                E.T("FP_btnBaja"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (respuesta != DialogResult.Yes) return;
+            bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                E.T("FP_confirmar_baja_titulo"),
+                E.T("FP_msg_confirmar_baja", p.Nombre),
+                E.T("FP_btnBaja"));
+            if (!confirmado) return;
 
             try
             {
@@ -365,7 +388,7 @@ namespace GUI_08YS.Maestros
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
             Cargar(p.ProductoID);

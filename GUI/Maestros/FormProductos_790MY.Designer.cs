@@ -18,6 +18,7 @@ namespace GUI_08YS.Maestros
         private void InitializeComponent()
         {
             this.pnlBarra_790MY = new System.Windows.Forms.Panel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.txtBuscar_790MY = new System.Windows.Forms.TextBox();
             this.lblFiltroCategoria_790MY = new System.Windows.Forms.Label();
             this.cmbFiltroCategoria_790MY = new System.Windows.Forms.ComboBox();
@@ -544,6 +545,12 @@ namespace GUI_08YS.Maestros
             this.colEstado_790MY.Name = "colEstado_790MY";
             this.colEstado_790MY.Tag = "FP_colEstado";
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 4;
+            //
             // FormProductos_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -553,6 +560,7 @@ namespace GUI_08YS.Maestros
             this.Controls.Add(this.dgvProductos_790MY);
             this.Controls.Add(this.pnlDetalle_790MY);
             this.Controls.Add(this.pnlEstado_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlBarra_790MY);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormProductos_790MY";
@@ -615,5 +623,6 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.DataGridViewTextBoxColumn colStock_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colControlaStock_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colEstado_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }
