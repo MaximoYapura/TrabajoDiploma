@@ -1,3 +1,4 @@
+using GUI_08YS.Estilo;
 using BE_08YS;
 using BLL_08YS;
 using Service_08YS;
@@ -130,11 +131,7 @@ namespace GUI_08YS.RF1
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    TraductorManager_08YS.Instance.GetTexto("aviso_titulo") ?? "Aviso",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MostrarAvisoFlotante(ex.Message, TipoBanner_790MY.Aviso);
                 return;
             }
 
@@ -191,6 +188,7 @@ namespace GUI_08YS.RF1
                 MesaSeleccionada    = dto.Mesa;
                 _btnAceptar.Enabled = true;
                 ActualizarDetalle(dto);
+                bnrAvisos_790MY.Ocultar();   // «Falta elegir mesa» ya quedó resuelto.
             }
         }
 
@@ -236,15 +234,24 @@ namespace GUI_08YS.RF1
         {
             if (MesaSeleccionada == null)
             {
-                MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_sm_falta_seleccion")
-                        ?? "Seleccioná una mesa del plano",
-                    TraductorManager_08YS.Instance.GetTexto("aviso_titulo") ?? "Aviso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarAvisoFlotante(TraductorManager_08YS.Instance.GetTexto("msg_sm_falta_seleccion")
+                                         ?? "Seleccioná una mesa del plano",
+                                     TipoBanner_790MY.Aviso);
                 return;
             }
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        // ── Avisos (Etapa 2) ─────────────────────────────────────────────
+        // El banner flota sobre la franja superior del plano (sin Dock) para no mover
+        // ni redimensionar ningún control del salón. Se cierra con su ✕ o al elegir una mesa.
+        private void MostrarAvisoFlotante(string mensaje, TipoBanner_790MY tipo)
+        {
+            Rectangle zona = RectangleToClient(_pnlSalon.RectangleToScreen(_pnlSalon.ClientRectangle));
+            bnrAvisos_790MY.SetBounds(zona.Left, zona.Top, zona.Width, bnrAvisos_790MY.Height);
+            bnrAvisos_790MY.Mostrar(mensaje, tipo, cerrable: true);
+            bnrAvisos_790MY.BringToFront();
         }
 
         private void _btnCancelar_Click(object sender, EventArgs e)

@@ -19,6 +19,7 @@ namespace GUI_08YS.RF1
             this._lblTituloHeader = new System.Windows.Forms.Label();
             this._lblSubtitulo = new System.Windows.Forms.Label();
             this._pnlFooter = new System.Windows.Forms.Panel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this._lblFooterInfo = new System.Windows.Forms.Label();
             this.pnlBody_790MY = new System.Windows.Forms.Panel();
             this._pnlSalon = new DoubleBufferedPanel();
@@ -309,6 +310,13 @@ namespace GUI_08YS.RF1
             this._btnCancelar.UseVisualStyleBackColor = true;
             this._btnCancelar.Click += new System.EventHandler(this._btnCancelar_Click);
             //
+            // bnrAvisos_790MY
+            // Flotante (sin Dock): se superpone al plano al mostrarse, sin mover sus controles.
+            //
+            this.bnrAvisos_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabStop = false;
+            //
             // FormSeleccionarMesa_790MY
             //
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(56)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
@@ -318,6 +326,7 @@ namespace GUI_08YS.RF1
             this.Controls.Add(this.pnlHeader_790MY);
             this.Controls.Add(this._pnlFooter);
             this.Controls.Add(this.pnlBody_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -396,5 +405,6 @@ namespace GUI_08YS.RF1
         private System.Windows.Forms.Label _lblPista;
         private System.Windows.Forms.Button _btnAceptar;
         private System.Windows.Forms.Button _btnCancelar;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }
