@@ -56,6 +56,7 @@ namespace GUI_08YS.RF2
             this.lblComandaSub_790MY = new System.Windows.Forms.Label();
             this.lblComandaTitulo_790MY = new System.Windows.Forms.Label();
             this.timerAvisos_790MY = new System.Windows.Forms.Timer(this.components);
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.pnlAviso_790MY.SuspendLayout();
             this.tlpMain_790MY.SuspendLayout();
             this.pnlMesas_790MY.SuspendLayout();
@@ -553,6 +554,12 @@ namespace GUI_08YS.RF2
             this.timerAvisos_790MY.Interval = 20000;
             this.timerAvisos_790MY.Tick += new System.EventHandler(this.timerAvisos_790MY_Tick);
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 2;
+            //
             // FormRegistrarPedido_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -561,6 +568,7 @@ namespace GUI_08YS.RF2
             this.ClientSize = new System.Drawing.Size(1280, 760);
             this.Controls.Add(this.tlpMain_790MY);
             this.Controls.Add(this.pnlAviso_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormRegistrarPedido_790MY";
             this.Text = "Registrar Pedido";
@@ -627,5 +635,6 @@ namespace GUI_08YS.RF2
         private System.Windows.Forms.Label lblComandaSub_790MY;
         private System.Windows.Forms.Label lblComandaTitulo_790MY;
         private System.Windows.Forms.Timer timerAvisos_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }

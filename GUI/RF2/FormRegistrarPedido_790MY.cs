@@ -11,6 +11,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
@@ -131,7 +132,7 @@ namespace GUI_08YS.RF2
             catch (Exception ex)
             {
                 _catalogo = new List<Producto_790MY>();
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
 
             try
@@ -146,7 +147,7 @@ namespace GUI_08YS.RF2
                 _puedeOperar = false;
                 _mesas = new List<Reserva_790MY>();
                 _pedidos = new List<Pedido_790MY>();
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
 
             // Se descartan las comandas de mesas que ya no están a cargo (cerradas o reasignadas).
@@ -286,6 +287,7 @@ namespace GUI_08YS.RF2
             E.PropagarClick(card, (s, e) =>
             {
                 _mesaSel = mesa;
+                bnrAvisos_790MY.Ocultar();   // «Elegí primero la mesa» ya quedó resuelto.
                 _productoSel = null;
                 RenderizarMesas();
                 RenderizarProductos();
@@ -444,8 +446,7 @@ namespace GUI_08YS.RF2
         {
             if (_mesaSel == null)
             {
-                MessageBox.Show(VentanaPropietaria, E.T("RP_msg_falta_mesa"), E.T("titulo_datos_invalidos"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bnrAvisos_790MY.Mostrar(E.T("RP_msg_falta_mesa"), TipoBanner_790MY.Aviso);
                 return;
             }
 
@@ -651,26 +652,27 @@ namespace GUI_08YS.RF2
             {
                 // Escenario alternativo 4.1: no se generó el pedido. Se refresca el catálogo
                 // para que el camarero vea las porciones reales y ajuste la comanda.
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 RecargarCatalogo();
                 return;
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 CargarTodo();
                 return;
             }
 
             _comandas.Remove(_mesaSel.ReservaID);
-            E.MostrarExito(VentanaPropietaria, E.T("msg_rf2_pedido_registrado_ok", pedido.NroPedido));
+            bnrAvisos_790MY.Ocultar();
             CargarTodo();
+            E.MostrarExitoToast(this, E.T("msg_rf2_pedido_registrado_ok", pedido.NroPedido));
         }
 
         private void RecargarCatalogo()
         {
             try { _catalogo = _pedidoBll.ObtenerCatalogo(); }
-            catch (Exception ex) { E.MostrarError(VentanaPropietaria, ex); }
+            catch (Exception ex) { E.MostrarErrorEnBanner(bnrAvisos_790MY, ex); }
             RenderizarProductos();
             RenderizarComanda();
         }
