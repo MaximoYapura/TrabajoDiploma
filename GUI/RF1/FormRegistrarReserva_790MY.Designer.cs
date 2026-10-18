@@ -17,7 +17,10 @@
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tlpMain_790MY = new System.Windows.Forms.TableLayoutPanel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             this.pnlEncabezado_790MY = new System.Windows.Forms.Panel();
             this.lblSubtitulo_790MY = new System.Windows.Forms.Label();
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
@@ -66,6 +69,7 @@
             this.pnlCardDetalles_790MY.SuspendLayout();
             this.tlpDetalles_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudComensales_790MY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.pnlResumen_790MY.SuspendLayout();
             this.tlpResumen_790MY.SuspendLayout();
             this.pnlResumenHeader_790MY.SuspendLayout();
@@ -679,11 +683,29 @@
             this.btnConfirmar_790MY.MouseEnter += new System.EventHandler(this.btnConfirmar_790MY_MouseEnter);
             this.btnConfirmar_790MY.MouseLeave += new System.EventHandler(this.btnConfirmar_790MY_MouseLeave);
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            this.errValidacion_790MY.SetIconAlignment(this.txtDniCliente_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.txtDniCliente_790MY, -20);
+            this.errValidacion_790MY.SetIconAlignment(this.cmbHora_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.cmbHora_790MY, -40);
+            this.errValidacion_790MY.SetIconAlignment(this.btnSeleccionarMesa_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.btnSeleccionarMesa_790MY, -20);
+            //
             // FormRegistrarReserva_790MY
             //
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(1073, 704);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             this.Name = "FormRegistrarReserva_790MY";
             this.Padding = new System.Windows.Forms.Padding(28, 18, 28, 10);
@@ -700,6 +722,7 @@
             this.tlpDetalles_790MY.ResumeLayout(false);
             this.tlpDetalles_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudComensales_790MY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.pnlResumen_790MY.ResumeLayout(false);
             this.tlpResumen_790MY.ResumeLayout(false);
             this.tlpResumen_790MY.PerformLayout();
@@ -753,5 +776,7 @@
         private System.Windows.Forms.Label lblResMesaV_790MY;
         private System.Windows.Forms.Label lblResEstado_790MY;
         private System.Windows.Forms.Button btnConfirmar_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }

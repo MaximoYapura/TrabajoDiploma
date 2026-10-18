@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
@@ -19,6 +21,12 @@ namespace GUI_08YS.RF1
 
         private Cliente_790MY _clienteActual;
         private Mesa_790MY _mesaSeleccionada;
+
+        // DNI de cliente: solo números, de 7 u 8 dígitos (regla del propietario).
+        private static readonly Regex _regexDni = new Regex(@"^\d{7,8}$");
+
+        // El resumen de faltantes aparece al intentar confirmar y se va solo al completarse.
+        private bool _resumenVisible;
 
         // Fuentes del label de cliente (encontrado / placeholder). Se crean una sola
         // vez porque el resumen se refresca en cada cambio de la pantalla.
@@ -210,6 +218,8 @@ namespace GUI_08YS.RF1
                 lblResEstado_790MY.BackColor = ColorPendFondo;
                 lblResEstado_790MY.ForeColor = ColorPendTexto;
             }
+
+            ActualizarValidacion();
         }
 
         private static void AsignarValor(Label etiqueta, string valor, string vacio)
@@ -228,6 +238,9 @@ namespace GUI_08YS.RF1
         private void InvalidarMesaSeleccionada(object sender, EventArgs e)
         {
             _mesaSeleccionada = null;
+            // «Sin disponibilidad» u otro aviso sobre el contexto anterior ya no aplica.
+            OcultarAvisoPuntual();
+            errValidacion_790MY.SetError(cmbHora_790MY, string.Empty);
             ActualizarResumen();
         }
 
@@ -247,12 +260,18 @@ namespace GUI_08YS.RF1
 
         private void btnBuscarCliente_790MY_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(txtDniCliente_790MY.Text.Trim(), out int dni))
+            var t = TraductorManager_08YS.Instance;
+            OcultarAvisoPuntual();
+            errValidacion_790MY.SetError(txtDniCliente_790MY, string.Empty);
+
+            // DNI: solo números, de 7 u 8 dígitos (misma regla que el Maestro de Clientes).
+            string texto = txtDniCliente_790MY.Text.Trim();
+            if (!_regexDni.IsMatch(texto) || !int.TryParse(texto, out int dni) || dni <= 0)
             {
-                MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_rr_dni_invalido"),
-                    TraductorManager_08YS.Instance.GetTexto("titulo_dato_invalido"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string mensaje = t.GetTexto("FC_val_dni_formato");
+                errValidacion_790MY.SetError(txtDniCliente_790MY, mensaje);
+                bnrAvisos_790MY.Mostrar(mensaje);
+                txtDniCliente_790MY.Focus();
                 return;
             }
 
@@ -268,21 +287,18 @@ namespace GUI_08YS.RF1
                 // Exists no filtra por Activo, por lo que devuelve true en ese caso.
                 if (_clienteBll.Exists(dni))
                 {
-                    MessageBox.Show(
-                        TraductorManager_08YS.Instance.GetTexto("msg_rr_cliente_inactivo"),
-                        TraductorManager_08YS.Instance.GetTexto("titulo_cliente_inactivo"),
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
+                    bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("RR_aviso_cliente_inactivo"), dni),
+                                            TipoBanner_790MY.Aviso);
                     return;
                 }
 
                 // Escenario 3: DNI no existe en absoluto — ofrecer registro rápido.
-                var respuesta = MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_rr_cliente_no_encontrado_preg"),
-                    TraductorManager_08YS.Instance.GetTexto("titulo_cliente_no_encontrado"),
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                bool registrar = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                    string.Format(t.GetTexto("RR_confirmar_registro_titulo"), dni),
+                    t.GetTexto("RR_confirmar_registro_msg"),
+                    t.GetTexto("RR_confirmar_registro_accion"));
 
-                if (respuesta != DialogResult.Yes) return;
+                if (!registrar) return;
 
                 using (var frmCliente = new FormRegistrarCliente_790MY(dni))
                 {
@@ -292,10 +308,7 @@ namespace GUI_08YS.RF1
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    string.Format(TraductorManager_08YS.Instance.GetTexto("msg_rr_error_buscar_cliente"), ex.Message),
-                    TraductorManager_08YS.Instance.GetTexto("error"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(string.Format(t.GetTexto("msg_rr_error_buscar_cliente"), ex.Message));
             }
             finally
             {
@@ -305,12 +318,15 @@ namespace GUI_08YS.RF1
 
         private void btnSeleccionarMesa_790MY_Click(object sender, EventArgs e)
         {
+            var t = TraductorManager_08YS.Instance;
+            OcultarAvisoPuntual();
+
             if (cmbHora_790MY.SelectedItem == null)
             {
-                MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_turno"),
-                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_turno"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string mensaje = t.GetTexto("msg_rr_falta_turno");
+                errValidacion_790MY.SetError(cmbHora_790MY, mensaje);
+                bnrAvisos_790MY.Mostrar(mensaje);
+                cmbHora_790MY.Focus();
                 return;
             }
 
@@ -327,19 +343,13 @@ namespace GUI_08YS.RF1
                 var mesas = _mesaBll.ObtenerMesasMapa(fecha, hora, comensales);
                 if (mesas == null || !mesas.Any(m => m.EsSeleccionable))
                 {
-                    MessageBox.Show(
-                        TraductorManager_08YS.Instance.GetTexto("FRR_msg_sin_disponibilidad"),
-                        TraductorManager_08YS.Instance.GetTexto("titulo_sin_disponibilidad"),
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    bnrAvisos_790MY.Mostrar(t.GetTexto("RR_aviso_sin_disponibilidad"), TipoBanner_790MY.Aviso);
                     return;
                 }
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    TraductorManager_08YS.Instance.GetTexto("error"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(ex.Message);
                 return;
             }
             // ─────────────────────────────────────────────────────────────────
@@ -356,30 +366,13 @@ namespace GUI_08YS.RF1
 
         private void btnConfirmar_790MY_Click(object sender, EventArgs e)
         {
-            if (_clienteActual == null)
-            {
-                MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_cliente"),
-                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_cliente"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            var t = TraductorManager_08YS.Instance;
 
-            if (_mesaSeleccionada == null)
+            // Etapa 2 (E2-D4): todo lo que falta se marca a la vez y se resume en el banner.
+            if (Faltantes().Count > 0)
             {
-                MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_mesa"),
-                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_mesa_sel"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (cmbHora_790MY.SelectedItem == null)
-            {
-                MessageBox.Show(
-                    TraductorManager_08YS.Instance.GetTexto("msg_rr_falta_turno2"),
-                    TraductorManager_08YS.Instance.GetTexto("titulo_falta_turno"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _resumenVisible = true;
+                ActualizarValidacion();
                 return;
             }
 
@@ -394,17 +387,12 @@ namespace GUI_08YS.RF1
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message,
-                    TraductorManager_08YS.Instance.GetTexto("titulo_datos_invalidos"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("RR_err_bll_registrar"), ex.Message));
                 return;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    string.Format(TraductorManager_08YS.Instance.GetTexto("msg_rr_error_registrar"), ex.Message),
-                    TraductorManager_08YS.Instance.GetTexto("error"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(string.Format(t.GetTexto("msg_rr_error_registrar"), ex.Message));
                 return;
             }
 
@@ -415,12 +403,72 @@ namespace GUI_08YS.RF1
 
             using (var frmComprobante = new FormComprobanteReserva_790MY(reserva, cliente, _reservaBll))
                 frmComprobante.ShowDialog(VentanaPropietaria);
+
+            ToastHost_790MY.Mostrar(this, string.Format(t.GetTexto("RR_toast_registrada"),
+                                                        reserva.ReservaID, cliente.Nombre, cliente.Apellido));
         }
+
+        #region Validación y avisos (Etapa 2)
+
+        /// <summary>Datos que faltan para confirmar, en el orden de la pantalla.</summary>
+        private Dictionary<Control, string> Faltantes()
+        {
+            var t = TraductorManager_08YS.Instance;
+            var faltantes = new Dictionary<Control, string>();
+            if (_clienteActual == null)
+                faltantes[txtDniCliente_790MY] = t.GetTexto("msg_rr_falta_cliente");
+            if (cmbHora_790MY.SelectedItem == null)
+                faltantes[cmbHora_790MY] = t.GetTexto("msg_rr_falta_turno2");
+            if (_mesaSeleccionada == null)
+                faltantes[btnSeleccionarMesa_790MY] = t.GetTexto("msg_rr_falta_mesa");
+            return faltantes;
+        }
+
+        // Tras intentar confirmar, las marcas y el resumen se actualizan con cada cambio
+        // de la pantalla y desaparecen solos cuando ya no falta nada.
+        private void ActualizarValidacion()
+        {
+            if (!_resumenVisible) return;
+
+            Dictionary<Control, string> faltantes = Faltantes();
+            foreach (Control control in new Control[] { txtDniCliente_790MY, cmbHora_790MY, btnSeleccionarMesa_790MY })
+                errValidacion_790MY.SetError(control, faltantes.TryGetValue(control, out string m) ? m : string.Empty);
+
+            if (faltantes.Count == 0)
+            {
+                _resumenVisible = false;
+                bnrAvisos_790MY.Ocultar();
+                return;
+            }
+
+            var renglones = faltantes.Values.Select(m => "•  " + m);
+            bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("RR_banner_faltan")
+                + Environment.NewLine + string.Join(Environment.NewLine, renglones),
+                TipoBanner_790MY.Error, cerrable: false);
+        }
+
+        /// <summary>Quita un aviso puntual (cliente inactivo, sin disponibilidad, regla de la BLL); el resumen sigue.</summary>
+        private void OcultarAvisoPuntual()
+        {
+            if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
+        }
+
+        /// <summary>Error inesperado (base de datos, excepción no prevista): se conserva el MessageBox nativo (E2-D1).</summary>
+        private void MostrarErrorFatal(string mensaje)
+        {
+            MessageBox.Show(VentanaPropietaria, mensaje, TraductorManager_08YS.Instance.GetTexto("error"),
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        #endregion
 
         private void LimpiarFormulario()
         {
             _clienteActual = null;
             _mesaSeleccionada = null;
+            _resumenVisible = false;
+            bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.Clear();
 
             txtDniCliente_790MY.Clear();
 
