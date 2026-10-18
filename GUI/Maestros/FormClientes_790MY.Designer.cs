@@ -58,34 +58,30 @@ namespace GUI_08YS.Maestros
             this.lblDetalleAyuda_790MY = new System.Windows.Forms.Label();
             this.lblDni_790MY = new System.Windows.Forms.Label();
             this.txtDni_790MY = new System.Windows.Forms.TextBox();
-            this.lblErrorDni_790MY = new System.Windows.Forms.Label();
             this.lblApellidos_790MY = new System.Windows.Forms.Label();
             this.txtApellidos_790MY = new System.Windows.Forms.TextBox();
-            this.lblErrorApellidos_790MY = new System.Windows.Forms.Label();
             this.lblNombres_790MY = new System.Windows.Forms.Label();
             this.txtNombres_790MY = new System.Windows.Forms.TextBox();
-            this.lblErrorNombres_790MY = new System.Windows.Forms.Label();
             this.lblEmail_790MY = new System.Windows.Forms.Label();
             this.txtEmail_790MY = new System.Windows.Forms.TextBox();
-            this.lblErrorEmail_790MY = new System.Windows.Forms.Label();
             this.txtEmailAdicional_790MY = new System.Windows.Forms.TextBox();
             this.btnEmailsAdicionales_790MY = new System.Windows.Forms.Button();
             this.flpEmailsAdicionales_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.lblCelular_790MY = new System.Windows.Forms.Label();
             this.txtCelular_790MY = new System.Windows.Forms.TextBox();
-            this.lblErrorCelular_790MY = new System.Windows.Forms.Label();
             this.txtCelularAdicional_790MY = new System.Windows.Forms.TextBox();
             this.btnTelefonosAdicionales_790MY = new System.Windows.Forms.Button();
             this.flpTelefonosAdicionales_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.lblDireccion_790MY = new System.Windows.Forms.Label();
             this.txtDireccion_790MY = new System.Windows.Forms.TextBox();
-            this.lblErrorDireccion_790MY = new System.Windows.Forms.Label();
             this.btnAplicar_790MY = new System.Windows.Forms.Button();
             this.btnCancelar_790MY = new System.Windows.Forms.Button();
-            this.lblMotivoGuardar_790MY = new System.Windows.Forms.Label();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             this.pnlEncabezado_790MY.SuspendLayout();
             this.pnlLista_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes_790MY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.pnlAvisoCambios_790MY.SuspendLayout();
             this.pnlSerializacion_790MY.SuspendLayout();
             this.grpSerializacion_790MY.SuspendLayout();
@@ -486,31 +482,24 @@ namespace GUI_08YS.Maestros
             this.pnlDetalle_790MY.Controls.Add(this.lblDetalleAyuda_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.lblDni_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtDni_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblErrorDni_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.lblApellidos_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtApellidos_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblErrorApellidos_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.lblNombres_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtNombres_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblErrorNombres_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.lblEmail_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtEmail_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblErrorEmail_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtEmailAdicional_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.btnEmailsAdicionales_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.flpEmailsAdicionales_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.lblCelular_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtCelular_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblErrorCelular_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtCelularAdicional_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.btnTelefonosAdicionales_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.flpTelefonosAdicionales_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.lblDireccion_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.txtDireccion_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblErrorDireccion_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.btnAplicar_790MY);
             this.pnlDetalle_790MY.Controls.Add(this.btnCancelar_790MY);
-            this.pnlDetalle_790MY.Controls.Add(this.lblMotivoGuardar_790MY);
             this.pnlDetalle_790MY.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlDetalle_790MY.Location = new System.Drawing.Point(673, 92);
             this.pnlDetalle_790MY.Name = "pnlDetalle_790MY";
@@ -561,16 +550,6 @@ namespace GUI_08YS.Maestros
             this.txtDni_790MY.TextChanged += new System.EventHandler(this.CampoFicha_TextChanged);
             this.txtDni_790MY.Leave += new System.EventHandler(this.CampoFicha_Leave);
             //
-            // lblErrorDni_790MY
-            //
-            this.lblErrorDni_790MY.AutoEllipsis = true;
-            this.lblErrorDni_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblErrorDni_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(38)))), ((int)(((byte)(30)))));
-            this.lblErrorDni_790MY.Location = new System.Drawing.Point(16, 118);
-            this.lblErrorDni_790MY.Name = "lblErrorDni_790MY";
-            this.lblErrorDni_790MY.Size = new System.Drawing.Size(368, 16);
-            this.lblErrorDni_790MY.TabIndex = 4;
-            //
             // lblApellidos_790MY
             //
             this.lblApellidos_790MY.AutoSize = true;
@@ -592,16 +571,6 @@ namespace GUI_08YS.Maestros
             this.txtApellidos_790MY.TabIndex = 6;
             this.txtApellidos_790MY.TextChanged += new System.EventHandler(this.CampoFicha_TextChanged);
             this.txtApellidos_790MY.Leave += new System.EventHandler(this.CampoFicha_Leave);
-            //
-            // lblErrorApellidos_790MY
-            //
-            this.lblErrorApellidos_790MY.AutoEllipsis = true;
-            this.lblErrorApellidos_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblErrorApellidos_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(38)))), ((int)(((byte)(30)))));
-            this.lblErrorApellidos_790MY.Location = new System.Drawing.Point(16, 182);
-            this.lblErrorApellidos_790MY.Name = "lblErrorApellidos_790MY";
-            this.lblErrorApellidos_790MY.Size = new System.Drawing.Size(176, 16);
-            this.lblErrorApellidos_790MY.TabIndex = 7;
             //
             // lblNombres_790MY
             //
@@ -625,16 +594,6 @@ namespace GUI_08YS.Maestros
             this.txtNombres_790MY.TextChanged += new System.EventHandler(this.CampoFicha_TextChanged);
             this.txtNombres_790MY.Leave += new System.EventHandler(this.CampoFicha_Leave);
             //
-            // lblErrorNombres_790MY
-            //
-            this.lblErrorNombres_790MY.AutoEllipsis = true;
-            this.lblErrorNombres_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblErrorNombres_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(38)))), ((int)(((byte)(30)))));
-            this.lblErrorNombres_790MY.Location = new System.Drawing.Point(200, 182);
-            this.lblErrorNombres_790MY.Name = "lblErrorNombres_790MY";
-            this.lblErrorNombres_790MY.Size = new System.Drawing.Size(184, 16);
-            this.lblErrorNombres_790MY.TabIndex = 10;
-            //
             // lblEmail_790MY
             //
             this.lblEmail_790MY.AutoSize = true;
@@ -656,16 +615,6 @@ namespace GUI_08YS.Maestros
             this.txtEmail_790MY.TabIndex = 12;
             this.txtEmail_790MY.TextChanged += new System.EventHandler(this.CampoFicha_TextChanged);
             this.txtEmail_790MY.Leave += new System.EventHandler(this.CampoFicha_Leave);
-            //
-            // lblErrorEmail_790MY
-            //
-            this.lblErrorEmail_790MY.AutoEllipsis = true;
-            this.lblErrorEmail_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblErrorEmail_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(38)))), ((int)(((byte)(30)))));
-            this.lblErrorEmail_790MY.Location = new System.Drawing.Point(16, 246);
-            this.lblErrorEmail_790MY.Name = "lblErrorEmail_790MY";
-            this.lblErrorEmail_790MY.Size = new System.Drawing.Size(368, 16);
-            this.lblErrorEmail_790MY.TabIndex = 13;
             //
             // txtEmailAdicional_790MY
             //
@@ -717,16 +666,6 @@ namespace GUI_08YS.Maestros
             this.txtCelular_790MY.TextChanged += new System.EventHandler(this.CampoFicha_TextChanged);
             this.txtCelular_790MY.Leave += new System.EventHandler(this.CampoFicha_Leave);
             //
-            // lblErrorCelular_790MY
-            //
-            this.lblErrorCelular_790MY.AutoEllipsis = true;
-            this.lblErrorCelular_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblErrorCelular_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(38)))), ((int)(((byte)(30)))));
-            this.lblErrorCelular_790MY.Location = new System.Drawing.Point(16, 390);
-            this.lblErrorCelular_790MY.Name = "lblErrorCelular_790MY";
-            this.lblErrorCelular_790MY.Size = new System.Drawing.Size(368, 16);
-            this.lblErrorCelular_790MY.TabIndex = 19;
-            //
             // txtCelularAdicional_790MY
             //
             this.txtCelularAdicional_790MY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -777,16 +716,6 @@ namespace GUI_08YS.Maestros
             this.txtDireccion_790MY.TextChanged += new System.EventHandler(this.CampoFicha_TextChanged);
             this.txtDireccion_790MY.Leave += new System.EventHandler(this.CampoFicha_Leave);
             //
-            // lblErrorDireccion_790MY
-            //
-            this.lblErrorDireccion_790MY.AutoEllipsis = true;
-            this.lblErrorDireccion_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblErrorDireccion_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(38)))), ((int)(((byte)(30)))));
-            this.lblErrorDireccion_790MY.Location = new System.Drawing.Point(16, 534);
-            this.lblErrorDireccion_790MY.Name = "lblErrorDireccion_790MY";
-            this.lblErrorDireccion_790MY.Size = new System.Drawing.Size(368, 16);
-            this.lblErrorDireccion_790MY.TabIndex = 25;
-            //
             // btnAplicar_790MY
             //
             this.btnAplicar_790MY.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
@@ -809,15 +738,16 @@ namespace GUI_08YS.Maestros
             this.btnCancelar_790MY.Text = "Cancelar";
             this.btnCancelar_790MY.Click += new System.EventHandler(this.btnCancelar_790MY_Click);
             //
-            // lblMotivoGuardar_790MY
+            // bnrAvisos_790MY
             //
-            this.lblMotivoGuardar_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.lblMotivoGuardar_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(110)))), ((int)(((byte)(100)))), ((int)(((byte)(95)))));
-            this.lblMotivoGuardar_790MY.Location = new System.Drawing.Point(16, 592);
-            this.lblMotivoGuardar_790MY.Name = "lblMotivoGuardar_790MY";
-            this.lblMotivoGuardar_790MY.Size = new System.Drawing.Size(368, 18);
-            this.lblMotivoGuardar_790MY.TabIndex = 28;
-            this.lblMotivoGuardar_790MY.AutoEllipsis = true;
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 3;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
             //
             // FormClientes_790MY
             //
@@ -825,6 +755,7 @@ namespace GUI_08YS.Maestros
             this.ClientSize = new System.Drawing.Size(1073, 704);
             this.Controls.Add(this.pnlLista_790MY);
             this.Controls.Add(this.pnlDetalle_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlEncabezado_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Name = "FormClientes_790MY";
@@ -833,6 +764,7 @@ namespace GUI_08YS.Maestros
             this.pnlEncabezado_790MY.ResumeLayout(false);
             this.pnlEncabezado_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes_790MY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.pnlAvisoCambios_790MY.ResumeLayout(false);
             this.grpSerializacion_790MY.ResumeLayout(false);
             this.grpSerializacion_790MY.PerformLayout();
@@ -878,6 +810,20 @@ namespace GUI_08YS.Maestros
             this.btnPlegarSerializacion_790MY.FlatAppearance.MouseOverBackColor = GUI_08YS.Estilo.TemaFogon_790MY.Panel;
             this.btnPlegarSerializacion_790MY.BackColor = GUI_08YS.Estilo.TemaFogon_790MY.Tarjeta;
             this.btnPlegarSerializacion_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
+
+            // Ícono de error dentro del borde derecho de cada campo: la ficha no tiene
+            // margen libre a la derecha y DNI/Apellidos quedan pegados a otro campo.
+            foreach (System.Windows.Forms.Control campo in new System.Windows.Forms.Control[]
+            {
+                this.txtDni_790MY, this.txtApellidos_790MY, this.txtNombres_790MY,
+                this.txtEmail_790MY, this.txtCelular_790MY, this.txtDireccion_790MY,
+                this.txtEmailAdicional_790MY, this.txtCelularAdicional_790MY,
+                this.txtRutaSerializar_790MY, this.txtRutaDeserializar_790MY
+            })
+            {
+                this.errValidacion_790MY.SetIconAlignment(campo, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+                this.errValidacion_790MY.SetIconPadding(campo, -20);
+            }
         }
 
         /// <summary>
@@ -911,17 +857,10 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.Panel pnlDetalle_790MY;
         private System.Windows.Forms.Label lblDetalleTitulo_790MY;
         private System.Windows.Forms.Label lblDetalleAyuda_790MY;
-        private System.Windows.Forms.Label lblErrorDni_790MY;
-        private System.Windows.Forms.Label lblErrorApellidos_790MY;
-        private System.Windows.Forms.Label lblErrorNombres_790MY;
-        private System.Windows.Forms.Label lblErrorEmail_790MY;
         private System.Windows.Forms.TextBox txtEmailAdicional_790MY;
         private System.Windows.Forms.FlowLayoutPanel flpEmailsAdicionales_790MY;
-        private System.Windows.Forms.Label lblErrorCelular_790MY;
         private System.Windows.Forms.TextBox txtCelularAdicional_790MY;
         private System.Windows.Forms.FlowLayoutPanel flpTelefonosAdicionales_790MY;
-        private System.Windows.Forms.Label lblErrorDireccion_790MY;
-        private System.Windows.Forms.Label lblMotivoGuardar_790MY;
         private System.Windows.Forms.DataGridView dgvClientes_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDni_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colApellidos_790MY;
@@ -960,5 +899,7 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.Button btnDeserializar_790MY;
         private System.Windows.Forms.Button btnLimpiarSerializacion_790MY;
         private System.Windows.Forms.ListBox lstDeserializados_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }

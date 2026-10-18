@@ -5,9 +5,11 @@ using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using Service_08YS;
 using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
@@ -26,8 +28,10 @@ namespace GUI_08YS.Maestros
             };
 
         // Mismas expresiones que ya usaba el formulario (y que aplica la BLL para el email).
+        // DNI: solo números, sin puntos ni guiones, de 7 u 8 dígitos (regla del propietario).
         private static readonly Regex _regexEmail = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         private static readonly Regex _regexCelular = new Regex(@"^\d+$");
+        private static readonly Regex _regexDni = new Regex(@"^\d{7,8}$");
 
         private readonly ClienteBLL_790MY _clienteBll;
 
@@ -36,10 +40,12 @@ namespace GUI_08YS.Maestros
         private List<string> _emailsAdicionalesEdicion = new List<string>();
         private List<string> _telefonosAdicionalesEdicion = new List<string>();
 
-        // Validación en línea (P16): un campo muestra su error recién cuando el usuario
-        // lo tocó, para no llenar de rojo una ficha nueva vacía.
+        // Validación en línea (P16, E2-D4): un campo muestra su error (ErrorProvider) recién
+        // cuando el usuario sale de él, para no llenar de rojo una ficha nueva vacía.
+        // El resumen en el banner aparece al intentar guardar y se va solo al corregirse.
         private readonly HashSet<Control> _camposTocados = new HashSet<Control>();
         private bool _cargandoCampos;
+        private bool _resumenVisible;
 
         // «Guardar o descartar» (P18): huella de la ficha al empezar a editar, DNI de la
         // fila a la que el usuario quiso ir con cambios sin guardar, y bandera para que
@@ -169,6 +175,8 @@ namespace GUI_08YS.Maestros
 
             if (_modo == ModoEdicion.Reposo)
             {
+                // Un aviso sobre el cliente anterior (por ejemplo, una baja rechazada) ya no aplica.
+                bnrAvisos_790MY.Ocultar();
                 MostrarFicha();
                 ActualizarHabilitacionBotonesAccion();
                 return;
@@ -328,6 +336,9 @@ namespace GUI_08YS.Maestros
             }
 
             _camposTocados.Clear();
+            _resumenVisible = false;
+            bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.Clear();
             ActualizarTituloFicha();
             ActualizarValidacion();
         }
@@ -409,31 +420,46 @@ namespace GUI_08YS.Maestros
                 return;
 
             var t = TraductorManager_08YS.Instance;
-            var respuesta = MessageBox.Show(
+            bool confirmado = ConfirmModal_790MY.Confirmar(this,
+                t.GetTexto("FC_confirmar_baja_titulo"),
                 string.Format(t.GetTexto("msg_fc_confirmar_baja"),
                               seleccionado.Nombre, seleccionado.Apellido, seleccionado.DNI),
-                t.GetTexto("titulo_confirmar_baja"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                t.GetTexto("FC_confirmar_baja_accion"));
 
-            if (respuesta != DialogResult.Yes) return;
+            if (!confirmado) return;
 
             try
             {
                 _clienteBll.EliminarCliente(seleccionado.DNI);
-                MessageBox.Show(t.GetTexto("msg_fc_baja_ok"), t.GetTexto("exito"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                 CargarGrilla(null);
+                ToastHost_790MY.Mostrar(dgvClientes_790MY,
+                    string.Format(t.GetTexto("msg_fc_baja_ok"), seleccionado.Nombre, seleccionado.Apellido));
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, t.GetTexto("no_se_puede_eliminar"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarErrorEnBanner(string.Format(t.GetTexto("FC_err_bll_baja"), ex.Message));
             }
             catch (Exception)
             {
-                MessageBox.Show(t.GetTexto("msg_fc_error_eliminar"), t.GetTexto("error"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(t.GetTexto("msg_fc_error_eliminar"));
             }
         }
+
+        #region Avisos (Etapa 2: banner, toast y MessageBox solo para errores fatales)
+        /// <summary>Error recuperable (regla de la BLL, archivo, etc.): queda en el banner hasta cerrarlo o corregirlo.</summary>
+        private void MostrarErrorEnBanner(string mensaje, TipoBanner_790MY tipo = TipoBanner_790MY.Error)
+        {
+            _resumenVisible = false;
+            bnrAvisos_790MY.Mostrar(mensaje, tipo, cerrable: true);
+        }
+
+        /// <summary>Error inesperado (base de datos, excepción no prevista): se conserva el MessageBox nativo (E2-D1).</summary>
+        private void MostrarErrorFatal(string mensaje)
+        {
+            MessageBox.Show(this, mensaje, TraductorManager_08YS.Instance.GetTexto("error"),
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        #endregion
 
         #region Emails y celulares adicionales como etiquetas (P17)
         private void btnEmailsAdicionales_790MY_Click(object sender, EventArgs e)
@@ -453,7 +479,7 @@ namespace GUI_08YS.Maestros
         }
 
         // Mismas reglas que FormListaSimple_790MY: se ignora el valor vacío y no se
-        // admiten duplicados. El aviso de duplicado se muestra en línea.
+        // admiten duplicados. El duplicado se marca en el campo con el ErrorProvider.
         private void AgregarAdicional(TextBox origen, List<string> destino)
         {
             string valor = origen.Text.Trim();
@@ -463,28 +489,27 @@ namespace GUI_08YS.Maestros
             if (destino.Contains(valor))
             {
                 origen.BackColor = T.ErrorFondo;
-                DibujarEtiquetas(origen == txtEmailAdicional_790MY
-                    ? TraductorManager_08YS.Instance.GetTexto("msg_valor_duplicado") : null,
-                    origen == txtCelularAdicional_790MY
-                    ? TraductorManager_08YS.Instance.GetTexto("msg_valor_duplicado") : null);
+                errValidacion_790MY.SetError(origen,
+                    TraductorManager_08YS.Instance.GetTexto("FC_val_adicional_duplicado"));
                 return;
             }
 
             destino.Add(valor);
             origen.Clear();
             origen.BackColor = T.Tarjeta;
+            errValidacion_790MY.SetError(origen, string.Empty);
             origen.Focus();
             DibujarEtiquetas();
             ActualizarValidacion();
         }
 
-        private void DibujarEtiquetas(string errorEmails = null, string errorCelulares = null)
+        private void DibujarEtiquetas()
         {
-            LlenarEtiquetas(flpEmailsAdicionales_790MY, _emailsAdicionalesEdicion, errorEmails);
-            LlenarEtiquetas(flpTelefonosAdicionales_790MY, _telefonosAdicionalesEdicion, errorCelulares);
+            LlenarEtiquetas(flpEmailsAdicionales_790MY, _emailsAdicionalesEdicion);
+            LlenarEtiquetas(flpTelefonosAdicionales_790MY, _telefonosAdicionalesEdicion);
         }
 
-        private void LlenarEtiquetas(FlowLayoutPanel panel, List<string> valores, string error)
+        private void LlenarEtiquetas(FlowLayoutPanel panel, List<string> valores)
         {
             bool editando = _modo != ModoEdicion.Reposo;
             var t = TraductorManager_08YS.Instance;
@@ -528,18 +553,7 @@ namespace GUI_08YS.Maestros
                 panel.Controls.Add(etiqueta);
             }
 
-            if (!string.IsNullOrEmpty(error))
-            {
-                panel.Controls.Add(new Label
-                {
-                    AutoSize = true,
-                    Font = new Font(T.Familia, 8.25F, FontStyle.Bold),
-                    ForeColor = T.ErrorTexto,
-                    Margin = new Padding(0, 4, 0, 0),
-                    Text = "⚠ " + error
-                });
-            }
-            else if (valores.Count == 0 && !editando)
+            if (valores.Count == 0 && !editando)
             {
                 panel.Controls.Add(new Label
                 {
@@ -557,10 +571,14 @@ namespace GUI_08YS.Maestros
         #endregion
 
         #region Validación en línea (P16)
+        // Mientras se escribe solo se re-evalúan los campos ya visitados: un error se
+        // borra apenas se corrige, pero uno nuevo recién aparece al salir del campo.
         private void CampoFicha_TextChanged(object sender, EventArgs e)
         {
             if (_cargandoCampos || _modo == ModoEdicion.Reposo) return;
-            _camposTocados.Add((Control)sender);
+
+            // Un error devuelto por la BLL (DNI duplicado, etc.) se da por atendido al editar.
+            if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
             ActualizarValidacion();
         }
 
@@ -572,8 +590,9 @@ namespace GUI_08YS.Maestros
         }
 
         /// <summary>
-        /// Reglas en el mismo orden que antes, más las que exige ClienteBLL_790MY
-        /// (DNI positivo, email y celular obligatorios). La BLL sigue validando al guardar.
+        /// Reglas simples repetidas en la GUI (E2-H3); ClienteBLL_790MY sigue siendo la
+        /// autoridad al guardar. Obligatorios: DNI, apellido, nombre, email y celular.
+        /// La dirección es opcional (la BLL no la exige).
         /// </summary>
         private Dictionary<TextBox, string> ValidarFicha()
         {
@@ -581,77 +600,69 @@ namespace GUI_08YS.Maestros
             var errores = new Dictionary<TextBox, string>();
 
             string dni = txtDni_790MY.Text.Trim();
-            if (!int.TryParse(dni, out int numero))
-                errores[txtDni_790MY] = t.GetTexto("msg_fc_dni_invalido");
-            else if (numero <= 0)
+            if (!_regexDni.IsMatch(dni))
+                errores[txtDni_790MY] = t.GetTexto("FC_val_dni_formato");
+            else if (int.Parse(dni) <= 0)
                 errores[txtDni_790MY] = t.GetTexto("msg_fc_dni_positivo");
 
             if (string.IsNullOrWhiteSpace(txtApellidos_790MY.Text))
-                errores[txtApellidos_790MY] = t.GetTexto("msg_fc_apellido_requerido");
+                errores[txtApellidos_790MY] = t.GetTexto("FC_val_apellido");
 
             if (string.IsNullOrWhiteSpace(txtNombres_790MY.Text))
-                errores[txtNombres_790MY] = t.GetTexto("msg_fc_nombre_requerido");
+                errores[txtNombres_790MY] = t.GetTexto("FC_val_nombre");
 
             string email = txtEmail_790MY.Text.Trim();
             if (string.IsNullOrWhiteSpace(email))
                 errores[txtEmail_790MY] = t.GetTexto("msg_fc_email_requerido");
             else if (!_regexEmail.IsMatch(email))
-                errores[txtEmail_790MY] = t.GetTexto("msg_fc_email_invalido");
+                errores[txtEmail_790MY] = t.GetTexto("FC_val_email_formato");
 
             string celular = txtCelular_790MY.Text.Trim();
             if (string.IsNullOrWhiteSpace(celular))
                 errores[txtCelular_790MY] = t.GetTexto("msg_fc_celular_requerido");
             else if (!_regexCelular.IsMatch(celular))
-                errores[txtCelular_790MY] = t.GetTexto("msg_fc_celular_solo_numeros");
-
-            if (string.IsNullOrWhiteSpace(txtDireccion_790MY.Text))
-                errores[txtDireccion_790MY] = t.GetTexto("msg_fc_direccion_requerida");
+                errores[txtCelular_790MY] = t.GetTexto("FC_val_celular_numeros");
 
             return errores;
         }
 
         private void ActualizarValidacion()
         {
-            var etiquetasError = new Dictionary<TextBox, Label>
-            {
-                { txtDni_790MY, lblErrorDni_790MY },
-                { txtApellidos_790MY, lblErrorApellidos_790MY },
-                { txtNombres_790MY, lblErrorNombres_790MY },
-                { txtEmail_790MY, lblErrorEmail_790MY },
-                { txtCelular_790MY, lblErrorCelular_790MY },
-                { txtDireccion_790MY, lblErrorDireccion_790MY }
-            };
-
             if (_modo == ModoEdicion.Reposo)
             {
-                foreach (Label etiqueta in etiquetasError.Values) etiqueta.Text = string.Empty;
-                lblMotivoGuardar_790MY.Text = string.Empty;
+                foreach (TextBox caja in CamposFicha()) errValidacion_790MY.SetError(caja, string.Empty);
+                if (_resumenVisible) OcultarResumen();
                 return;
             }
 
             Dictionary<TextBox, string> errores = ValidarFicha();
-            foreach (var par in etiquetasError)
+            foreach (TextBox caja in CamposFicha())
             {
-                TextBox caja = par.Key;
                 bool mostrar = errores.ContainsKey(caja) && _camposTocados.Contains(caja);
-                par.Value.Text = mostrar ? "⚠ " + errores[caja] : string.Empty;
+                errValidacion_790MY.SetError(caja, mostrar ? errores[caja] : string.Empty);
                 if (!caja.ReadOnly)
                     caja.BackColor = mostrar ? T.ErrorFondo : T.Tarjeta;
             }
 
-            // Guardar explica por qué está deshabilitado (P16).
-            btnAplicar_790MY.Enabled = errores.Count == 0;
-            btnGuardarCambios_790MY.Enabled = errores.Count == 0;
+            if (!_resumenVisible) return;
             if (errores.Count == 0)
-            {
-                lblMotivoGuardar_790MY.Text = string.Empty;
-            }
+                OcultarResumen();
             else
-            {
-                var nombres = errores.Keys.Select(NombreCampo);
-                lblMotivoGuardar_790MY.Text = string.Format(
-                    TraductorManager_08YS.Instance.GetTexto("FC_motivo_guardar"), string.Join(", ", nombres));
-            }
+                bnrAvisos_790MY.Mostrar(TextoResumen(errores), TipoBanner_790MY.Error, cerrable: false);
+        }
+
+        // Resumen del banner al intentar guardar: un renglón por campo, con su motivo.
+        private string TextoResumen(Dictionary<TextBox, string> errores)
+        {
+            var renglones = errores.Select(par => "•  " + NombreCampo(par.Key) + ": " + par.Value);
+            return TraductorManager_08YS.Instance.GetTexto("FC_banner_revisar")
+                 + Environment.NewLine + string.Join(Environment.NewLine, renglones);
+        }
+
+        private void OcultarResumen()
+        {
+            _resumenVisible = false;
+            bnrAvisos_790MY.Ocultar();
         }
 
         private string NombreCampo(TextBox caja)
@@ -677,10 +688,13 @@ namespace GUI_08YS.Maestros
         {
             var t = TraductorManager_08YS.Instance;
 
-            if (ValidarFicha().Count > 0)
+            Dictionary<TextBox, string> errores = ValidarFicha();
+            if (errores.Count > 0)
             {
                 foreach (TextBox caja in CamposFicha()) _camposTocados.Add(caja);
+                _resumenVisible = true;
                 ActualizarValidacion();
+                errores.Keys.First().Focus();
                 return false;
             }
 
@@ -698,42 +712,50 @@ namespace GUI_08YS.Maestros
                     _clienteBll.RegistrarCliente(dni, nombre, apellido, email, celular, direccion,
                                                   _emailsAdicionalesEdicion, _telefonosAdicionalesEdicion);
 
-                    MessageBox.Show(t.GetTexto("msg_fc_registrado_ok"), t.GetTexto("exito"),
-                                     MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Alta (E2-D4): la ficha queda limpia y lista para el siguiente cliente.
+                    // Se recarga la grilla en reposo para que la selección no dispare
+                    // el aviso de «Guardar o descartar».
+                    _modo = ModoEdicion.Reposo;
+                    CargarGrilla(null);
+                    ToastHost_790MY.Mostrar(dgvClientes_790MY,
+                        string.Format(t.GetTexto("msg_fc_registrado_ok"), nombre, apellido));
+                    LimpiarCampos();
+                    EstablecerModo(ModoEdicion.Alta);
+                    _huellaInicial = HuellaFicha();
+                    txtDni_790MY.Focus();
+                    return true;
                 }
-                else if (_modo == ModoEdicion.Modificacion)
+
+                // Modificación (E2-D4): la ficha conserva los datos guardados.
+                var cliente = new Cliente_790MY(dni, nombre, apellido, email, celular, direccion)
                 {
-                    var cliente = new Cliente_790MY(dni, nombre, apellido, email, celular, direccion)
-                    {
-                        EmailsAdicionales = _emailsAdicionalesEdicion,
-                        TelefonosAdicionales = _telefonosAdicionalesEdicion
-                    };
+                    EmailsAdicionales = _emailsAdicionalesEdicion,
+                    TelefonosAdicionales = _telefonosAdicionalesEdicion
+                };
 
-                    _clienteBll.ActualizarCliente(cliente);
-
-                    MessageBox.Show(t.GetTexto("msg_fc_modificado_ok"), t.GetTexto("exito"),
-                                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                _clienteBll.ActualizarCliente(cliente);
 
                 _modo = ModoEdicion.Reposo;
                 CargarGrilla(dni);
                 EstablecerModo(ModoEdicion.Reposo);
+                ToastHost_790MY.Mostrar(dgvClientes_790MY, t.GetTexto("msg_fc_modificado_ok"));
                 return true;
             }
             catch (ClienteDniDuplicadoException_790MY)
             {
-                MessageBox.Show(t.GetTexto("msg_dni_duplicado_cliente"), t.GetTexto("titulo_operacion_no_permitida"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Exists() cuenta también a los clientes dados de baja.
+                string mensaje = string.Format(t.GetTexto("FC_err_dni_duplicado"), dni);
+                MostrarErrorEnBanner(mensaje);
+                errValidacion_790MY.SetError(txtDni_790MY, mensaje);
+                txtDni_790MY.Focus();
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
-                MessageBox.Show(t.GetTexto("msg_fc_error_validacion_bll"), t.GetTexto("titulo_datos_invalidos"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarErrorEnBanner(string.Format(t.GetTexto("FC_err_bll_guardar"), ex.Message));
             }
             catch (Exception)
             {
-                MessageBox.Show(t.GetTexto("msg_fc_error_guardar"), t.GetTexto("error"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(t.GetTexto("FC_fatal_guardar"));
             }
             return false;
         }
@@ -760,7 +782,11 @@ namespace GUI_08YS.Maestros
             int? destino = _dniPendiente;
             bool irAOtro = _hayDestinoPendiente;
             if (Guardar() && irAOtro)
+            {
+                // Tras un alta la ficha queda lista para otro cliente; acá el usuario ya eligió otra fila.
+                SalirDeEdicion();
                 IrAPendiente(destino);
+            }
         }
 
         private void btnDescartarCambios_790MY_Click(object sender, EventArgs e)
@@ -814,7 +840,10 @@ namespace GUI_08YS.Maestros
             })
             {
                 if (dialogo.ShowDialog(this) == DialogResult.OK)
+                {
                     txtRutaSerializar_790MY.Text = dialogo.FileName;
+                    errValidacion_790MY.SetError(txtRutaSerializar_790MY, string.Empty);
+                }
             }
         }
 
@@ -826,7 +855,10 @@ namespace GUI_08YS.Maestros
             })
             {
                 if (dialogo.ShowDialog(this) == DialogResult.OK)
+                {
                     txtRutaDeserializar_790MY.Text = dialogo.FileName;
+                    errValidacion_790MY.SetError(txtRutaDeserializar_790MY, string.Empty);
+                }
             }
         }
 
@@ -843,18 +875,18 @@ namespace GUI_08YS.Maestros
                 .Where(cliente => cliente != null)
                 .ToList();
 
+            errValidacion_790MY.SetError(txtRutaSerializar_790MY, string.Empty);
             if (aSerializar.Count == 0)
             {
-                MessageBox.Show(t.GetTexto("msg_fc_seleccionar_para_exportar"), t.GetTexto("titulo_fc_sin_seleccion"),
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarErrorEnBanner(t.GetTexto("msg_fc_seleccionar_para_exportar"), TipoBanner_790MY.Aviso);
                 dgvClientes_790MY.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtRutaSerializar_790MY.Text))
             {
-                MessageBox.Show(t.GetTexto("msg_fc_falta_ruta_serializar"), t.GetTexto("titulo_falta_ruta"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                errValidacion_790MY.SetError(txtRutaSerializar_790MY, t.GetTexto("msg_fc_falta_ruta_serializar"));
+                btnExaminarSerializar_790MY.Focus();
                 return;
             }
 
@@ -862,27 +894,33 @@ namespace GUI_08YS.Maestros
             {
                 string ruta = txtRutaSerializar_790MY.Text.Trim();
                 _clienteBll.SerializarArchivoXML(aSerializar, ruta);
-
-                MessageBox.Show(
-                    string.Format(t.GetTexto("msg_fc_serializacion_ok"), aSerializar.Count),
-                    t.GetTexto("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bnrAvisos_790MY.Ocultar();
+                ToastHost_790MY.Mostrar(dgvClientes_790MY,
+                    string.Format(t.GetTexto("msg_fc_serializacion_ok"), aSerializar.Count));
+            }
+            catch (Exception ex) when (EsErrorDeArchivo(ex))
+            {
+                MostrarErrorEnBanner(string.Format(t.GetTexto("msg_fc_error_serializar"), ex.Message));
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    string.Format(t.GetTexto("msg_fc_error_serializar"), ex.Message),
-                    t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(string.Format(t.GetTexto("msg_fc_error_serializar"), ex.Message));
             }
         }
+
+        // Archivo inválido, inexistente, sin permiso o en uso: el usuario puede elegir otro.
+        private static bool EsErrorDeArchivo(Exception ex)
+            => ex is ArgumentException || ex is IOException || ex is UnauthorizedAccessException;
 
         private void btnDeserializar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
 
+            errValidacion_790MY.SetError(txtRutaDeserializar_790MY, string.Empty);
             if (string.IsNullOrWhiteSpace(txtRutaDeserializar_790MY.Text))
             {
-                MessageBox.Show(t.GetTexto("msg_fc_falta_ruta_deserializar"), t.GetTexto("titulo_falta_ruta"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                errValidacion_790MY.SetError(txtRutaDeserializar_790MY, t.GetTexto("msg_fc_falta_ruta_deserializar"));
+                btnExaminarDeserializar_790MY.Focus();
                 return;
             }
 
@@ -891,6 +929,7 @@ namespace GUI_08YS.Maestros
                 string ruta = txtRutaDeserializar_790MY.Text.Trim();
                 List<Cliente_790MY> resultado = _clienteBll.DeserializarArchivoXML(ruta);
 
+                bnrAvisos_790MY.Ocultar();
                 lstDeserializados_790MY.Items.Clear();
 
                 if (resultado.Count == 0)
@@ -905,16 +944,20 @@ namespace GUI_08YS.Maestros
                         $"DNI {cliente.DNI} - {cliente.Nombre} {cliente.Apellido} - {cliente.Email}");
                 }
             }
+            catch (Exception ex) when (EsErrorDeArchivo(ex))
+            {
+                MostrarErrorEnBanner(string.Format(t.GetTexto("msg_fc_error_deserializar"), ex.Message));
+            }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    string.Format(t.GetTexto("msg_fc_error_deserializar"), ex.Message),
-                    t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarErrorFatal(string.Format(t.GetTexto("msg_fc_error_deserializar"), ex.Message));
             }
         }
 
         private void btnLimpiarSerializacion_790MY_Click(object sender, EventArgs e)
         {
+            errValidacion_790MY.SetError(txtRutaSerializar_790MY, string.Empty);
+            errValidacion_790MY.SetError(txtRutaDeserializar_790MY, string.Empty);
             txtRutaSerializar_790MY.Clear();
             txtRutaDeserializar_790MY.Clear();
             lstDeserializados_790MY.Items.Clear();
