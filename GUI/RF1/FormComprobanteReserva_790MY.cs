@@ -8,6 +8,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
@@ -80,6 +81,16 @@ namespace GUI_08YS.RF1
         private void FormComprobanteReserva_790MY_Load(object sender, EventArgs e)
         {
             UpdateIdioma();
+            _altoSinBanner = Height;
+        }
+
+        // El diálogo tiene tamaño fijo: crece mientras se ve el banner para no recortar la vista previa.
+        private int _altoSinBanner;
+
+        private void bnrAvisos_790MY_TamanioCambiado(object sender, EventArgs e)
+        {
+            if (_altoSinBanner == 0) return;
+            Height = _altoSinBanner + (bnrAvisos_790MY.Visible ? bnrAvisos_790MY.Height : 0);
         }
 
         // El envío arranca recién cuando la ventana ya está visible, así el usuario
@@ -203,15 +214,23 @@ namespace GUI_08YS.RF1
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK) return;
 
+                bnrAvisos_790MY.Ocultar();
                 try
                 {
                     Cursor = Cursors.WaitCursor;
                     byte[] pdf = _reservaBll.GenerarComprobantePDF(_reserva, _cliente);
                     File.WriteAllBytes(dlg.FileName, pdf);
                 }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException)
+                {
+                    // Ruta inválida, sin permiso o archivo abierto: el usuario puede elegir otra ubicación.
+                    bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("CR_msg_error_guardar"), ex.Message));
+                    return;
+                }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(string.Format(t.GetTexto("CR_msg_error_guardar"), ex.Message),
+                    // Error inesperado al generar el PDF: MessageBox nativo (E2-D1).
+                    MessageBox.Show(this, string.Format(t.GetTexto("CR_fatal_generar"), ex.Message),
                                     t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -220,9 +239,12 @@ namespace GUI_08YS.RF1
                     Cursor = Cursors.Default;
                 }
 
-                var abrir = MessageBox.Show(string.Format(t.GetTexto("CR_msg_guardado"), dlg.FileName),
-                                            t.GetTexto("exito"), MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                if (abrir == DialogResult.Yes)
+                bool abrir = ConfirmModal_790MY.Confirmar(this,
+                    t.GetTexto("CR_confirmar_abrir_titulo"),
+                    string.Format(t.GetTexto("CR_msg_guardado"), dlg.FileName),
+                    t.GetTexto("CR_confirmar_abrir_accion"),
+                    t.GetTexto("CR_confirmar_abrir_cancelar"));
+                if (abrir)
                 {
                     try { Process.Start(new ProcessStartInfo(dlg.FileName) { UseShellExecute = true }); }
                     catch (Exception) { /* sin visor de PDF asociado: el archivo ya quedó guardado */ }

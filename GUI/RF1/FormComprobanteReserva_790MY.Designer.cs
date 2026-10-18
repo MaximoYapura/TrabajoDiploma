@@ -28,6 +28,7 @@
             this.btnGuardarPdf_790MY = new System.Windows.Forms.Button();
             this.btnCerrar_790MY = new System.Windows.Forms.Button();
             this.tipEstado_790MY = new System.Windows.Forms.ToolTip(this.components);
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.pnlBanner_790MY.SuspendLayout();
             this.tlpHost_790MY.SuspendLayout();
             this.pnlFooter_790MY.SuspendLayout();
@@ -161,6 +162,14 @@
             this.btnCerrar_790MY.UseVisualStyleBackColor = false;
             this.btnCerrar_790MY.Click += new System.EventHandler(this.btnCerrar_790MY_Click);
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 3;
+            this.bnrAvisos_790MY.VisibleChanged += new System.EventHandler(this.bnrAvisos_790MY_TamanioCambiado);
+            this.bnrAvisos_790MY.SizeChanged += new System.EventHandler(this.bnrAvisos_790MY_TamanioCambiado);
+            //
             // FormComprobanteReserva_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -170,6 +179,7 @@
             this.ClientSize = new System.Drawing.Size(520, 669);
             this.Controls.Add(this.tlpHost_790MY);
             this.Controls.Add(this.pnlFooter_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlBanner_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -202,5 +212,6 @@
         private System.Windows.Forms.Button btnGuardarPdf_790MY;
         private System.Windows.Forms.Button btnCerrar_790MY;
         private System.Windows.Forms.ToolTip tipEstado_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }
