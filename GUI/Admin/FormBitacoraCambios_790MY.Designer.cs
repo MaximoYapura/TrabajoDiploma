@@ -17,7 +17,11 @@ namespace GUI_08YS.Admin
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tlpMain_790MY = new System.Windows.Forms.TableLayoutPanel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.pnlCabecera_790MY = new GUI_08YS.RF2.PanelRedondeado_790MY();
             this.tlpCabecera_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
@@ -698,6 +702,19 @@ namespace GUI_08YS.Admin
             this.btnSalir_790MY.UseVisualStyleBackColor = false;
             this.btnSalir_790MY.Click += new System.EventHandler(this.btnSalir_790MY_Click);
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            this.errValidacion_790MY.SetIconAlignment(this.txtCodigo_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.txtCodigo_790MY, -20);
+            //
             // FormBitacoraCambios_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -705,6 +722,7 @@ namespace GUI_08YS.Admin
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(251)))), ((int)(((byte)(247)))));
             this.ClientSize = new System.Drawing.Size(1400, 860);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.KeyPreview = true;
@@ -730,6 +748,7 @@ namespace GUI_08YS.Admin
             this.pnlPie_790MY.ResumeLayout(false);
             this.tlpPie_790MY.ResumeLayout(false);
             this.tlpPie_790MY.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -786,5 +805,7 @@ namespace GUI_08YS.Admin
         private System.Windows.Forms.Label lblSeleccion_790MY;
         private FontAwesome.Sharp.IconButton btnRestaurar_790MY;
         private System.Windows.Forms.Button btnSalir_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }

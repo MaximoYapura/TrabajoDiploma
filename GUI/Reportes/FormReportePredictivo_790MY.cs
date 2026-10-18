@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Reportes
@@ -95,7 +96,7 @@ namespace GUI_08YS.Reportes
                 _resumen = null;
                 _reglas = new List<ReglaAsociacion_790MY>();
                 _sugerencias = new List<SugerenciaInteligente_790MY>();
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Mostrar();
             MostrarSugerencias();
@@ -111,7 +112,7 @@ namespace GUI_08YS.Reportes
             catch (Exception ex)
             {
                 _reglas = new List<ReglaAsociacion_790MY>();
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Mostrar();
         }
@@ -380,11 +381,12 @@ namespace GUI_08YS.Reportes
             if (!((sender as Control)?.Tag is SugerenciaInteligente_790MY sugerencia)) return;
             TextoSugerencia texto = Redactar(sugerencia);
 
-            var respuesta = MessageBox.Show(VentanaPropietaria, E.T("RI_msg_confirmar", texto.Titulo),
-                texto.Boton, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (respuesta != DialogResult.Yes) return;
+            // Se avisa que la acción es simulada antes de confirmarla, no después.
+            bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                E.T("RI_msg_confirmar", texto.Titulo), E.T("RI_msg_simulada"), texto.Boton);
+            if (!confirmado) return;
 
-            E.MostrarExito(VentanaPropietaria, texto.Confirmacion + Environment.NewLine + Environment.NewLine + E.T("RI_msg_simulada"));
+            E.MostrarExitoToast(this, texto.Confirmacion);
         }
 
         #endregion

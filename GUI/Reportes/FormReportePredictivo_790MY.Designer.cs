@@ -18,6 +18,7 @@ namespace GUI_08YS.Reportes
         private void InitializeComponent()
         {
             this.tlpMain_790MY = new System.Windows.Forms.TableLayoutPanel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.tlpEncabezado_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
             this.lblSubtitulo_790MY = new System.Windows.Forms.Label();
@@ -281,6 +282,12 @@ namespace GUI_08YS.Reportes
             this.tlpSugerencias_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpSugerencias_790MY.TabIndex = 3;
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
             // FormReportePredictivo_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -288,6 +295,7 @@ namespace GUI_08YS.Reportes
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(251)))), ((int)(((byte)(247)))));
             this.ClientSize = new System.Drawing.Size(1400, 820);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormReportePredictivo_790MY";
@@ -330,5 +338,6 @@ namespace GUI_08YS.Reportes
         private FontAwesome.Sharp.IconPictureBox icoSugerencias_790MY;
         private System.Windows.Forms.Label lblSugerencias_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpSugerencias_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }

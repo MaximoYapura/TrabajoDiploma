@@ -19,6 +19,7 @@ namespace GUI_08YS.Reportes
         {
             System.Windows.Forms.DataGridViewCellStyle estiloDerecha = new System.Windows.Forms.DataGridViewCellStyle();
             this.tlpMain_790MY = new System.Windows.Forms.TableLayoutPanel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.tlpFiltro_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblFecha_790MY = new System.Windows.Forms.Label();
             this.btnAnterior_790MY = new FontAwesome.Sharp.IconButton();
@@ -265,6 +266,12 @@ namespace GUI_08YS.Reportes
             this.lblSinCobros_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblSinCobros_790MY.Visible = false;
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
             // FormArqueoCaja_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -272,6 +279,7 @@ namespace GUI_08YS.Reportes
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(1400, 820);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormArqueoCaja_790MY";
@@ -306,5 +314,6 @@ namespace GUI_08YS.Reportes
         private System.Windows.Forms.DataGridViewTextBoxColumn colPropina_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colImporte_790MY;
         private System.Windows.Forms.Label lblSinCobros_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }

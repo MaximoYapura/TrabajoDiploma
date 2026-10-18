@@ -16,6 +16,9 @@ namespace GUI_08YS.Reportes
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             System.Windows.Forms.DataGridViewCellStyle headerCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle altRowStyle      = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle fechaCellStyle   = new System.Windows.Forms.DataGridViewCellStyle();
@@ -386,6 +389,14 @@ namespace GUI_08YS.Reportes
             this._lblValCliente.Text = "—";
 
             // ── FormReporteReservas_790MY ────────────────────────────────────────────────
+            // bnrAvisos_790MY / errValidacion_790MY (Etapa 2)
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            this.errValidacion_790MY.SetIconAlignment(this.txtDniCliente_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.txtDniCliente_790MY, -20);
+
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode       = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor           = System.Drawing.Color.FromArgb(250, 248, 245);
@@ -395,6 +406,7 @@ namespace GUI_08YS.Reportes
             this.Controls.Add(this.pnlFiltros);
             // Se agrega último, igual que en la versión original (se creaba en Load).
             this.Controls.Add(this._pnlResumenFiltros);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Name            = "FormReporteReservas_790MY";
             this.Text            = "Reporte de Reservas";
             this.Load           += new System.EventHandler(this.FormReporteReservas_790MY_Load);
@@ -405,6 +417,7 @@ namespace GUI_08YS.Reportes
             this._pnlResumenFiltros.ResumeLayout(false);
             this._pnlResumenFiltros.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReporteReservas_790MY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -439,5 +452,7 @@ namespace GUI_08YS.Reportes
         private System.Windows.Forms.Label                       _lblSepFiltros;
         private System.Windows.Forms.Label                       _lblPrefCliente;
         private System.Windows.Forms.Label                       _lblValCliente;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }

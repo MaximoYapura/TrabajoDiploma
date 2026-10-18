@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Reportes
@@ -111,7 +112,7 @@ namespace GUI_08YS.Reportes
             catch (Exception ex)
             {
                 _reporte = null;
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Mostrar();
         }
@@ -166,23 +167,26 @@ namespace GUI_08YS.Reportes
         private void btnCerrarCaja_790MY_Click(object sender, EventArgs e)
         {
             DateTime fecha = dtpFecha_790MY.Value.Date;
-            var respuesta = MessageBox.Show(VentanaPropietaria,
-                E.T("msg_ac_confirmar_cierre", fecha.ToString("dd/MM/yyyy")),
-                E.T("AC_btn_cerrar_caja").Trim(), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (respuesta != DialogResult.Yes) return;
+            bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                E.T("AC_confirmar_cierre_titulo", fecha.ToString("dd/MM/yyyy")),
+                E.T("msg_ac_confirmar_cierre"),
+                E.T("AC_btn_cerrar_caja").Trim());
+            if (!confirmado) return;
+
+            bnrAvisos_790MY.Ocultar();
 
             try
             {
                 ReporteArqueoCaja_790MY cierre = _pagoBll.CerrarCaja(fecha);
                 _reporte = cierre;
                 Mostrar();
-                E.MostrarExito(VentanaPropietaria, E.T("msg_ac_cierre_ok", fecha.ToString("dd/MM/yyyy"),
-                    cierre.CantidadCuentas, Moneda(cierre.TotalEfectivo), Moneda(cierre.TotalTarjetas),
-                    Moneda(cierre.TotalPropinas), Moneda(cierre.RecaudacionNeta)));
+                // Los totales del cierre quedan a la vista en las tarjetas; el toast resume lo esencial.
+                E.MostrarExitoToast(this, E.T("AC_toast_cierre", fecha.ToString("dd/MM/yyyy"),
+                    cierre.CantidadCuentas, Moneda(cierre.RecaudacionNeta)));
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
         }
 

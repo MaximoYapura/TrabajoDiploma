@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Admin
@@ -109,13 +110,17 @@ namespace GUI_08YS.Admin
 
         private void Cargar(int? seleccionarProductoVigente = null, int? seleccionarId = null)
         {
+            bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.SetError(txtCodigo_790MY, string.Empty);
+
             int? codigo = null;
             if (!string.IsNullOrWhiteSpace(txtCodigo_790MY.Text))
             {
                 if (!int.TryParse(txtCodigo_790MY.Text.Trim(), out int valor) || valor <= 0)
                 {
-                    MessageBox.Show(VentanaPropietaria, E.T("BC_msg_codigo_invalido"), E.T("titulo_datos_invalidos"),
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    string mensaje = E.T("BC_msg_codigo_invalido");
+                    errValidacion_790MY.SetError(txtCodigo_790MY, mensaje);
+                    bnrAvisos_790MY.Mostrar(mensaje);
                     txtCodigo_790MY.Focus();
                     return;
                 }
@@ -128,7 +133,7 @@ namespace GUI_08YS.Admin
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
 
@@ -294,7 +299,7 @@ namespace GUI_08YS.Admin
                 lblDetalleResumen_790MY.Text = string.Empty;
                 LimpiarDiff();
                 ActualizarBotonRestaurar();
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
 
@@ -445,10 +450,12 @@ namespace GUI_08YS.Admin
             string detalle = _diff.CantidadCambios == 0
                 ? E.T("BC_resumen_sin_cambios")
                 : E.T("BC_msg_confirmar_cambios", _diff.CantidadCambios);
-            var respuesta = MessageBox.Show(VentanaPropietaria,
-                E.T("BC_msg_confirmar", sel.ID, sel.Nombre, Fecha(sel.Fecha)) + Environment.NewLine + Environment.NewLine + detalle,
-                E.T("BC_btn_restaurar"), MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-            if (respuesta != DialogResult.Yes) return;
+            // El foco arranca en Cancelar (como el Button2 por defecto del diálogo anterior).
+            bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                E.T("BC_msg_confirmar", sel.ID, sel.Nombre, Fecha(sel.Fecha)),
+                detalle,
+                E.T("BC_btn_restaurar"));
+            if (!confirmado) return;
 
             try
             {
@@ -456,16 +463,16 @@ namespace GUI_08YS.Admin
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                // Se recarga primero: Cargar() limpia el banner al empezar.
                 Cargar(seleccionarId: sel.ID);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
-
-            E.MostrarExito(VentanaPropietaria, E.T("BC_msg_restaurado", sel.ID, sel.Nombre));
 
             // La versión restaurada vuelve como una fila vigente nueva (fecha actual): si el
             // filtro "hasta" la deja afuera, se mantiene seleccionada la versión de origen.
             Cargar(seleccionarProductoVigente: sel.ProductoID);
+            E.MostrarExitoToast(this, E.T("BC_msg_restaurado", sel.ID, sel.Nombre));
         }
 
         /// <summary>Atajo Alt+R para restaurar la versión seleccionada.</summary>

@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 
 namespace GUI_08YS.Reportes
 {
@@ -128,13 +130,20 @@ namespace GUI_08YS.Reportes
             DateTime? desde = dtpDesde_790MY.Checked ? dtpDesde_790MY.Value.Date : (DateTime?)null;
             DateTime? hasta = dtpHasta_790MY.Checked ? dtpHasta_790MY.Value.Date : (DateTime?)null;
 
+            bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.SetError(txtDniCliente_790MY, string.Empty);
+
+            // Filtro opcional por DNI: misma regla que el resto del sistema (7 u 8 dígitos).
             int? dni = null;
             if (!string.IsNullOrWhiteSpace(txtDniCliente_790MY.Text))
             {
-                if (!int.TryParse(txtDniCliente_790MY.Text.Trim(), out int dniParseado))
+                string texto = txtDniCliente_790MY.Text.Trim();
+                if (!Regex.IsMatch(texto, @"^\d{7,8}$") || !int.TryParse(texto, out int dniParseado))
                 {
-                    MessageBox.Show(t.GetTexto("msg_rep_dni_invalido"), t.GetTexto("titulo_dato_invalido"),
-                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    string mensaje = t.GetTexto("FC_val_dni_formato");
+                    errValidacion_790MY.SetError(txtDniCliente_790MY, mensaje);
+                    bnrAvisos_790MY.Mostrar(mensaje);
+                    txtDniCliente_790MY.Focus();
                     return;
                 }
                 dni = dniParseado;
@@ -157,11 +166,16 @@ namespace GUI_08YS.Reportes
                 _filtroHasta = hasta;
                 _filtroDni   = dni;
             }
+            catch (Exception ex) when (ex is ArgumentException || ex is UnauthorizedAccessException)
+            {
+                // Regla de la BLL o falta de permiso: se informa en el banner del formulario.
+                bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("msg_rep_error_buscar"), ex.Message));
+            }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    string.Format(t.GetTexto("msg_rep_error_buscar"), ex.Message),
-                    t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Error inesperado (base de datos, excepción no prevista): MessageBox nativo (E2-D1).
+                MessageBox.Show(this, string.Format(t.GetTexto("msg_rep_error_buscar"), ex.Message),
+                                t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -191,8 +205,7 @@ namespace GUI_08YS.Reportes
 
             if (_ultimoResultado == null || _ultimoResultado.Count == 0)
             {
-                MessageBox.Show(t.GetTexto("msg_rep_sin_datos_pdf"), t.GetTexto("titulo_dato_invalido"),
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(t.GetTexto("msg_rep_sin_datos_pdf"), TipoBanner_790MY.Aviso);
                 return;
             }
 
@@ -205,19 +218,30 @@ namespace GUI_08YS.Reportes
                 if (dlg.ShowDialog() != DialogResult.OK)
                     return;
 
+                bnrAvisos_790MY.Ocultar();
                 try
                 {
                     GenerarPDF(dlg.FileName);
-                    MessageBox.Show(t.GetTexto("msg_rep_pdf_guardado"), t.GetTexto("exito"),
-                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    // Abrir el PDF automáticamente
-                    Process.Start(new ProcessStartInfo(dlg.FileName) { UseShellExecute = true });
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException)
+                {
+                    // Ruta inválida, sin permiso o archivo abierto: el usuario puede elegir otra ubicación.
+                    bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("msg_rep_pdf_error"), ex.Message));
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(string.Format(t.GetTexto("msg_rep_pdf_error"), ex.Message),
+                    // Error inesperado al generar el PDF: MessageBox nativo (E2-D1).
+                    MessageBox.Show(this, string.Format(t.GetTexto("REP_fatal_pdf"), ex.Message),
                                     t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+
+                ToastHost_790MY.Mostrar(dgvReporteReservas_790MY, t.GetTexto("msg_rep_pdf_guardado"));
+
+                // Abrir el PDF automáticamente (sin visor asociado, el archivo ya quedó guardado).
+                try { Process.Start(new ProcessStartInfo(dlg.FileName) { UseShellExecute = true }); }
+                catch (Exception) { }
             }
         }
 
