@@ -1,4 +1,5 @@
 using BE_08YS;
+using GUI_08YS.Estilo;
 using Service_08YS;
 using System;
 using System.Drawing;
@@ -88,9 +89,11 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>
-        /// Muestra el error de una operación de la BLL con el mismo criterio que el resto
-        /// de la GUI: reglas de negocio (ArgumentException) como advertencia, permisos
-        /// como acceso denegado y cualquier otra falla como error.
+        /// Camino legacy (MessageBox nativo). Lo siguen usando FormFacturacionCobro_790MY
+        /// (sin cambios hasta la Etapa 4) y las pantallas aún no migradas a la Etapa 2;
+        /// las migradas usan <see cref="MostrarErrorEnBanner"/>.
+        /// Reglas de negocio (ArgumentException) como advertencia, permisos como acceso
+        /// denegado y cualquier otra falla como error.
         /// </summary>
         public static void MostrarError(IWin32Window owner, Exception ex)
         {
@@ -102,8 +105,28 @@ namespace GUI_08YS.RF2
                 MessageBox.Show(owner, T("RF2_msg_error_inesperado", ex.Message), T("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        /// <summary>Camino legacy (MessageBox nativo); las pantallas migradas usan <see cref="MostrarExitoToast"/>.</summary>
         public static void MostrarExito(IWin32Window owner, string mensaje)
             => MessageBox.Show(owner, mensaje, T("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        /// <summary>
+        /// Etapa 2 (E2-D1/E2-D4): mismo criterio que <see cref="MostrarError"/>, pero las
+        /// reglas de negocio y los permisos van al banner del formulario. Solo las fallas
+        /// inesperadas conservan el MessageBox nativo (error fatal).
+        /// Nombre distinto a propósito: una sobrecarga con Control capturaría las llamadas legacy.
+        /// </summary>
+        public static void MostrarErrorEnBanner(Banner_UC_790MY banner, Exception ex)
+        {
+            if (ex is UnauthorizedAccessException || ex is ArgumentException)
+                banner.Mostrar(ex.Message, TipoBanner_790MY.Error, cerrable: true);
+            else
+                MessageBox.Show(banner.FindForm(), T("RF2_msg_error_inesperado", ex.Message), T("error"),
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        /// <summary>Etapa 2: éxito no bloqueante (toast de 4 s) sobre la esquina inferior derecha de <paramref name="ancla"/>.</summary>
+        public static void MostrarExitoToast(Control ancla, string mensaje)
+            => ToastHost_790MY.Mostrar(ancla, mensaje);
 
         public static Label CrearLabel(string texto, Font fuente, Color color, bool autoSize = true)
         {
