@@ -80,6 +80,9 @@ namespace GUI_08YS.RF2
             this.lblResEstado_790MY = new System.Windows.Forms.Label();
             this.lblAyudaDerecha_790MY = new System.Windows.Forms.Label();
             this.timerReloj_790MY = new System.Windows.Forms.Timer(this.components);
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.tlpMain_790MY.SuspendLayout();
             this.pnlIzquierda_790MY.SuspendLayout();
             this.tlpIzquierda_790MY.SuspendLayout();
@@ -890,6 +893,25 @@ namespace GUI_08YS.RF2
             this.timerReloj_790MY.Interval = 30000;
             this.timerReloj_790MY.Tick += new System.EventHandler(this.timerReloj_790MY_Tick);
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            this.errValidacion_790MY.SetIconAlignment(this.txtDniCliente_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.txtDniCliente_790MY, -20);
+            this.errValidacion_790MY.SetIconAlignment(this.btnSeleccionarMesa_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.btnSeleccionarMesa_790MY, -20);
+            this.errValidacion_790MY.SetIconAlignment(this.flpReservas_790MY, System.Windows.Forms.ErrorIconAlignment.TopRight);
+            this.errValidacion_790MY.SetIconPadding(this.flpReservas_790MY, -40);
+            this.errValidacion_790MY.SetIconAlignment(this.flpCamareros_790MY, System.Windows.Forms.ErrorIconAlignment.TopRight);
+            this.errValidacion_790MY.SetIconPadding(this.flpCamareros_790MY, -40);
+            //
             // FormAbrirMesa_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -897,6 +919,7 @@ namespace GUI_08YS.RF2
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(1180, 760);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormAbrirMesa_790MY";
             this.Text = "Abrir Mesa";
@@ -929,6 +952,7 @@ namespace GUI_08YS.RF2
             this.flpContadores_790MY.PerformLayout();
             this.pnlTicket_790MY.ResumeLayout(false);
             this.tlpTicket_790MY.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -997,5 +1021,7 @@ namespace GUI_08YS.RF2
         private System.Windows.Forms.Label lblResEstado_790MY;
         private System.Windows.Forms.Label lblAyudaDerecha_790MY;
         private System.Windows.Forms.Timer timerReloj_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }

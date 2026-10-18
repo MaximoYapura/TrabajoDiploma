@@ -9,7 +9,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
@@ -101,7 +103,7 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
 
             // La selección previa deja de valer si la reserva ya no está en la nómina
@@ -383,10 +385,17 @@ namespace GUI_08YS.RF2
 
         private void btnBuscarCliente_790MY_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(txtDniCliente_790MY.Text.Trim(), out int dni) || dni <= 0)
+            OcultarAvisoPuntual();
+            errValidacion_790MY.SetError(txtDniCliente_790MY, string.Empty);
+
+            // DNI: solo números, de 7 u 8 dígitos (misma regla que Clientes y Reservas).
+            string texto = txtDniCliente_790MY.Text.Trim();
+            if (!_regexDni.IsMatch(texto) || !int.TryParse(texto, out int dni) || dni <= 0)
             {
-                MessageBox.Show(VentanaPropietaria, E.T("msg_rr_dni_invalido"), E.T("titulo_dato_invalido"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string mensaje = E.T("FC_val_dni_formato");
+                errValidacion_790MY.SetError(txtDniCliente_790MY, mensaje);
+                bnrAvisos_790MY.Mostrar(mensaje);
+                txtDniCliente_790MY.Focus();
                 return;
             }
 
@@ -397,15 +406,16 @@ namespace GUI_08YS.RF2
 
                 if (_clienteBll.Exists(dni))
                 {
-                    MessageBox.Show(VentanaPropietaria, E.T("msg_rr_cliente_inactivo"), E.T("titulo_cliente_inactivo"),
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    bnrAvisos_790MY.Mostrar(E.T("RR_aviso_cliente_inactivo", dni), TipoBanner_790MY.Aviso);
                     return;
                 }
 
                 // La reserva Walk-in necesita un cliente registrado (FK): se ofrece el alta rápida.
-                var respuesta = MessageBox.Show(VentanaPropietaria, E.T("msg_rr_cliente_no_encontrado_preg"),
-                    E.T("titulo_cliente_no_encontrado"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (respuesta != DialogResult.Yes) return;
+                bool registrar = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                    E.T("RR_confirmar_registro_titulo", dni),
+                    E.T("RR_confirmar_registro_msg"),
+                    E.T("RR_confirmar_registro_accion"));
+                if (!registrar) return;
 
                 using (var frmCliente = new FormRegistrarCliente_790MY(dni))
                 {
@@ -415,7 +425,7 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             finally
             {
@@ -427,6 +437,7 @@ namespace GUI_08YS.RF2
         {
             // La mesa elegida dejó de corresponder a la nueva cantidad de comensales.
             _mesaWalkIn = null;
+            OcultarAvisoPuntual();
             ActualizarResumen();
         }
 
@@ -438,6 +449,7 @@ namespace GUI_08YS.RF2
         {
             int comensales = (int)nudComensales_790MY.Value;
             TimeSpan turno;
+            OcultarAvisoPuntual();
 
             try
             {
@@ -445,14 +457,13 @@ namespace GUI_08YS.RF2
                 var mapa = _mesaBll.ObtenerMesasMapa(DateTime.Today, turno, comensales);
                 if (mapa == null || !mapa.Any(m => m.EsSeleccionable))
                 {
-                    MessageBox.Show(VentanaPropietaria, E.T("FRR_msg_sin_disponibilidad"), E.T("titulo_sin_disponibilidad"),
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    bnrAvisos_790MY.Mostrar(E.T("RR_aviso_sin_disponibilidad"), TipoBanner_790MY.Aviso);
                     return;
                 }
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
 
@@ -519,10 +530,67 @@ namespace GUI_08YS.RF2
             lblResEstado_790MY.BackColor = listo ? E.ListoFondo : E.PendFondo;
             lblResEstado_790MY.ForeColor = listo ? E.ListoTexto : E.PendTexto;
 
-            btnConfirmar_790MY.Enabled = listo && _turno.HasValue;
+            // Etapa 2 (E2-D4): Confirmar queda habilitado durante el turno; si falta algo,
+            // al tocarlo se marca cada dato con el ErrorProvider y se resume en el banner.
+            btnConfirmar_790MY.Enabled = _turno.HasValue;
             btnConfirmar_790MY.BackColor = btnConfirmar_790MY.Enabled ? E.Bordo : E.Deshabilitado;
             btnConfirmar_790MY.ForeColor = btnConfirmar_790MY.Enabled ? Color.White : E.Gris;
+
+            ActualizarValidacion();
         }
+
+        #region Validación y avisos (Etapa 2)
+
+        // DNI de cliente: solo números, de 7 u 8 dígitos (regla del propietario).
+        private static readonly Regex _regexDni = new Regex(@"^\d{7,8}$");
+
+        // El resumen de faltantes aparece al intentar confirmar y se va solo al completarse.
+        private bool _resumenVisible;
+
+        /// <summary>Datos que faltan para abrir la mesa, en el orden de la pantalla.</summary>
+        private Dictionary<Control, string> Faltantes()
+        {
+            var faltantes = new Dictionary<Control, string>();
+            if (_modoWalkIn)
+            {
+                if (_clienteWalkIn == null) faltantes[txtDniCliente_790MY] = E.T("AM_val_cliente");
+                if (_mesaWalkIn == null) faltantes[btnSeleccionarMesa_790MY] = E.T("AM_val_mesa");
+            }
+            else if (_reservaSel == null)
+            {
+                faltantes[flpReservas_790MY] = E.T("AM_val_reserva");
+            }
+            if (_camareroSel == null) faltantes[flpCamareros_790MY] = E.T("AM_val_camarero");
+            return faltantes;
+        }
+
+        private void ActualizarValidacion()
+        {
+            if (!_resumenVisible) return;
+
+            Dictionary<Control, string> faltantes = Faltantes();
+            foreach (Control control in new Control[] { txtDniCliente_790MY, btnSeleccionarMesa_790MY, flpReservas_790MY, flpCamareros_790MY })
+                errValidacion_790MY.SetError(control, faltantes.TryGetValue(control, out string m) ? m : string.Empty);
+
+            if (faltantes.Count == 0)
+            {
+                _resumenVisible = false;
+                bnrAvisos_790MY.Ocultar();
+                return;
+            }
+
+            var renglones = faltantes.Values.Select(m => "•  " + m);
+            bnrAvisos_790MY.Mostrar(E.T("AM_banner_faltan") + Environment.NewLine + string.Join(Environment.NewLine, renglones),
+                                    TipoBanner_790MY.Error, cerrable: false);
+        }
+
+        /// <summary>Quita un aviso puntual (cliente inactivo, sin disponibilidad, regla de la BLL); el resumen sigue.</summary>
+        private void OcultarAvisoPuntual()
+        {
+            if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
+        }
+
+        #endregion
 
         private static void Asignar(Label etiqueta, string valor, string vacio)
         {
@@ -537,7 +605,12 @@ namespace GUI_08YS.RF2
 
         private void btnConfirmar_790MY_Click(object sender, EventArgs e)
         {
-            if (_camareroSel == null) return;
+            if (Faltantes().Count > 0)
+            {
+                _resumenVisible = true;
+                ActualizarValidacion();
+                return;
+            }
 
             Reserva_790MY abierta;
             try
@@ -548,14 +621,15 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
-                // Una apertura concurrente o una mesa recién ocupada se refleja al recargar.
+                // Una apertura concurrente o una mesa recién ocupada se refleja al recargar;
+                // el aviso se muestra después para que la recarga no lo oculte.
                 CargarDatos();
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
 
-            E.MostrarExito(VentanaPropietaria, E.T("msg_rf2_mesa_abierta_ok", abierta.MesaNumero, abierta.ReservaID));
             Limpiar();
+            E.MostrarExitoToast(this, E.T("msg_rf2_mesa_abierta_ok", abierta.MesaNumero, abierta.ReservaID));
         }
 
         private void btnLimpiar_790MY_Click(object sender, EventArgs e) => Limpiar();
@@ -566,6 +640,9 @@ namespace GUI_08YS.RF2
             _camareroSel = null;
             _clienteWalkIn = null;
             _mesaWalkIn = null;
+            _resumenVisible = false;
+            bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.Clear();
 
             txtBuscar_790MY.Clear();
             txtDniCliente_790MY.Clear();
