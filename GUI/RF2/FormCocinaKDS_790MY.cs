@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
@@ -86,7 +87,7 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Recargar(mostrarErrores: true);
             timerKds_790MY.Start();
@@ -104,7 +105,7 @@ namespace GUI_08YS.RF2
             catch (Exception ex)
             {
                 if (mostrarErrores)
-                    E.MostrarError(VentanaPropietaria, ex);
+                    E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 else
                     System.Diagnostics.Trace.TraceWarning("Actualización KDS: " + ex.Message);
             }
@@ -358,28 +359,30 @@ namespace GUI_08YS.RF2
 
         private void IniciarPreparacion(Pedido_790MY pedido)
         {
+            bnrAvisos_790MY.Ocultar();
             try
             {
                 _pedidoBll.IniciarPreparacion(pedido.NroPedido);
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Recargar(mostrarErrores: true);
         }
 
         private void MarcarListo(Pedido_790MY pedido)
         {
+            bnrAvisos_790MY.Ocultar();
             try
             {
                 // Cambio de estado + descuento efectivo del inventario en una transacción.
                 Pedido_790MY despachado = _pedidoBll.MarcarPedidoListo(pedido.NroPedido);
-                E.MostrarExito(VentanaPropietaria, E.T("msg_rf2_pedido_listo_ok", despachado?.NroPedido ?? pedido.NroPedido));
+                E.MostrarExitoToast(this, E.T("msg_rf2_pedido_listo_ok", despachado?.NroPedido ?? pedido.NroPedido));
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Recargar(mostrarErrores: true);
         }

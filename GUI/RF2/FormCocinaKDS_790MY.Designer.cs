@@ -55,6 +55,7 @@ namespace GUI_08YS.RF2
             this.lblColListas_790MY = new System.Windows.Forms.Label();
             this.chipCntListas_790MY = new GUI_08YS.RF2.EtiquetaChip_790MY();
             this.timerKds_790MY = new System.Windows.Forms.Timer(this.components);
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.tlpMain_790MY.SuspendLayout();
             this.tlpHeader_790MY.SuspendLayout();
             this.flpIndicadores_790MY.SuspendLayout();
@@ -569,6 +570,12 @@ namespace GUI_08YS.RF2
             this.timerKds_790MY.Interval = 15000;
             this.timerKds_790MY.Tick += new System.EventHandler(this.timerKds_790MY_Tick);
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
             // FormCocinaKDS_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -576,6 +583,7 @@ namespace GUI_08YS.RF2
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(24)))), ((int)(((byte)(22)))));
             this.ClientSize = new System.Drawing.Size(1280, 760);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormCocinaKDS_790MY";
             this.Text = "Cocina (KDS)";
@@ -644,5 +652,6 @@ namespace GUI_08YS.RF2
         private System.Windows.Forms.Label lblColListas_790MY;
         private GUI_08YS.RF2.EtiquetaChip_790MY chipCntListas_790MY;
         private System.Windows.Forms.Timer timerKds_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }
