@@ -41,11 +41,14 @@ namespace GUI_08YS.Maestros
             if (string.IsNullOrWhiteSpace(valor))
                 return;
 
+            // Etapa 2 (E2-D4): los errores de campo se marcan con el ErrorProvider y se
+            // borran solos al corregirse (al escribir o al elegir un valor de la lista).
             if (lstValores_790MY.Items.Contains(valor))
             {
-                var t = TraductorManager_08YS.Instance;
-                MessageBox.Show(t.GetTexto("msg_valor_duplicado"), t.GetTexto("titulo_duplicado"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                errValidacion_790MY.SetError(txtNuevoValor_790MY,
+                    TraductorManager_08YS.Instance.GetTexto("msg_valor_duplicado"));
+                txtNuevoValor_790MY.SelectAll();
+                txtNuevoValor_790MY.Focus();
                 return;
             }
 
@@ -58,13 +61,22 @@ namespace GUI_08YS.Maestros
         {
             if (lstValores_790MY.SelectedItem == null)
             {
-                var t = TraductorManager_08YS.Instance;
-                MessageBox.Show(t.GetTexto("msg_seleccionar_valor"), t.GetTexto("msg_sin_seleccion_lista"),
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                errValidacion_790MY.SetError(lstValores_790MY,
+                    TraductorManager_08YS.Instance.GetTexto("msg_seleccionar_valor"));
+                lstValores_790MY.Focus();
                 return;
             }
 
             lstValores_790MY.Items.Remove(lstValores_790MY.SelectedItem);
+        }
+
+        private void txtNuevoValor_790MY_TextChanged(object sender, EventArgs e)
+            => errValidacion_790MY.SetError(txtNuevoValor_790MY, string.Empty);
+
+        private void lstValores_790MY_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstValores_790MY.SelectedItem != null)
+                errValidacion_790MY.SetError(lstValores_790MY, string.Empty);
         }
 
         private void btnAceptar_790MY_Click(object sender, EventArgs e)
