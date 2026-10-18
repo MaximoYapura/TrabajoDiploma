@@ -43,6 +43,9 @@
             this.lblDireccion_790MY = new System.Windows.Forms.Label();
             this.txtDireccion_790MY = new System.Windows.Forms.TextBox();
             this.tipAyuda_790MY = new System.Windows.Forms.ToolTip(this.components);
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.pnlHeader_790MY.SuspendLayout();
             this.pnlFooter_790MY.SuspendLayout();
             this.flpBotones_790MY.SuspendLayout();
@@ -230,6 +233,8 @@
             this.txtDni_790MY.Name = "txtDni_790MY";
             this.txtDni_790MY.ReadOnly = true;
             this.txtDni_790MY.Size = new System.Drawing.Size(298, 25);
+            this.txtDni_790MY.TextChanged += new System.EventHandler(this.Campo_TextChanged);
+            this.txtDni_790MY.Leave += new System.EventHandler(this.Campo_Leave);
             this.txtDni_790MY.TabIndex = 1;
             this.txtDni_790MY.TabStop = false;
             //
@@ -250,6 +255,8 @@
             this.txtApellidos_790MY.Location = new System.Drawing.Point(107, 39);
             this.txtApellidos_790MY.Name = "txtApellidos_790MY";
             this.txtApellidos_790MY.Size = new System.Drawing.Size(298, 25);
+            this.txtApellidos_790MY.TextChanged += new System.EventHandler(this.Campo_TextChanged);
+            this.txtApellidos_790MY.Leave += new System.EventHandler(this.Campo_Leave);
             this.txtApellidos_790MY.TabIndex = 3;
             //
             // lblNombres_790MY
@@ -269,6 +276,8 @@
             this.txtNombres_790MY.Location = new System.Drawing.Point(107, 74);
             this.txtNombres_790MY.Name = "txtNombres_790MY";
             this.txtNombres_790MY.Size = new System.Drawing.Size(298, 25);
+            this.txtNombres_790MY.TextChanged += new System.EventHandler(this.Campo_TextChanged);
+            this.txtNombres_790MY.Leave += new System.EventHandler(this.Campo_Leave);
             this.txtNombres_790MY.TabIndex = 5;
             //
             // lblEmail_790MY
@@ -288,6 +297,8 @@
             this.txtEmail_790MY.Location = new System.Drawing.Point(107, 109);
             this.txtEmail_790MY.Name = "txtEmail_790MY";
             this.txtEmail_790MY.Size = new System.Drawing.Size(298, 25);
+            this.txtEmail_790MY.TextChanged += new System.EventHandler(this.Campo_TextChanged);
+            this.txtEmail_790MY.Leave += new System.EventHandler(this.Campo_Leave);
             this.txtEmail_790MY.TabIndex = 7;
             //
             // btnEmailsAdicionales_790MY
@@ -324,6 +335,8 @@
             this.txtCelular_790MY.Location = new System.Drawing.Point(107, 144);
             this.txtCelular_790MY.Name = "txtCelular_790MY";
             this.txtCelular_790MY.Size = new System.Drawing.Size(298, 25);
+            this.txtCelular_790MY.TextChanged += new System.EventHandler(this.Campo_TextChanged);
+            this.txtCelular_790MY.Leave += new System.EventHandler(this.Campo_Leave);
             this.txtCelular_790MY.TabIndex = 10;
             //
             // btnTelefonosAdicionales_790MY
@@ -360,7 +373,22 @@
             this.txtDireccion_790MY.Location = new System.Drawing.Point(107, 179);
             this.txtDireccion_790MY.Name = "txtDireccion_790MY";
             this.txtDireccion_790MY.Size = new System.Drawing.Size(298, 25);
+            this.txtDireccion_790MY.TextChanged += new System.EventHandler(this.Campo_TextChanged);
+            this.txtDireccion_790MY.Leave += new System.EventHandler(this.Campo_Leave);
             this.txtDireccion_790MY.TabIndex = 13;
+            //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 3;
+            this.bnrAvisos_790MY.VisibleChanged += new System.EventHandler(this.bnrAvisos_790MY_TamanioCambiado);
+            this.bnrAvisos_790MY.SizeChanged += new System.EventHandler(this.bnrAvisos_790MY_TamanioCambiado);
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
             //
             // FormRegistrarCliente_790MY
             //
@@ -371,6 +399,7 @@
             this.CancelButton = this.btnCancelar_790MY;
             this.Controls.Add(this.pnlCuerpo_790MY);
             this.Controls.Add(this.pnlFooter_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlHeader_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -383,6 +412,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Registrar Cliente";
             this.Load += new System.EventHandler(this.FormRegistrarCliente_790MY_Load);
+            this.AplicarIconosDeError();
             this.pnlHeader_790MY.ResumeLayout(false);
             this.pnlHeader_790MY.PerformLayout();
             this.pnlFooter_790MY.ResumeLayout(false);
@@ -392,6 +422,7 @@
             this.grpDatos_790MY.ResumeLayout(false);
             this.tlpCampos_790MY.ResumeLayout(false);
             this.tlpCampos_790MY.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -423,5 +454,19 @@
         private System.Windows.Forms.Label lblDireccion_790MY;
         private System.Windows.Forms.TextBox txtDireccion_790MY;
         private System.Windows.Forms.ToolTip tipAyuda_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
+
+        /// <summary>Ícono de error dentro del borde derecho de cada campo (solo apariencia). Invocado desde InitializeComponent().</summary>
+        private void AplicarIconosDeError()
+        {
+            foreach (System.Windows.Forms.Control campo in new System.Windows.Forms.Control[]
+                { this.txtDni_790MY, this.txtApellidos_790MY, this.txtNombres_790MY,
+                  this.txtEmail_790MY, this.txtCelular_790MY, this.txtDireccion_790MY })
+            {
+                this.errValidacion_790MY.SetIconAlignment(campo, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+                this.errValidacion_790MY.SetIconPadding(campo, -20);
+            }
+        }
     }
 }

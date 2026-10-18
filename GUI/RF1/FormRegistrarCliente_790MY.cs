@@ -6,8 +6,10 @@ using Service_08YS;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
@@ -43,6 +45,7 @@ namespace GUI_08YS.RF1
         {
             UpdateIdioma();
             ActualizarContadoresAdicionales();
+            _altoSinBanner = Height;
             txtApellidos_790MY.Focus();
         }
 
@@ -91,50 +94,142 @@ namespace GUI_08YS.RF1
             btnTelefonosAdicionales_790MY.Text = _telefonosAdicionales.Count > 0 ? $"+{_telefonosAdicionales.Count}" : "+";
         }
 
+        #region Validación en línea (Etapa 2, mismas reglas que el Maestro de Clientes)
+
+        // DNI de 7 u 8 dígitos; email y celular obligatorios (los exige ClienteBLL_790MY);
+        // dirección opcional. La BLL sigue siendo la autoridad al guardar (E2-H3).
+        private static readonly Regex _regexDni     = new Regex(@"^\d{7,8}$");
+        private static readonly Regex _regexEmail   = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+        private static readonly Regex _regexCelular = new Regex(@"^\d+$");
+
+        // Un campo muestra su error recién al salir de él; el resumen del banner aparece
+        // al intentar guardar y se va solo cuando ya no hay errores.
+        private readonly HashSet<Control> _camposTocados = new HashSet<Control>();
+        private bool _resumenVisible;
+        private int _altoSinBanner;
+
+        private IEnumerable<TextBox> CamposFicha()
+        {
+            yield return txtDni_790MY;
+            yield return txtApellidos_790MY;
+            yield return txtNombres_790MY;
+            yield return txtEmail_790MY;
+            yield return txtCelular_790MY;
+            yield return txtDireccion_790MY;
+        }
+
+        private Dictionary<TextBox, string> ValidarFicha()
+        {
+            var t = TraductorManager_08YS.Instance;
+            var errores = new Dictionary<TextBox, string>();
+
+            string dni = txtDni_790MY.Text.Trim();
+            if (!_regexDni.IsMatch(dni) || int.Parse(dni) <= 0)
+                errores[txtDni_790MY] = t.GetTexto("RC_val_dni_precargado");
+
+            if (string.IsNullOrWhiteSpace(txtApellidos_790MY.Text))
+                errores[txtApellidos_790MY] = t.GetTexto("FC_val_apellido");
+
+            if (string.IsNullOrWhiteSpace(txtNombres_790MY.Text))
+                errores[txtNombres_790MY] = t.GetTexto("FC_val_nombre");
+
+            string email = txtEmail_790MY.Text.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                errores[txtEmail_790MY] = t.GetTexto("msg_fc_email_requerido");
+            else if (!_regexEmail.IsMatch(email))
+                errores[txtEmail_790MY] = t.GetTexto("FC_val_email_formato");
+
+            string celular = txtCelular_790MY.Text.Trim();
+            if (string.IsNullOrWhiteSpace(celular))
+                errores[txtCelular_790MY] = t.GetTexto("msg_fc_celular_requerido");
+            else if (!_regexCelular.IsMatch(celular))
+                errores[txtCelular_790MY] = t.GetTexto("FC_val_celular_numeros");
+
+            return errores;
+        }
+
+        private void Campo_TextChanged(object sender, EventArgs e)
+        {
+            // Un error devuelto por la BLL (DNI duplicado, etc.) se da por atendido al editar.
+            if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
+            ActualizarValidacion();
+        }
+
+        private void Campo_Leave(object sender, EventArgs e)
+        {
+            _camposTocados.Add((Control)sender);
+            ActualizarValidacion();
+        }
+
+        private void ActualizarValidacion()
+        {
+            Dictionary<TextBox, string> errores = ValidarFicha();
+            foreach (TextBox caja in CamposFicha())
+            {
+                bool mostrar = errores.ContainsKey(caja) && _camposTocados.Contains(caja);
+                errValidacion_790MY.SetError(caja, mostrar ? errores[caja] : string.Empty);
+            }
+
+            if (!_resumenVisible) return;
+            if (errores.Count == 0)
+            {
+                _resumenVisible = false;
+                bnrAvisos_790MY.Ocultar();
+                return;
+            }
+
+            var renglones = errores.Select(par => "•  " + NombreCampo(par.Key) + ": " + par.Value);
+            bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("FC_banner_revisar")
+                + Environment.NewLine + string.Join(Environment.NewLine, renglones),
+                TipoBanner_790MY.Error, cerrable: false);
+        }
+
+        private string NombreCampo(TextBox caja)
+        {
+            Label etiqueta =
+                caja == txtDni_790MY ? lblDni_790MY :
+                caja == txtApellidos_790MY ? lblApellidos_790MY :
+                caja == txtNombres_790MY ? lblNombres_790MY :
+                caja == txtEmail_790MY ? lblEmail_790MY :
+                caja == txtCelular_790MY ? lblCelular_790MY : lblDireccion_790MY;
+            return etiqueta.Text.TrimEnd(':', ' ');
+        }
+
+        // El diálogo tiene tamaño fijo: crece mientras se ve el banner para no apretar los campos.
+        private void bnrAvisos_790MY_TamanioCambiado(object sender, EventArgs e)
+        {
+            if (_altoSinBanner == 0) return;
+            Height = _altoSinBanner + (bnrAvisos_790MY.Visible ? bnrAvisos_790MY.Height : 0);
+        }
+
+        private void MostrarErrorEnBanner(string mensaje)
+        {
+            _resumenVisible = false;
+            bnrAvisos_790MY.Mostrar(mensaje);
+        }
+
+        #endregion
+
         private void btnAplicar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
 
-            if (!int.TryParse(txtDni_790MY.Text.Trim(), out int dni))
+            Dictionary<TextBox, string> errores = ValidarFicha();
+            if (errores.Count > 0)
             {
-                Avisar(t.GetTexto("msg_fc_dni_invalido"), txtDni_790MY);
+                foreach (TextBox caja in CamposFicha()) _camposTocados.Add(caja);
+                _resumenVisible = true;
+                ActualizarValidacion();
+                errores.Keys.First().Focus();
                 return;
             }
 
-            string apellido = txtApellidos_790MY.Text.Trim();
-            if (string.IsNullOrWhiteSpace(apellido))
-            {
-                Avisar(t.GetTexto("msg_fc_apellido_requerido"), txtApellidos_790MY);
-                return;
-            }
-
-            string nombre = txtNombres_790MY.Text.Trim();
-            if (string.IsNullOrWhiteSpace(nombre))
-            {
-                Avisar(t.GetTexto("msg_fc_nombre_requerido"), txtNombres_790MY);
-                return;
-            }
-
-            string email = txtEmail_790MY.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(email) && !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            {
-                Avisar(t.GetTexto("msg_fc_email_invalido"), txtEmail_790MY);
-                return;
-            }
-
-            string celular = txtCelular_790MY.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(celular) && !Regex.IsMatch(celular, @"^\d+$"))
-            {
-                Avisar(t.GetTexto("msg_fc_celular_solo_numeros"), txtCelular_790MY);
-                return;
-            }
-
+            int dni = int.Parse(txtDni_790MY.Text.Trim());
+            string apellido  = txtApellidos_790MY.Text.Trim();
+            string nombre    = txtNombres_790MY.Text.Trim();
+            string email     = txtEmail_790MY.Text.Trim();
+            string celular   = txtCelular_790MY.Text.Trim();
             string direccion = txtDireccion_790MY.Text.Trim();
-            if (string.IsNullOrWhiteSpace(direccion))
-            {
-                Avisar(t.GetTexto("msg_fc_direccion_requerida"), txtDireccion_790MY);
-                return;
-            }
 
             try
             {
@@ -152,26 +247,21 @@ namespace GUI_08YS.RF1
             }
             catch (ClienteDniDuplicadoException_790MY)
             {
-                MessageBox.Show(t.GetTexto("msg_dni_duplicado_cliente"), t.GetTexto("titulo_operacion_no_permitida"),
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Exists() cuenta también a los clientes dados de baja.
+                string mensaje = string.Format(t.GetTexto("FC_err_dni_duplicado"), dni);
+                MostrarErrorEnBanner(mensaje);
+                errValidacion_790MY.SetError(txtDni_790MY, mensaje);
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
-                MessageBox.Show(t.GetTexto("msg_fc_error_validacion_bll"), t.GetTexto("titulo_datos_invalidos"),
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarErrorEnBanner(string.Format(t.GetTexto("FC_err_bll_guardar"), ex.Message));
             }
             catch (Exception)
             {
-                MessageBox.Show(t.GetTexto("msg_fc_error_guardar"), t.GetTexto("error"),
+                // Error inesperado (base de datos, excepción no prevista): MessageBox nativo (E2-D1).
+                MessageBox.Show(this, t.GetTexto("FC_fatal_guardar"), t.GetTexto("error"),
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void Avisar(string mensaje, Control foco)
-        {
-            MessageBox.Show(mensaje, TraductorManager_08YS.Instance.GetTexto("titulo_dato_invalido"),
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            foco.Focus();
         }
 
         private void btnCancelar_790MY_Click(object sender, EventArgs e)
