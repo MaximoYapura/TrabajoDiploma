@@ -17,7 +17,10 @@ namespace GUI_08YS.Maestros
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.pnlBarra_790MY = new System.Windows.Forms.Panel();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             this.txtBuscar_790MY = new System.Windows.Forms.TextBox();
             this.lblFiltroCargo_790MY = new System.Windows.Forms.Label();
             this.cmbFiltroCargo_790MY = new System.Windows.Forms.ComboBox();
@@ -60,6 +63,7 @@ namespace GUI_08YS.Maestros
             this.pnlDetalle_790MY.SuspendLayout();
             this.tlpDetalle_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEmpleados_790MY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.SuspendLayout();
             //
             // pnlBarra_790MY
@@ -505,6 +509,19 @@ namespace GUI_08YS.Maestros
             this.colEstado_790MY.Name = "colEstado_790MY";
             this.colEstado_790MY.Tag = "FE_colEstado";
             //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 4;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            this.errValidacion_790MY.SetIconAlignment(this.txtDni_790MY, System.Windows.Forms.ErrorIconAlignment.MiddleRight);
+            this.errValidacion_790MY.SetIconPadding(this.txtDni_790MY, -20);
+            //
             // FormEmpleados_790MY
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -514,6 +531,7 @@ namespace GUI_08YS.Maestros
             this.Controls.Add(this.dgvEmpleados_790MY);
             this.Controls.Add(this.pnlDetalle_790MY);
             this.Controls.Add(this.pnlEstado_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlBarra_790MY);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormEmpleados_790MY";
@@ -527,6 +545,7 @@ namespace GUI_08YS.Maestros
             this.pnlDetalle_790MY.ResumeLayout(false);
             this.pnlDetalle_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEmpleados_790MY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -571,5 +590,7 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.DataGridViewTextBoxColumn colCargo_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colUsuario_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colEstado_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }
