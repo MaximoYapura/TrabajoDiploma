@@ -123,6 +123,10 @@
       <DependentUpon>FormMesas_790MY.cs</DependentUpon>
     </Compile>
     <Compile Include="Maestros\EstiloMaestros_790MY.cs" />
+    <Compile Include="Maestros\MesaCard_790MY.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Estilo\TemaFogon_790MY.cs" />
     <Compile Include="Maestros\FormEmpleados_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
