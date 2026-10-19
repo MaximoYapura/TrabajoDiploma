@@ -1,6 +1,5 @@
 using BE_08YS;
 using BLL_08YS;
-using FontAwesome.Sharp;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Windows.Forms;
 using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
+using NivelSemaforo = GUI_08YS.RF2.TicketKds_790MY.NivelSemaforo;
 
 namespace GUI_08YS.RF2
 {
@@ -21,23 +21,6 @@ namespace GUI_08YS.RF2
     /// </summary>
     public partial class FormCocinaKDS_790MY : Form, IIdiomaObserver_08YS
     {
-        /// <summary>
-        /// Semáforo por tiempo de espera desde la solicitud (comandas Pendiente / EnPreparación):
-        /// menos de 10 min = verde (a tiempo), 10 a 20 min = amarillo (atención),
-        /// más de 20 min = rojo (demorado).
-        /// </summary>
-        private enum NivelSemaforo { ATiempo, Atencion, Demorado }
-
-        private const int MinutosAtencion = 10;
-        private const int MinutosDemora = 20;
-
-        private static readonly Color SemVerde       = Color.FromArgb(120, 200, 130);
-        private static readonly Color SemVerdeFondo  = Color.FromArgb(32, 58, 40);
-        private static readonly Color SemAmbar       = Color.FromArgb(244, 185, 66);
-        private static readonly Color SemAmbarFondo  = Color.FromArgb(64, 52, 28);
-        private static readonly Color SemRojo        = Color.FromArgb(240, 110, 100);
-        private static readonly Color SemRojoFondo   = Color.FromArgb(72, 30, 30);
-
         private readonly PedidoBLL_790MY _pedidoBll;
 
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
@@ -50,13 +33,17 @@ namespace GUI_08YS.RF2
         private List<Pedido_790MY> _listos = new List<Pedido_790MY>();
         private Dictionary<int, Empleado_790MY> _camareros = new Dictionary<int, Empleado_790MY>();
 
-        private readonly Font _fuentePedido  = new Font("Segoe UI", 15F, FontStyle.Bold);
-        private readonly Font _fuenteMesa    = new Font("Segoe UI", 11.25F, FontStyle.Bold);
-        private readonly Font _fuenteDetalle = new Font("Segoe UI", 9.75F);
-        private readonly Font _fuenteItem    = new Font("Segoe UI", 12.5F);
-        private readonly Font _fuenteCant    = new Font("Segoe UI", 12.5F, FontStyle.Bold);
-        private readonly Font _fuenteChip    = new Font("Segoe UI", 9.75F, FontStyle.Bold);
-        private readonly Font _fuenteBoton   = new Font("Segoe UI", 12F, FontStyle.Bold);
+        /// <summary>
+        /// Etapa 3 (Opción C): cada pedido en pantalla tiene un único ticket, que se
+        /// actualiza en el lugar y se mueve de columna; solo se crean los pedidos nuevos
+        /// y solo se destruyen los que ya no vienen en la consulta.
+        /// </summary>
+        private readonly Dictionary<int, TicketKds_790MY> _tickets = new Dictionary<int, TicketKds_790MY>();
+
+        /// <summary>Aviso «sin comandas» de cada columna; se muestra u oculta, no se recrea.</summary>
+        private readonly Dictionary<FlowLayoutPanel, Label> _avisosVacio = new Dictionary<FlowLayoutPanel, Label>();
+
+        private readonly FuentesKds_790MY _fuentes = new FuentesKds_790MY();
 
         public FormCocinaKDS_790MY()
         {
@@ -69,8 +56,7 @@ namespace GUI_08YS.RF2
             {
                 TraductorManager_08YS.Instance.Desuscribir(this);
                 timerKds_790MY.Stop();
-                foreach (var f in new[] { _fuentePedido, _fuenteMesa, _fuenteDetalle, _fuenteItem, _fuenteCant, _fuenteChip, _fuenteBoton })
-                    f.Dispose();
+                _fuentes.Dispose();
             };
         }
 
@@ -97,6 +83,9 @@ namespace GUI_08YS.RF2
 
         private void Recargar(bool mostrarErrores)
         {
+            // Tiempos de consulta y redibujado (criterio E3-D5: redibujado < 50 ms),
+            // para poder medir en el equipo real de la cocina.
+            var reloj = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 _comandas = _pedidoBll.ObtenerComandasCocina();
@@ -109,7 +98,11 @@ namespace GUI_08YS.RF2
                 else
                     System.Diagnostics.Trace.TraceWarning("Actualización KDS: " + ex.Message);
             }
+            long msConsulta = reloj.ElapsedMilliseconds;
+            reloj.Restart();
             Renderizar();
+            System.Diagnostics.Trace.WriteLine(
+                $"consulta {msConsulta} ms, redibujado {reloj.ElapsedMilliseconds} ms ({_comandas.Count + _listos.Count} tickets)", "KDS");
         }
 
         private void timerKds_790MY_Tick(object sender, EventArgs e) => Recargar(mostrarErrores: false);
@@ -139,219 +132,83 @@ namespace GUI_08YS.RF2
             chipCntListas_790MY.Text = _listos.Count.ToString();
             lblReloj_790MY.Text = DateTime.Now.ToString("HH:mm");
 
-            var niveles = _comandas.Select(p => Nivel(MinutosEspera(p))).ToList();
+            var niveles = _comandas.Select(p => TicketKds_790MY.Nivel(TicketKds_790MY.MinutosEspera(p))).ToList();
             chipATiempo_790MY.Text = E.T("KDS_sem_a_tiempo", niveles.Count(n => n == NivelSemaforo.ATiempo));
             chipAtencion_790MY.Text = E.T("KDS_sem_atencion", niveles.Count(n => n == NivelSemaforo.Atencion));
             chipDemorado_790MY.Text = E.T("KDS_sem_demorado", niveles.Count(n => n == NivelSemaforo.Demorado));
 
-            LlenarColumna(flpPendientes_790MY, pendientes, "msg_rf2_sin_comandas");
-            LlenarColumna(flpPreparacion_790MY, enPreparacion, "KDS_sin_preparacion");
-            LlenarColumna(flpListas_790MY, _listos, "KDS_sin_listas");
-        }
+            var columnas = new[] { flpPendientes_790MY, flpPreparacion_790MY, flpListas_790MY };
+            foreach (var flp in columnas) flp.SuspendLayout();
 
-        private void LlenarColumna(FlowLayoutPanel flp, List<Pedido_790MY> pedidos, string claveVacio)
-        {
-            // Se conserva la posición de scroll al refrescar periódicamente.
-            int scroll = flp.VerticalScroll.Value;
+            var vigentes = new HashSet<int>();
+            SincronizarColumna(flpPendientes_790MY, pendientes, "msg_rf2_sin_comandas", vigentes);
+            SincronizarColumna(flpPreparacion_790MY, enPreparacion, "KDS_sin_preparacion", vigentes);
+            SincronizarColumna(flpListas_790MY, _listos, "KDS_sin_listas", vigentes);
 
-            flp.SuspendLayout();
-            foreach (Control c in flp.Controls.Cast<Control>().ToList())
-                c.Dispose();
-            flp.Controls.Clear();
-
-            int ancho = Math.Max(220, flp.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 4);
-
-            if (pedidos.Count == 0)
+            // Bajas: solo se destruyen los tickets de pedidos que ya no vienen en la consulta.
+            foreach (int nro in _tickets.Keys.Where(k => !vigentes.Contains(k)).ToList())
             {
-                var vacio = E.CrearLabel(E.T(claveVacio), _fuenteDetalle, E.KdsGris, autoSize: false);
-                vacio.Size = new Size(ancho, 80);
-                vacio.TextAlign = ContentAlignment.MiddleCenter;
-                flp.Controls.Add(vacio);
+                _tickets[nro].Dispose();
+                _tickets.Remove(nro);
             }
 
-            foreach (var pedido in pedidos)
-                flp.Controls.Add(CrearTicket(pedido, ancho));
+            foreach (var flp in columnas) flp.ResumeLayout();
+        }
 
-            flp.ResumeLayout();
-            if (scroll > 0 && flp.VerticalScroll.Visible)
+        private void SincronizarColumna(FlowLayoutPanel flp, List<Pedido_790MY> pedidos, string claveVacio, HashSet<int> vigentes)
+        {
+            int ancho = Math.Max(220, flp.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 4);
+            int scroll = flp.VerticalScroll.Value;
+
+            var vacio = AvisoVacio(flp);
+            vacio.Text = E.T(claveVacio);
+            vacio.Width = ancho;
+            vacio.Visible = pedidos.Count == 0;
+
+            // El aviso ocupa el índice 0; los tickets van detrás, en el orden de la consulta.
+            for (int i = 0; i < pedidos.Count; i++)
+            {
+                var pedido = pedidos[i];
+                vigentes.Add(pedido.NroPedido);
+
+                if (!_tickets.TryGetValue(pedido.NroPedido, out var ticket))
+                {
+                    // Alta: solo se instancia el ticket del pedido nuevo.
+                    ticket = new TicketKds_790MY(_fuentes, NombreCamarero,
+                        SessionManager_08YS.Instance.HasPermission(Permisos.DespacharPedido),
+                        IniciarPreparacion, MarcarListo);
+                    _tickets.Add(pedido.NroPedido, ticket);
+                }
+                ticket.Aplicar(pedido, ancho);
+
+                // Cambio de columna: el mismo control pasa de panel, sin destruirse.
+                if (ticket.Parent != flp)
+                    ticket.Parent = flp;
+                if (flp.Controls.GetChildIndex(ticket) != i + 1)
+                    flp.Controls.SetChildIndex(ticket, i + 1);
+            }
+
+            // Se conserva la posición de scroll al refrescar periódicamente.
+            if (scroll > 0 && flp.VerticalScroll.Visible && flp.VerticalScroll.Value != scroll)
                 flp.AutoScrollPosition = new Point(0, scroll);
         }
 
-        private Control CrearTicket(Pedido_790MY pedido, int ancho)
+        private Label AvisoVacio(FlowLayoutPanel flp)
         {
-            bool listo = pedido.Estado == EstadoPedido_790MY.Listo;
-            int minutos = MinutosEspera(pedido);
-            NivelSemaforo nivel = Nivel(minutos);
-
-            // Las comandas en curso llevan el borde del color del semáforo.
-            var card = new PanelRedondeado_790MY
+            if (!_avisosVacio.TryGetValue(flp, out var aviso))
             {
-                Width = ancho,
-                Margin = new Padding(0, 0, 0, 14),
-                BackColor = listo ? Color.FromArgb(38, 56, 44) : E.KdsTarjeta,
-                ColorBorde = listo ? Color.FromArgb(70, 120, 85) : ColorSemaforo(nivel),
-                GrosorBorde = listo ? 1f : 2.5f,
-                Radio = 12
-            };
-
-            int x = 18, y = 14, interior = ancho - 36;
-
-            // Encabezado: número de pedido + mesa
-            var lblPedido = E.CrearLabel(E.T("KDS_pedido_nro", pedido.NroPedido), _fuentePedido, E.KdsTexto);
-            lblPedido.Location = new Point(x, y);
-            var chipMesa = E.CrearChip(E.T("KDS_mesa", pedido.MesaNumero).ToUpper(), E.KdsTexto, E.KdsFondo, _fuenteMesa);
-            chipMesa.Padding = new Padding(10, 4, 10, 4);
-            card.Controls.Add(lblPedido);
-            card.Controls.Add(chipMesa);
-            chipMesa.Location = new Point(ancho - chipMesa.PreferredWidth - 18, y + 2);
-            y += 40;
-
-            if (!listo)
-            {
-                // Camarero, hora de solicitud y tiempo transcurrido
-                string camarero = pedido.CamareroDNI.HasValue && _camareros.TryGetValue(pedido.CamareroDNI.Value, out var emp)
-                    ? E.NombreCorto(emp) : "-";
-                var lblDetalle = E.CrearLabel(E.T("KDS_solicitado", camarero, E.Hora(pedido.Hora)), _fuenteDetalle, E.KdsGris);
-                lblDetalle.Location = new Point(x, y + 4);
-                card.Controls.Add(lblDetalle);
-
-                var chipTiempo = E.CrearChip(TextoSemaforo(nivel, minutos), FondoSemaforo(nivel),
-                                             ColorSemaforo(nivel), _fuenteChip, ColorSemaforo(nivel));
-                card.Controls.Add(chipTiempo);
-                chipTiempo.Location = new Point(ancho - chipTiempo.PreferredWidth - 18, y);
-                y += 38;
+                aviso = E.CrearLabel("", _fuentes.Detalle, E.KdsGris, autoSize: false);
+                aviso.Height = 80;
+                aviso.TextAlign = ContentAlignment.MiddleCenter;
+                flp.Controls.Add(aviso);
+                flp.Controls.SetChildIndex(aviso, 0);
+                _avisosVacio.Add(flp, aviso);
             }
-
-            // Ítems con sus observaciones
-            foreach (var item in pedido.Items.OrderBy(i => i.NroItem))
-            {
-                var lblCant = E.CrearLabel(item.Cantidad + "×", _fuenteCant, listo ? E.KdsVerde : ColorAcento(pedido.Estado));
-                lblCant.Location = new Point(x, y);
-                var lblItem = E.CrearLabel(item.ProductoNombre, _fuenteItem, E.KdsTexto, autoSize: false);
-                lblItem.Location = new Point(x + 46, y);
-                lblItem.Size = new Size(interior - 46, 26);
-                card.Controls.Add(lblCant);
-                card.Controls.Add(lblItem);
-                y += 30;
-
-                if (!string.IsNullOrWhiteSpace(item.Observaciones))
-                {
-                    var chipObs = E.CrearChip("⚠ " + item.Observaciones, Color.FromArgb(70, 56, 30), E.KdsAmbar, _fuenteChip);
-                    chipObs.MaximumSize = new Size(interior - 46, 0);
-                    chipObs.Location = new Point(x + 46, y);
-                    card.Controls.Add(chipObs);
-                    y += chipObs.PreferredHeight + 6;
-                }
-            }
-            y += 6;
-
-            if (listo)
-            {
-                string camarero = pedido.CamareroDNI.HasValue && _camareros.TryGetValue(pedido.CamareroDNI.Value, out var emp)
-                    ? E.NombreCorto(emp) : "-";
-                var barra = new Label
-                {
-                    Text = E.T("KDS_finalizado", pedido.HoraFin.HasValue ? E.Hora(pedido.HoraFin.Value) : "-", camarero),
-                    Font = _fuenteChip,
-                    ForeColor = E.KdsVerde,
-                    BackColor = Color.FromArgb(28, 72, 40),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    Padding = new Padding(10, 0, 10, 0),
-                    Location = new Point(x, y),
-                    Size = new Size(interior, 34)
-                };
-                card.Controls.Add(barra);
-                y += 42;
-
-                string descontado = string.Join(" · ", pedido.Items
-                    .GroupBy(i => i.ProductoNombre)
-                    .Select(g => $"{g.Key} −{g.Sum(i => i.Cantidad)}"));
-                var lblStock = E.CrearLabel(E.T("KDS_stock_descontado", descontado), _fuenteDetalle, E.KdsGris, autoSize: false);
-                lblStock.Location = new Point(x, y);
-                lblStock.Size = new Size(interior, TextRenderer.MeasureText(lblStock.Text, _fuenteDetalle,
-                    new Size(interior, 0), TextFormatFlags.WordBreak).Height + 4);
-                card.Controls.Add(lblStock);
-                y += lblStock.Height + 10;
-            }
-            else
-            {
-                bool pendiente = pedido.Estado == EstadoPedido_790MY.Pendiente;
-                var boton = new IconButton
-                {
-                    Text = pendiente ? E.T("KDS_btn_iniciar") : E.T("KDS_btn_listo"),
-                    IconChar = pendiente ? IconChar.Play : IconChar.Check,
-                    IconColor = E.KdsFondo,
-                    IconSize = 22,
-                    TextImageRelation = TextImageRelation.ImageBeforeText,
-                    ImageAlign = ContentAlignment.MiddleCenter,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Font = _fuenteBoton,
-                    ForeColor = E.KdsFondo,
-                    BackColor = pendiente ? E.KdsAzul : E.KdsVerde,
-                    FlatStyle = FlatStyle.Flat,
-                    Cursor = Cursors.Hand,
-                    Location = new Point(x, y),
-                    Size = new Size(interior, 52),
-                    Enabled = SessionManager_08YS.Instance.HasPermission(Permisos.DespacharPedido)
-                };
-                boton.FlatAppearance.BorderSize = 0;
-                boton.Click += (s, e) =>
-                {
-                    if (pendiente) IniciarPreparacion(pedido);
-                    else MarcarListo(pedido);
-                };
-                card.Controls.Add(boton);
-                y += 66;
-            }
-
-            card.Height = y;
-            return card;
+            return aviso;
         }
 
-        private static Color ColorAcento(EstadoPedido_790MY estado)
-            => estado == EstadoPedido_790MY.Pendiente ? Color.FromArgb(240, 140, 120) : E.KdsAzul;
-
-        // ─── Semáforo por tiempo ─────────────────────────────────────────────
-
-        private static int MinutosEspera(Pedido_790MY pedido)
-            => Math.Max(0, (int)(DateTime.Now - (pedido.Fecha.Date + pedido.Hora)).TotalMinutes);
-
-        private static NivelSemaforo Nivel(int minutos)
-        {
-            if (minutos < MinutosAtencion) return NivelSemaforo.ATiempo;
-            if (minutos <= MinutosDemora) return NivelSemaforo.Atencion;
-            return NivelSemaforo.Demorado;
-        }
-
-        private static Color ColorSemaforo(NivelSemaforo nivel)
-        {
-            switch (nivel)
-            {
-                case NivelSemaforo.ATiempo: return SemVerde;
-                case NivelSemaforo.Atencion: return SemAmbar;
-                default: return SemRojo;
-            }
-        }
-
-        private static Color FondoSemaforo(NivelSemaforo nivel)
-        {
-            switch (nivel)
-            {
-                case NivelSemaforo.ATiempo: return SemVerdeFondo;
-                case NivelSemaforo.Atencion: return SemAmbarFondo;
-                default: return SemRojoFondo;
-            }
-        }
-
-        private static string TextoSemaforo(NivelSemaforo nivel, int minutos)
-        {
-            switch (nivel)
-            {
-                case NivelSemaforo.ATiempo: return E.T("KDS_chip_a_tiempo", minutos);
-                case NivelSemaforo.Atencion: return E.T("KDS_chip_atencion", minutos);
-                default: return E.T("KDS_demorado", minutos);
-            }
-        }
+        private string NombreCamarero(int? dni)
+            => dni.HasValue && _camareros.TryGetValue(dni.Value, out var emp) ? E.NombreCorto(emp) : "-";
 
         #endregion
 
@@ -395,6 +252,8 @@ namespace GUI_08YS.RF2
         {
             E.TraducirTags(this);
             if (_pedidoBll == null) return; // aún en construcción
+            foreach (var ticket in _tickets.Values)
+                ticket.Invalidar(); // los textos cambian de idioma: se rearma cada ticket
             Renderizar();
         }
 

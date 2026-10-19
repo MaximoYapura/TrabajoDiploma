@@ -195,6 +195,9 @@
     <Compile Include="RF2\PanelRedondeado_790MY.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="RF2\TicketKds_790MY.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RF2\FormAbrirMesa_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
