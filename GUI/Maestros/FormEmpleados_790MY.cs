@@ -258,6 +258,10 @@ namespace GUI_08YS.Maestros
                 });
 
             int? actual = editado?.UsuarioDNI;
+            // Vínculo vigente con un usuario que no figura entre los vinculables (p. ej. inactivo):
+            // se muestra igual, para no presentarlo como «sin usuario».
+            if (actual.HasValue && !cmbUsuario_790MY.Items.Cast<Opcion<int?>>().Any(o => o.Valor == actual))
+                cmbUsuario_790MY.Items.Add(new Opcion<int?> { Valor = actual, Texto = NombreUsuario(actual) });
             cmbUsuario_790MY.SelectedItem = cmbUsuario_790MY.Items.Cast<Opcion<int?>>()
                 .FirstOrDefault(o => o.Valor == actual) ?? cmbUsuario_790MY.Items[0];
         }
@@ -273,7 +277,10 @@ namespace GUI_08YS.Maestros
 
             txtDni_790MY.ReadOnly = modo != ModoEdicion.Alta;
             txtNombre_790MY.ReadOnly = txtApellido_790MY.ReadOnly = !editando;
-            cmbCargo_790MY.Enabled = cmbUsuario_790MY.Enabled = chkActivo_790MY.Enabled = editando;
+            cmbCargo_790MY.Enabled = chkActivo_790MY.Enabled = editando;
+            // El vínculo con un usuario del sistema no se asigna ni se cambia desde este maestro:
+            // el combo solo muestra el vínculo vigente (p. ej. el del administrador «Maximo»).
+            cmbUsuario_790MY.Enabled = false;
 
             btnGuardar_790MY.Visible = btnCancelar_790MY.Visible = editando;
             btnAnadir_790MY.Enabled = !editando;
@@ -343,7 +350,9 @@ namespace GUI_08YS.Maestros
             }
 
             var puesto = (cmbCargo_790MY.SelectedItem as Opcion<PuestoEmpleado_790MY>)?.Valor ?? PuestoEmpleado_790MY.Camarero;
-            var usuario = (cmbUsuario_790MY.SelectedItem as Opcion<int?>)?.Valor;
+            // Alta: siempre sin usuario. Modificación: se conserva el vínculo que ya tenía el
+            // empleado (no el del combo), así nunca se asigna, cambia ni borra desde acá.
+            int? usuario = _modo == ModoEdicion.Alta ? null : _empleados.FirstOrDefault(x => x.DNI == dni)?.UsuarioDNI;
             var empleado = new Empleado_790MY(dni, txtNombre_790MY.Text, txtApellido_790MY.Text, puesto, usuario, chkActivo_790MY.Checked);
 
             try

@@ -85,6 +85,7 @@ namespace GUI_08YS.RF2
 
             UpdateIdioma();
             CargarDatos();
+            sldModo_790MY.SeleccionarSinAnimacion(OpcionReserva);
             AplicarModo(false);
             timerReloj_790MY.Start();
         }
@@ -341,29 +342,26 @@ namespace GUI_08YS.RF2
 
         #region Modo (Con reserva / Walk-in)
 
-        private void btnModoReserva_790MY_Click(object sender, EventArgs e) => AplicarModo(false);
+        // Orden de las opciones de sldModo_790MY (ClavesIdioma en el Designer).
+        private const int OpcionReserva = 0;
+        private const int OpcionWalkIn = 1;
 
-        private void btnModoWalkIn_790MY_Click(object sender, EventArgs e) => AplicarModo(true);
+        private void sldModo_790MY_SeleccionCambiada(object sender, EventArgs e)
+            => AplicarModo(sldModo_790MY.IndiceSeleccionado == OpcionWalkIn);
 
         private void AplicarModo(bool walkIn)
         {
             _modoWalkIn = walkIn;
+            sldModo_790MY.IndiceSeleccionado = walkIn ? OpcionWalkIn : OpcionReserva;
 
             pnlReserva_790MY.Visible = !walkIn;
             pnlWalkIn_790MY.Visible = walkIn;
 
-            EstilizarBotonModo(btnModoReserva_790MY, !walkIn);
-            EstilizarBotonModo(btnModoWalkIn_790MY, walkIn);
-
             ActualizarResumen();
+            // Si el cambio vino del selector (clic o flechas), el foco queda en él para poder
+            // seguir usando el teclado; al cargar, va al primer campo del modo.
+            if (sldModo_790MY.Focused) return;
             if (walkIn) txtDniCliente_790MY.Focus(); else txtBuscar_790MY.Focus();
-        }
-
-        private static void EstilizarBotonModo(Button boton, bool activo)
-        {
-            boton.BackColor = activo ? Color.White : E.FondoPanel;
-            boton.ForeColor = activo ? E.Bordo : E.Gris;
-            boton.FlatAppearance.MouseOverBackColor = activo ? Color.White : E.Deshabilitado;
         }
 
         #endregion
@@ -693,6 +691,7 @@ namespace GUI_08YS.RF2
         public void UpdateIdioma()
         {
             E.TraducirTags(this);
+            sldModo_790MY.ActualizarTextos();
             SendMessage(txtBuscar_790MY.Handle, EM_SETCUEBANNER, (IntPtr)1, E.T("AM_buscar_placeholder"));
             SendMessage(txtDniCliente_790MY.Handle, EM_SETCUEBANNER, (IntPtr)1, E.T("AM_dni_placeholder"));
 

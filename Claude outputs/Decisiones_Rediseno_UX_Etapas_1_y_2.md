@@ -2,12 +2,13 @@
 
 Fuente: auditoría y plan en cuatro etapas (artifact «Rediseño El Fogón del Sur», v2). Decisiones del propietario del proyecto.
 Este documento manda sobre el artifact: si hay contradicción, vale lo que dice acá. Reemplaza a «Decisiones Etapa 1 - Rediseño UX».
-Última actualización: 2026-10-18.
+Última actualización: 2026-10-19.
 
 ## Estado
 - Etapa 1 (quick wins y sistema visual): TERMINADA. Existe la clase de tema `TemaFogon` (GUI).
 - Etapa 2 (interacción y UX, reemplazo de MessageBox): MIGRACIÓN COMPLETA en ramas encadenadas `etapa2/*` (la última, `etapa2/reportes-y-bitacora`, contiene todo salvo `etapa2/limpieza-prueba-mapa`, que sale de `beta`). Pendiente: pruebas de integración en la app (100/125/150 %, es/en). Quedan en el camino legacy, por decisión, `FormFacturacionCobro_790MY` y `FormComprobanteFactura_790MY` (Etapa 4) y todos los `_08YS`.
-- Etapa 3 (KDS): TERMINADA. Opción C implementada (B medida y descartada) y probada en la app; ver «Decisiones_Etapa3_KDS.md». Etapa 4: sin decisiones.
+- Etapa 3 (KDS): TERMINADA. Opción C implementada (B medida y descartada) y probada en la app; ver «Decisiones_Etapa3_KDS.md».
+- Etapa 4 (facturación, cobro y asincronismo): TERMINADA. Cobro con `Task.Run`, `SlidingTab_UC_790MY`, `BotonCobro_790MY` y migración de `FormFacturacionCobro_790MY` y `FormComprobanteFactura_790MY`; selector deslizante también en Abrir Mesa y vínculo empleado-usuario de solo lectura en el Maestro de Empleados. Pruebas de integración informadas como exitosas por el propietario (2026-10-19). Fusionada en `beta`; ver «Decisiones_Etapa4_Facturacion_Cobro.md».
 
 ## Etapa 2 — respuestas al inventario (2026-10-18, vigentes)
 - **Formularios `_08YS` EXCLUIDOS** (Login, MDI, Administración, Bitácora, Respaldos, Contraseña, etc.): prohibido modificarlos en esta etapa y en las siguientes. Solo se evaluarán al final del proyecto si fuera estrictamente necesario.

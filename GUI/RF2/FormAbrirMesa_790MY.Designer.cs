@@ -22,10 +22,7 @@ namespace GUI_08YS.RF2
             this.pnlIzquierda_790MY = new System.Windows.Forms.Panel();
             this.tlpIzquierda_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
-            this.pnlModo_790MY = new GUI_08YS.RF2.PanelRedondeado_790MY();
-            this.tlpModo_790MY = new System.Windows.Forms.TableLayoutPanel();
-            this.btnModoReserva_790MY = new System.Windows.Forms.Button();
-            this.btnModoWalkIn_790MY = new System.Windows.Forms.Button();
+            this.sldModo_790MY = new GUI_08YS.Estilo.SlidingTab_UC_790MY();
             this.pnlContenido_790MY = new System.Windows.Forms.Panel();
             this.pnlReserva_790MY = new System.Windows.Forms.Panel();
             this.tlpReserva_790MY = new System.Windows.Forms.TableLayoutPanel();
@@ -86,8 +83,6 @@ namespace GUI_08YS.RF2
             this.tlpMain_790MY.SuspendLayout();
             this.pnlIzquierda_790MY.SuspendLayout();
             this.tlpIzquierda_790MY.SuspendLayout();
-            this.pnlModo_790MY.SuspendLayout();
-            this.tlpModo_790MY.SuspendLayout();
             this.pnlContenido_790MY.SuspendLayout();
             this.pnlReserva_790MY.SuspendLayout();
             this.tlpReserva_790MY.SuspendLayout();
@@ -137,7 +132,7 @@ namespace GUI_08YS.RF2
             this.tlpIzquierda_790MY.ColumnCount = 1;
             this.tlpIzquierda_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpIzquierda_790MY.Controls.Add(this.lblTitulo_790MY, 0, 0);
-            this.tlpIzquierda_790MY.Controls.Add(this.pnlModo_790MY, 0, 1);
+            this.tlpIzquierda_790MY.Controls.Add(this.sldModo_790MY, 0, 1);
             this.tlpIzquierda_790MY.Controls.Add(this.pnlContenido_790MY, 0, 2);
             this.tlpIzquierda_790MY.Controls.Add(this.lblCamareroTitulo_790MY, 0, 3);
             this.tlpIzquierda_790MY.Controls.Add(this.lblCamareroAyuda_790MY, 0, 4);
@@ -168,61 +163,15 @@ namespace GUI_08YS.RF2
             this.lblTitulo_790MY.Tag = "AM_titulo";
             this.lblTitulo_790MY.Text = "Abrir mesa";
             //
-            // pnlModo_790MY
+            // sldModo_790MY  (selector deslizante: Con reserva / Walk-in)
             //
-            this.pnlModo_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(240)))), ((int)(((byte)(233)))));
-            this.pnlModo_790MY.ColorBorde = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(228)))), ((int)(((byte)(216)))));
-            this.pnlModo_790MY.Controls.Add(this.tlpModo_790MY);
-            this.pnlModo_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlModo_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 8);
-            this.pnlModo_790MY.Name = "pnlModo_790MY";
-            this.pnlModo_790MY.Padding = new System.Windows.Forms.Padding(4);
-            this.pnlModo_790MY.Radio = 12;
-            this.pnlModo_790MY.TabIndex = 1;
-            //
-            // tlpModo_790MY
-            //
-            this.tlpModo_790MY.BackColor = System.Drawing.Color.Transparent;
-            this.tlpModo_790MY.ColumnCount = 2;
-            this.tlpModo_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpModo_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpModo_790MY.Controls.Add(this.btnModoReserva_790MY, 0, 0);
-            this.tlpModo_790MY.Controls.Add(this.btnModoWalkIn_790MY, 1, 0);
-            this.tlpModo_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlpModo_790MY.Name = "tlpModo_790MY";
-            this.tlpModo_790MY.RowCount = 1;
-            this.tlpModo_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpModo_790MY.TabIndex = 0;
-            //
-            // btnModoReserva_790MY
-            //
-            this.btnModoReserva_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnModoReserva_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnModoReserva_790MY.FlatAppearance.BorderSize = 0;
-            this.btnModoReserva_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnModoReserva_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.btnModoReserva_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 2, 0);
-            this.btnModoReserva_790MY.Name = "btnModoReserva_790MY";
-            this.btnModoReserva_790MY.TabIndex = 0;
-            this.btnModoReserva_790MY.Tag = "AM_modo_reserva";
-            this.btnModoReserva_790MY.Text = "Con reserva";
-            this.btnModoReserva_790MY.UseVisualStyleBackColor = false;
-            this.btnModoReserva_790MY.Click += new System.EventHandler(this.btnModoReserva_790MY_Click);
-            //
-            // btnModoWalkIn_790MY
-            //
-            this.btnModoWalkIn_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnModoWalkIn_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnModoWalkIn_790MY.FlatAppearance.BorderSize = 0;
-            this.btnModoWalkIn_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnModoWalkIn_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.btnModoWalkIn_790MY.Margin = new System.Windows.Forms.Padding(2, 0, 0, 0);
-            this.btnModoWalkIn_790MY.Name = "btnModoWalkIn_790MY";
-            this.btnModoWalkIn_790MY.TabIndex = 1;
-            this.btnModoWalkIn_790MY.Tag = "AM_modo_walkin";
-            this.btnModoWalkIn_790MY.Text = "Walk-in (sin reserva)";
-            this.btnModoWalkIn_790MY.UseVisualStyleBackColor = false;
-            this.btnModoWalkIn_790MY.Click += new System.EventHandler(this.btnModoWalkIn_790MY_Click);
+            this.sldModo_790MY.ClavesIdioma = new string[] { "AM_modo_reserva", "AM_modo_walkin" };
+            this.sldModo_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sldModo_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
+            this.sldModo_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 8);
+            this.sldModo_790MY.Name = "sldModo_790MY";
+            this.sldModo_790MY.TabIndex = 1;
+            this.sldModo_790MY.SeleccionCambiada += new System.EventHandler(this.sldModo_790MY_SeleccionCambiada);
             //
             // pnlContenido_790MY
             //
@@ -928,8 +877,6 @@ namespace GUI_08YS.RF2
             this.pnlIzquierda_790MY.ResumeLayout(false);
             this.tlpIzquierda_790MY.ResumeLayout(false);
             this.tlpIzquierda_790MY.PerformLayout();
-            this.pnlModo_790MY.ResumeLayout(false);
-            this.tlpModo_790MY.ResumeLayout(false);
             this.pnlContenido_790MY.ResumeLayout(false);
             this.pnlReserva_790MY.ResumeLayout(false);
             this.tlpReserva_790MY.ResumeLayout(false);
@@ -963,10 +910,7 @@ namespace GUI_08YS.RF2
         private System.Windows.Forms.Panel pnlIzquierda_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpIzquierda_790MY;
         private System.Windows.Forms.Label lblTitulo_790MY;
-        private GUI_08YS.RF2.PanelRedondeado_790MY pnlModo_790MY;
-        private System.Windows.Forms.TableLayoutPanel tlpModo_790MY;
-        private System.Windows.Forms.Button btnModoReserva_790MY;
-        private System.Windows.Forms.Button btnModoWalkIn_790MY;
+        private GUI_08YS.Estilo.SlidingTab_UC_790MY sldModo_790MY;
         private System.Windows.Forms.Panel pnlContenido_790MY;
         private System.Windows.Forms.Panel pnlReserva_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpReserva_790MY;

@@ -32,6 +32,9 @@ namespace GUI_08YS.RF2
     {
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
+        /// <summary>Demora simulada de la entidad bancaria antes de procesar el cobro (Etapa 4).</summary>
+        private const int LatenciaSimuladaMs = 2500;
+
         private readonly FacturaBLL_790MY _facturaBll;
         private readonly PagoBLL_790MY _pagoBll;
 
@@ -584,6 +587,10 @@ namespace GUI_08YS.RF2
             Exception error = null;
             try
             {
+                // Latencia simulada de la pasarela bancaria: permite ver el indicador de carga y
+                // verificar el bloqueo del formulario y del contenedor durante el cobro.
+                await Task.Delay(LatenciaSimuladaMs);
+
                 resultado = await Task.Run(() =>
                 {
                     // CUN-006 (punto de extensión 8.1): factura vigente con los importes mostrados.

@@ -1,6 +1,8 @@
 # Inventario de `MessageBox` — Etapa 4 (Caja y cobro)
 
-Rama: `etapa4/facturacion-y-cobro` (base `beta`, commit `30038dd`). Fecha: 2026-10-19.
+Rama: `etapa4/facturacion-y-cobro` (base `beta`, commit `30038dd`), fusionada en `beta`. Fecha: 2026-10-19.
+
+**Estado: migración TERMINADA.** Pruebas de integración informadas como exitosas por el propietario (2026-10-19).
 Mismas clases que `Inventario_MessageBox_Etapa2.md`: **V** validación · **C** confirmación · **X** éxito · **R** error recuperable · **F** error fatal.
 
 ## Resumen
