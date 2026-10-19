@@ -438,6 +438,15 @@ namespace GUI_08YS.RF2
             if (!_cargando) ActualizarCobro();
         }
 
+        // Límite del vuelto proporcional a la cuenta: el efectivo recibido no puede superar
+        // 5 veces lo abonado ni dejar más de $ 100.000 de vuelto.
+        private const decimal FactorMaximoRecibido = 5m;
+        private const decimal VueltoMaximo = 100000m;
+
+        private static bool VueltoExcedeLimite(decimal montoAbonado, decimal montoRecibido)
+            => montoRecibido > montoAbonado * FactorMaximoRecibido
+            || montoRecibido - montoAbonado > VueltoMaximo;
+
         private int CuotasSeleccionadas
             => cmbCuotas_790MY.SelectedIndex >= 0 && cmbCuotas_790MY.SelectedIndex < Pago_790MY.CuotasPermitidas.Length
                 ? Pago_790MY.CuotasPermitidas[cmbCuotas_790MY.SelectedIndex]
@@ -467,14 +476,20 @@ namespace GUI_08YS.RF2
             lblTotalCobrar_790MY.Text = _importes == null ? "-" : Moneda(total);
 
             // ─── Efectivo: vuelto ───
+            bool vueltoExcedido = false;
             if (TryParseImporte(txtMontoRecibido_790MY.Text, out decimal recibido, permitirVacio: false) && _importes != null)
             {
                 decimal cambio = PagoBLL_790MY.CalcularCambio(total, recibido);
+                vueltoExcedido = cambio >= 0 && VueltoExcedeLimite(total, recibido);
                 lblCambio_790MY.Text = Moneda(Math.Max(0m, cambio));
-                lblEfectivoEstado_790MY.Text = cambio >= 0 ? E.T("CJ_efectivo_ok") : E.T("msg_fc_efectivo_insuficiente");
-                lblEfectivoEstado_790MY.ForeColor = cambio >= 0 ? E.ListoTexto : E.KdsRojoTexto;
+                lblEfectivoEstado_790MY.Text = cambio < 0 ? E.T("msg_fc_efectivo_insuficiente")
+                                             : vueltoExcedido ? E.T("msg_fc_vuelto_excedido")
+                                             : E.T("CJ_efectivo_ok");
+                lblEfectivoEstado_790MY.ForeColor = cambio >= 0 && !vueltoExcedido ? E.ListoTexto : E.KdsRojoTexto;
                 if (_metodo == MetodoPago_790MY.Efectivo && motivo == null && cambio < 0)
                     motivo = E.T("msg_fc_efectivo_insuficiente");
+                else if (_metodo == MetodoPago_790MY.Efectivo && motivo == null && vueltoExcedido)
+                    motivo = E.T("msg_fc_vuelto_excedido");
             }
             else
             {
@@ -525,7 +540,9 @@ namespace GUI_08YS.RF2
             errValidacion_790MY.SetError(txtPropina_790MY,
                 _importes != null && !propinaValida ? E.T("msg_fc_propina_invalida") : string.Empty);
             errValidacion_790MY.SetError(txtMontoRecibido_790MY,
-                efectivoInsuficiente ? E.T("msg_fc_efectivo_insuficiente") : string.Empty);
+                efectivoInsuficiente ? E.T("msg_fc_efectivo_insuficiente")
+                : _metodo == MetodoPago_790MY.Efectivo && vueltoExcedido ? E.T("msg_fc_vuelto_excedido")
+                : string.Empty);
             errValidacion_790MY.SetError(txtNroTarjeta_790MY,
                 luhnInvalido ? E.T("msg_fc_tarjeta_invalida")
                 : _rechazoVisible ? E.T("CJ_tarjeta_rechazada") : string.Empty);

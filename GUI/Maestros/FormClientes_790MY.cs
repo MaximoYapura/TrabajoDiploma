@@ -486,11 +486,14 @@ namespace GUI_08YS.Maestros
             if (string.IsNullOrWhiteSpace(valor))
                 return;
 
-            if (destino.Contains(valor))
+            // Mismo formato que el email y el celular principales, en alta y en modificación.
+            string errorFormato = ErrorFormatoAdicional(origen == txtEmailAdicional_790MY, valor);
+            string error = errorFormato
+                ?? (destino.Contains(valor) ? TraductorManager_08YS.Instance.GetTexto("FC_val_adicional_duplicado") : null);
+            if (error != null)
             {
                 origen.BackColor = T.ErrorFondo;
-                errValidacion_790MY.SetError(origen,
-                    TraductorManager_08YS.Instance.GetTexto("FC_val_adicional_duplicado"));
+                errValidacion_790MY.SetError(origen, error);
                 return;
             }
 
@@ -502,6 +505,24 @@ namespace GUI_08YS.Maestros
             DibujarEtiquetas();
             ActualizarValidacion();
         }
+
+        /// <summary>Motivo si el email/celular adicional no tiene formato válido; null si es válido.</summary>
+        private static string ErrorFormatoAdicional(bool esEmail, string valor)
+        {
+            var t = TraductorManager_08YS.Instance;
+            if (esEmail)
+                return _regexEmail.IsMatch(valor) ? null : t.GetTexto("FC_val_email_formato");
+            return _regexCelular.IsMatch(valor) ? null : t.GetTexto("FC_val_celular_numeros");
+        }
+
+        /// <summary>
+        /// Adicionales ya cargados con formato inválido (p. ej. datos viejos guardados antes de
+        /// validarlos). Al guardar se informan para que se quiten con su ✕.
+        /// </summary>
+        private List<string> AdicionalesInvalidos()
+            => _emailsAdicionalesEdicion.Where(v => ErrorFormatoAdicional(true, v) != null)
+                .Concat(_telefonosAdicionalesEdicion.Where(v => ErrorFormatoAdicional(false, v) != null))
+                .ToList();
 
         private void DibujarEtiquetas()
         {
@@ -695,6 +716,14 @@ namespace GUI_08YS.Maestros
                 _resumenVisible = true;
                 ActualizarValidacion();
                 errores.Keys.First().Focus();
+                return false;
+            }
+
+            List<string> adicionalesInvalidos = AdicionalesInvalidos();
+            if (adicionalesInvalidos.Count > 0)
+            {
+                MostrarErrorEnBanner(string.Format(t.GetTexto("FC_val_adicionales_invalidos"),
+                                                   string.Join(", ", adicionalesInvalidos)));
                 return false;
             }
 

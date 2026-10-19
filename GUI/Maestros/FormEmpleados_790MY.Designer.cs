@@ -45,9 +45,6 @@ namespace GUI_08YS.Maestros
             this.cmbCargo_790MY = new System.Windows.Forms.ComboBox();
             this.chkActivo_790MY = new System.Windows.Forms.CheckBox();
             this.lblAviso_790MY = new System.Windows.Forms.Label();
-            this.lblUsuario_790MY = new System.Windows.Forms.Label();
-            this.cmbUsuario_790MY = new System.Windows.Forms.ComboBox();
-            this.lblUsuarioAyuda_790MY = new System.Windows.Forms.Label();
             this.btnGuardar_790MY = new System.Windows.Forms.Button();
             this.btnCancelar_790MY = new System.Windows.Forms.Button();
             this.lblAyuda_790MY = new System.Windows.Forms.Label();
@@ -56,7 +53,6 @@ namespace GUI_08YS.Maestros
             this.colNombre_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colApellido_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCargo_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colUsuario_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colEstado_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pnlBarra_790MY.SuspendLayout();
             this.pnlEstado_790MY.SuspendLayout();
@@ -221,19 +217,13 @@ namespace GUI_08YS.Maestros
             this.tlpDetalle_790MY.Controls.Add(this.cmbCargo_790MY, 0, 6);
             this.tlpDetalle_790MY.Controls.Add(this.chkActivo_790MY, 0, 7);
             this.tlpDetalle_790MY.Controls.Add(this.lblAviso_790MY, 0, 8);
-            this.tlpDetalle_790MY.Controls.Add(this.lblUsuario_790MY, 0, 9);
-            this.tlpDetalle_790MY.Controls.Add(this.cmbUsuario_790MY, 0, 10);
-            this.tlpDetalle_790MY.Controls.Add(this.lblUsuarioAyuda_790MY, 0, 11);
-            this.tlpDetalle_790MY.Controls.Add(this.btnGuardar_790MY, 0, 12);
-            this.tlpDetalle_790MY.Controls.Add(this.btnCancelar_790MY, 1, 12);
-            this.tlpDetalle_790MY.Controls.Add(this.lblAyuda_790MY, 0, 13);
+            this.tlpDetalle_790MY.Controls.Add(this.btnGuardar_790MY, 0, 9);
+            this.tlpDetalle_790MY.Controls.Add(this.btnCancelar_790MY, 1, 9);
+            this.tlpDetalle_790MY.Controls.Add(this.lblAyuda_790MY, 0, 10);
             this.tlpDetalle_790MY.Dock = System.Windows.Forms.DockStyle.Top;
             this.tlpDetalle_790MY.AutoSize = true;
             this.tlpDetalle_790MY.Name = "tlpDetalle_790MY";
-            this.tlpDetalle_790MY.RowCount = 14;
-            this.tlpDetalle_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
-            this.tlpDetalle_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
-            this.tlpDetalle_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
+            this.tlpDetalle_790MY.RowCount = 11;
             this.tlpDetalle_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpDetalle_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpDetalle_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
@@ -251,9 +241,6 @@ namespace GUI_08YS.Maestros
             this.tlpDetalle_790MY.SetColumnSpan(this.cmbCargo_790MY, 2);
             this.tlpDetalle_790MY.SetColumnSpan(this.chkActivo_790MY, 2);
             this.tlpDetalle_790MY.SetColumnSpan(this.lblAviso_790MY, 2);
-            this.tlpDetalle_790MY.SetColumnSpan(this.lblUsuario_790MY, 2);
-            this.tlpDetalle_790MY.SetColumnSpan(this.cmbUsuario_790MY, 2);
-            this.tlpDetalle_790MY.SetColumnSpan(this.lblUsuarioAyuda_790MY, 2);
             this.tlpDetalle_790MY.SetColumnSpan(this.lblAyuda_790MY, 2);
             this.tlpDetalle_790MY.TabIndex = 0;
             //
@@ -383,37 +370,6 @@ namespace GUI_08YS.Maestros
             this.lblAviso_790MY.TabIndex = 11;
             this.lblAviso_790MY.Visible = false;
             //
-            // lblUsuario_790MY
-            //
-            this.lblUsuario_790MY.AutoSize = true;
-            this.lblUsuario_790MY.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.lblUsuario_790MY.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
-            this.lblUsuario_790MY.Name = "lblUsuario_790MY";
-            this.lblUsuario_790MY.TabIndex = 12;
-            this.lblUsuario_790MY.Tag = "FE_lblUsuario";
-            this.lblUsuario_790MY.Text = "Usuario del sistema (opcional)";
-            //
-            // cmbUsuario_790MY
-            //
-            this.cmbUsuario_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cmbUsuario_790MY.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbUsuario_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
-            this.cmbUsuario_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 4);
-            this.cmbUsuario_790MY.Name = "cmbUsuario_790MY";
-            this.cmbUsuario_790MY.TabIndex = 13;
-            //
-            // lblUsuarioAyuda_790MY
-            //
-            this.lblUsuarioAyuda_790MY.AutoSize = true;
-            this.lblUsuarioAyuda_790MY.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblUsuarioAyuda_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(110)))), ((int)(((byte)(100)))), ((int)(((byte)(95)))));
-            this.lblUsuarioAyuda_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 16);
-            this.lblUsuarioAyuda_790MY.MaximumSize = new System.Drawing.Size(340, 0);
-            this.lblUsuarioAyuda_790MY.Name = "lblUsuarioAyuda_790MY";
-            this.lblUsuarioAyuda_790MY.TabIndex = 14;
-            this.lblUsuarioAyuda_790MY.Tag = "FE_lblUsuarioAyuda";
-            this.lblUsuarioAyuda_790MY.Text = "Sin usuario vinculado, el empleado no podrá iniciar sesión.";
-            //
             // btnGuardar_790MY
             //
             this.btnGuardar_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -459,7 +415,6 @@ namespace GUI_08YS.Maestros
             this.colNombre_790MY,
             this.colApellido_790MY,
             this.colCargo_790MY,
-            this.colUsuario_790MY,
             this.colEstado_790MY});
             this.dgvEmpleados_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvEmpleados_790MY.Name = "dgvEmpleados_790MY";
@@ -494,13 +449,6 @@ namespace GUI_08YS.Maestros
             this.colCargo_790MY.HeaderText = "Cargo";
             this.colCargo_790MY.Name = "colCargo_790MY";
             this.colCargo_790MY.Tag = "FE_colCargo";
-            //
-            // colUsuario_790MY
-            //
-            this.colUsuario_790MY.FillWeight = 100F;
-            this.colUsuario_790MY.HeaderText = "Usuario vinculado";
-            this.colUsuario_790MY.Name = "colUsuario_790MY";
-            this.colUsuario_790MY.Tag = "FE_colUsuario";
             //
             // colEstado_790MY
             //
@@ -577,9 +525,6 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.ComboBox cmbCargo_790MY;
         private System.Windows.Forms.CheckBox chkActivo_790MY;
         private System.Windows.Forms.Label lblAviso_790MY;
-        private System.Windows.Forms.Label lblUsuario_790MY;
-        private System.Windows.Forms.ComboBox cmbUsuario_790MY;
-        private System.Windows.Forms.Label lblUsuarioAyuda_790MY;
         private System.Windows.Forms.Button btnGuardar_790MY;
         private System.Windows.Forms.Button btnCancelar_790MY;
         private System.Windows.Forms.Label lblAyuda_790MY;
@@ -588,7 +533,6 @@ namespace GUI_08YS.Maestros
         private System.Windows.Forms.DataGridViewTextBoxColumn colNombre_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colApellido_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCargo_790MY;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colUsuario_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colEstado_790MY;
         private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
         private System.Windows.Forms.ErrorProvider errValidacion_790MY;

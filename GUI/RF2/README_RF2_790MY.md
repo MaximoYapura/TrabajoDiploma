@@ -77,11 +77,11 @@ Camarero (`Empleados.UsuarioDNI`).
 - `Migraciones_790MY/DatosPrueba_AtencionMesa_790MY.sql`: productos de ejemplo por categoría
   (con uno en bajo stock y uno agotado) y vínculo del usuario `@UsuarioCamarero` como Camarero.
   Ejecutar con `sqlcmd -S <servidor> -E -I -f 65001 -i ...` (UTF-8 y `QUOTED_IDENTIFIER ON`).
-- **Modo prueba de turno** (`GUI/Config/App.config`, `<appSettings>`): con
-  `ModoPruebaTurno_790MY = true`, si la hora actual no cae en un turno real,
+- **Modo demostración** (`GUI/Config/App.config`, `<appSettings>`): con
+  `ModoDemostracion = true`, si la hora actual no cae en un turno real,
   `MesaBLL_790MY.ObtenerTurnoVigente` devuelve `TurnoPrueba_790MY` (por defecto 22:00).
-  Abrir Mesa muestra "(MODO PRUEBA)" en el encabezado. Para el flujo "Con reserva", la reserva
-  tiene que ser de HOY en ese turno. **Poner la bandera en `false` antes de entregar.**
+  Abrir Mesa muestra "(MODO DEMOSTRACIÓN)" en el encabezado. Para el flujo "Con reserva", la reserva
+  tiene que ser de HOY en ese turno. Con `false` se aplica el control de turnos estricto.
 
 ## Pendientes (próximo sprint)
 

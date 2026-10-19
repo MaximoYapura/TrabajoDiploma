@@ -5,7 +5,6 @@ using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Bitacora;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
@@ -177,10 +176,7 @@ namespace BLL_08YS
 
             // Paso 9-10: confirmación transaccional.
             pago.FechaHoraPago = Truncar(DateTime.Now);
-            // Etapa 4 (E4-H1): medición por tramo; solo cronometraje, sin cambios de lógica.
-            var reloj = Stopwatch.StartNew();
             ResultadoRegistroCobro_790MY resultado = _pagoRepository.RegistrarCobro(pago, out int reservaId, out int mesaNumero);
-            Trace.WriteLine($"Transaccion RegistrarCobro: {reloj.ElapsedMilliseconds} ms ({resultado})", "Cobro");
             switch (resultado)
             {
                 case ResultadoRegistroCobro_790MY.Ok:
@@ -195,16 +191,11 @@ namespace BLL_08YS
                     throw new InvalidOperationException(resultado.ToString());
             }
 
-            reloj.Restart();
             DVManager_08YS.Recalcular();
-            Trace.WriteLine($"DVManager.Recalcular: {reloj.ElapsedMilliseconds} ms", "Cobro");
-
-            reloj.Restart();
             _bitacoraBll.RegistrarEventoPostCommit(Evento.PagoRegistrado,
                 $"Factura {factura.NroFactura} - {pago.MetodoPago} {pago.MontoAbonado.ToString("N2", CulturaMoneda)}");
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ReservaFinalizada, $"Reserva {reservaId}");
             _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaEstadoActualizado, $"Mesa {mesaNumero} Libre");
-            Trace.WriteLine($"Bitacora (3 eventos): {reloj.ElapsedMilliseconds} ms", "Cobro");
 
             return new ResultadoCobroDTO_790MY
             {

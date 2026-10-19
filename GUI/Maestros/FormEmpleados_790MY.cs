@@ -15,7 +15,7 @@ namespace GUI_08YS.Maestros
 {
     /// <summary>
     /// ABM de empleados (RF2). El empleado es independiente de la seguridad: el vínculo
-    /// con un usuario del sistema es opcional. Validaciones, DV y bitácora los resuelve
+    /// con un usuario del sistema no se gestiona desde acá. Validaciones, DV y bitácora los resuelve
     /// EmpleadoBLL_790MY (patente CrearEmpleado).
     /// </summary>
     public partial class FormEmpleados_790MY : Form, IIdiomaObserver_08YS
@@ -39,7 +39,6 @@ namespace GUI_08YS.Maestros
 
         private readonly EmpleadoBLL_790MY _empleadoBll;
         private List<Empleado_790MY> _empleados = new List<Empleado_790MY>();
-        private Dictionary<int, User_08YS> _usuarios = new Dictionary<int, User_08YS>();
         private ModoEdicion _modo = ModoEdicion.Reposo;
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
@@ -82,7 +81,6 @@ namespace GUI_08YS.Maestros
             try
             {
                 _empleados = _empleadoBll.GetAll();
-                _usuarios = _empleadoBll.ObtenerUsuariosVinculables().ToDictionary(u => u.DNI);
             }
             catch (Exception ex)
             {
@@ -119,7 +117,6 @@ namespace GUI_08YS.Maestros
                     emp.Nombre,
                     emp.Apellido,
                     E.T("FE_puesto_" + emp.Puesto),
-                    NombreUsuario(emp.UsuarioDNI),
                     null);
                 dgvEmpleados_790MY.Rows[fila].Tag = emp;
                 if (emp.DNI == seleccionarDni)
@@ -133,12 +130,6 @@ namespace GUI_08YS.Maestros
             int activos = _empleados.Count(x => x.Activo);
             lblResumen_790MY.Text = E.T("FE_resumen", _empleados.Count, visibles.Count, activos, _empleados.Count - activos);
             MostrarSeleccion();
-        }
-
-        private string NombreUsuario(int? dni)
-        {
-            if (!dni.HasValue) return E.T("FE_sin_usuario");
-            return _usuarios.TryGetValue(dni.Value, out var u) ? u.Username : dni.Value.ToString();
         }
 
         private void dgvEmpleados_790MY_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -161,10 +152,6 @@ namespace GUI_08YS.Maestros
             else if (e.ColumnIndex == colEstado_790MY.Index)
             {
                 EstiloMaestros_790MY.PintarEstado(e, emp.Activo, E.T("FE_activo"), E.T("FE_inactivo"));
-            }
-            else if (e.ColumnIndex == colUsuario_790MY.Index && !emp.UsuarioDNI.HasValue)
-            {
-                e.CellStyle.ForeColor = E.Gris;
             }
         }
 
@@ -189,7 +176,6 @@ namespace GUI_08YS.Maestros
             txtApellido_790MY.Text = emp.Apellido;
             SeleccionarPuesto(emp.Puesto);
             chkActivo_790MY.Checked = emp.Activo;
-            CargarComboUsuarios(emp);
             ActualizarAvisoMesas(emp);
         }
 
@@ -238,34 +224,6 @@ namespace GUI_08YS.Maestros
                 .FirstOrDefault(o => o.Valor == puesto);
         }
 
-        /// <summary>
-        /// "Sin usuario" + usuarios activos no vinculados a OTRO empleado
-        /// (la BLL vuelve a validarlo al guardar).
-        /// </summary>
-        private void CargarComboUsuarios(Empleado_790MY editado)
-        {
-            var ocupados = new HashSet<int>(_empleados
-                .Where(x => x.UsuarioDNI.HasValue && (editado == null || x.DNI != editado.DNI))
-                .Select(x => x.UsuarioDNI.Value));
-
-            cmbUsuario_790MY.Items.Clear();
-            cmbUsuario_790MY.Items.Add(new Opcion<int?> { Valor = null, Texto = E.T("FE_sin_usuario_opcion") });
-            foreach (var u in _usuarios.Values.Where(u => !ocupados.Contains(u.DNI)).OrderBy(u => u.Username))
-                cmbUsuario_790MY.Items.Add(new Opcion<int?>
-                {
-                    Valor = u.DNI,
-                    Texto = E.T("FE_usuario_opcion", u.Username, u.DNI, u.Rol?.Nombre ?? "-")
-                });
-
-            int? actual = editado?.UsuarioDNI;
-            // Vínculo vigente con un usuario que no figura entre los vinculables (p. ej. inactivo):
-            // se muestra igual, para no presentarlo como «sin usuario».
-            if (actual.HasValue && !cmbUsuario_790MY.Items.Cast<Opcion<int?>>().Any(o => o.Valor == actual))
-                cmbUsuario_790MY.Items.Add(new Opcion<int?> { Valor = actual, Texto = NombreUsuario(actual) });
-            cmbUsuario_790MY.SelectedItem = cmbUsuario_790MY.Items.Cast<Opcion<int?>>()
-                .FirstOrDefault(o => o.Valor == actual) ?? cmbUsuario_790MY.Items[0];
-        }
-
         #endregion
 
         #region Modo de edición
@@ -278,9 +236,6 @@ namespace GUI_08YS.Maestros
             txtDni_790MY.ReadOnly = modo != ModoEdicion.Alta;
             txtNombre_790MY.ReadOnly = txtApellido_790MY.ReadOnly = !editando;
             cmbCargo_790MY.Enabled = chkActivo_790MY.Enabled = editando;
-            // El vínculo con un usuario del sistema no se asigna ni se cambia desde este maestro:
-            // el combo solo muestra el vínculo vigente (p. ej. el del administrador «Maximo»).
-            cmbUsuario_790MY.Enabled = false;
 
             btnGuardar_790MY.Visible = btnCancelar_790MY.Visible = editando;
             btnAnadir_790MY.Enabled = !editando;
@@ -313,7 +268,6 @@ namespace GUI_08YS.Maestros
             txtApellido_790MY.Clear();
             SeleccionarPuesto(PuestoEmpleado_790MY.Camarero);
             chkActivo_790MY.Checked = true;
-            CargarComboUsuarios(null);
             lblAviso_790MY.Visible = false;
         }
 
@@ -350,10 +304,9 @@ namespace GUI_08YS.Maestros
             }
 
             var puesto = (cmbCargo_790MY.SelectedItem as Opcion<PuestoEmpleado_790MY>)?.Valor ?? PuestoEmpleado_790MY.Camarero;
-            // Alta: siempre sin usuario. Modificación: se conserva el vínculo que ya tenía el
-            // empleado (no el del combo), así nunca se asigna, cambia ni borra desde acá.
-            int? usuario = _modo == ModoEdicion.Alta ? null : _empleados.FirstOrDefault(x => x.DNI == dni)?.UsuarioDNI;
-            var empleado = new Empleado_790MY(dni, txtNombre_790MY.Text, txtApellido_790MY.Text, puesto, usuario, chkActivo_790MY.Checked);
+            // UsuarioDNI no se envía: el alta queda sin usuario y la DAL no lo modifica al
+            // actualizar, así se conserva el vínculo existente (p. ej. el del administrador).
+            var empleado = new Empleado_790MY(dni, txtNombre_790MY.Text, txtApellido_790MY.Text, puesto, activo: chkActivo_790MY.Checked);
 
             try
             {

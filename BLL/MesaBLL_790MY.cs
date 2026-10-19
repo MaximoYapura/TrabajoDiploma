@@ -52,11 +52,11 @@ namespace BLL_08YS
             return null;
         }
 
-        // ─── Modo prueba (solo testing) ──────────────────────────────────────
+        // ─── Modo demostración ───────────────────────────────────────────────
         // App.config de la GUI, <appSettings>:
-        //   <add key="ModoPruebaTurno_790MY" value="true" />
-        //   <add key="TurnoPrueba_790MY"     value="22:00" />   (18:00, 20:00 o 22:00)
-        // Con la bandera en false o ausente, el comportamiento es el de producción.
+        //   <add key="ModoDemostracion"  value="true" />
+        //   <add key="TurnoPrueba_790MY" value="22:00" />   (18:00, 20:00 o 22:00)
+        // Con ModoDemostracion en false o ausente se aplica el control de turnos estricto.
         private static readonly Lazy<TimeSpan?> _turnoDePrueba = new Lazy<TimeSpan?>(LeerTurnoDePrueba);
 
         private static TimeSpan? TurnoDePrueba => _turnoDePrueba.Value;
@@ -65,7 +65,7 @@ namespace BLL_08YS
         {
             try
             {
-                if (!bool.TryParse(ConfigurationManager.AppSettings["ModoPruebaTurno_790MY"], out bool activo) || !activo)
+                if (!bool.TryParse(ConfigurationManager.AppSettings["ModoDemostracion"], out bool activo) || !activo)
                     return null;
 
                 // Un valor ausente o que no es un inicio de turno válido cae en el último

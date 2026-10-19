@@ -107,11 +107,16 @@ namespace DAL_08YS.SQL
             }
         }
 
+        /// <summary>
+        /// Actualiza los datos del empleado. UsuarioDNI no se modifica: el vínculo con un
+        /// usuario del sistema no se gestiona desde el Maestro de Empleados (se conserva el
+        /// existente, p. ej. el del administrador).
+        /// </summary>
         public void Update(Empleado_790MY empleado)
         {
             const string sql =
                 "UPDATE Empleados SET Nombre = @Nombre, Apellido = @Apellido, Puesto = @Puesto, " +
-                "UsuarioDNI = @UsuarioDNI, Activo = @Activo WHERE DNI = @DNI";
+                "Activo = @Activo WHERE DNI = @DNI";
 
             using (var con = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand(sql, con))
