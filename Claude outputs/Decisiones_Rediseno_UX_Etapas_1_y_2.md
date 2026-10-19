@@ -7,7 +7,7 @@ Este documento manda sobre el artifact: si hay contradicción, vale lo que dice 
 ## Estado
 - Etapa 1 (quick wins y sistema visual): TERMINADA. Existe la clase de tema `TemaFogon` (GUI).
 - Etapa 2 (interacción y UX, reemplazo de MessageBox): MIGRACIÓN COMPLETA en ramas encadenadas `etapa2/*` (la última, `etapa2/reportes-y-bitacora`, contiene todo salvo `etapa2/limpieza-prueba-mapa`, que sale de `beta`). Pendiente: pruebas de integración en la app (100/125/150 %, es/en). Quedan en el camino legacy, por decisión, `FormFacturacionCobro_790MY` y `FormComprobanteFactura_790MY` (Etapa 4) y todos los `_08YS`.
-- Etapa 3 (KDS): decisiones E3-D1 a E3-D6 aprobadas y Opción C implementada (B medida y descartada); ver «Decisiones_Etapa3_KDS.md». Etapa 4: sin decisiones.
+- Etapa 3 (KDS): TERMINADA. Opción C implementada (B medida y descartada) y probada en la app; ver «Decisiones_Etapa3_KDS.md». Etapa 4: sin decisiones.
 
 ## Etapa 2 — respuestas al inventario (2026-10-18, vigentes)
 - **Formularios `_08YS` EXCLUIDOS** (Login, MDI, Administración, Bitácora, Respaldos, Contraseña, etc.): prohibido modificarlos en esta etapa y en las siguientes. Solo se evaluarán al final del proyecto si fuera estrictamente necesario.

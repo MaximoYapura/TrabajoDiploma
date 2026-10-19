@@ -57,6 +57,6 @@ Opción C con 24 tickets, por tipo de cambio (mediana / máx.): Pendiente → En
 - Con la Opción C todos los ticks medidos quedan debajo de 50 ms en la PC de desarrollo, con margen (p95 ≤ 37 ms; 23 ms con 24 tickets).
 - Ningún tick destruye los controles de los tickets que no cambiaron, así que en ellos no hay parpadeo ni clics perdidos.
 
-## Pendiente de verificar
-- Prueba en la app con base real: 100/125/150 % y es/en; «Iniciar» y «Marcar listo» (incluido doble toque); cambio de idioma con el KDS abierto; redimensionar la ventana.
-- Traza `KDS` en un equipo como el de la cocina (H6).
+## Verificación
+- Pruebas de integración manuales en la app con base real: EXITOSAS (2026-10-19, propietario). Etapa 3 CERRADA y fusionada en `beta`.
+- Pendiente (no bloquea): revisar la traza `KDS` en un equipo como el de la cocina (H6).
