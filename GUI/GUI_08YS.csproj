@@ -145,6 +145,12 @@
     <Compile Include="Estilo\ToastHost_790MY.Designer.cs">
       <DependentUpon>ToastHost_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="Estilo\SlidingTab_UC_790MY.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Estilo\SlidingTab_UC_790MY.Designer.cs">
+      <DependentUpon>SlidingTab_UC_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="Maestros\FormEmpleados_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
