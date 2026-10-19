@@ -395,6 +395,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Config\App.config" />
+    <!-- Credenciales SMTP locales (no versionadas): se copian junto al .exe porque
+         App.config las referencia con configSource="App.secrets.config". -->
+    <None Include="Config\App.secrets.config" Condition="Exists('Config\App.secrets.config')">
+      <Link>App.secrets.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\App.secrets.config.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BE\BE_08YS.csproj">
