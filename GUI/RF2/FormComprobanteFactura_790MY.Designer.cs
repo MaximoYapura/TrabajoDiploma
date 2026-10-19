@@ -22,6 +22,7 @@ namespace GUI_08YS.RF2
             this.pnlBotones_790MY = new System.Windows.Forms.FlowLayoutPanel();
             this.btnCerrar_790MY = new FontAwesome.Sharp.IconButton();
             this.btnImprimir_790MY = new FontAwesome.Sharp.IconButton();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.pnlScroll_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTicket_790MY)).BeginInit();
             this.pnlBotones_790MY.SuspendLayout();
@@ -104,6 +105,12 @@ namespace GUI_08YS.RF2
             this.btnImprimir_790MY.UseVisualStyleBackColor = false;
             this.btnImprimir_790MY.Click += new System.EventHandler(this.btnImprimir_790MY_Click);
             //
+            // bnrAvisos_790MY  (errores de impresión; Dock = Top empuja el ticket)
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 2;
+            //
             // FormComprobanteFactura_790MY
             //
             this.AcceptButton = this.btnCerrar_790MY;
@@ -114,6 +121,7 @@ namespace GUI_08YS.RF2
             this.ClientSize = new System.Drawing.Size(560, 860);
             this.Controls.Add(this.pnlScroll_790MY);
             this.Controls.Add(this.pnlBotones_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -137,5 +145,6 @@ namespace GUI_08YS.RF2
         private System.Windows.Forms.FlowLayoutPanel pnlBotones_790MY;
         private FontAwesome.Sharp.IconButton btnCerrar_790MY;
         private FontAwesome.Sharp.IconButton btnImprimir_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }

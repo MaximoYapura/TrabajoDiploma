@@ -72,6 +72,17 @@ namespace GUI_08YS.Estilo
             }
         }
 
+        /// <summary>Posición inicial (al cargar el formulario): sin deslizamiento y sin disparar <see cref="SeleccionCambiada"/>.</summary>
+        public void SeleccionarSinAnimacion(int indice)
+        {
+            if (_claves.Length == 0) return;
+            tmrDeslizar_790MY.Stop();
+            _indice = Math.Max(0, Math.Min(_claves.Length - 1, indice));
+            _posicion = _indice;
+            AccessibleName = _textos.Length > _indice ? _textos[_indice] : string.Empty;
+            Invalidate();
+        }
+
         /// <summary>Vuelve a leer los textos de idiomas.json (llamar desde UpdateIdioma del formulario).</summary>
         public void ActualizarTextos()
         {

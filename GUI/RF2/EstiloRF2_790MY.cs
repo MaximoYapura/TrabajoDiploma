@@ -89,8 +89,8 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>
-        /// Camino legacy (MessageBox nativo). Lo siguen usando FormFacturacionCobro_790MY
-        /// (sin cambios hasta la Etapa 4) y las pantallas aún no migradas a la Etapa 2;
+        /// Camino legacy (MessageBox nativo). Lo siguen usando
+        /// las pantallas aún no migradas (FormFacturacionCobro_790MY se migró en la Etapa 4);
         /// las migradas usan <see cref="MostrarErrorEnBanner"/>.
         /// Reglas de negocio (ArgumentException) como advertencia, permisos como acceso
         /// denegado y cualquier otra falla como error.

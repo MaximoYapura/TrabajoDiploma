@@ -19,6 +19,9 @@ namespace GUI_08YS.RF2
         {
             System.Windows.Forms.DataGridViewCellStyle estiloDerecha = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle estiloCentro = new System.Windows.Forms.DataGridViewCellStyle();
+            this.components = new System.ComponentModel.Container();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             this.tlpMain_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.tlpMesas_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblMesasTitulo_790MY = new System.Windows.Forms.Label();
@@ -58,9 +61,7 @@ namespace GUI_08YS.RF2
             this.lblNotaIva_790MY = new System.Windows.Forms.Label();
             this.tlpCobro_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblCobroTitulo_790MY = new System.Windows.Forms.Label();
-            this.tlpMetodo_790MY = new System.Windows.Forms.TableLayoutPanel();
-            this.btnEfectivo_790MY = new FontAwesome.Sharp.IconButton();
-            this.btnTarjeta_790MY = new FontAwesome.Sharp.IconButton();
+            this.sldMetodo_790MY = new GUI_08YS.Estilo.SlidingTab_UC_790MY();
             this.lblPropina_790MY = new System.Windows.Forms.Label();
             this.tlpPropina_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.txtPropina_790MY = new System.Windows.Forms.TextBox();
@@ -88,7 +89,7 @@ namespace GUI_08YS.RF2
             this.pnlCambio_790MY = new GUI_08YS.RF2.PanelRedondeado_790MY();
             this.lblCambioTxt_790MY = new System.Windows.Forms.Label();
             this.lblCambio_790MY = new System.Windows.Forms.Label();
-            this.btnRegistrarCobro_790MY = new FontAwesome.Sharp.IconButton();
+            this.btnRegistrarCobro_790MY = new GUI_08YS.Estilo.BotonCobro_790MY();
             this.lblValidacion_790MY = new System.Windows.Forms.Label();
             this.tlpMain_790MY.SuspendLayout();
             this.tlpMesas_790MY.SuspendLayout();
@@ -101,7 +102,6 @@ namespace GUI_08YS.RF2
             this.pnlTotales_790MY.SuspendLayout();
             this.tlpTotales_790MY.SuspendLayout();
             this.tlpCobro_790MY.SuspendLayout();
-            this.tlpMetodo_790MY.SuspendLayout();
             this.tlpPropina_790MY.SuspendLayout();
             this.pnlTotalCobrar_790MY.SuspendLayout();
             this.pnlMetodoHost_790MY.SuspendLayout();
@@ -109,7 +109,19 @@ namespace GUI_08YS.RF2
             this.pnlCuota_790MY.SuspendLayout();
             this.tlpEfectivo_790MY.SuspendLayout();
             this.pnlCambio_790MY.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.SuspendLayout();
+            //
+            // bnrAvisos_790MY  (errores y rechazos del cobro; Dock = Top empuja el contenido)
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 1;
+            //
+            // errValidacion_790MY  (validación en línea de descuento, propina, efectivo y tarjeta)
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
             //
             // tlpMain_790MY
             //
@@ -583,7 +595,7 @@ namespace GUI_08YS.RF2
             this.tlpCobro_790MY.ColumnCount = 1;
             this.tlpCobro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpCobro_790MY.Controls.Add(this.lblCobroTitulo_790MY, 0, 0);
-            this.tlpCobro_790MY.Controls.Add(this.tlpMetodo_790MY, 0, 1);
+            this.tlpCobro_790MY.Controls.Add(this.sldMetodo_790MY, 0, 1);
             this.tlpCobro_790MY.Controls.Add(this.lblPropina_790MY, 0, 2);
             this.tlpCobro_790MY.Controls.Add(this.tlpPropina_790MY, 0, 3);
             this.tlpCobro_790MY.Controls.Add(this.pnlTotalCobrar_790MY, 0, 4);
@@ -616,59 +628,14 @@ namespace GUI_08YS.RF2
             this.lblCobroTitulo_790MY.Tag = "CJ_cobro_titulo";
             this.lblCobroTitulo_790MY.Text = "Cobro";
             //
-            // tlpMetodo_790MY
+            // sldMetodo_790MY  (selector deslizante de medio de pago: Efectivo / Tarjeta)
             //
-            this.tlpMetodo_790MY.ColumnCount = 2;
-            this.tlpMetodo_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpMetodo_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpMetodo_790MY.Controls.Add(this.btnEfectivo_790MY, 0, 0);
-            this.tlpMetodo_790MY.Controls.Add(this.btnTarjeta_790MY, 1, 0);
-            this.tlpMetodo_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlpMetodo_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 8);
-            this.tlpMetodo_790MY.Name = "tlpMetodo_790MY";
-            this.tlpMetodo_790MY.RowCount = 1;
-            this.tlpMetodo_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpMetodo_790MY.TabIndex = 1;
-            //
-            // btnEfectivo_790MY
-            //
-            this.btnEfectivo_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnEfectivo_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnEfectivo_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnEfectivo_790MY.FlatAppearance.BorderSize = 2;
-            this.btnEfectivo_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEfectivo_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnEfectivo_790MY.IconChar = FontAwesome.Sharp.IconChar.MoneyBill;
-            this.btnEfectivo_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.btnEfectivo_790MY.IconSize = 22;
-            this.btnEfectivo_790MY.Margin = new System.Windows.Forms.Padding(0);
-            this.btnEfectivo_790MY.Name = "btnEfectivo_790MY";
-            this.btnEfectivo_790MY.TabIndex = 0;
-            this.btnEfectivo_790MY.Tag = "CJ_efectivo";
-            this.btnEfectivo_790MY.Text = " Efectivo";
-            this.btnEfectivo_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnEfectivo_790MY.UseVisualStyleBackColor = false;
-            this.btnEfectivo_790MY.Click += new System.EventHandler(this.btnEfectivo_790MY_Click);
-            //
-            // btnTarjeta_790MY
-            //
-            this.btnTarjeta_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnTarjeta_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnTarjeta_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnTarjeta_790MY.FlatAppearance.BorderSize = 2;
-            this.btnTarjeta_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTarjeta_790MY.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnTarjeta_790MY.IconChar = FontAwesome.Sharp.IconChar.CreditCard;
-            this.btnTarjeta_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.btnTarjeta_790MY.IconSize = 22;
-            this.btnTarjeta_790MY.Margin = new System.Windows.Forms.Padding(0);
-            this.btnTarjeta_790MY.Name = "btnTarjeta_790MY";
-            this.btnTarjeta_790MY.TabIndex = 1;
-            this.btnTarjeta_790MY.Tag = "CJ_tarjeta";
-            this.btnTarjeta_790MY.Text = " Tarjeta";
-            this.btnTarjeta_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnTarjeta_790MY.UseVisualStyleBackColor = false;
-            this.btnTarjeta_790MY.Click += new System.EventHandler(this.btnTarjeta_790MY_Click);
+            this.sldMetodo_790MY.ClavesIdioma = new string[] { "CJ_efectivo", "CJ_tarjeta" };
+            this.sldMetodo_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sldMetodo_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 8);
+            this.sldMetodo_790MY.Name = "sldMetodo_790MY";
+            this.sldMetodo_790MY.TabIndex = 1;
+            this.sldMetodo_790MY.SeleccionCambiada += new System.EventHandler(this.sldMetodo_790MY_SeleccionCambiada);
             //
             // lblPropina_790MY
             //
@@ -1003,24 +970,13 @@ namespace GUI_08YS.RF2
             //
             // btnRegistrarCobro_790MY
             //
-            this.btnRegistrarCobro_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-            this.btnRegistrarCobro_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRegistrarCobro_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnRegistrarCobro_790MY.FlatAppearance.BorderSize = 0;
-            this.btnRegistrarCobro_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRegistrarCobro_790MY.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
-            this.btnRegistrarCobro_790MY.ForeColor = System.Drawing.Color.White;
-            this.btnRegistrarCobro_790MY.IconChar = FontAwesome.Sharp.IconChar.Check;
-            this.btnRegistrarCobro_790MY.IconColor = System.Drawing.Color.White;
-            this.btnRegistrarCobro_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.btnRegistrarCobro_790MY.IconSize = 26;
             this.btnRegistrarCobro_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.btnRegistrarCobro_790MY.Name = "btnRegistrarCobro_790MY";
             this.btnRegistrarCobro_790MY.TabIndex = 6;
             this.btnRegistrarCobro_790MY.Tag = "CJ_btn_registrar";
             this.btnRegistrarCobro_790MY.Text = "  Registrar Cobro y Liberar Mesa";
-            this.btnRegistrarCobro_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnRegistrarCobro_790MY.UseVisualStyleBackColor = false;
             this.btnRegistrarCobro_790MY.Click += new System.EventHandler(this.btnRegistrarCobro_790MY_Click);
             //
             // lblValidacion_790MY
@@ -1041,11 +997,13 @@ namespace GUI_08YS.RF2
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(1400, 820);
             this.Controls.Add(this.tlpMain_790MY);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormFacturacionCobro_790MY";
             this.Tag = "CJ_titulo";
             this.Text = "Caja y cobro";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormFacturacionCobro_790MY_FormClosing);
             this.Load += new System.EventHandler(this.FormFacturacionCobro_790MY_Load);
             this.tlpMain_790MY.ResumeLayout(false);
             this.tlpMesas_790MY.ResumeLayout(false);
@@ -1064,7 +1022,6 @@ namespace GUI_08YS.RF2
             this.tlpTotales_790MY.PerformLayout();
             this.tlpCobro_790MY.ResumeLayout(false);
             this.tlpCobro_790MY.PerformLayout();
-            this.tlpMetodo_790MY.ResumeLayout(false);
             this.tlpPropina_790MY.ResumeLayout(false);
             this.tlpPropina_790MY.PerformLayout();
             this.pnlTotalCobrar_790MY.ResumeLayout(false);
@@ -1076,6 +1033,7 @@ namespace GUI_08YS.RF2
             this.tlpEfectivo_790MY.ResumeLayout(false);
             this.tlpEfectivo_790MY.PerformLayout();
             this.pnlCambio_790MY.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -1120,9 +1078,7 @@ namespace GUI_08YS.RF2
         private System.Windows.Forms.Label lblNotaIva_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpCobro_790MY;
         private System.Windows.Forms.Label lblCobroTitulo_790MY;
-        private System.Windows.Forms.TableLayoutPanel tlpMetodo_790MY;
-        private FontAwesome.Sharp.IconButton btnEfectivo_790MY;
-        private FontAwesome.Sharp.IconButton btnTarjeta_790MY;
+        private GUI_08YS.Estilo.SlidingTab_UC_790MY sldMetodo_790MY;
         private System.Windows.Forms.Label lblPropina_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpPropina_790MY;
         private System.Windows.Forms.TextBox txtPropina_790MY;
@@ -1150,7 +1106,9 @@ namespace GUI_08YS.RF2
         private GUI_08YS.RF2.PanelRedondeado_790MY pnlCambio_790MY;
         private System.Windows.Forms.Label lblCambioTxt_790MY;
         private System.Windows.Forms.Label lblCambio_790MY;
-        private FontAwesome.Sharp.IconButton btnRegistrarCobro_790MY;
+        private GUI_08YS.Estilo.BotonCobro_790MY btnRegistrarCobro_790MY;
         private System.Windows.Forms.Label lblValidacion_790MY;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }

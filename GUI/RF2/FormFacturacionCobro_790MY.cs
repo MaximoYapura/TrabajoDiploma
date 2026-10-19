@@ -1,6 +1,7 @@
 using BE_08YS;
 using BLL_08YS;
 using BLL_08YS.Exceptions;
+using GUI_08YS.Estilo;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
@@ -9,6 +10,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
@@ -23,6 +25,8 @@ namespace GUI_08YS.RF2
     ///    "Registrar Cobro y Liberar Mesa", que emite la Factura B en estado PAGADA.
     /// Los cálculos y validaciones definitivos los repite la BLL; la pantalla solo
     /// anticipa el resultado. Bitácora y DV los registra la BLL después del COMMIT.
+    /// Etapa 4: errores y rechazos en el banner, éxito en toast, confirmación con
+    /// ConfirmModal y el cobro (GenerarFactura + RegistrarCobro) en un Task.Run.
     /// </summary>
     public partial class FormFacturacionCobro_790MY : Form, IIdiomaObserver_08YS
     {
@@ -45,6 +49,8 @@ namespace GUI_08YS.RF2
         private int _cobradasEnTurno;
         private bool _cargando;
         private bool _listo;
+        private bool _procesando;      // cobro en curso en segundo plano (E4-D6)
+        private bool _rechazoVisible;  // el banner muestra un rechazo de tarjeta (E4-D5)
 
         private readonly Font _fMesaTitulo = new Font("Segoe UI", 14F, FontStyle.Bold);
         private readonly Font _fMesaDetalle = new Font("Segoe UI", 9.75F);
@@ -88,6 +94,7 @@ namespace GUI_08YS.RF2
 
             UpdateIdioma();
             _listo = true;
+            sldMetodo_790MY.SeleccionarSinAnimacion(OpcionTarjeta);
             SeleccionarMetodo(MetodoPago_790MY.Tarjeta);
             CargarMesas(mantenerSeleccion: false);
         }
@@ -104,7 +111,7 @@ namespace GUI_08YS.RF2
             catch (Exception ex)
             {
                 _mesas = new List<MesaCobroDTO_790MY>();
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
 
             RenderizarMesas();
@@ -182,7 +189,13 @@ namespace GUI_08YS.RF2
             card.Controls.Add(lblMonto);
             lblMonto.Location = new Point(ancho - lblMonto.PreferredWidth - 16, 80);
 
-            E.PropagarClick(card, (s, e) => SeleccionarMesa(mesa.ReservaID));
+            E.PropagarClick(card, (s, e) =>
+            {
+                // Elegir otra mesa descarta el aviso anterior (error o rechazo de otra cuenta).
+                OcultarRechazo();
+                bnrAvisos_790MY.Ocultar();
+                SeleccionarMesa(mesa.ReservaID);
+            });
             return card;
         }
 
@@ -212,7 +225,7 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
             }
 
@@ -322,6 +335,7 @@ namespace GUI_08YS.RF2
                 }
             }
 
+            errValidacion_790MY.SetError(txtDescuento_790MY, lblErrorDescuento_790MY.Text);
             MostrarImportes(_importes);
             ActualizarCobro();
         }
@@ -342,24 +356,25 @@ namespace GUI_08YS.RF2
 
         private void btnPreTicket_790MY_Click(object sender, EventArgs e)
         {
-            if (_detalle == null || _importes == null) return;
+            if (_procesando || _detalle == null || _importes == null) return;
             try
             {
+                bnrAvisos_790MY.Ocultar();
                 SessionManager_08YS.Instance.ValidatePermission(Permisos.GenerarFactura);
                 TryParseImporte(txtDescuento_790MY.Text, out decimal valor, permitirVacio: true);
 
                 // CUN-006 pasos 5-7: factura Abierta con importes congelados.
                 Factura_790MY factura = _facturaBll.GenerarFactura(_detalle.ReservaID, valor, TipoDescuentoSeleccionado);
 
-                E.MostrarExito(VentanaPropietaria, E.T("msg_fc_factura_generada", factura.NumeroComprobante, Moneda(factura.MontoTotal)));
                 using (var comprobante = new FormComprobanteFactura_790MY(factura, null))
                     comprobante.ShowDialog(VentanaPropietaria);
 
                 CargarMesas(mantenerSeleccion: true);
+                E.MostrarExitoToast(this, E.T("msg_fc_factura_generada", factura.NumeroComprobante, Moneda(factura.MontoTotal)));
             }
             catch (Exception ex)
             {
-                E.MostrarError(VentanaPropietaria, ex);
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
         }
 
@@ -367,26 +382,22 @@ namespace GUI_08YS.RF2
 
         #region Cobro (panel derecho) — CUN-007
 
-        private void btnEfectivo_790MY_Click(object sender, EventArgs e) => SeleccionarMetodo(MetodoPago_790MY.Efectivo);
+        // Orden de las opciones de sldMetodo_790MY (ClavesIdioma en el Designer).
+        private const int OpcionEfectivo = 0;
+        private const int OpcionTarjeta = 1;
 
-        private void btnTarjeta_790MY_Click(object sender, EventArgs e) => SeleccionarMetodo(MetodoPago_790MY.Tarjeta);
+        private void sldMetodo_790MY_SeleccionCambiada(object sender, EventArgs e)
+            => SeleccionarMetodo(sldMetodo_790MY.IndiceSeleccionado == OpcionEfectivo
+                ? MetodoPago_790MY.Efectivo : MetodoPago_790MY.Tarjeta);
 
         private void SeleccionarMetodo(MetodoPago_790MY metodo)
         {
+            if (metodo != _metodo) OcultarRechazo();
             _metodo = metodo;
-            PintarSegmento(btnEfectivo_790MY, metodo == MetodoPago_790MY.Efectivo);
-            PintarSegmento(btnTarjeta_790MY, metodo == MetodoPago_790MY.Tarjeta);
+            sldMetodo_790MY.IndiceSeleccionado = metodo == MetodoPago_790MY.Efectivo ? OpcionEfectivo : OpcionTarjeta;
             tlpEfectivo_790MY.Visible = metodo == MetodoPago_790MY.Efectivo;
             tlpTarjeta_790MY.Visible = metodo == MetodoPago_790MY.Tarjeta;
             ActualizarCobro();
-        }
-
-        private static void PintarSegmento(FontAwesome.Sharp.IconButton boton, bool activo)
-        {
-            boton.BackColor = activo ? E.Bordo : Color.White;
-            boton.ForeColor = activo ? Color.White : E.Bordo;
-            boton.IconColor = boton.ForeColor;
-            boton.FlatAppearance.MouseOverBackColor = activo ? E.BordoHover : E.BordoSuave;
         }
 
         private void txtPropina_790MY_TextChanged(object sender, EventArgs e)
@@ -414,7 +425,9 @@ namespace GUI_08YS.RF2
 
         private void txtNroTarjeta_790MY_TextChanged(object sender, EventArgs e)
         {
-            if (!_cargando) ActualizarCobro();
+            if (_cargando) return;
+            OcultarRechazo();
+            ActualizarCobro();
         }
 
         private void cmbCuotas_790MY_SelectedIndexChanged(object sender, EventArgs e)
@@ -435,13 +448,14 @@ namespace GUI_08YS.RF2
         private void ActualizarCobro()
         {
             string motivo = null;
-            decimal propina = 0m;
+            decimal propina;
+            bool propinaValida = TryParseImporte(txtPropina_790MY.Text, out propina, permitirVacio: true) && propina >= 0;
 
             if (_detalle == null)
                 motivo = E.T("CJ_val_seleccione_mesa");
             else if (_importes == null)
                 motivo = E.T("CJ_val_descuento");
-            else if (!TryParseImporte(txtPropina_790MY.Text, out propina, permitirVacio: true) || propina < 0)
+            else if (!propinaValida)
                 motivo = E.T("msg_fc_propina_invalida");
             else if (_detalle.PedidosSinDespachar > 0)
                 motivo = E.T("CJ_aviso_pedidos_pendientes", _detalle.PedidosSinDespachar);
@@ -499,95 +513,210 @@ namespace GUI_08YS.RF2
                 ? "-"
                 : E.T("CJ_cuota_resumen", cuotas, Moneda(Math.Round(total / cuotas, 2, MidpointRounding.AwayFromZero)));
 
+            // ─── Validación en línea (ErrorProvider) con las mismas reglas ───
+            bool efectivoInsuficiente = _metodo == MetodoPago_790MY.Efectivo && _importes != null
+                && TryParseImporte(txtMontoRecibido_790MY.Text, out decimal recibidoValidar, permitirVacio: false)
+                && PagoBLL_790MY.CalcularCambio(total, recibidoValidar) < 0;
+            bool luhnInvalido = _metodo == MetodoPago_790MY.Tarjeta && digitos != null
+                && digitos.Length >= 13 && digitos.Length <= 19 && !PagoBLL_790MY.ValidarTarjetaLuhn(digitos);
+            errValidacion_790MY.SetError(txtPropina_790MY,
+                _importes != null && !propinaValida ? E.T("msg_fc_propina_invalida") : string.Empty);
+            errValidacion_790MY.SetError(txtMontoRecibido_790MY,
+                efectivoInsuficiente ? E.T("msg_fc_efectivo_insuficiente") : string.Empty);
+            errValidacion_790MY.SetError(txtNroTarjeta_790MY,
+                luhnInvalido ? E.T("msg_fc_tarjeta_invalida")
+                : _rechazoVisible ? E.T("CJ_tarjeta_rechazada") : string.Empty);
+
+            // Durante el cobro el botón queda en «Procesando»; al terminar, FinalizarProcesamiento
+            // vuelve a llamar a este método y lo deja Disponible o Deshabilitado.
+            if (_procesando) return;
             bool puedeCobrar = motivo == null && SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarCobro);
-            btnRegistrarCobro_790MY.Enabled = puedeCobrar;
-            btnRegistrarCobro_790MY.BackColor = puedeCobrar ? E.Bordo : E.Deshabilitado;
-            btnRegistrarCobro_790MY.ForeColor = puedeCobrar ? Color.White : E.Gris;
-            btnRegistrarCobro_790MY.IconColor = btnRegistrarCobro_790MY.ForeColor;
+            btnRegistrarCobro_790MY.Estado = puedeCobrar ? EstadoBotonCobro_790MY.Disponible : EstadoBotonCobro_790MY.Deshabilitado;
             lblValidacion_790MY.Text = motivo ?? string.Empty;
         }
 
-        private void btnRegistrarCobro_790MY_Click(object sender, EventArgs e)
+        /// <summary>
+        /// CUN-007 paso 9 en adelante. Todos los valores de pantalla se leen ANTES del
+        /// Task.Run: el hilo secundario solo ejecuta GenerarFactura + RegistrarCobro con datos
+        /// ya capturados (leer un control desde otro hilo lanza InvalidOperationException).
+        /// Los textos, el banner y el comprobante se resuelven después del await, ya en el hilo
+        /// de la interfaz.
+        /// </summary>
+        private async void btnRegistrarCobro_790MY_Click(object sender, EventArgs e)
         {
-            if (_detalle == null || _importes == null) return;
+            if (_procesando || _detalle == null || _importes == null) return;
 
+            // ─── Captura en el hilo de la interfaz ───
             TryParseImporte(txtPropina_790MY.Text, out decimal propina, permitirVacio: true);
+            TryParseImporte(txtDescuento_790MY.Text, out decimal valorDescuento, permitirVacio: true);
             decimal total = _importes.MontoTotal + propina;
-
-            // Paso 9: el camarero verifica los datos y confirma.
-            string medio = _metodo == MetodoPago_790MY.Efectivo
-                ? E.T("CJ_efectivo").Trim()
-                : E.T("CJ_confirmar_tarjeta", PagoBLL_790MY.DetectarMarca(txtNroTarjeta_790MY.Text), CuotasSeleccionadas);
-            var respuesta = MessageBox.Show(VentanaPropietaria,
-                E.T("msg_fc_confirmar_cobro", _detalle.MesaNumero, Moneda(total), medio),
-                E.T("CJ_confirmar_titulo"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (respuesta != DialogResult.Yes) return;
-
+            TipoDescuento_790MY tipoDescuento = TipoDescuentoSeleccionado;
+            MetodoPago_790MY metodo = _metodo;
+            decimal? montoRecibido = metodo == MetodoPago_790MY.Efectivo && TryParseImporte(txtMontoRecibido_790MY.Text, out decimal recibido, false)
+                ? recibido : (decimal?)null;
+            string nroTarjeta = metodo == MetodoPago_790MY.Tarjeta ? txtNroTarjeta_790MY.Text : null;
+            int cuotas = CuotasSeleccionadas;
+            int reservaId = _detalle.ReservaID;
             int mesaNumero = _detalle.MesaNumero;
+
+            // Sin la patente GenerarFactura (solo cobra) se usa la cuenta ya emitida por el camarero.
+            bool generarFactura = SessionManager_08YS.Instance.HasPermission(Permisos.GenerarFactura);
+            Factura_790MY facturaEmitida = _detalle.FacturaAbierta;
+            if (!generarFactura && facturaEmitida == null)
+            {
+                bnrAvisos_790MY.Mostrar(E.T("msg_fc_factura_requerida"), TipoBanner_790MY.Error, cerrable: true);
+                return;
+            }
+
+            // Paso 9: el camarero verifica los datos y confirma (E4-D2).
+            string medio = metodo == MetodoPago_790MY.Efectivo
+                ? E.T("CJ_efectivo").Trim()
+                : E.T("CJ_medio_tarjeta", PagoBLL_790MY.DetectarMarca(nroTarjeta), cuotas);
+            bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                E.T("CJ_confirmar_titulo_mesa", mesaNumero),
+                E.T("msg_fc_confirmar_cobro_modal", Moneda(total), medio),
+                E.T("CJ_btn_confirmar_cobro"));
+            if (!confirmado || _procesando) return;
+
+            // ─── Proceso en segundo plano ───
+            IniciarProcesamiento();
+            ResultadoCobroDTO_790MY resultado = null;
+            Exception error = null;
             try
             {
-                Cursor = Cursors.WaitCursor;
-
-                // CUN-006 (punto de extensión 8.1): factura vigente con los importes mostrados.
-                var reloj = Stopwatch.StartNew();
-                Factura_790MY factura = ObtenerFacturaParaCobrar();
-                Trace.WriteLine($"GenerarFactura: {reloj.ElapsedMilliseconds} ms", "Cobro");
-
-                // CUN-007: pago, factura Pagada, reserva Finalizada y mesa Libre.
-                var solicitud = new SolicitudCobro_790MY
+                resultado = await Task.Run(() =>
                 {
-                    NroFactura = factura.NroFactura,
-                    MetodoPago = _metodo,
-                    MontoPropina = propina,
-                    MontoRecibido = _metodo == MetodoPago_790MY.Efectivo && TryParseImporte(txtMontoRecibido_790MY.Text, out decimal recibido, false)
-                        ? recibido : (decimal?)null,
-                    NroTarjeta = _metodo == MetodoPago_790MY.Tarjeta ? txtNroTarjeta_790MY.Text : null,
-                    CantidadCuotas = CuotasSeleccionadas
-                };
-                reloj.Restart();
-                ResultadoCobroDTO_790MY resultado = _pagoBll.RegistrarCobro(solicitud);
-                Trace.WriteLine($"RegistrarCobro (total): {reloj.ElapsedMilliseconds} ms", "Cobro");
-                Cursor = Cursors.Default;
+                    // CUN-006 (punto de extensión 8.1): factura vigente con los importes mostrados.
+                    var reloj = Stopwatch.StartNew();
+                    Factura_790MY factura = generarFactura
+                        ? _facturaBll.GenerarFactura(reservaId, valorDescuento, tipoDescuento)
+                        : facturaEmitida;
+                    Trace.WriteLine($"GenerarFactura: {reloj.ElapsedMilliseconds} ms", "Cobro");
 
-                _cobradasEnTurno++;
-                E.MostrarExito(VentanaPropietaria, E.T("msg_fc_cobro_ok", resultado.Factura.NumeroComprobante, mesaNumero));
-                using (var comprobante = new FormComprobanteFactura_790MY(resultado.Factura, resultado.Pago))
-                    comprobante.ShowDialog(VentanaPropietaria);
-
-                _detalle = null;
-                CargarMesas(mantenerSeleccion: false);
-            }
-            catch (PagoRechazadoException_790MY ex)
-            {
-                // Escenario 8.1: sin cambios de estado; se solicita otro medio de pago.
-                Cursor = Cursors.Default;
-                MessageBox.Show(VentanaPropietaria, ex.Message, E.T("CJ_pago_rechazado_titulo"),
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtNroTarjeta_790MY.Focus();
-                txtNroTarjeta_790MY.SelectAll();
+                    // CUN-007: pago, factura Pagada, reserva Finalizada y mesa Libre.
+                    var solicitud = new SolicitudCobro_790MY
+                    {
+                        NroFactura = factura.NroFactura,
+                        MetodoPago = metodo,
+                        MontoPropina = propina,
+                        MontoRecibido = montoRecibido,
+                        NroTarjeta = nroTarjeta,
+                        CantidadCuotas = cuotas
+                    };
+                    reloj.Restart();
+                    ResultadoCobroDTO_790MY cobro = _pagoBll.RegistrarCobro(solicitud);
+                    Trace.WriteLine($"RegistrarCobro (total): {reloj.ElapsedMilliseconds} ms", "Cobro");
+                    return cobro;
+                });
             }
             catch (Exception ex)
             {
-                Cursor = Cursors.Default;
-                E.MostrarError(VentanaPropietaria, ex);
+                // Con await, la excepción del hilo secundario llega acá, en el hilo de la interfaz.
+                error = ex;
+            }
+            finally
+            {
+                FinalizarProcesamiento();
+            }
+
+            if (IsDisposed) return;
+
+            if (error is PagoRechazadoException_790MY rechazo)
+            {
+                // Escenario 8.1: sin cambios de estado; se solicita otro medio de pago (E4-D5).
+                MostrarRechazo(rechazo);
+                return;
+            }
+            if (error != null)
+            {
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, error);
                 CargarMesas(mantenerSeleccion: true);
+                return;
+            }
+
+            _cobradasEnTurno++;
+            using (var comprobante = new FormComprobanteFactura_790MY(resultado.Factura, resultado.Pago))
+                comprobante.ShowDialog(VentanaPropietaria);
+
+            _detalle = null;
+            CargarMesas(mantenerSeleccion: false);
+            E.MostrarExitoToast(this, E.T("msg_fc_cobro_ok", resultado.Factura.NumeroComprobante, mesaNumero));
+        }
+
+        /// <summary>Controles que no se pueden usar mientras el cobro está en curso.</summary>
+        private IEnumerable<Control> ControlesDeEntrada
+            => new Control[] { tlpMesas_790MY, tlpCuenta_790MY, sldMetodo_790MY, tlpPropina_790MY, pnlMetodoHost_790MY };
+
+        private FormMDI_08YS Contenedor => TopLevelControl as FormMDI_08YS;
+
+        /// <summary>
+        /// E4-D6: la bandera se activa antes del primer await (bloquea doble clic y
+        /// reentradas), el botón pasa a «Procesando», se deshabilitan las entradas y el
+        /// contenedor principal bloquea navegación, idioma y cierre.
+        /// </summary>
+        private void IniciarProcesamiento()
+        {
+            _procesando = true;
+            bnrAvisos_790MY.Ocultar();
+            OcultarRechazo();
+            btnRegistrarCobro_790MY.Estado = EstadoBotonCobro_790MY.Procesando;
+            foreach (Control c in ControlesDeEntrada) c.Enabled = false;
+            lblValidacion_790MY.Text = E.T("CJ_val_procesando");
+
+            FormMDI_08YS contenedor = Contenedor;
+            if (contenedor != null)
+            {
+                contenedor.CierreBloqueado += AvisarCobroEnCurso;
+                contenedor.BloquearNavegacion(true);
             }
         }
 
-        /// <summary>
-        /// Factura Abierta con los importes en pantalla. Si el usuario no tiene la patente
-        /// GenerarFactura (solo cobra), se usa la ya emitida por el camarero.
-        /// </summary>
-        private Factura_790MY ObtenerFacturaParaCobrar()
+        /// <summary>Restaura el estado original (también tras un rechazo o un error).</summary>
+        private void FinalizarProcesamiento()
         {
-            if (!SessionManager_08YS.Instance.HasPermission(Permisos.GenerarFactura))
+            FormMDI_08YS contenedor = Contenedor;
+            if (contenedor != null)
             {
-                return _detalle.FacturaAbierta
-                    ?? throw new ArgumentException(E.T("msg_fc_factura_requerida"));
+                contenedor.BloquearNavegacion(false);
+                contenedor.CierreBloqueado -= AvisarCobroEnCurso;
             }
 
-            TryParseImporte(txtDescuento_790MY.Text, out decimal valor, permitirVacio: true);
-            return _facturaBll.GenerarFactura(_detalle.ReservaID, valor, TipoDescuentoSeleccionado);
+            _procesando = false;
+            if (IsDisposed) return;
+            foreach (Control c in ControlesDeEntrada) c.Enabled = true;
+            if (bnrAvisos_790MY.Visible && bnrAvisos_790MY.Mensaje == E.T("msg_fc_cobro_en_curso"))
+                bnrAvisos_790MY.Ocultar();
+            ActualizarCobro();   // devuelve el botón a Disponible o Deshabilitado según los datos
+        }
+
+        private void AvisarCobroEnCurso()
+            => bnrAvisos_790MY.Mostrar(E.T("msg_fc_cobro_en_curso"), TipoBanner_790MY.Aviso, cerrable: false);
+
+        private void FormFacturacionCobro_790MY_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // No se cierra la ventana a mitad del cobro (salvo apagado de Windows).
+            if (!_procesando || e.CloseReason == CloseReason.WindowsShutDown) return;
+            e.Cancel = true;
+            AvisarCobroEnCurso();
+        }
+
+        private void MostrarRechazo(PagoRechazadoException_790MY ex)
+        {
+            bnrAvisos_790MY.Mostrar(ex.Message, TipoBanner_790MY.Error, cerrable: true);
+            _rechazoVisible = true;
+            errValidacion_790MY.SetError(txtNroTarjeta_790MY, E.T("CJ_tarjeta_rechazada"));
+            if (_metodo != MetodoPago_790MY.Tarjeta) return;
+            txtNroTarjeta_790MY.Focus();
+            txtNroTarjeta_790MY.SelectAll();
+        }
+
+        /// <summary>El aviso de rechazo se quita al corregir la tarjeta o cambiar de medio de pago.</summary>
+        private void OcultarRechazo()
+        {
+            if (!_rechazoVisible) return;
+            _rechazoVisible = false;
+            if (bnrAvisos_790MY.Visible) bnrAvisos_790MY.Ocultar();
+            errValidacion_790MY.SetError(txtNroTarjeta_790MY, string.Empty);
         }
 
         #endregion
@@ -616,6 +745,8 @@ namespace GUI_08YS.RF2
         public void UpdateIdioma()
         {
             E.TraducirTags(this);
+            sldMetodo_790MY.ActualizarTextos();
+            btnRegistrarCobro_790MY.TextoProcesando = E.T("CJ_btn_procesando");
             colCantidad_790MY.HeaderText = E.T("CJ_col_cantidad");
             colProducto_790MY.HeaderText = E.T("CJ_col_producto");
             colPrecio_790MY.HeaderText = E.T("CJ_col_precio");

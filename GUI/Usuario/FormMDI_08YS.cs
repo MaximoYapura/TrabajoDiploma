@@ -328,8 +328,33 @@ namespace GUI_08YS
             }
         }
 
+        /// <summary>
+        /// Etapa 4 (E4-D6): mientras un formulario hijo ejecuta una operación que no debe
+        /// interrumpirse (el cobro), se bloquean el menú lateral (incluido cerrar sesión), el
+        /// cambio de idioma y el cierre de la aplicación. panel2 queda habilitado para que el
+        /// formulario hijo siga respondiendo.
+        /// </summary>
+        public void BloquearNavegacion(bool bloquear)
+        {
+            _navegacionBloqueada = bloquear;
+            panelLateral.Enabled = !bloquear;
+            panelIdioma.Enabled = !bloquear;
+        }
+
+        /// <summary>Se dispara cuando se canceló un cierre por <see cref="BloquearNavegacion"/>; el hijo avisa el motivo.</summary>
+        public event Action CierreBloqueado;
+
+        private bool _navegacionBloqueada;
+
         private void FormMDI_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (_navegacionBloqueada && e.CloseReason != CloseReason.WindowsShutDown)
+            {
+                e.Cancel = true;
+                CierreBloqueado?.Invoke();
+                return;
+            }
+
             SessionManager_08YS.Instance.SesionInvalidada -= OnSesionInvalidada;
 
             if (SessionManager_08YS.Instance.IsLogged)

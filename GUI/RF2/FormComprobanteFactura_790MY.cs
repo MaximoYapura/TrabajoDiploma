@@ -1,5 +1,6 @@
 using BE_08YS;
 using BLL_08YS;
+using GUI_08YS.Estilo;
 using Service_08YS;
 using System;
 using System.Drawing;
@@ -112,6 +113,7 @@ namespace GUI_08YS.RF2
 
         private void btnImprimir_790MY_Click(object sender, EventArgs e)
         {
+            bnrAvisos_790MY.Ocultar();
             try
             {
                 using (var doc = new PrintDocument())
@@ -137,7 +139,10 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                E.MostrarError(this, ex);
+                // Etapa 4: la falla de impresión (sin impresora, cola detenida) no es un error
+                // fatal: el comprobante ya está registrado. Se informa en el banner y se puede
+                // reintentar sin cerrar la vista previa.
+                bnrAvisos_790MY.Mostrar(E.T("CJ_msg_error_impresion", ex.Message), TipoBanner_790MY.Error, cerrable: true);
             }
         }
 
