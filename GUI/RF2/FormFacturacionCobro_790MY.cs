@@ -5,6 +5,7 @@ using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -528,7 +529,9 @@ namespace GUI_08YS.RF2
                 Cursor = Cursors.WaitCursor;
 
                 // CUN-006 (punto de extensión 8.1): factura vigente con los importes mostrados.
+                var reloj = Stopwatch.StartNew();
                 Factura_790MY factura = ObtenerFacturaParaCobrar();
+                Trace.WriteLine($"GenerarFactura: {reloj.ElapsedMilliseconds} ms", "Cobro");
 
                 // CUN-007: pago, factura Pagada, reserva Finalizada y mesa Libre.
                 var solicitud = new SolicitudCobro_790MY
@@ -541,7 +544,9 @@ namespace GUI_08YS.RF2
                     NroTarjeta = _metodo == MetodoPago_790MY.Tarjeta ? txtNroTarjeta_790MY.Text : null,
                     CantidadCuotas = CuotasSeleccionadas
                 };
+                reloj.Restart();
                 ResultadoCobroDTO_790MY resultado = _pagoBll.RegistrarCobro(solicitud);
+                Trace.WriteLine($"RegistrarCobro (total): {reloj.ElapsedMilliseconds} ms", "Cobro");
                 Cursor = Cursors.Default;
 
                 _cobradasEnTurno++;
