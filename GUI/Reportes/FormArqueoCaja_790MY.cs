@@ -105,16 +105,31 @@ namespace GUI_08YS.Reportes
 
         private void Cargar()
         {
+            bnrAvisos_790MY.Ocultar();
             try
             {
                 _reporte = _pagoBll.GenerarReporteArqueoCaja(dtpFecha_790MY.Value.Date);
+                _cajaCerrada = _pagoBll.EstaCajaCerrada(dtpFecha_790MY.Value.Date);
             }
             catch (Exception ex)
             {
                 _reporte = null;
+                _cajaCerrada = false;
                 E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             Mostrar();
+            AvisarSiCajaCerrada();
+        }
+
+        // La caja de cada día se cierra una sola vez (la BLL también lo controla).
+        private bool _cajaCerrada;
+
+        /// <summary>Explica por qué «Cerrar caja» está deshabilitado.</summary>
+        private void AvisarSiCajaCerrada()
+        {
+            if (_cajaCerrada)
+                bnrAvisos_790MY.Mostrar(E.T("msg_ac_caja_ya_cerrada", dtpFecha_790MY.Value.Date.ToString("dd/MM/yyyy")),
+                                        TipoBanner_790MY.Info, cerrable: false);
         }
 
         private void Mostrar()
@@ -149,7 +164,7 @@ namespace GUI_08YS.Reportes
             lblSinCobros_790MY.Text = E.T("msg_ac_sin_cobros", r.Fecha.ToString("dd/MM/yyyy"));
             lblSinCobros_790MY.Visible = r.CantidadCuentas == 0;
             UbicarMensajeVacio();
-            btnCerrarCaja_790MY.Enabled = r.CantidadCuentas > 0;
+            btnCerrarCaja_790MY.Enabled = r.CantidadCuentas > 0 && !_cajaCerrada;
             btnSiguiente_790MY.Enabled = dtpFecha_790MY.Value.Date < DateTime.Today;
         }
 
@@ -167,6 +182,24 @@ namespace GUI_08YS.Reportes
         private void btnCerrarCaja_790MY_Click(object sender, EventArgs e)
         {
             DateTime fecha = dtpFecha_790MY.Value.Date;
+
+            // Validación defensiva: otra terminal pudo cerrar la caja después de cargar la pantalla.
+            try
+            {
+                _cajaCerrada = _pagoBll.EstaCajaCerrada(fecha);
+            }
+            catch (Exception ex)
+            {
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
+                return;
+            }
+            if (_cajaCerrada)
+            {
+                Mostrar();
+                bnrAvisos_790MY.Mostrar(E.T("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy")), TipoBanner_790MY.Aviso);
+                return;
+            }
+
             bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
                 E.T("AC_confirmar_cierre_titulo", fecha.ToString("dd/MM/yyyy")),
                 E.T("msg_ac_confirmar_cierre"),
@@ -179,10 +212,12 @@ namespace GUI_08YS.Reportes
             {
                 ReporteArqueoCaja_790MY cierre = _pagoBll.CerrarCaja(fecha);
                 _reporte = cierre;
+                _cajaCerrada = true;
                 Mostrar();
                 // Los totales del cierre quedan a la vista en las tarjetas; el toast resume lo esencial.
                 E.MostrarExitoToast(this, E.T("AC_toast_cierre", fecha.ToString("dd/MM/yyyy"),
                     cierre.CantidadCuentas, Moneda(cierre.RecaudacionNeta)));
+                AvisarSiCajaCerrada();
             }
             catch (Exception ex)
             {

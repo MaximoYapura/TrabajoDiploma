@@ -239,10 +239,33 @@ namespace BLL_08YS
             if (reporte.CantidadCuentas == 0)
                 throw MensajesBLL_790MY.Regla("msg_ac_sin_cobros", fecha.ToString("dd/MM/yyyy"));
 
+            // Una sola vez por día: el cierre no tiene tabla propia, su constancia es el
+            // evento CierreCajaRealizado de la bitácora.
+            if (EstaCajaCerrada(fecha))
+                throw MensajesBLL_790MY.Regla("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy"));
+
             _bitacoraBll.RegistrarEventoPostCommit(Evento.CierreCajaRealizado,
-                $"Caja {fecha:dd/MM/yyyy} - {reporte.RecaudacionNeta.ToString("N2", CulturaMoneda)}");
+                PrefijoCierre(fecha) + reporte.RecaudacionNeta.ToString("N2", CulturaMoneda));
             return reporte;
         }
+
+        /// <summary>
+        /// True si la caja de <paramref name="fecha"/> ya se cerró, según los eventos
+        /// CierreCajaRealizado de la bitácora ("Caja dd/MM/yyyy - importe").
+        /// </summary>
+        public bool EstaCajaCerrada(DateTime fecha)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
+            string prefijo = PrefijoCierre(fecha);
+            return _bitacoraBll
+                .Filtrar(new BitacoraFiltro_08YS { Evento = Evento.CierreCajaRealizado, TargetUsername = prefijo })
+                .Any(e => e.TargetUsername != null && e.TargetUsername.StartsWith(prefijo, StringComparison.Ordinal));
+        }
+
+        // Mismo texto al registrar y al consultar; cultura invariante para que la barra
+        // no dependa del idioma activo.
+        private static string PrefijoCierre(DateTime fecha)
+            => "Caja " + fecha.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) + " - ";
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
