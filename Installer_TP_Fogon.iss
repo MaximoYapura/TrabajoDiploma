@@ -9,15 +9,18 @@
 ;
 ;  MODOS
 ;   * Instalación limpia (no existe HKLM\Software\ElFogonDelSur):
-;       - el usuario elige la carpeta de destino y la instancia de SQL Server;
+;       - el usuario elige la carpeta de destino y la instancia de SQL Server
+;         (desplegable con las instancias detectadas en el Registro);
 ;       - se copian los binarios de GUI\bin\Release y el PDF de docs\;
-;       - se ejecuta docs\Seed_TP_Ing_Soft.sql con sqlcmd sobre esa instancia;
+;       - se ejecuta docs\Deploy_TP_Ing_Soft.sql con sqlcmd sobre esa instancia:
+;         crea TP_Ing_Soft completa (esquema + datos iniciales + DV) si no existe,
+;         y si ya existe no la modifica;
 ;       - se crea App.secrets.config a partir de la plantilla (si no existe);
 ;       - se crean los accesos directos (Escritorio y Menú Inicio).
 ;   * Reinstalación / actualización (la clave de registro ya existe):
 ;       - se reutilizan la carpeta y la instancia SQL de la instalación anterior;
 ;       - solo se reemplazan ejecutables, DLLs y recursos;
-;       - NO se ejecuta la semilla: la base de datos queda intacta;
+;       - NO se ejecuta el script de despliegue: la base de datos queda intacta;
 ;       - App.secrets.config (credenciales SMTP) no se toca.
 ;   * Desinstalación: borra toda la carpeta de instalación (incluidos
 ;     App.secrets.config y Database\); la base TP_Ing_Soft queda intacta.
@@ -84,9 +87,10 @@ Source: "GUI\Config\App.secrets.config.template"; DestDir: "{app}"; Flags: ignor
 Source: "GUI\Config\App.secrets.config.template"; DestDir: "{app}"; DestName: "App.secrets.config"; \
     Flags: onlyifdoesntexist
 
-; Semilla de la base: se instala siempre (para poder re-aplicarla a mano),
-; pero el instalador solo la ejecuta en la instalación limpia.
-Source: "docs\Seed_TP_Ing_Soft.sql"; DestDir: "{app}\Database"; Flags: ignoreversion
+; Script único de base de datos (esquema + datos iniciales + DV). Se instala
+; siempre, para poder re-ejecutarlo a mano; el instalador solo lo corre en la
+; instalación limpia (ver [Run]).
+Source: "docs\Deploy_TP_Ing_Soft.sql"; DestDir: "{app}\Database"; Flags: ignoreversion
 
 ; Documentación
 Source: "docs\*.pdf"; DestDir: "{app}\docs"; Flags: ignoreversion
@@ -105,12 +109,20 @@ Root: HKLM; Subkey: "{#RegKey}"; ValueType: string; ValueName: "Version"; ValueD
 Root: HKLM; Subkey: "{#RegKey}"; ValueType: string; ValueName: "SqlInstance"; ValueData: "{code:GetSqlInstance}"
 
 [Run]
+; Base de datos: solo en la instalación limpia (Check). -b corta ante el primer error
+; y -f 65001 lee el script en UTF-8. La salida queda en Database\Deploy_TP_Ing_Soft.log
+; y VerificarDeploy la revisa (marcas DEPLOY_OK / DEPLOY_OMITIDO).
+Filename: "{cmd}"; \
+    Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -f 65001 -i ""{app}\Database\Deploy_TP_Ing_Soft.sql"" > ""{app}\Database\Deploy_TP_Ing_Soft.log"" 2>&1"; \
+    StatusMsg: "Creando la base de datos TP_Ing_Soft..."; \
+    Flags: runhidden waituntilterminated; Check: DebeDesplegarBase; AfterInstall: VerificarDeploy
+
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; \
     WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 ; Limpieza total: también lo que se crea en tiempo de ejecución o después de
-; instalar (log de la semilla, App.secrets.config con credenciales SMTP, etc.).
+; instalar (log del despliegue, App.secrets.config con credenciales SMTP, etc.).
 ; La base de datos TP_Ing_Soft en SQL Server NO se toca.
 Type: filesandordirs; Name: "{app}\Database"
 Type: files; Name: "{app}\App.secrets.config"
@@ -120,13 +132,16 @@ Type: filesandordirs; Name: "{app}\*"
 const
   RegKey         = '{#RegKey}';
   DefaultSqlInst = '{#DefaultSqlInst}';
+  LocalDbInst    = '(localdb)\MSSQLLocalDB';
+  SqlInstancesKey = 'SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL';
   NetFx48Release = 528040;
 
 var
   IsUpgrade: Boolean;
   PreviousSqlInstance: String;
-  SqlPage: TInputQueryWizardPage;
-  SeedCheckBox: TNewCheckBox;
+  SqlPage: TWizardPage;
+  SqlCombo: TNewComboBox;
+  SqlCmdEncontrado: Boolean;
 
 { ---------------------------------------------------------------------------
   Utilidades
@@ -137,7 +152,7 @@ begin
   if IsUpgrade then
     Result := PreviousSqlInstance
   else
-    Result := Trim(SqlPage.Values[0]);
+    Result := Trim(SqlCombo.Text);
 end;
 
 { Ejecuta un comando de consola con salida redirigida a LogFile. Devuelve el exit code. }
@@ -164,6 +179,59 @@ end;
 function SqlCmdDisponible: Boolean;
 begin
   Result := RunCmd('where sqlcmd', ExpandConstant('{tmp}\where_sqlcmd.log')) = 0;
+end;
+
+{ Agrega una instancia al desplegable si todavía no está. }
+procedure AgregarInstancia(const Instancia: String);
+begin
+  if SqlCombo.Items.IndexOf(Instancia) < 0 then
+    SqlCombo.Items.Add(Instancia);
+end;
+
+{ Lee los nombres de instancia de una vista del Registro (64 o 32 bits).
+  MSSQLSERVER (instancia predeterminada) se informa aparte, porque va primero como ".". }
+procedure LeerInstancias(const RootKey: Integer; var Nombradas: TArrayOfString; var TienePredeterminada: Boolean);
+var
+  Nombres: TArrayOfString;
+  I, N: Integer;
+begin
+  if not RegGetValueNames(RootKey, SqlInstancesKey, Nombres) then
+    Exit;
+  for I := 0 to GetArrayLength(Nombres) - 1 do
+  begin
+    if CompareText(Nombres[I], 'MSSQLSERVER') = 0 then
+      TienePredeterminada := True
+    else
+    begin
+      N := GetArrayLength(Nombradas);
+      SetArrayLength(Nombradas, N + 1);
+      Nombradas[N] := '.\' + Nombres[I];
+    end;
+  end;
+end;
+
+{ Llena el desplegable con las instancias instaladas:
+    "." si existe MSSQLSERVER, luego ".\NOMBRE" por cada instancia nombrada
+    y siempre al final (localdb)\MSSQLLocalDB. Preselecciona el primer ítem. }
+procedure DetectarInstanciasSql;
+var
+  Nombradas: TArrayOfString;
+  TienePredeterminada: Boolean;
+  I: Integer;
+begin
+  TienePredeterminada := False;
+  SetArrayLength(Nombradas, 0);
+  if IsWin64 then
+    LeerInstancias(HKLM64, Nombradas, TienePredeterminada);
+  LeerInstancias(HKLM32, Nombradas, TienePredeterminada);
+
+  SqlCombo.Items.Clear;
+  if TienePredeterminada then
+    AgregarInstancia('.');
+  for I := 0 to GetArrayLength(Nombradas) - 1 do
+    AgregarInstancia(Nombradas[I]);
+  AgregarInstancia(LocalDbInst);
+  SqlCombo.ItemIndex := 0;
 end;
 
 { Escribe la instancia elegida como "Data Source" de la cadena de conexión TP_Ing_Soft
@@ -199,6 +267,33 @@ begin
 end;
 
 { ---------------------------------------------------------------------------
+  Despliegue de la base (entrada de la sección Run)
+  --------------------------------------------------------------------------- }
+
+{ Check de la entrada de [Run]: solo en la instalación limpia y si hay sqlcmd. }
+function DebeDesplegarBase: Boolean;
+begin
+  Result := (not IsUpgrade) and SqlCmdEncontrado;
+end;
+
+{ AfterInstall de la entrada de [Run]: revisa la salida de sqlcmd. }
+procedure VerificarDeploy;
+var
+  LogFile, ScriptFile, Salida: String;
+begin
+  LogFile := ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.log');
+  ScriptFile := ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.sql');
+  Salida := ReadLog(LogFile);
+
+  if (Pos('DEPLOY_OK', Salida) > 0) or (Pos('DEPLOY_OMITIDO', Salida) > 0) then
+    Exit;
+
+  MsgBox('No se pudo crear la base de datos TP_Ing_Soft:' + #13#10#13#10 + Salida + #13#10#13#10 +
+         'La aplicación quedó instalada. Puede re-ejecutar el script a mano:' + #13#10 +
+         'sqlcmd -S "' + GetSqlInstance('') + '" -E -b -f 65001 -i "' + ScriptFile + '"', mbError, MB_OK);
+end;
+
+{ ---------------------------------------------------------------------------
   Asistente
   --------------------------------------------------------------------------- }
 
@@ -226,9 +321,13 @@ begin
        or (Trim(PreviousSqlInstance) = '') then
       PreviousSqlInstance := DefaultSqlInst;
   end;
+
+  SqlCmdEncontrado := SqlCmdDisponible;
 end;
 
 procedure InitializeWizard;
+var
+  Descripcion, Etiqueta, Nota: TNewStaticText;
 begin
   { Reinstalación: se avisa antes de copiar nada que la base no se va a tocar. }
   if IsUpgrade then
@@ -239,23 +338,42 @@ begin
       'Carpeta de instalación: ' + WizardForm.PrevAppDir + #13#10 +
       'Instancia de SQL Server: ' + PreviousSqlInstance);
 
-  SqlPage := CreateInputQueryPage(wpSelectDir,
+  SqlPage := CreateCustomPage(wpSelectDir,
     'Base de datos',
-    'Instancia de SQL Server donde está la base TP_Ing_Soft',
-    'Ingrese el nombre de la instancia de SQL Server: "." es la instancia predeterminada del equipo ' +
-    '(localhost); otros ejemplos: .\SQLEXPRESS, (localdb)\MSSQLLocalDB o NOMBRE-PC\INSTANCIA. ' +
-    'Se usa autenticación integrada de Windows.');
-  SqlPage.Add('Instancia de SQL Server:', False);
-  SqlPage.Values[0] := DefaultSqlInst;
+    'Instancia de SQL Server donde se creará la base TP_Ing_Soft');
 
-  SeedCheckBox := TNewCheckBox.Create(SqlPage);
-  SeedCheckBox.Parent := SqlPage.Surface;
-  SeedCheckBox.Top := SqlPage.Edits[0].Top + SqlPage.Edits[0].Height + ScaleY(24);
-  SeedCheckBox.Width := SqlPage.SurfaceWidth;
-  SeedCheckBox.Height := ScaleY(34);
-  SeedCheckBox.Caption := 'Aplicar la base semilla limpia (Seed_TP_Ing_Soft.sql). ' +
-    'ATENCIÓN: borra reservas, pedidos, facturas, pagos, bitácora, clientes y usuarios (salvo Maximo) de TP_Ing_Soft.';
-  SeedCheckBox.Checked := True;
+  Descripcion := TNewStaticText.Create(SqlPage);
+  Descripcion.Parent := SqlPage.Surface;
+  Descripcion.Width := SqlPage.SurfaceWidth;
+  Descripcion.WordWrap := True;
+  Descripcion.AutoSize := False;
+  Descripcion.Height := ScaleY(44);
+  Descripcion.Caption := 'Se detectaron las instancias de SQL Server instaladas en este equipo. ' +
+    'Elija una de la lista (también puede escribir otra, por ejemplo NOMBRE-PC\INSTANCIA). ' +
+    'Se usa autenticación integrada de Windows.';
+
+  Etiqueta := TNewStaticText.Create(SqlPage);
+  Etiqueta.Parent := SqlPage.Surface;
+  Etiqueta.Top := Descripcion.Top + Descripcion.Height + ScaleY(10);
+  Etiqueta.Caption := 'Instancia de SQL Server:';
+
+  SqlCombo := TNewComboBox.Create(SqlPage);
+  SqlCombo.Parent := SqlPage.Surface;
+  SqlCombo.Style := csDropDown;
+  SqlCombo.Top := Etiqueta.Top + Etiqueta.Height + ScaleY(4);
+  SqlCombo.Width := SqlPage.SurfaceWidth;
+  DetectarInstanciasSql;
+
+  Nota := TNewStaticText.Create(SqlPage);
+  Nota.Parent := SqlPage.Surface;
+  Nota.Top := SqlCombo.Top + SqlCombo.Height + ScaleY(16);
+  Nota.Width := SqlPage.SurfaceWidth;
+  Nota.WordWrap := True;
+  Nota.AutoSize := False;
+  Nota.Height := ScaleY(60);
+  Nota.Caption := 'Si la base TP_Ing_Soft no existe en esa instancia, se crea completa con los datos ' +
+    'iniciales (usuario Maximo, mesas, carta, empleados y un cliente de prueba). ' +
+    'Si ya existe, no se modifica.';
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
@@ -272,28 +390,27 @@ begin
   if CurPageID <> SqlPage.ID then
     Exit;
 
-  Instancia := Trim(SqlPage.Values[0]);
+  Instancia := Trim(SqlCombo.Text);
   if Instancia = '' then
   begin
-    MsgBox('Ingrese la instancia de SQL Server.', mbError, MB_OK);
+    MsgBox('Elija o escriba la instancia de SQL Server.', mbError, MB_OK);
     Result := False;
     Exit;
   end;
 
-  if not SqlCmdDisponible then
+  if not SqlCmdEncontrado then
   begin
-    Result := MsgBox('No se encontró sqlcmd en el PATH, por lo que no se podrá aplicar la base semilla.' + #13#10 +
-                     'Puede aplicarla luego a mano con Database\Seed_TP_Ing_Soft.sql (en la carpeta de instalación).' + #13#10#13#10 +
+    Result := MsgBox('No se encontró sqlcmd en el PATH, por lo que no se podrá crear la base de datos.' + #13#10 +
+                     'Puede crearla luego a mano con Database\Deploy_TP_Ing_Soft.sql (en la carpeta de instalación).' + #13#10#13#10 +
                      '¿Continuar igualmente?', mbConfirmation, MB_YESNO) = IDYES;
     Exit;
   end;
 
-  { Prueba de conexión: la instancia responde y existe la base TP_Ing_Soft. }
+  { Prueba de conexión (30 s: LocalDB puede tardar en arrancar la primera vez). }
   LogFile := ExpandConstant('{tmp}\sql_check.log');
-  if RunCmd('sqlcmd -S "' + Instancia + '" -E -b -l 10 -Q "IF DB_ID(N''TP_Ing_Soft'') IS NULL RAISERROR(N''No existe la base TP_Ing_Soft.'', 16, 1)"',
-            LogFile) <> 0 then
+  if RunCmd('sqlcmd -S "' + Instancia + '" -E -b -l 30 -Q "SELECT 1"', LogFile) <> 0 then
   begin
-    Result := MsgBox('No se pudo verificar la base TP_Ing_Soft en "' + Instancia + '":' + #13#10#13#10 +
+    Result := MsgBox('No se pudo conectar a la instancia "' + Instancia + '":' + #13#10#13#10 +
                      ReadLog(LogFile) + #13#10#13#10 +
                      '¿Continuar igualmente?', mbConfirmation, MB_YESNO) = IDYES;
   end;
@@ -305,34 +422,17 @@ begin
   if IsUpgrade then
     Result := 'Modo: Reinstalación / Actualización' + NewLine +
               Space + 'Se reemplazarán los ejecutables y DLLs. La base de datos NO se modifica.' + NewLine + NewLine
+  else if SqlCmdEncontrado then
+    Result := 'Modo: Instalación limpia' + NewLine +
+              Space + 'Se creará la base TP_Ing_Soft si no existe (si ya existe, no se modifica).' + NewLine + NewLine
   else
-  begin
-    Result := 'Modo: Instalación limpia' + NewLine;
-    if SeedCheckBox.Checked then
-      Result := Result + Space + 'Se aplicará la base semilla sobre TP_Ing_Soft.' + NewLine + NewLine
-    else
-      Result := Result + Space + 'No se aplicará la base semilla.' + NewLine + NewLine;
-  end;
+    Result := 'Modo: Instalación limpia' + NewLine +
+              Space + 'Sin sqlcmd: la base de datos deberá crearse a mano.' + NewLine + NewLine;
 
   Result := Result + MemoDirInfo + NewLine + NewLine +
             'Instancia de SQL Server:' + NewLine + Space + GetSqlInstance('') + NewLine + NewLine;
   if MemoTasksInfo <> '' then
     Result := Result + MemoTasksInfo;
-end;
-
-procedure AplicarSemilla(const Instancia: String);
-var
-  SeedFile, LogFile: String;
-begin
-  SeedFile := ExpandConstant('{app}\Database\Seed_TP_Ing_Soft.sql');
-  LogFile := ExpandConstant('{app}\Database\Seed_TP_Ing_Soft.log');
-  WizardForm.StatusLabel.Caption := 'Aplicando la base semilla en ' + Instancia + '...';
-
-  { -b: aborta con exit code <> 0 ante cualquier error; -f 65001: script en UTF-8. }
-  if RunCmd('sqlcmd -S "' + Instancia + '" -E -b -f 65001 -i "' + SeedFile + '"', LogFile) <> 0 then
-    MsgBox('No se pudo aplicar la base semilla:' + #13#10#13#10 + ReadLog(LogFile) + #13#10#13#10 +
-           'La aplicación quedó instalada. Puede re-ejecutar el script a mano:' + #13#10 +
-           'sqlcmd -S "' + Instancia + '" -E -b -f 65001 -i "' + SeedFile + '"', mbError, MB_OK);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -342,7 +442,4 @@ begin
 
   { En ambos modos el .exe.config se reemplaza: se vuelve a escribir la instancia. }
   ConfigurarConnectionString(GetSqlInstance(''));
-
-  if (not IsUpgrade) and SeedCheckBox.Checked and SqlCmdDisponible then
-    AplicarSemilla(GetSqlInstance(''));
 end;
