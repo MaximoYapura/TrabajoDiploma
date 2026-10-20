@@ -95,13 +95,8 @@ namespace GUI_08YS
             SessionManager_08YS.Instance.SesionInvalidada += OnSesionInvalidada;
             UpdateIdioma();
 
-            // Icono corporativo (seguro: el recurso puede no existir aún en la Build actual)
-            try
-            {
-                var icon = Resources.ResourceManager.GetObject("FogonIcon") as System.Drawing.Icon;
-                if (icon != null) this.Icon = icon;
-            }
-            catch { }
+            // Icono corporativo: barra de tareas y Alt+Tab (el formulario no tiene barra de título).
+            this.Icon = Resources.FogonIcon;
         }
 
         private void OnSesionInvalidada()

@@ -31,6 +31,8 @@ namespace GUI_08YS
         public FormLogin_08YS(bool modoRelogin = false)
         {
             InitializeComponent();
+            // Icono corporativo: barra de tareas y Alt+Tab (el formulario no tiene barra de título).
+            this.Icon = Properties.Resources.FogonIcon;
             CargarLogo();
             ModoRelogin = modoRelogin;
             _userBLL = BLLFactory_08YS.CreateUserBLL();

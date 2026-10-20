@@ -69,10 +69,10 @@ namespace BLL_08YS
         public DateTime Desde { get; set; }
 
         /// <summary>
-        /// true si no hay suficientes cuentas cobradas en la BD y el análisis corre sobre
-        /// un histórico simulado (la GUI lo informa como "datos simulados").
+        /// false si la BD todavía no tiene suficientes cuentas cobradas para calcular
+        /// asociaciones: no se generan reglas ni sugerencias y la GUI lo informa.
         /// </summary>
-        public bool DatosSimulados { get; set; }
+        public bool DatosSuficientes { get; set; }
     }
 
     /// <summary>
@@ -93,8 +93,12 @@ namespace BLL_08YS
     {
         public const int DiasAnalisis = 90;
 
-        /// <summary>Por debajo de esta cantidad de cuentas reales se usa el histórico simulado.</summary>
-        public const int MinimoCuentasReales = 30;
+        /// <summary>
+        /// Cuentas cobradas mínimas para calcular reglas. Por debajo de este umbral el
+        /// soporte de cualquier par sería anecdótico. Siempre se analizan datos reales
+        /// (Facturas pagadas + ItemsFactura), con o sin ModoDemostracion.
+        /// </summary>
+        public const int MinimoCuentasReales = 10;
 
         /// <summary>Soporte mínimo (%) para considerar frecuente una combinación.</summary>
         public const decimal SoporteMinimo = 3m;
@@ -211,18 +215,16 @@ namespace BLL_08YS
                 .Where(c => c.Productos.Count > 0)
                 .ToList();
 
-            bool simulado = canastas.Count < MinimoCuentasReales;
-            if (simulado)
-                canastas = GeneradorCanastasSimuladas_790MY.Generar(desde, DiasAnalisis);
+            bool suficientes = canastas.Count >= MinimoCuentasReales;
 
             _canastas = canastas;
-            _reglas = CalcularReglas(canastas);
+            _reglas = suficientes ? CalcularReglas(canastas) : new List<ReglaAsociacion_790MY>();
             _resumen = new ResumenCanasta_790MY
             {
                 CuentasAnalizadas = canastas.Count,
                 DiasAnalizados = DiasAnalisis,
                 Desde = desde,
-                DatosSimulados = simulado
+                DatosSuficientes = suficientes
             };
         }
 
@@ -336,87 +338,5 @@ namespace BLL_08YS
         /// <summary>Patente dedicada del reporte predictivo.</summary>
         private static void ValidarAcceso()
             => SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionReportePredictivo);
-    }
-
-    /// <summary>
-    /// Histórico simulado de 90 días para demostrar el reporte cuando la BD todavía no
-    /// tiene suficientes cuentas cobradas. Es determinístico (semilla fija) y modela
-    /// hábitos típicos de una parrilla: provoleta con Malbec, empanadas con cerveza,
-    /// postre con café y los martes como día más flojo. Las reglas se obtienen con el
-    /// mismo motor que los datos reales: aquí solo se generan canastas, no resultados.
-    /// </summary>
-    internal static class GeneradorCanastasSimuladas_790MY
-    {
-        private const int CantidadCuentas = 1240;
-        private const int Semilla = 790;
-
-        // Ids negativos: nunca colisionan con ProductoID reales.
-        private const int Provoleta = -1, Malbec = -2, Empanadas = -3, Cerveza = -4, Milanesa = -5, Coca = -6,
-                          Bife = -7, Vacio = -8, Flan = -9, Cafe = -10, Tiramisu = -11, Agua = -12, Ensalada = -13;
-
-        private static readonly Dictionary<int, string> Nombres = new Dictionary<int, string>
-        {
-            { Provoleta, "Provoleta a la parrilla" }, { Malbec, "Malbec Reserva" },
-            { Empanadas, "Empanadas criollas" },      { Cerveza, "Cerveza artesanal" },
-            { Milanesa, "Milanesa napolitana" },      { Coca, "Coca-Cola 500 ml" },
-            { Bife, "Bife de chorizo" },              { Vacio, "Vacío a las brasas" },
-            { Flan, "Flan casero" },                  { Cafe, "Café" },
-            { Tiramisu, "Tiramisú" },                 { Agua, "Agua mineral" },
-            { Ensalada, "Ensalada mixta" },
-        };
-
-        /// <summary>Peso relativo de cuentas por día de la semana (martes, el más bajo).</summary>
-        private static readonly Dictionary<DayOfWeek, double> PesoDia = new Dictionary<DayOfWeek, double>
-        {
-            { DayOfWeek.Monday, 0.70 }, { DayOfWeek.Tuesday, 0.45 }, { DayOfWeek.Wednesday, 0.80 },
-            { DayOfWeek.Thursday, 0.90 }, { DayOfWeek.Friday, 1.20 }, { DayOfWeek.Saturday, 1.40 },
-            { DayOfWeek.Sunday, 1.10 },
-        };
-
-        public static List<CanastaFactura_790MY> Generar(DateTime desde, int dias)
-        {
-            var rnd = new Random(Semilla);
-            double pesoMaximo = PesoDia.Values.Max();
-            var canastas = new List<CanastaFactura_790MY>(CantidadCuentas);
-
-            while (canastas.Count < CantidadCuentas)
-            {
-                // Fecha: muestreo por rechazo según el peso del día de la semana.
-                DateTime fecha = desde.AddDays(rnd.Next(dias)).AddHours(12 + rnd.Next(11)).AddMinutes(rnd.Next(60));
-                if (rnd.NextDouble() * pesoMaximo > PesoDia[fecha.DayOfWeek]) continue;
-
-                var productos = new HashSet<int>();
-                bool Pide(double probabilidad) => rnd.NextDouble() < probabilidad;
-
-                bool vacio = Pide(0.23), bife = Pide(0.34), milanesa = Pide(0.18), empanadas = Pide(0.22);
-                bool provoleta = Pide(vacio ? 0.55 : 0.20);
-                bool malbec = Pide(provoleta ? 0.76 : bife ? 0.58 : 0.14);
-                bool cerveza = Pide(empanadas ? 0.635 : 0.15);
-                bool coca = Pide(milanesa ? 0.58 : 0.10);
-                bool flan = Pide(0.20), tiramisu = Pide(0.17);
-                bool cafe = Pide(flan ? 0.49 : tiramisu ? 0.447 : 0.12);
-
-                if (vacio) productos.Add(Vacio);
-                if (bife) productos.Add(Bife);
-                if (milanesa) productos.Add(Milanesa);
-                if (empanadas) productos.Add(Empanadas);
-                if (provoleta) productos.Add(Provoleta);
-                if (malbec) productos.Add(Malbec);
-                if (cerveza) productos.Add(Cerveza);
-                if (coca) productos.Add(Coca);
-                if (flan) productos.Add(Flan);
-                if (tiramisu) productos.Add(Tiramisu);
-                if (cafe) productos.Add(Cafe);
-                if (Pide(0.30)) productos.Add(Agua);
-                if (Pide(0.20)) productos.Add(Ensalada);
-                if (productos.Count == 0) productos.Add(Bife);
-
-                var canasta = new CanastaFactura_790MY { NroFactura = -(canastas.Count + 1), FechaEmision = fecha };
-                foreach (int id in productos)
-                    canasta.Productos[id] = Nombres[id];
-                canastas.Add(canasta);
-            }
-            return canastas;
-        }
     }
 }

@@ -25,17 +25,18 @@ namespace DAL_08YS
         {
             get
             {
-                //if (!string.IsNullOrWhiteSpace(_connectionStringOverride))
-                //    return _connectionStringOverride;
+                if (!string.IsNullOrWhiteSpace(_connectionStringOverride))
+                    return _connectionStringOverride;
 
-                //string desdeConfig = ConfigurationManager
-                //    .ConnectionStrings[NombreClaveConfig]?.ConnectionString;
+                // El instalador (Installer_TP_Fogon.iss) escribe en GUI_08YS.exe.config
+                // la instancia de SQL Server elegida por el usuario.
+                string desdeConfig = ConfigurationManager
+                    .ConnectionStrings[NombreClaveConfig]?.ConnectionString;
 
-                //if (!string.IsNullOrWhiteSpace(desdeConfig))
-                //    return desdeConfig;
+                if (!string.IsNullOrWhiteSpace(desdeConfig))
+                    return desdeConfig;
 
-                //return ConnectionStringDefault;
-                return @"Data Source=PC_Maximo;Initial Catalog=TP_Ing_Soft;Integrated Security=True";
+                return ConnectionStringDefault;
             }
             set { _connectionStringOverride = value; }
         }

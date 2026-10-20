@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 # Credenciales locales (SMTP): nunca se versionan. Ver GUI/Config/App.secrets.config.template
 App.secrets.config
+
+# Salida del instalador (Inno Setup)
+Installer/Output/

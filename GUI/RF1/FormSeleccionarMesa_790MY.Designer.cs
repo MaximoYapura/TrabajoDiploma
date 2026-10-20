@@ -353,18 +353,12 @@ namespace GUI_08YS.RF1
         #endregion
 
         /// <summary>
-        /// Icono corporativo (seguro: el recurso puede no existir en la Build actual).
+        /// Icono corporativo (FogonIcon): barra de título, barra de tareas y Alt+Tab.
         /// Invocado desde InitializeComponent().
         /// </summary>
         private void AplicarIconoCorporativo()
         {
-            try
-            {
-                var icon = global::GUI_08YS.Properties.Resources.ResourceManager
-                               .GetObject("FogonIcon") as System.Drawing.Icon;
-                if (icon != null) this.Icon = icon;
-            }
-            catch { }
+            this.Icon = global::GUI_08YS.Properties.Resources.FogonIcon;
         }
 
         // ── Header ──────────────────────────────────────────────────────

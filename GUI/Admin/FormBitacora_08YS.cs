@@ -379,38 +379,14 @@ namespace GUI
             }
         }
 
-        private Color btnBackNormal = Color.FromArgb(5, 15, 45);
-        private Color btnBackHover = Color.Goldenrod;
-
-        private Color btnForeNormal = Color.Goldenrod;
-        private Color btnForeHover = Color.FromArgb(5, 15, 45);
-
-        private void ConfigurarBoton(IconButton btn)
+        /// <summary>
+        /// Botón principal de la casa (bordó #6B1D2F con hover más oscuro), igual al
+        /// resto de la aplicación. El hover lo resuelve FlatAppearance.
+        /// </summary>
+        private static void ConfigurarBoton(IconButton btn)
         {
-            btn.BackColor = btnBackNormal;
-            btn.ForeColor = btnForeNormal;
-            btn.IconColor = btnForeNormal;
-
-            btn.MouseEnter += Boton_MouseEnter;
-            btn.MouseLeave += Boton_MouseLeave;
-        }
-
-        private void Boton_MouseEnter(object sender, EventArgs e)
-        {
-            IconButton btn = (IconButton)sender;
-
-            btn.BackColor = btnBackHover;
-            btn.ForeColor = btnForeHover;
-            btn.IconColor = btnForeHover;
-        }
-
-        private void Boton_MouseLeave(object sender, EventArgs e)
-        {
-            IconButton btn = (IconButton)sender;
-
-            btn.BackColor = btnBackNormal;
-            btn.ForeColor = btnForeNormal;
-            btn.IconColor = btnForeNormal;
+            GUI_08YS.Estilo.TemaFogon_790MY.EstilizarBoton(btn, primario: true);
+            btn.IconColor = Color.White;
         }
 
         protected override CreateParams CreateParams

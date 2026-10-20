@@ -61,42 +61,12 @@ namespace GUI_08YS.Properties {
         }
         
         /// <summary>
-        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        ///   Busca un recurso adaptado de tipo System.Drawing.Icon similar a (Icono).
         /// </summary>
-        internal static System.Drawing.Bitmap BackGroundHorizon {
-            get {
-                object obj = ResourceManager.GetObject("BackGroundHorizon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ChatGPT_Image_19_may_2026__21_58_41 {
-            get {
-                object obj = ResourceManager.GetObject("ChatGPT Image 19 may 2026, 21_58_41", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ChatGPT_Image_19_may_2026__22_23_23 {
-            get {
-                object obj = ResourceManager.GetObject("ChatGPT Image 19 may 2026, 22_23_23", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Busca un recurso adaptado de tipo System.Byte[].
-        /// </summary>
-        internal static byte[] FogonIcon {
+        internal static System.Drawing.Icon FogonIcon {
             get {
                 object obj = ResourceManager.GetObject("FogonIcon", resourceCulture);
-                return ((byte[])(obj));
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
@@ -106,26 +76,6 @@ namespace GUI_08YS.Properties {
         internal static System.Drawing.Bitmap FondoRestauran {
             get {
                 object obj = ResourceManager.GetObject("FondoRestauran", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap HorizonLogoPuro {
-            get {
-                object obj = ResourceManager.GetObject("HorizonLogoPuro", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap HorizonLogoPuro1 {
-            get {
-                object obj = ResourceManager.GetObject("HorizonLogoPuro1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

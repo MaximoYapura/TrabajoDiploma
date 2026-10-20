@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\FogonIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
@@ -367,17 +367,14 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Config\packages.config" />
-    <Content Include="AppIcon.ico" />
     <Content Include="idiomas.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\ChatGPT Image 26 sept 2026, 21_21_47.png" />
     <Content Include="Resources\FogonIcon.ico" />
     <Content Include="Resources\FondoRestauran.png" />
     <Content Include="Resources\logo_fogon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\AppIcon.ico" />
     <None Include="Resources\logo_fogon_bn.jpg" />
     <Content Include="script.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -417,21 +414,5 @@
       <Name>Service_08YS</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChatGPT Image 19 may 2026, 21_58_41.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\HorizonLogoPuro.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\HorizonLogoPuro1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChatGPT Image 19 may 2026, 22_23_23.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BackGroundHorizon1.png" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -16,9 +16,10 @@ namespace GUI_08YS.Reportes
     /// <summary>
     /// Reporte inteligente: Análisis Predictivo de Canasta. Muestra las reglas de
     /// asociación entre productos (soporte y confianza, calculados por
-    /// ReportePredictivoBLL_790MY sobre las cuentas cobradas de los últimos 90 días),
+    /// ReportePredictivoBLL_790MY sobre las cuentas cobradas reales de los últimos 90 días),
     /// filtradas por confianza mínima, y tarjetas de sugerencias de negocio con
-    /// acciones simuladas. Patente: GestionReportePredictivo.
+    /// acciones simuladas. Si la BD todavía no tiene suficientes cobros, lo informa en
+    /// lugar de mostrar reglas. Patente: GestionReportePredictivo.
     /// </summary>
     public partial class FormReportePredictivo_790MY : Form, IIdiomaObserver_08YS
     {
@@ -61,6 +62,9 @@ namespace GUI_08YS.Reportes
         }
 
         private IWin32Window VentanaPropietaria => (this.TopLevelControl as Form) ?? (IWin32Window)this;
+
+        /// <summary>La BD todavía no tiene suficientes cuentas cobradas para calcular asociaciones.</summary>
+        private bool DatosInsuficientes => _resumen != null && !_resumen.DatosSuficientes;
 
         private static CultureInfo Cultura => TraductorManager_08YS.Instance.CulturaActual ?? CultureInfo.CurrentCulture;
 
@@ -122,8 +126,7 @@ namespace GUI_08YS.Reportes
             lblConfianza_790MY.Text = E.T("RI_confianza_minima", sldConfianza_790MY.Value);
             lblSubtitulo_790MY.Text = _resumen == null
                 ? string.Empty
-                : E.T("RI_subtitulo", _resumen.DiasAnalizados, _resumen.CuentasAnalizadas.ToString("N0", Cultura))
-                  + (_resumen.DatosSimulados ? " " + E.T("RI_datos_simulados") : string.Empty);
+                : E.T("RI_subtitulo", _resumen.DiasAnalizados, _resumen.CuentasAnalizadas.ToString("N0", Cultura));
 
             _soporteMaximo = 0;
             foreach (var r in _reglas)
@@ -144,7 +147,9 @@ namespace GUI_08YS.Reportes
             }
             dgvReglas_790MY.ClearSelection();
 
-            lblSinReglas_790MY.Text = E.T("RI_sin_reglas", sldConfianza_790MY.Value);
+            lblSinReglas_790MY.Text = DatosInsuficientes
+                ? E.T("RI_datos_insuficientes")
+                : E.T("RI_sin_reglas", sldConfianza_790MY.Value);
             lblSinReglas_790MY.Visible = _reglas.Count == 0;
             UbicarMensajeVacio();
         }
@@ -247,7 +252,8 @@ namespace GUI_08YS.Reportes
 
             if (_sugerencias.Count == 0)
             {
-                var vacio = E.CrearLabel(E.T("RI_sin_sugerencias"), _fCardTexto, E.Gris, autoSize: false);
+                string mensaje = DatosInsuficientes ? E.T("RI_datos_insuficientes") : E.T("RI_sin_sugerencias");
+                var vacio = E.CrearLabel(mensaje, _fCardTexto, E.Gris, autoSize: false);
                 vacio.Dock = DockStyle.Fill;
                 vacio.TextAlign = ContentAlignment.MiddleLeft;
                 tlpSugerencias_790MY.Controls.Add(vacio, 0, 0);
