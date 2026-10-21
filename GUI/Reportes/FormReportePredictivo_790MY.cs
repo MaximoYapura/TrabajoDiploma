@@ -21,7 +21,7 @@ namespace GUI_08YS.Reportes
     /// acciones simuladas. Si la BD todavía no tiene suficientes cobros, lo informa en
     /// lugar de mostrar reglas. Patente: GestionReportePredictivo.
     /// </summary>
-    public partial class FormReportePredictivo_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormReportePredictivo_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         // Paleta oficial de la casa.
         private static readonly Color Bordo = Color.FromArgb(107, 29, 47);       // #6B1D2F
@@ -435,6 +435,17 @@ namespace GUI_08YS.Reportes
             MostrarSugerencias();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(sldConfianza_790MY), "AY_sug_pc1_t", "AY_sug_pc1_x"),
+            new PistaAyuda_790MY(nameof(dgvReglas_790MY), "AY_sug_pc2_t", "AY_sug_pc2_x"),
+            new PistaAyuda_790MY(nameof(btnPorConfianza_790MY), "AY_sug_pc3_t", "AY_sug_pc3_x"),
+            new PistaAyuda_790MY(nameof(flpTituloSugerencias_790MY), "AY_sug_pc4_t", "RI_msg_simulada"),
+        };
         #endregion
     }
 }

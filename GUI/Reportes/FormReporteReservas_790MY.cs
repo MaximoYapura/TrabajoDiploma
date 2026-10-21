@@ -13,7 +13,7 @@ using GUI_08YS.Estilo;
 
 namespace GUI_08YS.Reportes
 {
-    public partial class FormReporteReservas_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormReporteReservas_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly ReservaBLL_790MY _reservaBll;
         private List<Reserva_790MY> _ultimoResultado;
@@ -512,6 +512,17 @@ namespace GUI_08YS.Reportes
                     TraducirControles(c);
             }
         }
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(dtpDesde_790MY), "AY_sug_rs1_t", "AY_sug_rs1_x"),
+            new PistaAyuda_790MY(nameof(txtDniCliente_790MY), "AY_sug_rs2_t", "AY_sug_rs2_x"),
+            new PistaAyuda_790MY(nameof(btnBuscar_790MY), "AY_sug_rs3_t", "AY_sug_rs3_x"),
+            new PistaAyuda_790MY(nameof(btnGenerarPDF_790MY), "AY_sug_rs4_t", "AY_sug_rs4_x"),
+        };
         #endregion
     }
 }

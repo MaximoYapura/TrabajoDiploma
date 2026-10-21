@@ -18,7 +18,7 @@ namespace GUI_08YS.Maestros
     /// la carta de Registrar Pedido solo muestra los activos. Validaciones, DV y
     /// bitácora los resuelve ProductoBLL_790MY (patente GestionProductos).
     /// </summary>
-    public partial class FormProductos_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormProductos_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private enum ModoEdicion { Reposo, Alta, Modificacion }
 
@@ -421,6 +421,17 @@ namespace GUI_08YS.Maestros
             }
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(txtBuscar_790MY), "AY_sug_pr1_t", "AY_sug_pr1_x"),
+            new PistaAyuda_790MY(nameof(dgvProductos_790MY), "AY_sug_pr2_t", "FP_ayuda"),
+            new PistaAyuda_790MY(nameof(nudStock_790MY), "AY_sug_pr3_t", "FP_lblStockAyuda"),
+            new PistaAyuda_790MY(nameof(chkActivo_790MY), "AY_sug_pr4_t", "FP_lblActivoAyuda"),
+        };
         #endregion
     }
 }

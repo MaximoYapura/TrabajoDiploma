@@ -21,7 +21,7 @@ namespace GUI_08YS.Reportes
     /// cobradas. "Cerrar caja del día" deja constancia del cierre en la bitácora
     /// (PagoBLL_790MY.CerrarCaja). Patente: GestionCaja.
     /// </summary>
-    public partial class FormArqueoCaja_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormArqueoCaja_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
         private static readonly Color RojoImporte = Color.FromArgb(150, 30, 30);
@@ -315,6 +315,16 @@ namespace GUI_08YS.Reportes
             Mostrar();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(dtpFecha_790MY), "AY_sug_ac1_t", "AY_sug_ac1_x"),
+            new PistaAyuda_790MY(nameof(dgvCobros_790MY), "AY_sug_ac2_t", "AC_nota"),
+            new PistaAyuda_790MY(nameof(btnCerrarCaja_790MY), "AY_sug_ac3_t", "AY_sug_ac3_x"),
+        };
         #endregion
     }
 }

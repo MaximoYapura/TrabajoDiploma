@@ -19,7 +19,7 @@ namespace GUI_08YS.Admin
     /// vigente del mismo producto (inspector de diferencias) y permite restaurarla
     /// (rollback). Consultas, diff, DV y bitácora los resuelve ProductoCBLL_790MY.
     /// </summary>
-    public partial class FormBitacoraCambios_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormBitacoraCambios_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         // Paleta oficial de la casa.
         private static readonly Color Bordo = Color.FromArgb(107, 29, 47);          // #6B1D2F
@@ -610,6 +610,16 @@ namespace GUI_08YS.Admin
             MostrarDetalle();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(txtCodigo_790MY), "AY_sug_bc1_t", "AY_sug_bc1_x"),
+            new PistaAyuda_790MY(nameof(dgvHistorial_790MY), "AY_sug_bc2_t", "BC_leyenda"),
+            new PistaAyuda_790MY(nameof(btnRestaurar_790MY), "AY_sug_bc3_t", "AY_sug_bc3_x"),
+        };
         #endregion
     }
 }

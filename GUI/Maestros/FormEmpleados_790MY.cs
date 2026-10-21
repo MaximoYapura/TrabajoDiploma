@@ -18,7 +18,7 @@ namespace GUI_08YS.Maestros
     /// con un usuario del sistema no se gestiona desde acá. Validaciones, DV y bitácora los resuelve
     /// EmpleadoBLL_790MY (patente CrearEmpleado).
     /// </summary>
-    public partial class FormEmpleados_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormEmpleados_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private enum ModoEdicion { Reposo, Alta, Modificacion }
 
@@ -398,6 +398,17 @@ namespace GUI_08YS.Maestros
             }
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(txtBuscar_790MY), "AY_sug_em1_t", "AY_sug_em1_x"),
+            new PistaAyuda_790MY(nameof(dgvEmpleados_790MY), "AY_sug_em2_t", "FE_ayuda"),
+            new PistaAyuda_790MY(nameof(btnAnadir_790MY), "AY_sug_em3_t", "AY_sug_em3_x"),
+            new PistaAyuda_790MY(nameof(btnBaja_790MY), "AY_sug_em4_t", "AY_sug_em4_x"),
+        };
         #endregion
     }
 }

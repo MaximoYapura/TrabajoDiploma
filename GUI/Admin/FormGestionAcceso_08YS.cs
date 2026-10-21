@@ -2,6 +2,7 @@
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
+using GUI_08YS.Estilo;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,7 +18,7 @@ namespace GUI_08YS.Admin
     public enum TipoEntidad { Familia, Rol }
     public enum OperacionAM { Alta, Modificacion }
 
-    public partial class FormGestionAcceso_08YS : Form, IIdiomaObserver_08YS
+    public partial class FormGestionAcceso_08YS : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly Dictionary<string, Permisos> _mapaFamilia =
             new Dictionary<string, Permisos>
@@ -361,5 +362,15 @@ namespace GUI_08YS.Admin
                 return cp;
             }
         }
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(dgvEntidades), "AY_sug_ga1_t", "AY_sug_ga1_x"),
+            new PistaAyuda_790MY(nameof(btnCrear), "AY_sug_ga2_t", "AY_sug_ga2_x"),
+            new PistaAyuda_790MY(nameof(btnModificar), "AY_sug_ga3_t", "AY_sug_ga3_x"),
+        };
+        #endregion
     }
 }

@@ -3,6 +3,7 @@ using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Comparers;
 using System;
+using GUI_08YS.Estilo;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +15,7 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.Admin
 {
-    public partial class FormAccesoAM_08YS : Form,IIdiomaObserver_08YS
+    public partial class FormAccesoAM_08YS : Form,IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly TipoEntidad _tipo;
         private readonly OperacionAM _operacion;
@@ -474,5 +475,16 @@ namespace GUI_08YS.Admin
             }
         }
 
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(txtNombre), "AY_sug_aa1_t", "AY_sug_aa1_x"),
+            new PistaAyuda_790MY(nameof(dgvDisponibles), "AY_sug_aa2_t", "AY_sug_aa2_x"),
+            new PistaAyuda_790MY(nameof(btnAgregar), "AY_sug_aa3_t", "AY_sug_aa3_x"),
+            new PistaAyuda_790MY(nameof(btnGuardar), "AY_sug_aa4_t", "AY_sug_aa4_x"),
+        };
+        #endregion
     }
 }

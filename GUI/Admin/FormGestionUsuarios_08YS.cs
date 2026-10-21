@@ -3,6 +3,7 @@ using GUI_08YS;
 using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
+using GUI_08YS.Estilo;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 namespace GUI
 {
-    public partial class FormGestionUsuarios_08YS : Form, IIdiomaObserver_08YS
+    public partial class FormGestionUsuarios_08YS : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
             new Dictionary<string, Permisos>
@@ -522,5 +523,17 @@ namespace GUI
                 return cp;
             }
         }
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(rbTodos), "AY_sug_gu1_t", "AY_sug_gu1_x"),
+            new PistaAyuda_790MY(nameof(dgvUsuarios), "AY_sug_gu2_t", "AY_sug_gu2_x"),
+            new PistaAyuda_790MY(nameof(btnCrear), "AY_sug_gu3_t", "AY_sug_gu3_x"),
+            new PistaAyuda_790MY(nameof(cmbRol), "AY_sug_gu4_t", "AY_sug_gu4_x"),
+            new PistaAyuda_790MY(nameof(btnDesbloquear), "AY_sug_gu5_t", "AY_sug_gu5_x"),
+        };
+        #endregion
     }
 }

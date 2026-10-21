@@ -3,6 +3,7 @@ using CustomControls;
 using FontAwesome.Sharp;
 using Service_08YS;
 using System;
+using GUI_08YS.Estilo;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +15,7 @@ using System.Windows.Forms;
 
 namespace GUI_08YS
 {
-    public partial class FormCambiarContraseña_08YS : Form,IIdiomaObserver_08YS
+    public partial class FormCambiarContraseña_08YS : Form,IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private UserBLL_08YS _userBLL;
         private bool _syncingPasswords = false;
@@ -256,5 +257,16 @@ namespace GUI_08YS
             }
         }
 
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(txtContraseñaActual), "AY_sug_cc1_t", "AY_sug_cc1_x"),
+            new PistaAyuda_790MY(nameof(txtNuevaContraseña), "AY_sug_cc2_t", "msg_pwd_igual_actual"),
+            new PistaAyuda_790MY(nameof(txtConfirmarContraseña), "AY_sug_cc3_t", "AY_sug_cc3_x"),
+            new PistaAyuda_790MY(nameof(btnCambiarContraseña), "AY_sug_cc4_t", "AY_sug_cc4_x"),
+        };
+        #endregion
     }
 }

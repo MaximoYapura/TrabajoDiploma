@@ -4,6 +4,7 @@ using CustomControls;
 using Service_08YS;
 using Service_08YS.Entities.Bitacora;
 using System;
+using GUI_08YS.Estilo;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,7 +17,7 @@ using System.Windows.Forms;
 
 namespace GUI
 {
-    public partial class FormBitacora_08YS : Form,IIdiomaObserver_08YS
+    public partial class FormBitacora_08YS : Form,IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private BitacoraBLL_08YS _bll = BLLFactory_08YS.CreateBitacoraBLL();
 
@@ -400,6 +401,16 @@ namespace GUI
         }
 
         #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(dtpDesde), "AY_sug_bi1_t", "AY_sug_bi1_x"),
+            new PistaAyuda_790MY(nameof(txtUsername), "AY_sug_bi2_t", "AY_sug_bi2_x"),
+            new PistaAyuda_790MY(nameof(btnFiltrar), "AY_sug_bi3_t", "AY_sug_bi3_x"),
+            new PistaAyuda_790MY(nameof(btnExportar), "AY_sug_bi4_t", "AY_sug_bi4_x"),
+        };
+        #endregion
     }
 }
-

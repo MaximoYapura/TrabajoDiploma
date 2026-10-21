@@ -2,6 +2,7 @@
 using Service_08YS;
 using Service_08YS.Entities;
 using System;
+using GUI_08YS.Estilo;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +15,7 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.Admin
 {
-    public partial class FormGestionRespaldos_08YS : Form, IIdiomaObserver_08YS
+    public partial class FormGestionRespaldos_08YS : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly BackupBLL_08YS _bll;
 
@@ -365,5 +366,16 @@ namespace GUI_08YS.Admin
                 return cp;
             }
         }
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(btnSeleccionarCarpetaBackup), "AY_sug_re1_t", "backup_crear_desc"),
+            new PistaAyuda_790MY(nameof(btnRealizarBackUp), "AY_sug_re2_t", "AY_sug_re2_x"),
+            new PistaAyuda_790MY(nameof(btnSeleccionarArchivoRestore), "AY_sug_re3_t", "backup_restore_label"),
+            new PistaAyuda_790MY(nameof(btnRealizarRestore), "AY_sug_re4_t", "backup_warning"),
+        };
+        #endregion
     }
 }

@@ -12,7 +12,7 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Maestros
 {
-    public partial class FormMesas_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormMesas_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private enum ModoEdicion { Reposo, Alta, Modificacion }
 
@@ -418,6 +418,17 @@ namespace GUI_08YS.Maestros
                     TraducirControles(c);
             }
         }
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(flpTablero_790MY), "AY_sug_me1_t", "FM_detalle_vacio"),
+            new PistaAyuda_790MY(nameof(btnAnadir_790MY), "AY_sug_me2_t", "FM_ayuda_numero"),
+            new PistaAyuda_790MY(nameof(nudCapacidad_790MY), "AY_sug_me3_t", "AY_sug_me3_x"),
+            new PistaAyuda_790MY(nameof(rdoFueraServicio_790MY), "AY_sug_me4_t", "FM_ayuda_estado"),
+        };
         #endregion
     }
 }
