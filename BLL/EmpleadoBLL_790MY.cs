@@ -112,21 +112,6 @@ namespace BLL_08YS
             return _reservaRepository.GetAsistidasPorCamarero(dni).Count;
         }
 
-        /// <summary>
-        /// Usuarios activos del sistema para el combo "Usuario vinculado". Solo expone los
-        /// datos de identificación necesarios; no requiere el permiso VerUsuarios.
-        /// </summary>
-        public List<User_08YS> ObtenerUsuariosVinculables()
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
-            var lista = new List<User_08YS>();
-            foreach (var u in _userRepository.GetAll())
-                if (u.Activo)
-                    lista.Add(u);
-            lista.Sort((a, b) => string.Compare(a.Username, b.Username, StringComparison.CurrentCultureIgnoreCase));
-            return lista;
-        }
-
         // ─── Validaciones ────────────────────────────────────────────────────
 
         private void ValidarSinMesasAbiertas(int dni)

@@ -432,7 +432,7 @@ Después de cada escritura: DVManager_08YS.Recalcular() → BitacoraBLL_08YS.Reg
 
 #### B. Lógica y Reglas de Negocio
 
-- **Permiso:** `Permisos.CrearEmpleado` para `GetAll`, `RegistrarEmpleado`, `ModificarEmpleado`, `DarDeBaja`, `ContarMesasAbiertas`, `ObtenerUsuariosVinculables`. `GetCamarerosActivos()` exige `Permisos.AbrirMesa` (lo usa la recepción, no el administrador).
+- **Permiso:** `Permisos.CrearEmpleado` para `GetAll`, `RegistrarEmpleado`, `ModificarEmpleado`, `DarDeBaja` y `ContarMesasAbiertas`. `GetCamarerosActivos()` exige `Permisos.AbrirMesa` (lo usa la recepción, no el administrador).
 - **`ValidarDatos(Empleado_790MY)`** (privada): objeto no nulo; `DNI > 0` (`msg_rf2_empleado_dni_invalido`); nombre y apellido no vacíos y ≤ `LargoMaximoNombre = 100` (`msg_rf2_empleado_nombre_invalido`); puesto válido con `Enum.IsDefined` (`msg_rf2_empleado_puesto_invalido`); recorta espacios (`Trim`).
 - **Unicidad:** `Exists(dni)` → `msg_rf2_empleado_duplicado`. **Vínculo con usuario** (`ValidarUsuarioAsociado`): si `UsuarioDNI` tiene valor, el usuario debe existir (`msg_rf2_usuario_inexistente`) y no estar vinculado a otro empleado (`msg_rf2_usuario_ya_vinculado`).
 - **Baja (`DarDeBaja(dni)`):** existe (`msg_rf2_empleado_inexistente`), no está ya inactivo (`msg_rf2_empleado_ya_inactivo`) y **no tiene mesas abiertas**: `ValidarSinMesasAbiertas` cuenta `_reservaRepository.GetAsistidasPorCamarero(dni)` (`msg_rf2_empleado_con_mesas_abiertas`). Luego `Activo = false` y `Update`.
@@ -462,7 +462,7 @@ BE: Empleado_790MY (DNI, Nombre, Apellido, Puesto : PuestoEmpleado_790MY, Usuari
 `EstiloRF2_790MY` (alias `E`: `T`, `MostrarErrorEnBanner`, `MostrarExitoToast`), `EstiloMaestros_790MY`, `MensajesBLL_790MY.Regla`, `ConfirmModal_790MY`, P/Invoke `user32.SendMessage`. Claves `FE_*` (incluye `FE_puesto_<Puesto>`, que reutiliza la Ficha de Ingredientes de la ayuda) y `msg_rf2_empleado_*`.
 
 **Mejoras (2.2):**
-1. La GUI no permite elegir/ver el **usuario vinculado** (`UsuarioDNI`) y `EmpleadoBLL_790MY.ObtenerUsuariosVinculables()` **no se invoca desde ningún formulario** (verificado en todo el repositorio): o se agrega el combo "Usuario del sistema" o se elimina el método.
+1. La GUI no permite elegir/ver el **usuario vinculado** (`UsuarioDNI`). *(Resuelto B1: se eliminó `EmpleadoBLL_790MY.ObtenerUsuariosVinculables()`, que no se invocaba desde ningún formulario; si se agrega el combo "Usuario del sistema" habrá que reintroducir una consulta equivalente.)*
 2. El DNI se valida solo como entero positivo (la GUI admite hasta 9 dígitos por `MaxLength`), a diferencia de Clientes (7–8 dígitos): unificar la regla.
 3. `ContarMesasAbiertas` captura `Exception` y devuelve 0 en la GUI (`ActualizarAvisoMesas`): un fallo de base se vuelve silencioso.
 
@@ -498,7 +498,7 @@ FormMesas_790MY ── BLLFactory_790MY.CreateMesaBLL() ──► MesaBLL_790MY
   btnAplicar (modif.)    → ModificarMesa(Mesa_790MY)          [CrearMesa]
   btnEliminar            → EliminarMesa(numero)               [CrearMesa]
         ▼  IMesaRepository_790MY (+ IReservaRepository_790MY.Buscar para el historial)
-SqlMesaRepository_790MY : GetAll, Exists, Add, Update, UpdateEstado, (Delete / TieneReservasActivas sin uso)
+SqlMesaRepository_790MY : GetAll, Exists, Add, Update, UpdateEstado
         ▼
 BE: Mesa_790MY (NroMesa, Capacidad, Estado : EstadoMesa_790MY, Activo)
 ```
@@ -513,7 +513,7 @@ BE: Mesa_790MY (NroMesa, Capacidad, Estado : EstadoMesa_790MY, Activo)
 3. Los eventos usan `RegistrarEvento` en vez de `RegistrarEventoPostCommit` (misma observación que Clientes).
 4. El límite de 12 cuenta mesas `FueraDeServicio`: una mesa dada de baja sigue consumiendo cupo y, como no se puede borrar si tuvo reservas, el salón podría quedar bloqueado.
 5. Hay **dos caminos para el mismo resultado**: `ModificarMesa` con el radio *Fuera de servicio* de la ficha y `EliminarMesa` (que solo marca `FueraDeServicio` si la mesa no tiene historial); y `ModificarMesa` no controla si la mesa tiene reservas futuras al pasarla a fuera de servicio.
-6. Código muerto: `IMesaRepository_790MY.Delete` y `TieneReservasActivas` no se invocan (la baja usa `UpdateEstado`).
+6. *(Resuelto B1)* Se eliminó el código muerto `IMesaRepository_790MY.Delete` y `TieneReservasActivas` (y su implementación en `SqlMesaRepository_790MY`): la baja usa `UpdateEstado`.
 
 ---
 

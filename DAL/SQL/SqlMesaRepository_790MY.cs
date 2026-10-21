@@ -143,37 +143,6 @@ namespace DAL_08YS.SQL
             }
         }
 
-        public void Delete(int nroMesa)
-        {
-            using (var con = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand(
-                "DELETE FROM Mesas WHERE NroMesa = @NroMesa", con))
-            {
-                cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        public bool TieneReservasActivas(int nroMesa)
-        {
-            using (var con = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand { Connection = con })
-            {
-                string ocupa = FiltroOcupacionMesa_790MY.CondicionEstado(cmd, null);
-                cmd.CommandText =
-                    "SELECT COUNT(1) FROM Reservas " +
-                    "WHERE MesaNumero = @NroMesa " +
-                    "  AND Fecha >= @Hoy " +
-                    "  AND " + ocupa;
-
-                cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
-                cmd.Parameters.AddWithValue("@Hoy",     DateTime.Today);
-                con.Open();
-                return (int)cmd.ExecuteScalar() > 0;
-            }
-        }
-
         public void UpdateEstado(int nroMesa, EstadoMesa_790MY estado)
         {
             using (var con = new SqlConnection(_connectionString))
