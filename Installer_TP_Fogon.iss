@@ -25,6 +25,15 @@
 ;   * Desinstalación: borra toda la carpeta de instalación (incluidos
 ;     App.secrets.config y Database\); la base TP_Ing_Soft queda intacta.
 ;
+;  MODO DEMOSTRACIÓN (A8)
+;   * Tarea opcional "Instalar en modo demostración", DESMARCADA por defecto.
+;   * Al terminar de copiar (también en reinstalación, porque el .exe.config se
+;     reemplaza) se escribe appSettings/ModoDemostracion en GUI_08YS.exe.config:
+;     "false" (producción) salvo que se marque la casilla ("true"). En una
+;     reinstalación el asistente propone la elección de la instalación anterior.
+;   * GUI\Config\App.config del repositorio conserva ModoDemostracion=true
+;     (entorno de desarrollo / defensa): el valor de producción lo fija el instalador.
+;
 ;  Requisitos en la PC destino: .NET Framework 4.8, SQL Server con la base
 ;  TP_Ing_Soft creada (esquema + migraciones) y sqlcmd en el PATH.
 ; =============================================================================
@@ -72,6 +81,10 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+; Modo demostración (A8): desmarcado por defecto = producción. En una reinstalación
+; Inno Setup vuelve a proponer la elección anterior (UsePreviousTasks).
+Name: "mododemo"; Description: "Instalar en modo demostración (turno de prueba, Ficha de Ingredientes y demora simulada del cobro)"; \
+    GroupDescription: "Opciones de la aplicación:"; Flags: unchecked
 
 [Files]
 ; Ejecutable, DLLs, idiomas.json, GUI_08YS.exe.config y Resources\.
@@ -271,6 +284,46 @@ begin
            'Edite a mano la cadena de conexión "TP_Ing_Soft" de ese archivo.', mbError, MB_OK);
 end;
 
+{ Escribe appSettings/ModoDemostracion en GUI_08YS.exe.config ("true" solo si se marcó
+  la tarea mododemo; si no, "false" = producción). Mismo mecanismo que
+  ConfigurarConnectionString (PowerShell + XmlDocument); si la clave no existe, se agrega. }
+procedure ConfigurarModoDemostracion(const Activo: Boolean);
+var
+  ConfigFile, Script, LogFile, Valor: String;
+begin
+  ConfigFile := ExpandConstant('{app}\{#MyAppExeName}.config');
+  Script := ExpandConstant('{tmp}\ConfigurarModoDemostracion.ps1');
+  LogFile := ExpandConstant('{tmp}\ConfigurarModoDemostracion.log');
+  if Activo then
+    Valor := 'true'
+  else
+    Valor := 'false';
+
+  SaveStringToFile(Script,
+    'param([string]$Archivo, [string]$Valor)' + #13#10 +
+    '$ErrorActionPreference = ''Stop''' + #13#10 +
+    '$xml = New-Object System.Xml.XmlDocument' + #13#10 +
+    '$xml.PreserveWhitespace = $true' + #13#10 +
+    '$xml.Load($Archivo)' + #13#10 +
+    '$settings = $xml.SelectSingleNode("/configuration/appSettings")' + #13#10 +
+    'if ($settings -eq $null) { throw "No existe la seccion appSettings en $Archivo" }' + #13#10 +
+    '$nodo = $settings.SelectSingleNode("add[@key=''ModoDemostracion'']")' + #13#10 +
+    'if ($nodo -eq $null) {' + #13#10 +
+    '  $nodo = $xml.CreateElement("add")' + #13#10 +
+    '  $nodo.SetAttribute(''key'', ''ModoDemostracion'')' + #13#10 +
+    '  [void]$settings.AppendChild($nodo)' + #13#10 +
+    '}' + #13#10 +
+    '$nodo.SetAttribute(''value'', $Valor)' + #13#10 +
+    '$xml.Save($Archivo)' + #13#10,
+    False);
+
+  if RunCmd('powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' + Script + '" -Archivo "' +
+            ConfigFile + '" -Valor "' + Valor + '"', LogFile) <> 0 then
+    MsgBox('No se pudo configurar el modo demostración en ' + ConfigFile + ':' + #13#10#13#10 +
+           ReadLog(LogFile) + #13#10#13#10 +
+           'Edite a mano la clave "ModoDemostracion" (true/false) de ese archivo.', mbError, MB_OK);
+end;
+
 { ---------------------------------------------------------------------------
   Despliegue de la base (entrada de la sección Run)
   --------------------------------------------------------------------------- }
@@ -445,6 +498,8 @@ begin
   if CurStep <> ssPostInstall then
     Exit;
 
-  { En ambos modos el .exe.config se reemplaza: se vuelve a escribir la instancia. }
+  { En ambos modos el .exe.config se reemplaza: se vuelve a escribir la instancia
+    y el modo demostración elegido en el asistente (tarea mododemo). }
   ConfigurarConnectionString(GetSqlInstance(''));
+  ConfigurarModoDemostracion(WizardIsTaskSelected('mododemo'));
 end;
