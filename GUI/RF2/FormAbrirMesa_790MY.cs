@@ -22,7 +22,7 @@ namespace GUI_08YS.RF2
     /// en el plano de FormSeleccionarMesa_790MY, y asigna el camarero responsable.
     /// Autorización, validaciones, DV y bitácora los resuelve ReservaBLL_790MY.
     /// </summary>
-    public partial class FormAbrirMesa_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormAbrirMesa_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly ReservaBLL_790MY  _reservaBll;
         private readonly EmpleadoBLL_790MY _empleadoBll;
@@ -703,6 +703,17 @@ namespace GUI_08YS.RF2
             ActualizarResumen();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(sldModo_790MY), "AY_sug_am1_t", "AY_sug_am1_x"),
+            new PistaAyuda_790MY(nameof(txtBuscar_790MY), "AY_sug_am2_t", "AM_lblBuscar"),
+            new PistaAyuda_790MY(nameof(flpCamareros_790MY), "AY_sug_am3_t", "AM_lblCamareroAyuda"),
+            new PistaAyuda_790MY(nameof(btnConfirmar_790MY), "AY_sug_am4_t", "AM_ayuda"),
+        };
         #endregion
     }
 }

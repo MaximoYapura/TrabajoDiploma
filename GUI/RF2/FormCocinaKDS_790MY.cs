@@ -19,7 +19,7 @@ namespace GUI_08YS.RF2
     /// PedidoBLL_790MY.MarcarPedidoListo, que en una misma transacción cambia el estado
     /// y descuenta el stock (con DV y bitácora). El camarero lo ve en Registrar Pedido.
     /// </summary>
-    public partial class FormCocinaKDS_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormCocinaKDS_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly PedidoBLL_790MY _pedidoBll;
 
@@ -257,6 +257,17 @@ namespace GUI_08YS.RF2
             Renderizar();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(flpPendientes_790MY), "AY_sug_kds1_t", "AY_sug_kds1_x"),
+            new PistaAyuda_790MY(nameof(flpPreparacion_790MY), "AY_sug_kds2_t", "KDS_subtitulo"),
+            new PistaAyuda_790MY(nameof(flpSemaforo_790MY), "AY_sug_kds3_t", "AY_sug_kds3_x"),
+            new PistaAyuda_790MY(nameof(btnActualizar_790MY), "AY_sug_kds4_t", "AY_sug_kds4_x"),
+        };
         #endregion
     }
 }

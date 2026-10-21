@@ -28,7 +28,7 @@ namespace GUI_08YS.RF2
     /// Etapa 4: errores y rechazos en el banner, éxito en toast, confirmación con
     /// ConfirmModal y el cobro (GenerarFactura + RegistrarCobro) en un Task.Run.
     /// </summary>
-    public partial class FormFacturacionCobro_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormFacturacionCobro_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
@@ -792,6 +792,18 @@ namespace GUI_08YS.RF2
             ActualizarCobro();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(flpMesas_790MY), "AY_sug_cj1_t", "CJ_mesas_sub"),
+            new PistaAyuda_790MY(nameof(sldMetodo_790MY), "AY_sug_cj2_t", "AY_sug_cj2_x"),
+            new PistaAyuda_790MY(nameof(txtNroTarjeta_790MY), "AY_sug_cj3_t", "AY_sug_cj3_x", "CJ_tarjeta_prueba"),
+            new PistaAyuda_790MY(nameof(cmbCuotas_790MY), "AY_sug_cj4_t", "AY_sug_cj4_x"),
+            new PistaAyuda_790MY(nameof(btnRegistrarCobro_790MY), "AY_sug_cj5_t", "AY_sug_cj5_x"),
+        };
         #endregion
     }
 }

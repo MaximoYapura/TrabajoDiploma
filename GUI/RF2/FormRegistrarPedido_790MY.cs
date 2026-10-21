@@ -23,7 +23,7 @@ namespace GUI_08YS.RF2
     /// valida y persiste PedidoBLL_790MY (stock, DV y bitácora).
     /// También consulta periódicamente los pedidos Listos de sus mesas (CUN-008 paso 8).
     /// </summary>
-    public partial class FormRegistrarPedido_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormRegistrarPedido_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         /// <summary>Renglón de la comanda todavía no enviada.</summary>
         private sealed class ItemComanda
@@ -743,6 +743,17 @@ namespace GUI_08YS.RF2
             ActualizarAviso();
         }
 
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(flpMesas_790MY), "AY_sug_rp1_t", "RP_mis_mesas_sub"),
+            new PistaAyuda_790MY(nameof(txtBuscarProducto_790MY), "AY_sug_rp2_t", "AY_sug_rp2_x"),
+            new PistaAyuda_790MY(nameof(btnAgregarItem_790MY), "AY_sug_rp3_t", "AY_sug_rp3_x"),
+            new PistaAyuda_790MY(nameof(btnEnviar_790MY), "AY_sug_rp4_t", "AY_sug_rp4_x"),
+        };
         #endregion
     }
 }

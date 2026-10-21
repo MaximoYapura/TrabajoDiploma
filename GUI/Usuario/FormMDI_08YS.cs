@@ -224,6 +224,7 @@ namespace GUI_08YS
             // La fila de Ayuda no usa Tag: traduce su texto, ToolTip y nombre accesible.
             btnAyuda.UpdateIdioma();
             panelAyuda.UpdateIdioma();
+            _sugerencias?.Cerrar();
 
             RefrescarContenidoComboIdioma();
         }
@@ -341,7 +342,11 @@ namespace GUI_08YS
             panelLateral.Enabled = !bloquear;
             panelIdioma.Enabled = !bloquear;
             // Etapa 5 (A4): la ayuda no queda abierta durante el cobro.
-            if (bloquear && panelAyuda.Visible) CerrarAyuda();
+            if (bloquear)
+            {
+                _sugerencias?.Cerrar();
+                if (panelAyuda.Visible) CerrarAyuda();
+            }
         }
 
         /// <summary>Se dispara cuando se canceló un cierre por <see cref="BloquearNavegacion"/>; el hijo avisa el motivo.</summary>
@@ -668,14 +673,39 @@ namespace GUI_08YS
         /// <summary>Control con el foco antes de abrir el panel, para devolvérselo al cerrar.</summary>
         private Control _focoAntesDeAyuda;
 
+        private AyudaSugerencias_790MY _sugerencias;
+
+        private AyudaSugerencias_790MY Sugerencias =>
+            _sugerencias ?? (_sugerencias = new AyudaSugerencias_790MY(this, panel2, globoAyuda,
+                pnlResalteArriba, pnlResalteAbajo, pnlResalteIzquierda, pnlResalteDerecha));
+
+        /// <summary>
+        /// F1 (contextual): con el panel abierto lo cierra; con sugerencias activas las cierra;
+        /// si la pantalla activa implementa IAyudaContextual_790MY, muestra sus sugerencias;
+        /// si no, abre el panel. La fila de Ayuda (no contextual) siempre alterna el panel.
+        /// </summary>
         private void AbrirAyuda(bool contextual)
         {
-            // F1 o la fila alternan el panel; el modo contextual se conecta en la Fase 6.
+            if (Sugerencias.Activas)
+            {
+                Sugerencias.Cerrar();
+                if (contextual) return;
+            }
             if (panelAyuda.Visible)
+            {
                 CerrarAyuda();
-            else
-                MostrarAyuda();
+                return;
+            }
+            if (contextual && panel2.Tag is IAyudaContextual_790MY pantalla && panel2.Tag is Form hijo
+                && panel2.Controls.Contains(hijo)
+                && Sugerencias.Mostrar(hijo, pantalla.ObtenerPistas(), ControlConFoco(this)))
+                return;
+            MostrarAyuda();
         }
+
+        private void panel2_ControlRemoved(object sender, ControlEventArgs e) => _sugerencias?.Cerrar();
+
+        private void FormMDI_Resize(object sender, EventArgs e) => _sugerencias?.Cerrar();
 
         private void MostrarAyuda()
         {

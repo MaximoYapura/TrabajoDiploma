@@ -85,3 +85,15 @@ Para el propietario:
 - [x] F1 con foco en el hijo, en inglés, con `ConfirmModal` abierto (no actúa) y con el combo de idioma desplegado (no actúa).
 - [x] Hijos reemplazados siguen vivos: timers de KDS (15 s), Abrir Mesa (30 s) y Registrar Pedido (20 s) activos; +1 observador de idioma por navegación. **Pendiente de decisión del propietario** (requiere tocar `OpenChildForm`).
 - [x] Portapapeles forzado a fallar: banner y valor seleccionado.
+
+## Fase 6 — Sugerencias del Chef (`IAyudaContextual_790MY`, `AyudaSugerencias_790MY`, `GloboAyuda_790MY`)
+
+Verificado por Claude Code (FormMDI real, teclado real):
+- [x] F1 en Clientes (3 pistas), Registrar Reserva (4), Abrir Mesa (4), Registrar Pedido (3 visibles de 4: «Agregar» aparece recién al elegir un producto y se omite), Cocina (4) y Caja y cobro (5): marco dorado de 4 paneles alrededor del control y globo al lado, **sin tapar el control** y dentro de la ventana.
+- [x] → avanza, ← retrocede, Esc cierra; el foco vuelve al control que lo tenía.
+- [x] F1 con sugerencias activas las cierra; sin panel ni sugerencias, F1 en una pantalla sin `IAyudaContextual` (Mesas) abre el panel.
+- [x] Se cierran solas al navegar, al cambiar de idioma, al maximizar/restaurar y con `BloquearNavegacion(true)`. Clic en la fila de Ayuda: cierra las sugerencias y abre el panel.
+- [x] Inglés: «Find a customer · Search by DNI, surname, name, email or mobile · 1 of 3».
+
+Para el propietario:
+- [ ] Recorrer las sugerencias con datos reales (mesas abiertas, pedidos en cocina) para ver el globo con más contenido en pantalla.

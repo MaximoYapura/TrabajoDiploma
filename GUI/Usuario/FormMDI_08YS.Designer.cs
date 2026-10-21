@@ -45,6 +45,11 @@
             this.lblRolSistema = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panelAyuda = new GUI_08YS.Estilo.PanelAyuda_UC_790MY();
+            this.globoAyuda = new GUI_08YS.Estilo.GloboAyuda_790MY();
+            this.pnlResalteArriba = new System.Windows.Forms.Panel();
+            this.pnlResalteAbajo = new System.Windows.Forms.Panel();
+            this.pnlResalteIzquierda = new System.Windows.Forms.Panel();
+            this.pnlResalteDerecha = new System.Windows.Forms.Panel();
             this.AdministrativoDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.gestionUsuarioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bitacoraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -503,6 +508,7 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1102, 747);
             this.panel2.TabIndex = 5;
+            this.panel2.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.panel2_ControlRemoved);
             //
             // panelAyuda  (Etapa 5, C1: hermano de panel2, Dock = Right, oculto por defecto.
             // OpenChildForm limpia solo panel2, así que nunca lo toca ni lo tapa)
@@ -515,6 +521,38 @@
             this.panelAyuda.Visible = false;
             this.panelAyuda.CerrarSolicitado += new System.EventHandler(this.panelAyuda_CerrarSolicitado);
             this.panelAyuda.NavegacionSolicitada += new System.EventHandler<GUI_08YS.Estilo.DestinoAyudaEventArgs_790MY>(this.panelAyuda_NavegacionSolicitada);
+            //
+            // globoAyuda  (Etapa 5, Sugerencias del Chef: globo opaco sobre el formulario,
+            // sin acople; AyudaSugerencias_790MY lo ubica junto al control resaltado)
+            //
+            this.globoAyuda.Location = new System.Drawing.Point(600, 300);
+            this.globoAyuda.Name = "globoAyuda";
+            this.globoAyuda.TabIndex = 7;
+            this.globoAyuda.Visible = false;
+            //
+            // pnlResalteArriba / Abajo / Izquierda / Derecha  (marco de resalte: 4 paneles
+            // opacos finos en TemaFogon.Oro; el control resaltado queda visible y operable)
+            //
+            this.pnlResalteArriba.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(185)))), ((int)(((byte)(100)))));
+            this.pnlResalteArriba.Name = "pnlResalteArriba";
+            this.pnlResalteArriba.Size = new System.Drawing.Size(10, 3);
+            this.pnlResalteArriba.TabStop = false;
+            this.pnlResalteArriba.Visible = false;
+            this.pnlResalteAbajo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(185)))), ((int)(((byte)(100)))));
+            this.pnlResalteAbajo.Name = "pnlResalteAbajo";
+            this.pnlResalteAbajo.Size = new System.Drawing.Size(10, 3);
+            this.pnlResalteAbajo.TabStop = false;
+            this.pnlResalteAbajo.Visible = false;
+            this.pnlResalteIzquierda.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(185)))), ((int)(((byte)(100)))));
+            this.pnlResalteIzquierda.Name = "pnlResalteIzquierda";
+            this.pnlResalteIzquierda.Size = new System.Drawing.Size(3, 10);
+            this.pnlResalteIzquierda.TabStop = false;
+            this.pnlResalteIzquierda.Visible = false;
+            this.pnlResalteDerecha.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(185)))), ((int)(((byte)(100)))));
+            this.pnlResalteDerecha.Name = "pnlResalteDerecha";
+            this.pnlResalteDerecha.Size = new System.Drawing.Size(3, 10);
+            this.pnlResalteDerecha.TabStop = false;
+            this.pnlResalteDerecha.Visible = false;
             //
             // AdministrativoDropDownMenu
             // 
@@ -790,6 +828,12 @@
             this.Controls.Add(this.panelAyuda);
             this.Controls.Add(this.panelLateral);
             this.Controls.Add(this.panel1);
+            // Sin acople: no alteran el orden de Dock de los paneles de arriba.
+            this.Controls.Add(this.globoAyuda);
+            this.Controls.Add(this.pnlResalteArriba);
+            this.Controls.Add(this.pnlResalteAbajo);
+            this.Controls.Add(this.pnlResalteIzquierda);
+            this.Controls.Add(this.pnlResalteDerecha);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.IsMdiContainer = true;
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -797,6 +841,7 @@
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMDI_FormClosing);
             this.Load += new System.EventHandler(this.FormMDI_Load);
+            this.Resize += new System.EventHandler(this.FormMDI_Resize);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panelIdioma.ResumeLayout(false);
@@ -839,6 +884,11 @@
         private System.Windows.Forms.ToolStripMenuItem cerrarSesionToolStripMenuItem1;
         private System.Windows.Forms.Panel panel2;
         private GUI_08YS.Estilo.PanelAyuda_UC_790MY panelAyuda;
+        private GUI_08YS.Estilo.GloboAyuda_790MY globoAyuda;
+        private System.Windows.Forms.Panel pnlResalteArriba;
+        private System.Windows.Forms.Panel pnlResalteAbajo;
+        private System.Windows.Forms.Panel pnlResalteIzquierda;
+        private System.Windows.Forms.Panel pnlResalteDerecha;
         private System.Windows.Forms.ToolStripMenuItem gestionAccesosToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rolesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem familiasToolStripMenuItem;

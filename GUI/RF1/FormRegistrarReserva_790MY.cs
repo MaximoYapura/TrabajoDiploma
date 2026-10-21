@@ -13,7 +13,7 @@ using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
-    public partial class FormRegistrarReserva_790MY : Form, IIdiomaObserver_08YS
+    public partial class FormRegistrarReserva_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly ClienteBLL_790MY _clienteBll;
         private readonly ReservaBLL_790MY _reservaBll;
@@ -501,6 +501,17 @@ namespace GUI_08YS.RF1
                     AplicarTraducciones(c);
             }
         }
+        #endregion
+
+        #region Ayuda contextual (Etapa 5)
+        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
+        {
+            new PistaAyuda_790MY(nameof(txtDniCliente_790MY), "AY_sug_rr1_t", "FC_val_dni_formato", "AY_sug_rr1_p"),
+            new PistaAyuda_790MY(nameof(cmbHora_790MY), "AY_sug_rr2_t", "AY_sug_rr2_x", "AY_sug_rr2_p"),
+            new PistaAyuda_790MY(nameof(btnSeleccionarMesa_790MY), "AY_sug_rr3_t", "AY_sug_rr3_x"),
+            new PistaAyuda_790MY(nameof(btnConfirmar_790MY), "AY_sug_rr4_t", "RR_subtitulo"),
+        };
         #endregion
     }
 }

@@ -138,6 +138,14 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Estilo\DestinoAyuda_790MY.cs" />
+    <Compile Include="Estilo\IAyudaContextual_790MY.cs" />
+    <Compile Include="Estilo\AyudaSugerencias_790MY.cs" />
+    <Compile Include="Estilo\GloboAyuda_790MY.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Estilo\GloboAyuda_790MY.Designer.cs">
+      <DependentUpon>GloboAyuda_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="Estilo\PanelAyuda_UC_790MY.cs">
       <SubType>UserControl</SubType>
     </Compile>
