@@ -47,6 +47,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.trvDetalle = new System.Windows.Forms.TreeView();
             this.lblDetalle = new System.Windows.Forms.Label();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).BeginInit();
             this.pnlBottom.SuspendLayout();
@@ -345,14 +346,21 @@
             this.lblDetalle.Tag = "lblDetalle";
             this.lblDetalle.Text = "Detalle";
             this.lblDetalle.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
+            //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 3;
+            //
             // FormGestionAcceso_08YS
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(1469, 921);
             this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.pnlBottom);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -391,5 +399,6 @@
         private System.Windows.Forms.TreeView trvDetalle;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTipo;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNombre;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
     }
 }

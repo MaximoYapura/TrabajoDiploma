@@ -3,6 +3,7 @@ using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
 using GUI_08YS.Estilo;
+using GUI_08YS.RF2;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -41,6 +42,8 @@ namespace GUI_08YS.Admin
         private readonly FamiliaBLL_08YS _familiaBLL;
         private readonly RolBLL_08YS _rolBLL;
         private readonly Action<Form> _openChildForm;
+
+        private IWin32Window VentanaPropietaria => (this.TopLevelControl as Form) ?? (IWin32Window)this;
 
         public FormGestionAcceso_08YS(TipoEntidad tipo, Action<Form> openChildForm)
         {
@@ -181,8 +184,8 @@ namespace GUI_08YS.Admin
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{TraductorManager_08YS.Instance.GetTexto("msg_error_cargar_datos")}{ex.Message}",
-                                TraductorManager_08YS.Instance.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Permiso o regla de negocio: banner; falla inesperada: MessageBox (E2-D1).
+                EstiloRF2_790MY.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
             TraducirColumnas();
         }
@@ -243,14 +246,14 @@ namespace GUI_08YS.Admin
             object entidad = row.Entidad;
 
             string pregunta = string.Format(TraductorManager_08YS.Instance.GetTexto("msg_eliminar_preg"), nombre);
-            var confirmacion = MessageBox.Show(
-                pregunta,
+            bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
                 TraductorManager_08YS.Instance.GetTexto("confirmar_eliminacion"),
-                MessageBoxButtons.OKCancel,
-                MessageBoxIcon.Warning);
+                pregunta,
+                TraductorManager_08YS.Instance.GetTexto("btnEliminar"));
 
-            if (confirmacion != DialogResult.OK) return;
+            if (!confirmado) return;
 
+            bnrAvisos_790MY.Ocultar();
             try
             {
                 if (_modo == TipoEntidad.Familia)
@@ -262,13 +265,13 @@ namespace GUI_08YS.Admin
             }
             catch (ComponenteEnUsoException_08YS)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_componente_en_uso_error"),
-                                TraductorManager_08YS.Instance.GetTexto("no_se_puede_eliminar"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(
+                    string.Format(TraductorManager_08YS.Instance.GetTexto("msg_acceso_en_uso"), nombre),
+                    TipoBanner_790MY.Aviso);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{TraductorManager_08YS.Instance.GetTexto("msg_error_inesperado")}{ex.Message}",
-                                TraductorManager_08YS.Instance.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                EstiloRF2_790MY.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
         }
 
