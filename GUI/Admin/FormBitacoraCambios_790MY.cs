@@ -469,8 +469,10 @@ namespace GUI_08YS.Admin
                 return;
             }
 
-            // La versión restaurada vuelve como una fila vigente nueva (fecha actual): si el
-            // filtro "hasta" la deja afuera, se mantiene seleccionada la versión de origen.
+            // La versión restaurada vuelve como una fila vigente nueva (fecha actual), salvo que
+            // difiera solo en stock: entonces sigue vigente la fila anterior con el stock
+            // restaurado. Si el filtro "hasta" deja afuera la vigente, se mantiene
+            // seleccionada la versión de origen.
             Cargar(seleccionarProductoVigente: sel.ProductoID);
             E.MostrarExitoToast(this, E.T("BC_msg_restaurado", sel.ID, sel.Nombre));
         }

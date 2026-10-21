@@ -116,8 +116,10 @@ namespace BLL_08YS
 
         /// <summary>
         /// Rollback: vuelve el producto a los datos de la versión histórica. El historial no
-        /// se borra: la versión restaurada queda como una fila vigente nueva, así que el
-        /// rollback puede deshacerse restaurando la versión que estaba vigente antes.
+        /// se borra: si la versión difiere en datos de negocio queda como una fila vigente
+        /// nueva, así que el rollback puede deshacerse restaurando la versión que estaba
+        /// vigente antes; si difiere solo en stock, el trigger actualiza el stock de la
+        /// vigente actual sin crear versión (producto_actualizado, A5).
         /// </summary>
         public void RestaurarVersion(Producto_C_790MY versionHistorica)
         {
