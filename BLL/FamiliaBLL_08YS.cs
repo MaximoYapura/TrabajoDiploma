@@ -101,10 +101,10 @@ namespace BLL_08YS
 
         public void Crear(string nombre, HashSet<AccessComponent_08YS> componentes)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearFamilias);
             ValidarDatosEntrada(nombre, componentes);
             ValidarFamiliaNoExistente(nombre, componentes, null);
 
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearFamilias);
             _familiaRepo.Create(nombre, componentes.ToList());
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.FamiliaCreada);
@@ -112,11 +112,11 @@ namespace BLL_08YS
 
         public void Modificar(int familiaId, string nombre, HashSet<AccessComponent_08YS> componentes)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.ModificarFamilias);
             ValidarDatosEntrada(nombre, componentes);
             ValidarFamiliaNoExistente(nombre, componentes, familiaId);
             ValidarPropagacion(familiaId, componentes, out var rolesAncestrosIds);
 
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.ModificarFamilias);
             _familiaRepo.Modify(familiaId, nombre, componentes.ToList());
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.FamiliaModificada);
@@ -219,10 +219,10 @@ namespace BLL_08YS
 
         public void Eliminar(int familiaId)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.EliminarFamilias);
             if (_familiaRepo.IsInUse(familiaId))
                 throw new ComponenteEnUsoException_08YS();
 
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.EliminarFamilias);
             _familiaRepo.Delete(familiaId);
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.FamiliaEliminada);

@@ -39,9 +39,9 @@ namespace BLL_08YS
 
         public void Crear(string nombre, HashSet<AccessComponent_08YS> componentes)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearRoles);
             ValidarDatosEntrada(nombre, componentes);
             ValidarRolNoExistente(nombre, componentes, null);
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearRoles);
 
             _rolRepo.Create(nombre, componentes.ToList());
             DVManager_08YS.Recalcular();
@@ -50,9 +50,9 @@ namespace BLL_08YS
 
         public void Modificar(int rolId, string nombre, HashSet<AccessComponent_08YS> componentes)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.ModificarRoles);
             ValidarDatosEntrada(nombre, componentes);
             ValidarRolNoExistente(nombre, componentes, rolId);
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.ModificarRoles);
 
             _rolRepo.Modify(rolId, nombre, componentes.ToList());
             DVManager_08YS.Recalcular();
@@ -64,10 +64,9 @@ namespace BLL_08YS
 
         public void Eliminar(int rolId)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.EliminarRoles);
             if (_rolRepo.IsInUse(rolId))
                 throw new ComponenteEnUsoException_08YS();
-
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.EliminarRoles);
 
             _rolRepo.Delete(rolId);
             DVManager_08YS.Recalcular();
