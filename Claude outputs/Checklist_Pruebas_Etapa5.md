@@ -114,3 +114,20 @@ Para el propietario:
 - [ ] Ingresar con un usuario de cada rol: la visita muestra solo sus botones.
 - [ ] Usuario de Windows sin permisos de administrador (app instalada en Program Files): la marca se guarda en `%LocalAppData%`.
 - [ ] Reducir animaciones: la visita no tiene animaciones (no aplica).
+
+## Ajustes post-revisión (2026-10-21)
+
+Verificado por Claude Code. El arnés ya **no mueve el mouse ni el teclado reales**: usa `PerformClick` y mensajes a la ventana, y captura con `DrawToBitmap`.
+- [x] **1. Submenú del Chef**: la fila despliega «Sugerencias de esta pantalla [F1]», «Visita Guiada», «Manual de Recetas (PDF)» (solo SuperAdmin) y «Ficha de Ingredientes [Modo Evaluación]» (para otros roles, «Menú Degustación»). Cada opción hace lo suyo.
+- [x] **2. Sugerencias en todas las pantallas**: F1 muestra el globo en las 19 pantallas del menú más el alta de rol/familia (74 pistas; claves verificadas en es y en).
+- [x] **3. Manual**: botón «Receta» en cada paso del Menú Degustación con su PDF (los 6 existen en `bin\Manual`). Sin la carpeta: banner «No se encontró el Manual de Recetas en …». El instalador copia `docs\Manual\*.pdf` a `{app}\Manual`.
+- [x] **4. Visita, paso 1**: el hueco y su borde quedan dentro de la barra lateral.
+- [x] **5. Cambiar Contraseña**: lo escrito se ve en tinta oscura (antes blanco sobre fondo claro) y enmascarado.
+- [x] **6. OpenChildForm**: el KDS anterior queda descartado con su timer detenido; los observadores de idioma se mantienen en 2 tras 12 navegaciones. Salir de Cambiar Contraseña no cierra la sesión. Roles: grilla → alta → Cancelar vuelve a la **misma** grilla, y el alta se libera.
+- [x] **7. Panel a 320 px**: Ficha (Copiar como ícono con ToolTip) y Menú Degustación sin recortes.
+- [x] **8. Animación**: inclinación de 0° a 10° en ~150 ms, latido y brillo en 300 ms; el timer se detiene solo; se corta al bloquear la navegación; 0,3 % de un núcleo.
+
+Para el propietario:
+- [ ] Abrir una receta y la carpeta del Manual desde la app real (el arnés no lanzó el visor de PDF para no abrir ventanas en tu escritorio).
+- [ ] Ver la animación con el mouse real y con «Efectos de animación» desactivado en Windows (no debe moverse).
+- [ ] Cambiar la contraseña de punta a punta: al confirmarla se cierra la sesión.

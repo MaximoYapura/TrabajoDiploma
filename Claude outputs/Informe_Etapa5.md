@@ -82,3 +82,17 @@ Forzado con `OpenClipboard` desde otra ventana: `Clipboard.SetText` lanza `Exter
 3. Decidir si se corrige `OpenChildForm` (5.2): timers y suscripciones vivas.
 4. Pruebas a 125/150 % y con usuarios reales de cada rol (checklist).
 5. Fusionar en `beta` y hacer push cuando lo apruebe.
+
+## Ajustes post-revisión (2026-10-21)
+| Ítem | Commit | Resultado |
+|---|---|---|
+| 1, 3–7 | `0ad79a1` | Submenú del Chef; Manual (`ManualRecetas_790MY.AbrirManual`, botón Receta, instalador); `OpenChildForm` con `Close()`/`Dispose()`; panel a 320 px; hueco de la visita; contraseñas legibles. |
+| 2 | `4e60496` | `IAyudaContextual_790MY` en los 13 formularios restantes (19 pantallas del menú + alta de rol/familia). |
+| 8 | `527e986` | Animación del sombrero. |
+
+Decisiones:
+- **Contraseñas**: `FormCambiarContraseña_08YS.cs` ponía `ForeColor = Color.White` al entrar al campo, sobre un fondo (250,248,245). Se cambió a `TemaFogon_790MY.Tinta`; el Designer ya tenía el color correcto.
+- **OpenChildForm**: si el hijo anterior cancela su cierre (Caja y cobro durante un cobro), no se navega y se descarta el formulario nuevo. `FormGestionAcceso_08YS` vuelve a mostrar **su misma instancia** tras el alta o modificación. Por eso recibe `AbrirSubpantalla` en lugar de `OpenChildForm`: conserva la grilla viva y libera el alta con `BeginInvoke`, porque se llama desde el propio manejador del formulario que se va. No se tocó ningún hijo para esto.
+- **Manual**: no hay PDF índice, así que la opción del submenú abre la carpeta `Manual`. Los PDF del coworker (`docs/Manual`, antes sin versionar) se agregaron al repositorio; el proyecto los copia a `bin\Manual`. En el instalador se excluyen de la copia de bin y se copian desde `docs\Manual` con la línea pedida. El botón «Receta» del Menú Degustación queda para todos los roles; solo la opción del submenú es exclusiva de SuperAdmin. `Receta_BitacoraCambios.pdf` no tiene paso en el Menú Degustación y solo se llega por la carpeta.
+- **Panel de 320 px**: «Copiar» pasó a un ícono con ToolTip y nombre accesible para no recortar los nombres.
+- **Animación**: el `PictureBox` pasó de 32 a 36 px (el sombrero se sigue dibujando a 32) y el Padding izquierdo de 5 a 3, así que el texto queda en el mismo lugar. El brillo se dibuja solo sobre los píxeles del sombrero (se redibuja aclarado dentro de una franja).
