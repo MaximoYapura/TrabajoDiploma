@@ -1073,7 +1073,8 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 
 #### A. Idea y Diseño Visual
 
-- **Objetivo:** que una PC "limpia" quede funcionando con **un solo `Setup_ElFogon.exe`**: copia la aplicación, crea la base de datos en una instancia de SQL Server elegida por el usuario, deja la cadena de conexión apuntando a esa instancia y crea accesos directos. También soporta **reinstalar/actualizar** sin tocar los datos.
+- **Objetivo:** que una PC "limpia" quede funcionando con **un solo `Setup_ElFogon.exe`**: copia la aplicación, crea la base de datos en una instancia de SQL Server elegida por el usuario, deja la cadena de conexión apuntando a esa instancia y crea accesos directos. También soporta **reinstalar/actualizar** sin tocar los datos: hace un `BACKUP DATABASE` y aplica el mismo script idempotente, que solo agrega lo que falte del esquema *(deuda técnica, fase 4)*.
+- **Casilla "Instalar en modo demostración"** (`[Tasks] mododemo`, **desmarcada** por defecto): fija `ModoDemostracion` en `GUI_08YS.exe.config` (`false` = producción; `true` solo si se marca) *(A8)*.
 - **Interfaz del asistente (no usa FontAwesome ni UserControls; es el asistente de Inno Setup):**
   - `WizardStyle=modern`, idioma `Spanish.isl` (`[Languages]`), ícono `GUI\Resources\FogonIcon.ico` (`SetupIconFile`, `UninstallDisplayIcon`), compresión `lzma2` + `SolidCompression=yes`.
   - **Página de reinstalación** (`CreateOutputMsgPage(wpWelcome, 'Reinstalación detectada', …)`): solo si ya existe la clave de registro; muestra carpeta e instancia previas.
@@ -1094,7 +1095,9 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 | Carpeta | la elige el usuario (`DisableDirPage=auto`) | se reutiliza (`UsePreviousAppDir=yes`) |
 | Instancia SQL | la elige en la página personalizada | se lee de `SqlInstance` del registro (si falta, `.`) |
 | Prueba de conexión | sí (`NextButtonClick`) | no |
-| Script de BD | **se ejecuta** | **NO se ejecuta**: la base queda intacta |
+| Backup previo | no | **`BACKUP DATABASE TP_Ing_Soft`** a `{app}\Database\Backups\TP_Ing_Soft_<fecha>_<hora>.bak` (`DebeRespaldarBase` / `VerificarBackup`); si falla, aviso con la ruta del log y **el script no se ejecuta** |
+| Script de BD | **se ejecuta** (crea todo) | **se ejecuta** si el backup salió bien: idempotente, agrega solo lo que falte; datos y DV sin cambios |
+| `ModoDemostracion` | `false` salvo que se marque la casilla | se reescribe con la elección del asistente (propone la anterior) |
 | `App.secrets.config` | se copia de la plantilla | **no se toca** (`onlyifdoesntexist`) |
 | `GUI_08YS.exe.config` | se reescribe la instancia | se reescribe la instancia (se vuelve a copiar el `.config`) |
 
@@ -1104,12 +1107,14 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 3. **Instancia no vacía** y **prueba de conexión:** `sqlcmd -S "<instancia>" -E -b -l 30 -Q "SELECT 1"` (30 s: LocalDB puede tardar en arrancar la primera vez); si falla, muestra el log y permite continuar.
 4. **Detección de instancias (`DetectarInstanciasSql`, `LeerInstancias`):** lee `HKLM64`/`HKLM32` `SOFTWARE\Microsoft\SQL Server\Instance Names\SQL`; `MSSQLSERVER` → `"."`, nombradas → `".\NOMBRE"`, y **siempre** agrega `(localdb)\MSSQLLocalDB` al final.
 
-**Despliegue de la base (`[Run]`):**
+**Despliegue de la base (`[Run]`, dos entradas en orden):**
 ```
-cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -f 65001 -i "{app}\Database\Deploy_TP_Ing_Soft.sql" > "{app}\Database\Deploy_TP_Ing_Soft.log" 2>&1
-   Check: DebeDesplegarBase  ( = not IsUpgrade and SqlCmdEncontrado )      AfterInstall: VerificarDeploy
+1) cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -Q "<ConsultaBackup>" > "{app}\Database\Backup_TP_Ing_Soft.log" 2>&1
+      Check: DebeRespaldarBase  ( = IsUpgrade and SqlCmdEncontrado )        AfterInstall: VerificarBackup (BackupOk)
+2) cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -f 65001 -i "{app}\Database\Deploy_TP_Ing_Soft.sql" > "{app}\Database\Deploy_TP_Ing_Soft.log" 2>&1
+      Check: DebeDesplegarBase  ( = SqlCmdEncontrado and (not IsUpgrade or BackupOk) )   AfterInstall: VerificarDeploy
 ```
-`-E` autenticación de Windows, `-b` corta ante el primer error, `-f 65001` lee UTF-8. `VerificarDeploy` lee el log y exige la marca **`DEPLOY_OK`** o **`DEPLOY_OMITIDO`**; si ninguna aparece, muestra el log y el comando para re-ejecutarlo a mano (la aplicación **queda instalada** igual).
+`-E` autenticación de Windows, `-b` corta ante el primer error, `-f 65001` lee UTF-8. En la actualización la instancia sale del registro (`SqlInstance`). `ConsultaBackup` hace `BACKUP DATABASE … WITH INIT, CHECKSUM` dentro de `TRY/CATCH` + `THROW` (un `BACKUP` fallido no corta el lote: sin eso se imprimía la marca aunque el archivo no existiera) y emite `BACKUP_OK` (o `BACKUP_SIN_BASE` si la base no existe). La carpeta `Database\Backups` se crea con `Permissions: service-modify` porque el `.bak` lo escribe el servicio de SQL Server (solo sirve con instancia local). `VerificarDeploy` exige **`DEPLOY_OK`** (sigue aceptando `DEPLOY_OMITIDO`, que emitían versiones anteriores del script); si falta, muestra el log, su ruta, la del backup y el comando para re-ejecutarlo a mano (la aplicación **queda instalada** igual y no se borra nada).
 
 **Cadena de conexión:** `CurStepChanged(ssPostInstall)` → `ConfigurarConnectionString(GetSqlInstance(''))`, que genera `ConfigurarConexion.ps1` y lo corre con `powershell.exe -NoProfile -ExecutionPolicy Bypass`. Usa `System.Xml.XmlDocument` (`PreserveWhitespace`) + `SqlConnectionStringBuilder` para cambiar **solo** el `Data Source` de `/configuration/connectionStrings/add[@name='TP_Ing_Soft']` en `GUI_08YS.exe.config`, respetando UTF-8 y el resto de la cadena. Si falla, muestra el log e indica editar a mano.
 
@@ -1129,22 +1134,24 @@ Setup_ElFogon.exe (administrador)
    InitializeWizard     : (reinstalación) página informativa · página "Base de datos" (SqlCombo)
    NextButtonClick      : instancia ≠ vacía · sqlcmd -Q "SELECT 1"
    [Files] / [Registry] / [Icons]
-   [Run]                : sqlcmd … Deploy_TP_Ing_Soft.sql  (solo instalación limpia) ─► VerificarDeploy (DEPLOY_OK / DEPLOY_OMITIDO)
+   [Run]                : (actualización) sqlcmd BACKUP DATABASE ─► VerificarBackup
+                          sqlcmd … Deploy_TP_Ing_Soft.sql  (limpia, o actualización con backup OK) ─► VerificarDeploy (DEPLOY_OK)
    CurStepChanged       : ConfigurarConnectionString → GUI_08YS.exe.config  (Data Source = instancia)
+                          ConfigurarModoDemostracion → GUI_08YS.exe.config  (ModoDemostracion = casilla mododemo)
 Primer arranque: GUI_08YS.exe ─► Program.Main ─► BLLInstalador_08YS.AsegurarBaseDatos() ─► (si falta) InstaladorBD_08YS …  (ver 6.3)
 ```
 
 #### D. Clases Auxiliares e Integración
 
-- **Funciones del bloque `[Code]` (Pascal Script):** `GetSqlInstance`, `RunCmd`, `ReadLog`, `SqlCmdDisponible`, `AgregarInstancia`, `LeerInstancias`, `DetectarInstanciasSql`, `ConfigurarConnectionString`, `DebeDesplegarBase`, `VerificarDeploy`, `InitializeSetup`, `InitializeWizard`, `ShouldSkipPage`, `NextButtonClick`, `UpdateReadyMemo`, `CurStepChanged`.
+- **Funciones del bloque `[Code]` (Pascal Script):** `GetSqlInstance`, `RunCmd`, `ReadLog`, `SqlCmdDisponible`, `AgregarInstancia`, `LeerInstancias`, `DetectarInstanciasSql`, `ConfigurarConnectionString`, `ConfigurarModoDemostracion`, `GetArchivoBackup`, `ConsultaBackup`, `DebeRespaldarBase`, `VerificarBackup`, `DebeDesplegarBase`, `VerificarDeploy`, `InitializeSetup`, `InitializeWizard`, `ShouldSkipPage`, `NextButtonClick`, `UpdateReadyMemo`, `CurStepChanged`.
 - **Dependencias externas:** Inno Setup 6, `.NET Framework 4.8`, SQL Server (o LocalDB) con `sqlcmd` en el PATH, Windows PowerShell.
-- **Config de la app que el instalador deja lista:** `App.config` → `ModoDemostracion=true`, `TurnoPrueba_790MY=22:00` (ver §5 y §1), SMTP por `<smtp configSource="App.secrets.config" />`, *binding redirect* de `BouncyCastle.Crypto` 0.0.0.0–1.9.0.0 → 1.9.0.0 (iTextSharp).
+- **Config de la app que el instalador deja lista:** `App.config` del repositorio → `ModoDemostracion=true` (desarrollo / defensa; el instalador lo reescribe: `false` salvo que se marque la casilla), `TurnoPrueba_790MY=22:00` (ver §5 y §1), SMTP por `<smtp configSource="App.secrets.config" />`, *binding redirect* de `BouncyCastle.Crypto` 0.0.0.0–1.9.0.0 → 1.9.0.0 (iTextSharp).
 
 **Mejoras (6.1):**
-1. El comentario de cabecera del `.iss` aún dice "SQL Server con la base TP_Ing_Soft creada (esquema + migraciones)", pero el instalador **ya la crea**: actualizar el comentario.
-2. En **reinstalación** `GUI_08YS.exe.config` se reemplaza y se reescribe la instancia, pero si el usuario había cambiado **otros** valores (`ModoDemostracion`, `TurnoPrueba_790MY`) se pierden; considerar conservarlos o moverlos a un archivo externo como `App.secrets.config`.
-3. `ModoDemostracion=true` se distribuye por defecto: para producción debería ir `false` (y en ese caso desaparece la Ficha, ver §5.B.5). Es una decisión de entrega que conviene explicar en la defensa.
-4. **Sin control de versión de esquema:** una reinstalación nunca ejecuta cambios de BD. Si la v1.2 agregara columnas, no hay mecanismo de migración (tabla `SchemaVersion` + scripts incrementales).
+1. ~~El comentario de cabecera del `.iss` aún dice "SQL Server con la base TP_Ing_Soft creada"~~ **Resuelto (fase 4):** el encabezado describe la creación, el backup y la actualización.
+2. En **reinstalación** `GUI_08YS.exe.config` se reemplaza y se reescribe la instancia; `ModoDemostracion` ahora también se reescribe con la elección del asistente (que propone la anterior), pero otros valores cambiados a mano (`TurnoPrueba_790MY`) se siguen perdiendo; considerar conservarlos o moverlos a un archivo externo como `App.secrets.config`.
+3. ~~`ModoDemostracion=true` se distribuye por defecto~~ **Resuelto (A8):** casilla "Instalar en modo demostración" desmarcada por defecto → `false` en producción (y desaparece la Ficha, ver §5.B.5). `GUI\Config\App.config` conserva `true` para desarrollo/defensa.
+4. **Parcialmente resuelto (M9):** la reinstalación ahora hace backup y ejecuta el Deploy idempotente, que agrega tablas/objetos faltantes y tiene una sección "Actualizaciones de esquema" para columnas (`IF COL_LENGTH … ADD`). Sigue sin haber una tabla `SchemaVersion`: cada cambio de esquema futuro debe escribirse con su guarda en esa sección.
 5. La desinstalación borra `{app}\*` completo; funciona porque el directorio es exclusivo de la app, pero si el usuario eligió una carpeta compartida (`C:\Programas`) sería destructivo. Mitigar forzando una subcarpeta propia.
 6. `PrivilegesRequired=admin` es necesario por `HKLM`/`Program Files`, pero obliga a UAC siempre; documentar la alternativa (`PrivilegesRequiredOverridesAllowed=dialog`).
 7. El usuario semilla `Maximo` (SuperAdmin) viaja con su hash de contraseña en el script: forzar el cambio en el primer ingreso (existe `FormCambiarContraseña_08YS`) o pedir la clave inicial en el asistente.
@@ -1159,15 +1166,16 @@ Script **único** y **re-ejecutable** que "reemplaza a script.sql + Migraciones_
 
 #### B. Lógica y Reglas
 
-- **Preparación:** `SET XACT_ABORT ON` y opciones ANSI. **(1)** Si `DB_ID('TP_Ing_Soft') IS NULL` → `CREATE DATABASE [TP_Ing_Soft] COLLATE Modern_Spanish_CI_AS`. **(2) Idempotencia:** si existe `dbo.Users`, imprime `DEPLOY_OMITIDO` y hace **`SET NOEXEC ON`** (el resto del script se salta; al final `SET NOEXEC OFF`). Si la base existe pero está vacía (despliegue anterior fallido), crea todo dentro de ella.
-- **Atomicidad:** todo el esquema y los datos van en **una única transacción** (`BEGIN TRANSACTION` … `COMMIT TRANSACTION` al final): ante cualquier error (`XACT_ABORT`) no queda una base a medio crear. Termina con `PRINT 'DEPLOY_OK'`.
+- **Preparación:** `SET XACT_ABORT ON` y opciones ANSI. **(1)** Si `DB_ID('TP_Ing_Soft') IS NULL` → `CREATE DATABASE [TP_Ing_Soft] COLLATE Modern_Spanish_CI_AS`. **(2) Idempotencia real (fase 4, M9):** ya no hay cortocircuito `SET NOEXEC ON`. Al empezar se decide si es **instalación nueva** (no existe `dbo.Users`) y se guarda en `SESSION_CONTEXT('DeployNuevo')`. Cada objeto tiene su guarda: tablas con `IF OBJECT_ID(N'dbo.X', N'U') IS NULL`; tipo con `TYPE_ID`; índices por `sys.indexes`; `CHECK` por nombre; `DEFAULT` y **claves foráneas por columna** (varias FK no tienen nombre fijo); procedimientos y triggers con **`CREATE OR ALTER`** (requiere **SQL Server 2016 SP1+**, documentado en el encabezado). Los cambios de columnas de tablas existentes van en la sección **"Actualizaciones de esquema"** (`IF COL_LENGTH(...) IS NULL ALTER TABLE … ADD`); hoy contiene la copia de los cierres históricos a `CierresCaja` (A4).
+- **Atomicidad:** todo el esquema y los datos van en **una única transacción** (`BEGIN TRANSACTION` … `COMMIT TRANSACTION` al final): ante cualquier error (`XACT_ABORT`) no queda una base a medio crear ni a medio actualizar. Termina con `PRINT 'DEPLOY_OK'` en ambos casos (ya no emite `DEPLOY_OMITIDO`).
 - **Contenido:**
   - **Tipo:** `IntList` (tabla de tipo, parámetros de tabla).
-  - **23 tablas:** `Bitacora`, `Clientes`, `DV`, `EmailsAdicionalesCliente`, `Empleados`, `Facturas`, `FamiliaIntegrada`, `FamiliaPermiso`, `Familias`, `ItemsFactura`, `ItemsPedido`, `Mesas`, `Pagos`, `Pedidos`, `Permisos`, `Productos`, `Productos_C`, `Reservas`, `Roles`, `RolFamilia`, `RolPermiso`, `TelefonosAdicionalesCliente`, `Users` (+ restricciones, índices y claves foráneas).
-  - **3 triggers** de la Bitácora de Cambios (§4.1): `producto_actualizado`, `producto_eliminado`, `producto_c_actualizado`.
+  - **24 tablas:** `Bitacora`, `CierresCaja` *(A4: PK `Fecha`, fuera de los DV)*, `Clientes`, `DV`, `EmailsAdicionalesCliente`, `Empleados`, `Facturas`, `FamiliaIntegrada`, `FamiliaPermiso`, `Familias`, `ItemsFactura`, `ItemsPedido`, `Mesas`, `Pagos`, `Pedidos`, `Permisos`, `Productos`, `Productos_C`, `Reservas`, `Roles`, `RolFamilia`, `RolPermiso`, `TelefonosAdicionalesCliente`, `Users` (+ restricciones, índices y claves foráneas).
+  - **3 triggers** de la Bitácora de Cambios (§4.1): `producto_actualizado` *(A5: versiona solo cambios de negocio; un cambio solo de stock actualiza la vigente)*, `producto_eliminado`, `producto_c_actualizado`.
   - **Procedimientos almacenados:** `sp_CreateFamilia`, `sp_CreateRol`, `sp_DeleteFamilia`, `sp_DeleteRol`, `sp_EjecutarBackup`, `sp_GetAllFamilias`, `sp_GetAllPermisos`, `sp_GetAllRolesConEstructura`, `sp_GetAllTablesParaDV`, `sp_GetAncestrosFamilia`, `sp_GetDVTodo`, `sp_GetRolByID`, `sp_ModifyFamilia`, `sp_ModifyRol`, `sp_UpsertDVTabla` (los de alta/modificación usan `BEGIN TRY … ROLLBACK; THROW`).
   - **Datos semilla:** Seguridad (Roles, Permisos, Familias y relaciones), usuario **`Maximo` (SuperAdmin)**, 1 cliente de prueba, 4 empleados (uno por puesto), Mesas y el catálogo de Productos. **Sin** reservas, pedidos, facturas, pagos ni bitácora.
   - **Dígitos verificadores:** inserta los `DVH/DVV` correctos para esos datos, de modo que **el primer login no informa inconsistencias** (la integridad se valida contra las 18 tablas de `DVManager_08YS.TablasMonitoreadas`).
+  - **Semilla y DV solo en instalación nueva** (`SESSION_CONTEXT('DeployNuevo') = 1`): en una base con datos no se inserta, pisa ni duplica nada y los DV quedan intactos (insertar aunque sea una fila semilla los dejaría inconsistentes). Prueba: `docs\Pruebas_DeployIdempotente.sql` (dos ejecuciones seguidas sobre una base con datos y sobre una base v1.1: sin errores, mismas filas y checksums, mismo hash de DV).
 
 #### C. Flujo
 
@@ -1179,7 +1187,7 @@ Script **único** y **re-ejecutable** que "reemplaza a script.sql + Migraciones_
 - `Productos_C` y sus triggers son la base de la Bitácora de Cambios (§4.1) y exigen la opción de servidor `nested triggers` (por defecto activa).
 
 **Mejoras (6.2):**
-1. El script se **genera** con SMO desde una base semilla; si el esquema cambia hay que regenerar a mano (no hay un paso automatizado). Mantener `Seed_TP_Ing_Soft.sql` + una receta de regeneración documentada.
+1. El script se **generó** con SMO desde una base semilla y desde la fase 4 se mantiene **a mano** con guardas idempotentes: un regenerado con SMO perdería esas guardas. Cada cambio de esquema futuro debe agregarse con su guarda (tabla nueva arriba; columna nueva en "Actualizaciones de esquema") y en `Migraciones_790MY\` para las bases existentes.
 2. Los scripts viejos (`script.sql`, `Migraciones_790MY\*.sql`, `Scripts\AlterTableMesas_Mapa.sql` —este **borra datos de mesas**) siguen en el repositorio; conviene moverlos a una carpeta `Legacy/` o eliminarlos para evitar ejecutarlos por error.
 3. El hash de contraseña del SuperAdmin `Maximo` queda en un script de texto versionado en el repositorio.
 
@@ -1214,7 +1222,7 @@ Application.Run(new FormLogin_08YS());
 `GUI.csproj` copia `script.sql` al directorio de salida (`CopyToOutputDirectory=Always`), pero el `.iss` **lo excluye** del instalador (`Excludes: … script.sql`): en una instalación con el Setup, la base la crea `Deploy_TP_Ing_Soft.sql` y el fallback queda como respaldo para ejecuciones de desarrollo.
 
 **Mejoras (6.3):**
-1. **Dos caminos de creación de BD con scripts distintos** (`script.sql` de 945 líneas, UTF-16, vs. `Deploy_TP_Ing_Soft.sql`): pueden divergir. Unificar: que el fallback use `Deploy_TP_Ing_Soft.sql` (o embebido como recurso).
+1. **Dos caminos de creación de BD con scripts distintos** (`script.sql` de 945 líneas, UTF-16, vs. `Deploy_TP_Ing_Soft.sql`): pueden divergir. Unificar: que el fallback use `Deploy_TP_Ing_Soft.sql` (o embebido como recurso). *(Pendiente, A9 parcial: la fase 4 se limitó al Deploy y al instalador; con el Deploy ya idempotente y transaccional, el fallback podría ejecutarlo sin el problema de lotes ignorados.)*
 2. Ignorar `SqlException` por lote puede dejar una base **incompleta sin que el usuario lo sepa** (solo queda `instalador_db.log`). Al menos distinguir lotes opcionales (`ALTER DATABASE … SET`) de críticos (`CREATE TABLE`), o ejecutar el cuerpo en una transacción.
 3. `Program.Main` usa `MessageBox` (es correcto: error fatal de arranque, previo a cualquier formulario) y `Regex` permite `GO` dentro de cadenas multilinea (poco probable, pero posible).
 4. La cadena de conexión predefinida en `App.config` apunta a `Data Source=PC_Maximo` (nombre del equipo de desarrollo); funciona porque el instalador la reescribe, pero un *copy-paste* de la carpeta `Release` a otra PC falla al conectar.
@@ -1287,15 +1295,15 @@ Priorización: **A** = riesgo funcional o de seguridad (corregir antes de produc
 
 | # | Hallazgo | Dónde |
 |---|---|---|
-| A1 | Validaciones **solo en la GUI** (DNI 7–8 dígitos en cliente; DNI de empleado sin regla; rango `desde ≤ hasta` en reporte de reservas): replicarlas en la BLL | 1.1, 2.1, 2.2, 3.1 |
-| A2 | `ReservaBLL_790MY.CancelarReserva` **no valida permiso** (todas las demás operaciones sí) | 1.1 |
-| A3 | Orden inseguro en `FamiliaBLL_08YS`/`RolBLL_08YS`: se valida y consulta `IsInUse` **antes** de `ValidatePermission` (filtra información) | 2.5 |
-| A4 | Cierre de caja sin tabla propia: depende del prefijo de un string en `Bitacora.TargetUsername` (50 caracteres) y no es atómico entre terminales | 3.2 |
-| A5 | `Productos_C` versiona **cada descuento de stock**; restaurar una versión también restaura su stock viejo | 2.4, 4.1 |
-| A6 | `BitacoraBLL_08YS.GetAll/Filtrar` no validan permiso y la tabla `Bitacora` no entra en `TablasMonitoreadas` (DV) | 4.2 |
-| A7 | `LatenciaSimuladaMs = 2500` (demora artificial del cobro): condicionarla a `ModoDemostracion`. La autorización bancaria simulada, el QR simulado y las acciones simuladas del Reporte Predictivo **se conservan**: no hay pasarela, verificador ni integración reales y son necesarias para el funcionamiento mínimo y la demostración | 1.5, 3.3 |
-| A8 | `ModoDemostracion=true` y `TurnoPrueba_790MY` se distribuyen por defecto; usuario semilla `Maximo` (SuperAdmin) con hash en el script | 6.1, 6.2 |
-| A9 | Fallback `InstaladorBD_08YS` ignora lotes con error (base posible incompleta) y usa un `script.sql` distinto del `Deploy_TP_Ing_Soft.sql` | 6.3 |
+| A1 | Validaciones **solo en la GUI** (DNI 7–8 dígitos en cliente; DNI de empleado sin regla; rango `desde ≤ hasta` en reporte de reservas): replicarlas en la BLL<br>✅ **Resuelto (fase 1):** `ClienteBLL_790MY.ValidarDatos` exige `^\d{7,8}$` (`FC_val_dni_formato`) y `ReservaBLL_790MY.Buscar` rechaza `desde > hasta` (`msg_rep_rango_fechas_invalido`). *Pendiente:* DNI de empleado (no estaba en el plan). | 1.1, 2.1, 2.2, 3.1 |
+| A2 | `ReservaBLL_790MY.CancelarReserva` **no valida permiso** (todas las demás operaciones sí)<br>✅ **Resuelto (fase 1):** valida `Permisos.RegistrarReserva`. | 1.1 |
+| A3 | Orden inseguro en `FamiliaBLL_08YS`/`RolBLL_08YS`: se valida y consulta `IsInUse` **antes** de `ValidatePermission` (filtra información)<br>✅ **Resuelto (fase 1):** `ValidatePermission` es lo primero en Crear/Modificar/Eliminar de ambas BLL. | 2.5 |
+| A4 | Cierre de caja sin tabla propia: depende del prefijo de un string en `Bitacora.TargetUsername` (50 caracteres) y no es atómico entre terminales<br>✅ **Resuelto (fase 2):** tabla `CierresCaja` (PK `Fecha`) con `ICierreCajaRepository_790MY`; doble cierre = violación de PK → `msg_ac_caja_ya_cerrada`; migración con copia de cierres históricos. *Pendiente:* `CierresCaja` fuera de los DV. | 3.2 |
+| A5 | `Productos_C` versiona **cada descuento de stock**; restaurar una versión también restaura su stock viejo<br>✅ **Resuelto (fase 2):** `producto_actualizado` versiona solo cambios de negocio; un cambio solo de stock actualiza la vigente (siempre una sola `Act = 1`). *Pendiente:* el rollback (`producto_c_actualizado`) sigue restaurando el stock de la versión. | 2.4, 4.1 |
+| A6 | `BitacoraBLL_08YS.GetAll/Filtrar` no validan permiso y la tabla `Bitacora` no entra en `TablasMonitoreadas` (DV)<br>✅ **Resuelto (fase 2):** `GetAll/Filtrar` validan `Permisos.VerBitacora` (único llamador: `FormBitacora_08YS`). *Pendiente:* `Bitacora` sigue fuera de `TablasMonitoreadas`. | 4.2 |
+| A7 | `LatenciaSimuladaMs = 2500` (demora artificial del cobro): condicionarla a `ModoDemostracion`. La autorización bancaria simulada, el QR simulado y las acciones simuladas del Reporte Predictivo **se conservan**: no hay pasarela, verificador ni integración reales y son necesarias para el funcionamiento mínimo y la demostración<br>✅ **Resuelto (fase 3):** la demora solo se aplica con `ModoDemostracion=true`; sin la clave o con `false` no hay demora. | 1.5, 3.3 |
+| A8 | `ModoDemostracion=true` y `TurnoPrueba_790MY` se distribuyen por defecto; usuario semilla `Maximo` (SuperAdmin) con hash en el script<br>✅ **Resuelto (fase 3) en lo pedido:** el instalador escribe `ModoDemostracion=false` salvo que se marque la casilla "Instalar en modo demostración". *Pendiente:* usuario semilla `Maximo` con hash en el script. | 6.1, 6.2 |
+| A9 | Fallback `InstaladorBD_08YS` ignora lotes con error (base posible incompleta) y usa un `script.sql` distinto del `Deploy_TP_Ing_Soft.sql`<br>🟡 **Parcial (fase 4):** el instalador ejecuta siempre el `Deploy_TP_Ing_Soft.sql` idempotente y transaccional (también en reinstalación, con backup previo). *Pendiente:* el fallback `InstaladorBD_08YS` sigue usando `script.sql` e ignorando lotes con error (fuera del alcance). | 6.3 |
 
 ### M — Prioridad media
 
@@ -1303,13 +1311,13 @@ Priorización: **A** = riesgo funcional o de seguridad (corregir antes de produc
 |---|---|---|
 | M1 | `ClienteBLL_790MY` y `MesaBLL_790MY` usan `RegistrarEvento` en vez de `RegistrarEventoPostCommit` | 2.1, 2.3 |
 | M2 | Mensajes **fijos en español** en la BLL (`ClienteBLL_790MY`, `MesaBLL_790MY`) en lugar de `MensajesBLL_790MY.Regla`; `GetTexto(..) ?? "x"` nunca usa el alternativo | 2.1, 2.3 |
-| M3 | `MessageBox` en `FormBitacora_08YS`, `FormGestionAcceso_08YS`, `FormAccesoAM_08YS` (contradice E2-D1) | 0.8, 2.5, 4.2 |
+| M3 | `MessageBox` en `FormBitacora_08YS`, `FormGestionAcceso_08YS`, `FormAccesoAM_08YS` (contradice E2-D1)<br>✅ **Resuelto (fase 3):** banner (`MostrarErrorEnBanner`), `ErrorProvider` en campos, `ToastHost_790MY` para éxitos y `ConfirmModal_790MY` para eliminar/reemplazar; `MessageBox` solo en el camino de error fatal. | 0.8, 2.5, 4.2 |
 | M4 | Controles creados en `FormX.cs` (`CrearTarjetasKpi`, `ArmarTablaDiff`, `CrearTarjeta`, mapa de mesas): moverlos a UserControls en el Designer | 0.9, 3.2, 3.3, 4.1 |
 | M5 | `MesaBLL_790MY` mezcla ABM y reglas de turno/disponibilidad; el tope de 12 mesas cuenta `FueraDeServicio` | 2.3 |
 | M6 | PDF del Reporte de Reservas: sin paginación ni encabezado repetido, 200 líneas dentro del formulario (extraer a una clase servicio) | 3.1 |
 | M7 | `FormBitacora_08YS`: "exportar" es solo impresión (sin PDF/CSV); `GetAll()` trae toda la tabla; pie "Sistema: GastroGest" | 4.2 |
 | M8 | El Reporte Predictivo no tiene botón *Actualizar*; la BLL guarda estado cacheado en la instancia | 3.3 |
-| M9 | Reinstalación sin control de versión de esquema (`SchemaVersion` + scripts incrementales); `GUI_08YS.exe.config` se pisa | 6.1 |
+| M9 | Reinstalación sin control de versión de esquema (`SchemaVersion` + scripts incrementales); `GUI_08YS.exe.config` se pisa<br>🟡 **Parcial (fase 4):** reinstalación con `BACKUP DATABASE` previo + Deploy idempotente (sección "Actualizaciones de esquema" para columnas); `ModoDemostracion` se reescribe con la elección del asistente. *Pendiente:* tabla `SchemaVersion`. | 6.1 |
 | M10 | Ayuda contextual acoplada por **nombre de control** (`nameof`); sin prueba que detecte pistas rotas; `ayuda.json` es por equipo | 5 |
 | M11 | `FormComprobanteReserva_790MY` no fue auditado (no se leyó); polling de `timerAvisos_790MY`/`timerKds_790MY` | 1.1, 1.3, 1.4 |
 | M12 | Dos caminos para pasar una mesa a fuera de servicio; `ModificarMesa` no revisa reservas futuras | 2.3 |
@@ -1318,10 +1326,10 @@ Priorización: **A** = riesgo funcional o de seguridad (corregir antes de produc
 
 | # | Hallazgo | Dónde |
 |---|---|---|
-| B1 | Código muerto: `EmpleadoBLL_790MY.ObtenerUsuariosVinculables`, `IMesaRepository_790MY.Delete`, `TieneReservasActivas` | 2.2, 2.3 |
+| B1 | Código muerto: `EmpleadoBLL_790MY.ObtenerUsuariosVinculables`, `IMesaRepository_790MY.Delete`, `TieneReservasActivas`<br>✅ **Resuelto (fase 3):** métodos e implementaciones eliminados; sin referencias en la solución. | 2.2, 2.3 |
 | B2 | Constantes duplicadas entre BLL, `NumericUpDown.Maximum` y columnas SQL (`PrecioMaximo`…); color `(184, 84, 20)` del botón restaurar fijo en el `.cs` | 2.4, 4.1 |
 | B3 | Legado: `Setup_08YS.vdproj` ("HorizonHotel&Resort"), `script.sql`, `Migraciones_790MY/*.sql` (13), `Scripts/AlterTableMesas_Mapa.sql` (borra datos): mover a `Legacy/` | 6 |
-| B4 | Comentario de cabecera del `.iss` desactualizado ("base creada previamente"); `PrivilegesRequired=admin` obligatorio; desinstalación borra `{app}\*` | 6.1 |
+| B4 | Comentario de cabecera del `.iss` desactualizado ("base creada previamente"); `PrivilegesRequired=admin` obligatorio; desinstalación borra `{app}\*`<br>🟡 **Parcial (fase 4):** encabezado del `.iss` actualizado. *Pendiente:* `PrivilegesRequired=admin` y el borrado de `{app}\*` (incluye `Database\Backups`) al desinstalar. | 6.1 |
 | B5 | `catch (Exception) { }` vacío al abrir el PDF de reservas; `ContarMesasAbiertas` devuelve 0 ante cualquier error | 2.2, 3.1 |
 | B6 | `InvalidOperationException` usada para validaciones de entrada en Accesos; `Familia_08YS.Hijos` mutable vía `ReemplazarHijos` | 2.5 |
 | B7 | Sin proyecto de **pruebas unitarias** en la solución (`CalcularReglas`, `CalcularImportes`, `ValidarTarjetaLuhn` son puros y fáciles de probar) | 1.5, 3.3 |
