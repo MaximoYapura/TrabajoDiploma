@@ -156,6 +156,12 @@
     <Compile Include="Estilo\FichaIngredientes_UC_790MY.Designer.cs">
       <DependentUpon>FichaIngredientes_UC_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="Estilo\PasoDegustacion_790MY.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Estilo\PasoDegustacion_790MY.Designer.cs">
+      <DependentUpon>PasoDegustacion_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="Estilo\MenuDegustacion_UC_790MY.cs">
       <SubType>UserControl</SubType>
     </Compile>

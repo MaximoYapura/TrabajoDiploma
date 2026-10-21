@@ -66,3 +66,16 @@ Verificado por Claude Code con la base local (solo lectura):
 Para el propietario:
 - [ ] Base vacía (sin clientes/empleados/mesas): «Todavía no hay datos cargados.» en cada sección.
 - [ ] Cambiar a inglés con la Ficha abierta: títulos, puestos y «Copy» traducidos.
+
+## Fase 4 — Menú Degustación (`MenuDegustacion_UC_790MY`, `PasoDegustacion_790MY`)
+
+Verificado por Claude Code:
+- [x] Seis pasos con el flujo real: Cliente → Reserva → Abrir mesa → Registrar pedido → Cocina → Caja y cobro. Cada pista muestra la ruta del menú y los textos de los botones **leídos de idiomas.json** («Confirmar Reserva», «Confirmar ingreso», «Agregar», «Enviar a cocina», «Iniciar preparación», «Marcar como listo»).
+- [x] Paso 2 muestra el turno vigente en vivo (22:00); paso 6 la terminación de rechazo leída de `PagoBLL_790MY`.
+- [x] SuperAdmin: los 6 «Ir» abren Clientes, Registrar Reserva, Abrir Mesa, Registrar Pedido, KDS y Caja y cobro (`PerformClick` del menú); **el panel queda abierto**.
+- [x] Rol con solo AbrirMesa y RegistrarPedido: pasos 1, 2, 5 y 6 con «Ir» gris y «Tu rol no tiene permiso para esta pantalla.»; 3 y 4 funcionan.
+- [x] «Hecho»: título y borde en verde; se mantiene al cambiar de idioma; no se guarda.
+- [x] Inglés: «Reservations › New Reservation … press «Confirm Reservation»».
+
+Para el propietario:
+- [ ] Hacer la ruta completa de punta a punta con un usuario real de cada rol.
