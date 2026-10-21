@@ -4,6 +4,7 @@ using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Comparers;
 using System;
 using GUI_08YS.Estilo;
+using GUI_08YS.RF2;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -37,6 +38,8 @@ namespace GUI_08YS.Admin
 
         // Evita cascada de eventos entre los dos dgv durante refreshes
         private bool _actualizandoSeleccion = false;
+
+        private IWin32Window VentanaPropietaria => (this.TopLevelControl as Form) ?? (IWin32Window)this;
 
         private AccesoBLL_08YS BLL => _tipo == TipoEntidad.Familia
                ? (AccesoBLL_08YS)_familiaBLL
@@ -257,16 +260,17 @@ namespace GUI_08YS.Admin
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
+            bnrAvisos_790MY.Ocultar();
             if (dgvDisponibles.CurrentRow == null)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_seleccionar_componente_add"), TraductorManager_08YS.Instance.GetTexto("sin_seleccion"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("msg_seleccionar_componente_add"), TipoBanner_790MY.Aviso);
                 return;
             }
 
             var candidato = (dgvDisponibles.CurrentRow.DataBoundItem as ComponentRow)?.Componente;
             if (candidato == null)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_error_obtener_componente"), TraductorManager_08YS.Instance.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("msg_error_obtener_componente"));
                 return;
             }
 
@@ -279,13 +283,13 @@ namespace GUI_08YS.Admin
                     break;
 
                 case ResultadoEvaluacion_08YS.Tipo.SugerenciaReemplazo:
-                    var confirm = MessageBox.Show(
-                        resultado.Mensaje, // Viene directo con lógica traducida desde la BLL o formateada
+                    // Quita componentes ya asignados: se confirma con el modal de la casa.
+                    bool confirmado = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
                         TraductorManager_08YS.Instance.GetTexto("reemplazo_sugerido"),
-                        MessageBoxButtons.OKCancel,
-                        MessageBoxIcon.Question);
+                        resultado.Mensaje, // Viene directo con lógica traducida desde la BLL o formateada
+                        TraductorManager_08YS.Instance.GetTexto("btn_Aceptar"));
 
-                    if (confirm == DialogResult.OK)
+                    if (confirmado)
                     {
                         foreach (var reemplazar in resultado.ComponentesAReemplazar)
                             _seleccionados.Remove(reemplazar);
@@ -295,7 +299,7 @@ namespace GUI_08YS.Admin
                     break;
 
                 case ResultadoEvaluacion_08YS.Tipo.ConflictoIrresoluble:
-                    MessageBox.Show(resultado.Mensaje, TraductorManager_08YS.Instance.GetTexto("no_se_puede_agregar"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    bnrAvisos_790MY.Mostrar(resultado.Mensaje);
                     break;
             }
         }
@@ -312,16 +316,17 @@ namespace GUI_08YS.Admin
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
+            bnrAvisos_790MY.Ocultar();
             if (dgvSeleccionados.CurrentRow == null)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_seleccionar_componente_del"), TraductorManager_08YS.Instance.GetTexto("sin_seleccion"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("msg_seleccionar_componente_del"), TipoBanner_790MY.Aviso);
                 return;
             }
 
             var componente = (dgvSeleccionados.CurrentRow.DataBoundItem as ComponentRow)?.Componente;
             if (componente == null)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_error_obtener_componente"), TraductorManager_08YS.Instance.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("msg_error_obtener_componente"));
                 return;
             }
 
@@ -335,21 +340,37 @@ namespace GUI_08YS.Admin
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
+            errValidacion_790MY.SetError(txtNombre, string.Empty);
+            bnrAvisos_790MY.Ocultar();
+
+            string nombre = txtNombre.Text.Trim();
+
+            // Validaciones de campo (la BLL las repite en ValidarDatosEntrada).
+            if (string.IsNullOrWhiteSpace(nombre))
+            {
+                MarcarErrorNombre(TraductorManager_08YS.Instance.GetTexto("bll_val_nombre_vacio"));
+                return;
+            }
+            if (_seleccionados.Count == 0)
+            {
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("bll_val_sin_componentes"));
+                return;
+            }
+
             try
             {
-                string nombre = txtNombre.Text.Trim();
-
+                string claveExito;
                 if (_tipo == TipoEntidad.Familia)
                 {
                     if (_operacion == OperacionAM.Alta)
                     {
                         _familiaBLL.Crear(nombre, _seleccionados);
-                        MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_familia_creada_exito"), TraductorManager_08YS.Instance.GetTexto("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        claveExito = "msg_familia_creada_exito";
                     }
                     else
                     {
                         _familiaBLL.Modificar(_familiaAEditar.FamiliaID, nombre, _seleccionados);
-                        MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_familia_modificada_exito"), TraductorManager_08YS.Instance.GetTexto("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        claveExito = "msg_familia_modificada_exito";
                     }
                 }
                 else
@@ -357,32 +378,47 @@ namespace GUI_08YS.Admin
                     if (_operacion == OperacionAM.Alta)
                     {
                         _rolBLL.Crear(nombre, _seleccionados);
-                        MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_rol_creado_exito"), TraductorManager_08YS.Instance.GetTexto("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        claveExito = "msg_rol_creado_exito";
                     }
                     else
                     {
                         _rolBLL.Modificar(_rolAEditar.RolID, nombre, _seleccionados);
-                        MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_rol_modificado_exito"), TraductorManager_08YS.Instance.GetTexto("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        claveExito = "msg_rol_modificado_exito";
                     }
                 }
 
+                // _onGuardado vuelve a la grilla y esta pantalla se libera: el toast se
+                // muestra sobre el contenedor principal para que siga visible.
+                Control contenedor = TopLevelControl ?? this;
                 _onGuardado?.Invoke();
+                EstiloRF2_790MY.MostrarExitoToast(contenedor, TraductorManager_08YS.Instance.GetTexto(claveExito));
             }
             catch (NombreDuplicadoException_08YS)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_nombre_acceso_duplicado"),
-                                TraductorManager_08YS.Instance.GetTexto("error_validacion"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MarcarErrorNombre(TraductorManager_08YS.Instance.GetTexto("msg_nombre_acceso_duplicado"));
             }
             catch (PermisosDuplicadosException_08YS)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_permisos_identicos_error"),
-                                TraductorManager_08YS.Instance.GetTexto("error_validacion"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("msg_permisos_identicos_error"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Validaciones de la BLL de accesos (nombre/composición, permisos duplicados
+                // por propagación): el mensaje ya viene traducido (bll_val_*, bll_propagacion_*).
+                bnrAvisos_790MY.Mostrar(ex.Message);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{TraductorManager_08YS.Instance.GetTexto("msg_error_inesperado")}{ex.Message}",
-                                TraductorManager_08YS.Instance.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Permiso: banner; falla inesperada: MessageBox (E2-D1).
+                EstiloRF2_790MY.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
+        }
+
+        private void MarcarErrorNombre(string mensaje)
+        {
+            errValidacion_790MY.SetError(txtNombre, mensaje);
+            bnrAvisos_790MY.Mostrar(mensaje);
+            txtNombre.Focus();
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)

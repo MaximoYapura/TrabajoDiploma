@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -63,6 +64,8 @@
             this.trvDetalle = new System.Windows.Forms.TreeView();
             this.lblDescripcion = new System.Windows.Forms.Label();
             this.lblDetalle = new System.Windows.Forms.Label();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).BeginInit();
             this.pnlBottom.SuspendLayout();
@@ -78,6 +81,7 @@
             this.flowLayoutPanel1.SuspendLayout();
             this.pnlIzquierda.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSeleccionados)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlHeader
@@ -597,9 +601,20 @@
             this.lblDetalle.Tag = "lblDetalleSeleccionado";
             this.lblDetalle.Text = "Detalle del seleccionado";
             this.lblDetalle.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
+            //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Dock = System.Windows.Forms.DockStyle.Top;
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.TabIndex = 4;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            //
             // FormAccesoAM_08YS
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
@@ -607,6 +622,7 @@
             this.Controls.Add(this.splitContenido);
             this.Controls.Add(this.pnlNombre);
             this.Controls.Add(this.pnlBottom);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.pnlHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -634,6 +650,7 @@
             this.pnlIzquierda.ResumeLayout(false);
             this.pnlIzquierda.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSeleccionados)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -667,5 +684,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colNombreDisp;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColTipoCel;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNombreSel;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }
