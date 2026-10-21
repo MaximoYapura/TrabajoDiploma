@@ -35,7 +35,7 @@ namespace GUI_08YS.Estilo
         public void ActualizarTextos(string textoCopiar)
         {
             _textoCopiar = textoCopiar;
-            btnCopiar_790MY.Text = textoCopiar;
+            ttCopiar_790MY.SetToolTip(btnCopiar_790MY, textoCopiar);
             ActualizarAccesible();
         }
 

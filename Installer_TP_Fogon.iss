@@ -77,7 +77,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; Se excluyen símbolos/documentación XML, el script de esquema viejo y, sobre todo,
 ; App.secrets.config: contiene credenciales SMTP reales de la PC de desarrollo.
 Source: "{#ReleaseDir}\*"; DestDir: "{app}"; \
-    Excludes: "*.pdb,*.xml,App.secrets.config,script.sql,*.vshost.*"; \
+    Excludes: "*.pdb,*.xml,App.secrets.config,script.sql,*.vshost.*,Manual\*"; \
     Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Plantilla SMTP y su copia como App.secrets.config (solo si todavía no existe:
@@ -94,6 +94,10 @@ Source: "docs\Deploy_TP_Ing_Soft.sql"; DestDir: "{app}\Database"; Flags: ignorev
 
 ; Documentación
 Source: "docs\*.pdf"; DestDir: "{app}\docs"; Flags: ignoreversion
+
+; Manual de Recetas (Etapa 5, Fase 8a): un PDF por receta; la Ayuda del Chef los abre
+; desde {app}\Manual. Arriba se excluyen de la copia de bin para no duplicarlos.
+Source: "docs\Manual\*.pdf"; DestDir: "{app}\Manual"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"

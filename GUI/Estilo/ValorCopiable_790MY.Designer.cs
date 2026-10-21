@@ -19,7 +19,9 @@ namespace GUI_08YS.Estilo
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
             this.lblDetalle_790MY = new System.Windows.Forms.Label();
             this.txtValor_790MY = new System.Windows.Forms.TextBox();
-            this.btnCopiar_790MY = new System.Windows.Forms.Button();
+            this.components = new System.ComponentModel.Container();
+            this.btnCopiar_790MY = new FontAwesome.Sharp.IconButton();
+            this.ttCopiar_790MY = new System.Windows.Forms.ToolTip(this.components);
             this.tlpValor_790MY.SuspendLayout();
             this.SuspendLayout();
             //
@@ -42,7 +44,7 @@ namespace GUI_08YS.Estilo
             this.tlpValor_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlpValor_790MY.SetRowSpan(this.txtValor_790MY, 2);
             this.tlpValor_790MY.SetRowSpan(this.btnCopiar_790MY, 2);
-            this.tlpValor_790MY.Size = new System.Drawing.Size(316, 44);
+            this.tlpValor_790MY.Size = new System.Drawing.Size(280, 44);
             this.tlpValor_790MY.TabIndex = 0;
             //
             // lblTitulo_790MY
@@ -85,25 +87,24 @@ namespace GUI_08YS.Estilo
             this.txtValor_790MY.Size = new System.Drawing.Size(128, 23);
             this.txtValor_790MY.TabIndex = 2;
             //
-            // btnCopiar_790MY  (secundario: contorno bordó)
+            // btnCopiar_790MY  (secundario, solo ícono; el texto va en ToolTip y nombre accesible)
             //
             this.btnCopiar_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnCopiar_790MY.AutoSize = true;
             this.btnCopiar_790MY.BackColor = System.Drawing.Color.White;
             this.btnCopiar_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCopiar_790MY.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(29)))), ((int)(((byte)(47)))));
             this.btnCopiar_790MY.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(236)))), ((int)(((byte)(238)))));
             this.btnCopiar_790MY.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(236)))), ((int)(((byte)(238)))));
             this.btnCopiar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCopiar_790MY.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnCopiar_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(29)))), ((int)(((byte)(47)))));
-            this.btnCopiar_790MY.Location = new System.Drawing.Point(252, 7);
+            this.btnCopiar_790MY.IconChar = FontAwesome.Sharp.IconChar.Copy;
+            this.btnCopiar_790MY.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(29)))), ((int)(((byte)(47)))));
+            this.btnCopiar_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.btnCopiar_790MY.IconSize = 18;
+            this.btnCopiar_790MY.Location = new System.Drawing.Point(246, 7);
             this.btnCopiar_790MY.Margin = new System.Windows.Forms.Padding(0);
-            this.btnCopiar_790MY.MinimumSize = new System.Drawing.Size(64, 30);
             this.btnCopiar_790MY.Name = "btnCopiar_790MY";
-            this.btnCopiar_790MY.Size = new System.Drawing.Size(64, 30);
+            this.btnCopiar_790MY.Size = new System.Drawing.Size(34, 30);
             this.btnCopiar_790MY.TabIndex = 3;
-            this.btnCopiar_790MY.Text = "Copiar";
             this.btnCopiar_790MY.UseVisualStyleBackColor = false;
             this.btnCopiar_790MY.Click += new System.EventHandler(this.btnCopiar_790MY_Click);
             //
@@ -115,7 +116,7 @@ namespace GUI_08YS.Estilo
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Margin = new System.Windows.Forms.Padding(0, 0, 0, 8);
             this.Name = "ValorCopiable_790MY";
-            this.Size = new System.Drawing.Size(316, 44);
+            this.Size = new System.Drawing.Size(280, 44);
             this.tlpValor_790MY.ResumeLayout(false);
             this.tlpValor_790MY.PerformLayout();
             this.ResumeLayout(false);
@@ -127,6 +128,7 @@ namespace GUI_08YS.Estilo
         private System.Windows.Forms.Label lblTitulo_790MY;
         private System.Windows.Forms.Label lblDetalle_790MY;
         private System.Windows.Forms.TextBox txtValor_790MY;
-        private System.Windows.Forms.Button btnCopiar_790MY;
+        private FontAwesome.Sharp.IconButton btnCopiar_790MY;
+        private System.Windows.Forms.ToolTip ttCopiar_790MY;
     }
 }

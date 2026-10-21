@@ -14,6 +14,9 @@ namespace GUI_08YS.Estilo
         /// <summary>El usuario pulsó «Ir».</summary>
         public event EventHandler IrSolicitado;
 
+        /// <summary>El usuario pulsó «Receta» (PDF del Manual de Recetas).</summary>
+        public event EventHandler RecetaSolicitada;
+
         public PasoDegustacion_790MY()
         {
             InitializeComponent();
@@ -24,8 +27,10 @@ namespace GUI_08YS.Estilo
         public bool IrHabilitado => btnIr_790MY.Enabled;
 
         public void Configurar(string titulo, string pista, bool permitido, string motivo,
-                               string textoIr, string textoHecho)
+                               string textoIr, string textoHecho, string textoReceta)
         {
+            btnReceta_790MY.Text = textoReceta;
+            btnReceta_790MY.AccessibleName = $"{textoReceta}: {titulo}";
             lblTitulo_790MY.Text = titulo;
             lblPista_790MY.Text = pista;
             btnIr_790MY.Text = textoIr;
@@ -46,6 +51,8 @@ namespace GUI_08YS.Estilo
         }
 
         private void btnIr_790MY_Click(object sender, EventArgs e) => IrSolicitado?.Invoke(this, EventArgs.Empty);
+
+        private void btnReceta_790MY_Click(object sender, EventArgs e) => RecetaSolicitada?.Invoke(this, EventArgs.Empty);
 
         // Un botón Flat deshabilitado conserva el bordó y parece activo (TemaFogon P04).
         private void btnIr_790MY_EnabledChanged(object sender, EventArgs e)

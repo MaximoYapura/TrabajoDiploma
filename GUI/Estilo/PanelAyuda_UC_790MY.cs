@@ -42,8 +42,7 @@ namespace GUI_08YS.Estilo
         /// </summary>
         public void Preparar()
         {
-            _fichaPermitida = ModoDemostracionActivo()
-                && string.Equals(SessionManager_08YS.Instance.Current?.Rol?.Nombre, RolFicha, StringComparison.Ordinal);
+            _fichaPermitida = ModoDemostracionActivo() && UsuarioEsSuperAdmin();
 
             if (!_fichaPermitida && ucFicha_790MY != null)
             {
@@ -57,6 +56,18 @@ namespace GUI_08YS.Estilo
         }
 
         public bool FichaPermitida => _fichaPermitida;
+
+        /// <summary>Rol del usuario actual = SuperAdmin (Ficha y Manual de Recetas).</summary>
+        public static bool UsuarioEsSuperAdmin()
+            => string.Equals(SessionManager_08YS.Instance.Current?.Rol?.Nombre, RolFicha, StringComparison.Ordinal);
+
+        /// <summary>Muestra un error en el panel, en la pestaña del Menú Degustación.</summary>
+        public void MostrarAviso(string mensaje)
+        {
+            if (pnlTabs_790MY.Visible) tabAyuda_790MY.IndiceSeleccionado = TabDegustacion;
+            MostrarPestana(TabDegustacion);
+            ucDegustacion_790MY.MostrarAviso(mensaje);
+        }
 
         private static bool ModoDemostracionActivo()
         {

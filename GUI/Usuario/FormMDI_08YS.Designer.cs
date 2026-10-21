@@ -77,6 +77,11 @@
             this.arqueoCajaToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.reportePredictivoToolStripMenuItem_790MY = new System.Windows.Forms.ToolStripMenuItem();
             this.PerfilDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
+            this.AyudaDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
+            this.sugerenciasAyudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.visitaAyudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.manualAyudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fichaAyudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cambiarContraseñaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ReLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cerrarSesionToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +98,7 @@
             this.ReportesDropDownMenu.SuspendLayout();
             this.AtencionDropDownMenu_790MY.SuspendLayout();
             this.PerfilDropDownMenu.SuspendLayout();
+            this.AyudaDropDownMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // crearToolStripMenuItem
@@ -516,9 +522,9 @@
             // OpenChildForm limpia solo panel2, así que nunca lo toca ni lo tapa)
             //
             this.panelAyuda.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelAyuda.Location = new System.Drawing.Point(990, 37);
+            this.panelAyuda.Location = new System.Drawing.Point(1030, 37);
             this.panelAyuda.Name = "panelAyuda";
-            this.panelAyuda.Size = new System.Drawing.Size(360, 747);
+            this.panelAyuda.Size = new System.Drawing.Size(320, 747);
             this.panelAyuda.TabIndex = 6;
             this.panelAyuda.Visible = false;
             this.panelAyuda.CerrarSolicitado += new System.EventHandler(this.panelAyuda_CerrarSolicitado);
@@ -833,6 +839,53 @@
             this.cerrarSesionToolStripMenuItem1.Tag = "menuCerrarSesion";
             this.cerrarSesionToolStripMenuItem1.Text = "Cerrar Sesion";
             this.cerrarSesionToolStripMenuItem1.Click += new System.EventHandler(this.cerrarSesionToolStripMenuItem1_Click);
+            //
+            // AyudaDropDownMenu  (Etapa 5: submenú del Chef de la fila de Ayuda)
+            //
+            this.AyudaDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.AyudaDropDownMenu.IsMainMenu = false;
+            this.AyudaDropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sugerenciasAyudaToolStripMenuItem,
+            this.visitaAyudaToolStripMenuItem,
+            this.manualAyudaToolStripMenuItem,
+            this.fichaAyudaToolStripMenuItem});
+            this.AyudaDropDownMenu.MenuItemHeight = 25;
+            this.AyudaDropDownMenu.MenuItemTextColor = System.Drawing.Color.Empty;
+            this.AyudaDropDownMenu.Name = "dropdownMenuStrip_08YS_Ayuda";
+            this.AyudaDropDownMenu.PrimaryColor = System.Drawing.Color.Empty;
+            this.AyudaDropDownMenu.Size = new System.Drawing.Size(300, 92);
+            //
+            // sugerenciasAyudaToolStripMenuItem
+            //
+            this.sugerenciasAyudaToolStripMenuItem.Name = "sugerenciasAyudaToolStripMenuItem";
+            this.sugerenciasAyudaToolStripMenuItem.ShortcutKeyDisplayString = "F1";
+            this.sugerenciasAyudaToolStripMenuItem.Size = new System.Drawing.Size(299, 22);
+            this.sugerenciasAyudaToolStripMenuItem.Tag = "AY_menu_sugerencias";
+            this.sugerenciasAyudaToolStripMenuItem.Text = "Sugerencias de esta pantalla";
+            this.sugerenciasAyudaToolStripMenuItem.Click += new System.EventHandler(this.sugerenciasAyudaToolStripMenuItem_Click);
+            //
+            // visitaAyudaToolStripMenuItem
+            //
+            this.visitaAyudaToolStripMenuItem.Name = "visitaAyudaToolStripMenuItem";
+            this.visitaAyudaToolStripMenuItem.Size = new System.Drawing.Size(299, 22);
+            this.visitaAyudaToolStripMenuItem.Tag = "AY_menu_visita";
+            this.visitaAyudaToolStripMenuItem.Text = "Visita Guiada";
+            this.visitaAyudaToolStripMenuItem.Click += new System.EventHandler(this.visitaAyudaToolStripMenuItem_Click);
+            //
+            // manualAyudaToolStripMenuItem  (solo SuperAdmin, ver AplicarPermisos)
+            //
+            this.manualAyudaToolStripMenuItem.Name = "manualAyudaToolStripMenuItem";
+            this.manualAyudaToolStripMenuItem.Size = new System.Drawing.Size(299, 22);
+            this.manualAyudaToolStripMenuItem.Tag = "AY_menu_manual";
+            this.manualAyudaToolStripMenuItem.Text = "Manual de Recetas (PDF)";
+            this.manualAyudaToolStripMenuItem.Click += new System.EventHandler(this.manualAyudaToolStripMenuItem_Click);
+            //
+            // fichaAyudaToolStripMenuItem  (sin Tag: el texto depende de si la Ficha existe)
+            //
+            this.fichaAyudaToolStripMenuItem.Name = "fichaAyudaToolStripMenuItem";
+            this.fichaAyudaToolStripMenuItem.Size = new System.Drawing.Size(299, 22);
+            this.fichaAyudaToolStripMenuItem.Text = "Ficha de Ingredientes [Modo Evaluación]";
+            this.fichaAyudaToolStripMenuItem.Click += new System.EventHandler(this.fichaAyudaToolStripMenuItem_Click);
             // 
             // FormMDI_08YS
             // 
@@ -876,6 +929,7 @@
             this.ReportesDropDownMenu.ResumeLayout(false);
             this.AtencionDropDownMenu_790MY.ResumeLayout(false);
             this.PerfilDropDownMenu.ResumeLayout(false);
+            this.AyudaDropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -898,6 +952,11 @@
         private System.Windows.Forms.Label lblNombreApellido;
         private System.Windows.Forms.Label lblRolSistema;
         private DropdownMenuStrip_08YS PerfilDropDownMenu;
+        private DropdownMenuStrip_08YS AyudaDropDownMenu;
+        private System.Windows.Forms.ToolStripMenuItem sugerenciasAyudaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem visitaAyudaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem manualAyudaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fichaAyudaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cambiarContraseñaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ReLoginToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cerrarSesionToolStripMenuItem1;

@@ -114,7 +114,7 @@ namespace GUI_08YS
                 if (_actualTienePlaceholder)
                 {
                     txtContraseñaActual.Text = "";
-                    txtContraseñaActual.ForeColor = Color.White;
+                    txtContraseñaActual.ForeColor = GUI_08YS.Estilo.TemaFogon_790MY.Tinta;   // legible sobre el fondo claro del campo
                     txtContraseñaActual.MaskedInput = true;
                     _actualTienePlaceholder = false;
                 }
@@ -134,7 +134,7 @@ namespace GUI_08YS
                 if (_nuevaTienePlaceholder)
                 {
                     txtNuevaContraseña.Text = "";
-                    txtNuevaContraseña.ForeColor = Color.White;
+                    txtNuevaContraseña.ForeColor = GUI_08YS.Estilo.TemaFogon_790MY.Tinta;   // legible sobre el fondo claro del campo
                     txtNuevaContraseña.MaskedInput = true;
                     _nuevaTienePlaceholder = false;
                 }
@@ -154,7 +154,7 @@ namespace GUI_08YS
                 if (_confirmarTienePlaceholder)
                 {
                     txtConfirmarContraseña.Text = "";
-                    txtConfirmarContraseña.ForeColor = Color.White;
+                    txtConfirmarContraseña.ForeColor = GUI_08YS.Estilo.TemaFogon_790MY.Tinta;   // legible sobre el fondo claro del campo
                     txtConfirmarContraseña.MaskedInput = true;
                     _confirmarTienePlaceholder = false;
                 }

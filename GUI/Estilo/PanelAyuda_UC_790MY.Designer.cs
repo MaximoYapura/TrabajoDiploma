@@ -39,7 +39,7 @@ namespace GUI_08YS.Estilo
             this.pnlEncabezado_790MY.Location = new System.Drawing.Point(1, 0);
             this.pnlEncabezado_790MY.Name = "pnlEncabezado_790MY";
             this.pnlEncabezado_790MY.Padding = new System.Windows.Forms.Padding(16, 8, 8, 8);
-            this.pnlEncabezado_790MY.Size = new System.Drawing.Size(359, 52);
+            this.pnlEncabezado_790MY.Size = new System.Drawing.Size(319, 52);
             this.pnlEncabezado_790MY.TabIndex = 0;
             //
             // lblTitulo_790MY
@@ -50,7 +50,7 @@ namespace GUI_08YS.Estilo
             this.lblTitulo_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(42)))), ((int)(((byte)(40)))));
             this.lblTitulo_790MY.Location = new System.Drawing.Point(16, 8);
             this.lblTitulo_790MY.Name = "lblTitulo_790MY";
-            this.lblTitulo_790MY.Size = new System.Drawing.Size(299, 36);
+            this.lblTitulo_790MY.Size = new System.Drawing.Size(169, 36);
             this.lblTitulo_790MY.TabIndex = 0;
             this.lblTitulo_790MY.Text = "Ayuda del Chef";
             this.lblTitulo_790MY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -65,7 +65,7 @@ namespace GUI_08YS.Estilo
             this.btnCerrar_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCerrar_790MY.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnCerrar_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(29)))), ((int)(((byte)(47)))));
-            this.btnCerrar_790MY.Location = new System.Drawing.Point(315, 8);
+            this.btnCerrar_790MY.Location = new System.Drawing.Point(275, 8);
             this.btnCerrar_790MY.Name = "btnCerrar_790MY";
             this.btnCerrar_790MY.Size = new System.Drawing.Size(36, 36);
             this.btnCerrar_790MY.TabIndex = 1;
@@ -83,7 +83,7 @@ namespace GUI_08YS.Estilo
             this.btnRepetirVisita_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRepetirVisita_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline);
             this.btnRepetirVisita_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(29)))), ((int)(((byte)(47)))));
-            this.btnRepetirVisita_790MY.Location = new System.Drawing.Point(225, 8);
+            this.btnRepetirVisita_790MY.Location = new System.Drawing.Point(185, 8);
             this.btnRepetirVisita_790MY.Name = "btnRepetirVisita_790MY";
             this.btnRepetirVisita_790MY.Size = new System.Drawing.Size(90, 36);
             this.btnRepetirVisita_790MY.TabIndex = 2;
@@ -99,7 +99,7 @@ namespace GUI_08YS.Estilo
             this.pnlTabs_790MY.Location = new System.Drawing.Point(1, 52);
             this.pnlTabs_790MY.Name = "pnlTabs_790MY";
             this.pnlTabs_790MY.Padding = new System.Windows.Forms.Padding(12, 0, 12, 12);
-            this.pnlTabs_790MY.Size = new System.Drawing.Size(359, 56);
+            this.pnlTabs_790MY.Size = new System.Drawing.Size(319, 56);
             this.pnlTabs_790MY.TabIndex = 1;
             //
             // tabAyuda_790MY
@@ -112,7 +112,7 @@ namespace GUI_08YS.Estilo
             this.tabAyuda_790MY.Location = new System.Drawing.Point(12, 0);
             this.tabAyuda_790MY.MinimumSize = new System.Drawing.Size(120, 40);
             this.tabAyuda_790MY.Name = "tabAyuda_790MY";
-            this.tabAyuda_790MY.Size = new System.Drawing.Size(335, 44);
+            this.tabAyuda_790MY.Size = new System.Drawing.Size(295, 44);
             this.tabAyuda_790MY.TabIndex = 0;
             this.tabAyuda_790MY.SeleccionCambiada += new System.EventHandler(this.tabAyuda_790MY_SeleccionCambiada);
             //
@@ -124,7 +124,7 @@ namespace GUI_08YS.Estilo
             this.pnlContenido_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlContenido_790MY.Location = new System.Drawing.Point(1, 108);
             this.pnlContenido_790MY.Name = "pnlContenido_790MY";
-            this.pnlContenido_790MY.Size = new System.Drawing.Size(359, 592);
+            this.pnlContenido_790MY.Size = new System.Drawing.Size(319, 592);
             this.pnlContenido_790MY.TabIndex = 2;
             //
             // ucFicha_790MY
@@ -132,7 +132,7 @@ namespace GUI_08YS.Estilo
             this.ucFicha_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ucFicha_790MY.Location = new System.Drawing.Point(0, 0);
             this.ucFicha_790MY.Name = "ucFicha_790MY";
-            this.ucFicha_790MY.Size = new System.Drawing.Size(359, 592);
+            this.ucFicha_790MY.Size = new System.Drawing.Size(319, 592);
             this.ucFicha_790MY.TabIndex = 0;
             //
             // ucDegustacion_790MY
@@ -140,7 +140,7 @@ namespace GUI_08YS.Estilo
             this.ucDegustacion_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ucDegustacion_790MY.Location = new System.Drawing.Point(0, 0);
             this.ucDegustacion_790MY.Name = "ucDegustacion_790MY";
-            this.ucDegustacion_790MY.Size = new System.Drawing.Size(359, 592);
+            this.ucDegustacion_790MY.Size = new System.Drawing.Size(319, 592);
             this.ucDegustacion_790MY.TabIndex = 1;
             this.ucDegustacion_790MY.Visible = false;
             this.ucDegustacion_790MY.NavegacionSolicitada += new System.EventHandler<GUI_08YS.Estilo.DestinoAyudaEventArgs_790MY>(this.ucDegustacion_790MY_NavegacionSolicitada);
@@ -157,7 +157,7 @@ namespace GUI_08YS.Estilo
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Name = "PanelAyuda_UC_790MY";
             this.Padding = new System.Windows.Forms.Padding(1, 0, 0, 0);
-            this.Size = new System.Drawing.Size(360, 700);
+            this.Size = new System.Drawing.Size(320, 700);
             this.pnlEncabezado_790MY.ResumeLayout(false);
             this.pnlTabs_790MY.ResumeLayout(false);
             this.pnlContenido_790MY.ResumeLayout(false);

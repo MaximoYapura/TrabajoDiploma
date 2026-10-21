@@ -15,6 +15,9 @@ namespace GUI_08YS.Estilo
         private static readonly Color Sombra = Color.FromArgb(170, 20, 10, 10);
         private const int Borde = 3;
 
+        /// <summary>Espacio que ocupa el borde dorado por fuera del hueco.</summary>
+        public const int AnchoBorde = Borde / 2 + 1 + Borde;
+
         private Bitmap _captura;
         private Rectangle _hueco;
 

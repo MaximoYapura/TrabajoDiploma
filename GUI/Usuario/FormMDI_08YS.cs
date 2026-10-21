@@ -188,6 +188,9 @@ namespace GUI_08YS
             PermissionFilter_08YS.AplicarMenuStrip(PerfilDropDownMenu, _mapaMenuPerfil);
             if (SessionManager_08YS.Instance.HasPermission(Permisos.VerBitacora))
                 ReLoginToolStripMenuItem.Visible = true;
+
+            // Ayuda: el Manual de Recetas es solo para SuperAdmin (el resto del submenú, para todos).
+            manualAyudaToolStripMenuItem.Visible = PanelAyuda_UC_790MY.UsuarioEsSuperAdmin();
         }
 
         #region idioma
@@ -220,6 +223,13 @@ namespace GUI_08YS
 
             if (PerfilDropDownMenu != null)
                 TraducirMenuFlotanteCustom(PerfilDropDownMenu);
+
+            if (AyudaDropDownMenu != null)
+            {
+                TraducirMenuFlotanteCustom(AyudaDropDownMenu);
+                fichaAyudaToolStripMenuItem.Text = TraductorManager_08YS.Instance.GetTexto(
+                    panelAyuda.FichaPermitida ? "AY_menu_ficha" : "AY_menu_degustacion");
+            }
 
             // La fila de Ayuda no usa Tag: traduce su texto, ToolTip y nombre accesible.
             btnAyuda.UpdateIdioma();
@@ -288,6 +298,7 @@ namespace GUI_08YS
             ReportesDropDownMenu.IsMainMenu = true;
             AtencionDropDownMenu_790MY.IsMainMenu = true;
             PerfilDropDownMenu.IsMainMenu = true;
+            AyudaDropDownMenu.IsMainMenu = true;
 
             // Marca de agua corporativa sobre el área de contenido (panel2)
             panel2.Paint += Panel2_PintarMarcaDeAgua;
@@ -374,7 +385,72 @@ namespace GUI_08YS
             }
         }
 
+        /// <summary>
+        /// Pantalla que FormGestionAcceso_08YS deja viva mientras muestra su alta/modificación,
+        /// porque al terminar vuelve a mostrar esa misma instancia.
+        /// </summary>
+        private Form _pantallaConservada;
+
         public void OpenChildForm(Form childForm)
+        {
+            // Etapa 5 (auditoría 5.2): cerrar y liberar el hijo anterior. Close() dispara
+            // FormClosed (desuscripción de idioma, timers detenidos) y Dispose() libera sus
+            // controles; antes quedaban vivos con sus timers (KDS 15 s, Abrir Mesa, Pedido).
+            if (panel2.Tag is Form anterior && !anterior.IsDisposed && !ReferenceEquals(anterior, childForm))
+            {
+                anterior.Close();
+                if (!anterior.IsDisposed && anterior.Visible)
+                {
+                    // El hijo canceló su cierre (p. ej. cobro en curso): no se navega.
+                    childForm.Dispose();
+                    return;
+                }
+                anterior.Dispose();
+            }
+            LiberarPantallaConservada(childForm);
+            MostrarHijo(childForm);
+        }
+
+        /// <summary>
+        /// Navegación interna de FormGestionAcceso_08YS (grilla ⇄ alta/modificación): se llama
+        /// desde un manejador del propio hijo, así que la pantalla que se va se libera después
+        /// (BeginInvoke) y la grilla se conserva para volver a ella.
+        /// </summary>
+        private void AbrirSubpantalla(Form childForm)
+        {
+            var anterior = panel2.Tag as Form;
+            if (ReferenceEquals(childForm, _pantallaConservada))
+            {
+                _pantallaConservada = null;
+                LiberarDiferido(anterior);
+            }
+            else
+            {
+                LiberarPantallaConservada(childForm);
+                _pantallaConservada = anterior;
+            }
+            MostrarHijo(childForm);
+        }
+
+        private void LiberarPantallaConservada(Form salvo)
+        {
+            var conservada = _pantallaConservada;
+            _pantallaConservada = null;
+            if (conservada != null && !ReferenceEquals(conservada, salvo)) LiberarDiferido(conservada);
+        }
+
+        private void LiberarDiferido(Form hijo)
+        {
+            if (hijo == null || hijo.IsDisposed) return;
+            BeginInvoke((Action)(() =>
+            {
+                if (hijo.IsDisposed || ReferenceEquals(hijo, panel2.Tag)) return;
+                hijo.Close();
+                hijo.Dispose();
+            }));
+        }
+
+        private void MostrarHijo(Form childForm)
         {
             panel2.Controls.Clear();
             childForm.TopLevel = false;
@@ -468,13 +544,13 @@ namespace GUI_08YS
         private void familiasToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerFamilias);
-            OpenChildForm(new FormGestionAcceso_08YS(TipoEntidad.Familia, OpenChildForm));
+            OpenChildForm(new FormGestionAcceso_08YS(TipoEntidad.Familia, AbrirSubpantalla));
         }
 
         private void rolesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerRoles);
-            OpenChildForm(new FormGestionAcceso_08YS(TipoEntidad.Rol, OpenChildForm));
+            OpenChildForm(new FormGestionAcceso_08YS(TipoEntidad.Rol, AbrirSubpantalla));
         }
 
         private void gestionRespaldosToolStripMenuItem_Click(object sender, EventArgs e)
@@ -667,9 +743,34 @@ namespace GUI_08YS
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>La fila despliega el submenú del Chef (como los demás botones de la barra).</summary>
         private void btnAyuda_Click(object sender, EventArgs e)
         {
-            if (!_navegacionBloqueada) AbrirAyuda(contextual: false);
+            if (_navegacionBloqueada) return;
+            AyudaDropDownMenu.Show(btnAyuda, btnAyuda.Width, 0);
+        }
+
+        private void sugerenciasAyudaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!_navegacionBloqueada) AbrirAyuda(contextual: true);
+        }
+
+        private void visitaAyudaToolStripMenuItem_Click(object sender, EventArgs e) => IniciarVisita();
+
+        /// <summary>Sin un PDF índice, abre la carpeta del Manual de Recetas.</summary>
+        private void manualAyudaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string error = ManualRecetas_790MY.AbrirManual(null);
+            if (error == null) return;
+            if (!panelAyuda.Visible) MostrarAyuda();
+            panelAyuda.MostrarAviso(error);
+        }
+
+        private void fichaAyudaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_navegacionBloqueada) return;
+            _sugerencias?.Cerrar();
+            if (!panelAyuda.Visible) MostrarAyuda();
         }
 
         /// <summary>Control con el foco antes de abrir el panel, para devolvérselo al cerrar.</summary>

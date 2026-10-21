@@ -101,7 +101,7 @@ namespace GUI_08YS.Estilo
             var paso = _pasos[indice];
 
             Rectangle objetivo = _host.RectangleToClient(paso.Objetivo.RectangleToScreen(paso.Objetivo.ClientRectangle));
-            Rectangle hueco = Rectangle.Inflate(objetivo, Separacion, Separacion);
+            Rectangle hueco = Rectangle.Intersect(Rectangle.Inflate(objetivo, Separacion, Separacion), LimiteDe(paso.Objetivo));
             _capa.Hueco = hueco;
 
             _globo.Mostrar(paso.Titulo, paso.Texto, null, indice, _pasos.Count,
@@ -112,6 +112,21 @@ namespace GUI_08YS.Estilo
             _globo.Location = UbicacionGlobo(hueco, _host.ClientRectangle, _globo.Size);
             _globo.BringToFront();
             _globo.EnfocarSiguiente();
+        }
+
+        /// <summary>
+        /// Zona en la que puede quedar el hueco: el contenedor de primer nivel que contiene al
+        /// elemento (barra lateral, barra superior), achicado por el borde que dibuja la capa.
+        /// Así el marco de un elemento que ocupa todo el ancho de la barra (el encabezado con
+        /// nombre y rol) no invade el área de contenido.
+        /// </summary>
+        private Rectangle LimiteDe(Control objetivo)
+        {
+            Control contenedor = objetivo;
+            while (contenedor.Parent != null && contenedor.Parent != _host) contenedor = contenedor.Parent;
+            Rectangle zona = _host.RectangleToClient(contenedor.RectangleToScreen(contenedor.ClientRectangle));
+            int margen = VisitaOverlay_790MY.AnchoBorde;
+            return Rectangle.Inflate(zona, -margen, -margen);
         }
 
         /// <summary>A la derecha del elemento si entra (la barra está a la izquierda); si no, abajo o arriba.</summary>

@@ -141,6 +141,7 @@
     <Compile Include="Estilo\IAyudaContextual_790MY.cs" />
     <Compile Include="Estilo\AyudaSugerencias_790MY.cs" />
     <Compile Include="Estilo\RegistroVisita_790MY.cs" />
+    <Compile Include="Estilo\ManualRecetas_790MY.cs" />
     <Compile Include="Estilo\VisitaGuiada_790MY.cs" />
     <Compile Include="Estilo\VisitaOverlay_790MY.cs">
       <SubType>Component</SubType>
@@ -430,6 +431,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\logo_fogon_bn.jpg" />
+    <Content Include="..\docs\Manual\*.pdf">
+      <Link>Manual\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\sombrero_ayuda_32.png" />
     <None Include="Resources\sombrero_ayuda_40.png" />
     <None Include="Resources\sombrero_ayuda_48.png" />

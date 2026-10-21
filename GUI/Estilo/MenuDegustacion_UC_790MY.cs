@@ -26,6 +26,7 @@ namespace GUI_08YS.Estilo
             public string ClaveTitulo;
             public Func<string> Ruta;       // con los textos reales del menú lateral
             public Func<string> Pista;
+            public string Receta;           // PDF del Manual de Recetas (carpeta Manual)
         }
 
         private readonly Paso[] _pasos;
@@ -36,27 +37,27 @@ namespace GUI_08YS.Estilo
             _pasos = new[]
             {
                 new Paso { Control = paso1_790MY, Destino = DestinoAyuda_790MY.Clientes,
-                           Permisos = new[] { Permisos.VerClientes }, ClaveTitulo = "AY_paso1_titulo",
+                           Permisos = new[] { Permisos.VerClientes }, ClaveTitulo = "AY_paso1_titulo", Receta = "Receta_Cliente.pdf",
                            Ruta = () => Ruta("btnMaestros", "menuClientes"),
                            Pista = () => T("AY_paso1_pista") },
                 new Paso { Control = paso2_790MY, Destino = DestinoAyuda_790MY.RegistrarReserva,
-                           Permisos = new[] { Permisos.RegistrarReserva }, ClaveTitulo = "AY_paso2_titulo",
+                           Permisos = new[] { Permisos.RegistrarReserva }, ClaveTitulo = "AY_paso2_titulo", Receta = "Receta_Reserva.pdf",
                            Ruta = () => Ruta("btnReservas", "menuRegistrarReserva"),
                            Pista = PistaReserva },
                 new Paso { Control = paso3_790MY, Destino = DestinoAyuda_790MY.AbrirMesa,
-                           Permisos = new[] { Permisos.AbrirMesa }, ClaveTitulo = "AY_paso3_titulo",
+                           Permisos = new[] { Permisos.AbrirMesa }, ClaveTitulo = "AY_paso3_titulo", Receta = "Receta_AbrirMesa.pdf",
                            Ruta = () => Ruta("menuAtencion", "menuAbrirMesa"),
                            Pista = () => T("AY_paso3_pista", Boton("AM_modo_reserva"), Boton("AM_btnConfirmar")) },
                 new Paso { Control = paso4_790MY, Destino = DestinoAyuda_790MY.RegistrarPedido,
-                           Permisos = new[] { Permisos.RegistrarPedido }, ClaveTitulo = "AY_paso4_titulo",
+                           Permisos = new[] { Permisos.RegistrarPedido }, ClaveTitulo = "AY_paso4_titulo", Receta = "Receta_RegistrarPedido.pdf",
                            Ruta = () => Ruta("menuAtencion", "menuRegistrarPedido"),
                            Pista = () => T("AY_paso4_pista", Boton("RP_btnAgregar"), Boton("RP_btnEnviar")) },
                 new Paso { Control = paso5_790MY, Destino = DestinoAyuda_790MY.Cocina,
-                           Permisos = new[] { Permisos.DespacharPedido }, ClaveTitulo = "AY_paso5_titulo",
+                           Permisos = new[] { Permisos.DespacharPedido }, ClaveTitulo = "AY_paso5_titulo", Receta = "Receta_DespacharPedido.pdf",
                            Ruta = () => Ruta("menuAtencion", "menuDespacharPedido"),
                            Pista = () => T("AY_paso5_pista", Boton("KDS_btn_iniciar"), Boton("KDS_btn_listo")) },
                 new Paso { Control = paso6_790MY, Destino = DestinoAyuda_790MY.CajaCobro,
-                           Permisos = new[] { Permisos.RegistrarCobro, Permisos.GenerarFactura }, ClaveTitulo = "AY_paso6_titulo",
+                           Permisos = new[] { Permisos.RegistrarCobro, Permisos.GenerarFactura }, ClaveTitulo = "AY_paso6_titulo", Receta = "Receta_CajaYCobro.pdf",
                            Ruta = () => Ruta("menuAtencion", "menuCajaCobro"),
                            Pista = () => T("AY_paso6_pista", PagoBLL_790MY.TerminacionRechazoSimulado) },
             };
@@ -89,13 +90,13 @@ namespace GUI_08YS.Estilo
         public void Refrescar()
         {
             lblIntro_790MY.Text = T("AY_deg_intro");
-            string ir = T("AY_btn_ir"), hecho = T("AY_chk_hecho"), motivo = T("AY_paso_sin_permiso");
+            string ir = T("AY_btn_ir"), hecho = T("AY_chk_hecho"), motivo = T("AY_paso_sin_permiso"), receta = T("AY_btn_receta");
             var sesion = SessionManager_08YS.Instance;
             foreach (var p in _pasos)
             {
                 bool permitido = p.Permisos.Any(sesion.HasPermission);
                 p.Control.Configurar(T(p.ClaveTitulo), p.Ruta() + Environment.NewLine + p.Pista(),
-                                     permitido, motivo, ir, hecho);
+                                     permitido, motivo, ir, hecho, receta);
             }
         }
 
@@ -105,6 +106,18 @@ namespace GUI_08YS.Estilo
         }
 
         public void UpdateIdioma() => Refrescar();
+
+        /// <summary>Muestra un aviso arriba de los pasos (lo usa también el submenú de Ayuda).</summary>
+        public void MostrarAviso(string mensaje) => bnrDegustacion_790MY.Mostrar(mensaje, TipoBanner_790MY.Error);
+
+        private void Paso_RecetaSolicitada(object sender, EventArgs e)
+        {
+            var paso = _pasos.FirstOrDefault(p => p.Control == sender);
+            if (paso == null) return;
+            string error = ManualRecetas_790MY.AbrirManual(paso.Receta);
+            if (error == null) bnrDegustacion_790MY.Ocultar();
+            else MostrarAviso(error);
+        }
 
         private void Paso_IrSolicitado(object sender, EventArgs e)
         {
