@@ -79,3 +79,9 @@ Verificado por Claude Code:
 
 Para el propietario:
 - [ ] Hacer la ruta completa de punta a punta con un usuario real de cada rol.
+
+## Fase 5 — Auditoría (ver `Informe_Etapa5.md`, nada corregido)
+
+- [x] F1 con foco en el hijo, en inglés, con `ConfirmModal` abierto (no actúa) y con el combo de idioma desplegado (no actúa).
+- [x] Hijos reemplazados siguen vivos: timers de KDS (15 s), Abrir Mesa (30 s) y Registrar Pedido (20 s) activos; +1 observador de idioma por navegación. **Pendiente de decisión del propietario** (requiere tocar `OpenChildForm`).
+- [x] Portapapeles forzado a fallar: banner y valor seleccionado.
