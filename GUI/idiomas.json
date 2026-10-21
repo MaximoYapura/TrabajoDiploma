@@ -1098,6 +1098,10 @@
     "AY_fila_texto": "Ayuda",
     "AY_fila_tooltip": "Ayuda del Chef (F1)",
     "AY_fila_accesible": "Ayuda (F1)",
+    "AY_panel_titulo": "Ayuda del Chef",
+    "AY_panel_cerrar": "Cerrar la ayuda",
+    "AY_tab_ficha": "Ficha de Ingredientes",
+    "AY_tab_degustacion": "Menú Degustación",
     "CJ_tarjeta_rechazada": "El banco rechazó esta tarjeta. Pruebe con otra tarjeta o cambie a efectivo.",
     "CJ_msg_error_impresion": "No se pudo preparar la impresión ({0}). El comprobante ya está registrado: revise la impresora y vuelva a intentar."
   },
@@ -2201,6 +2205,10 @@
     "AY_fila_texto": "Help",
     "AY_fila_tooltip": "Chef's Help (F1)",
     "AY_fila_accesible": "Help (F1)",
+    "AY_panel_titulo": "Chef's Help",
+    "AY_panel_cerrar": "Close help",
+    "AY_tab_ficha": "Ingredients Sheet",
+    "AY_tab_degustacion": "Tasting Menu",
     "CJ_tarjeta_rechazada": "The bank declined this card. Try another card or switch to cash.",
     "CJ_msg_error_impresion": "Printing could not be prepared ({0}). The receipt is already recorded: check the printer and try again."
   }

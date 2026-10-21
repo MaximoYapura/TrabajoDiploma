@@ -37,3 +37,18 @@ Para el propietario:
 - [ ] Repetir a 125 % y 150 %.
 - [ ] Narrador / lector de pantalla: anuncia «Ayuda (F1), botón».
 - [ ] Durante un cobro real (Caja y cobro): la fila se ve gris y F1 no hace nada.
+
+## Fase 2 — Panel de ayuda lateral (`PanelAyuda_UC_790MY`, `panelAyuda`)
+
+Verificado por Claude Code (FormMDI real, base local en solo lectura, ventana de 1350×784 y maximizada a 1920×1080):
+- [x] `panelAyuda` es hermano de `panel2`, `Dock = Right`, 360 px, oculto al iniciar.
+- [x] F1 con foco en un TextBox de Clientes: abre el panel y el foco pasa a las pestañas. Esc: lo cierra y el foco **vuelve al TextBox**.
+- [x] Clic en la fila: abre; F1 de nuevo: cierra (alterna).
+- [x] Navegar a Registrar Reserva, Caja y cobro, Cocina y Mesas con el panel abierto: el panel **sigue abierto**; el hijo ocupa 742 px.
+- [x] `BloquearNavegacion(true)`: el panel se oculta y F1 no lo reabre.
+- [x] Registrar Reserva, Caja y cobro y Maestro de Mesas se ven bien a 742 px.
+- [ ] **KDS a 742 px: la columna del título se parte** («Co / ma / nd / as…»). A 320 px de panel queda apretado pero legible. **Decisión pendiente del propietario** (ver informe).
+
+Para el propietario:
+- [ ] Copiar un dato de la Ficha y pegarlo en el formulario de al lado con el panel abierto.
+- [ ] Repetir a 125 % y 150 %.

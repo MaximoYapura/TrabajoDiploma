@@ -4,6 +4,7 @@ using GUI;
 using GUI_08YS.Admin;
 using GUI_08YS.RF1;
 using GUI_08YS.RF2;
+using GUI_08YS.Estilo;
 using GUI_08YS.Maestros;
 using GUI_08YS.Reportes;
 using GUI_08YS.Properties;
@@ -90,6 +91,7 @@ namespace GUI_08YS
             lblNombreApellido.Text= SessionManager_08YS.Instance.Current.Nombre + " " + SessionManager_08YS.Instance.Current.Apellido;
             ConfigurarCombo();
             AplicarPermisos();
+            panelAyuda.Preparar();
             TraductorManager_08YS.Instance.CambiarIdioma(SessionManager_08YS.Instance.Current.Idioma);
             TraductorManager_08YS.Instance.Suscribir(this);
             SessionManager_08YS.Instance.SesionInvalidada += OnSesionInvalidada;
@@ -221,6 +223,7 @@ namespace GUI_08YS
 
             // La fila de Ayuda no usa Tag: traduce su texto, ToolTip y nombre accesible.
             btnAyuda.UpdateIdioma();
+            panelAyuda.UpdateIdioma();
 
             RefrescarContenidoComboIdioma();
         }
@@ -337,6 +340,8 @@ namespace GUI_08YS
             _navegacionBloqueada = bloquear;
             panelLateral.Enabled = !bloquear;
             panelIdioma.Enabled = !bloquear;
+            // Etapa 5 (A4): la ayuda no queda abierta durante el cobro.
+            if (bloquear && panelAyuda.Visible) CerrarAyuda();
         }
 
         /// <summary>Se dispara cuando se canceló un cierre por <see cref="BloquearNavegacion"/>; el hijo avisa el motivo.</summary>
@@ -660,9 +665,74 @@ namespace GUI_08YS
             if (!_navegacionBloqueada) AbrirAyuda(contextual: false);
         }
 
+        /// <summary>Control con el foco antes de abrir el panel, para devolvérselo al cerrar.</summary>
+        private Control _focoAntesDeAyuda;
+
         private void AbrirAyuda(bool contextual)
         {
-            // TODO Fase 2: alternar el panel de ayuda lateral.
+            // F1 o la fila alternan el panel; el modo contextual se conecta en la Fase 6.
+            if (panelAyuda.Visible)
+                CerrarAyuda();
+            else
+                MostrarAyuda();
+        }
+
+        private void MostrarAyuda()
+        {
+            _focoAntesDeAyuda = ControlConFoco(this);
+            panelAyuda.Visible = true;
+            panelAyuda.AlMostrar();
+        }
+
+        private void CerrarAyuda()
+        {
+            bool tenia = panelAyuda.ContainsFocus;
+            panelAyuda.Visible = false;
+            if (!tenia) return;
+            var previo = _focoAntesDeAyuda;
+            _focoAntesDeAyuda = null;
+            if (previo != null && !previo.IsDisposed && previo.CanFocus)
+                previo.Focus();
+            else if (panel2.Tag is Form hijo && !hijo.IsDisposed)
+                hijo.Focus();
+        }
+
+        private static Control ControlConFoco(ContainerControl contenedor)
+        {
+            Control c = contenedor.ActiveControl;
+            while (c is ContainerControl interno && interno.ActiveControl != null)
+                c = interno.ActiveControl;
+            return c;
+        }
+
+        private void panelAyuda_CerrarSolicitado(object sender, EventArgs e) => CerrarAyuda();
+
+        private void panelAyuda_NavegacionSolicitada(object sender, DestinoAyudaEventArgs_790MY e)
+            => IrAPantalla(e.Destino);
+
+        /// <summary>
+        /// G5: acceso directo del Menú Degustación. Reutiliza el manejador del menú principal
+        /// (PerformClick), así hereda ValidatePermission y OpenChildForm sin duplicarlos.
+        /// Devuelve false si el ítem no está disponible para el rol actual.
+        /// </summary>
+        public bool IrAPantalla(DestinoAyuda_790MY destino)
+        {
+            if (_navegacionBloqueada) return false;
+            ToolStripMenuItem item;
+            switch (destino)
+            {
+                case DestinoAyuda_790MY.Clientes:         item = clientesToolStripMenuItem; break;
+                case DestinoAyuda_790MY.RegistrarReserva: item = registrarReservaToolStripMenuItem; break;
+                case DestinoAyuda_790MY.AbrirMesa:        item = abrirMesaToolStripMenuItem_790MY; break;
+                case DestinoAyuda_790MY.RegistrarPedido:  item = registrarPedidoToolStripMenuItem_790MY; break;
+                case DestinoAyuda_790MY.Cocina:           item = despacharPedidoToolStripMenuItem_790MY; break;
+                case DestinoAyuda_790MY.CajaCobro:        item = cajaCobroToolStripMenuItem_790MY; break;
+                default: return false;
+            }
+            // Available refleja la visibilidad que dejó PermissionFilter (el menú no está desplegado).
+            if (!item.Available || !item.Enabled) return false;
+            item.PerformClick();
+            return true;
         }
         #endregion
 

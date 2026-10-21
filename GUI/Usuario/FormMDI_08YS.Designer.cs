@@ -44,6 +44,7 @@
             this.lblNombreApellido = new System.Windows.Forms.Label();
             this.lblRolSistema = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.panelAyuda = new GUI_08YS.Estilo.PanelAyuda_UC_790MY();
             this.AdministrativoDropDownMenu = new GUI_08YS.DropdownMenuStrip_08YS(this.components);
             this.gestionUsuarioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bitacoraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -502,7 +503,19 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1102, 747);
             this.panel2.TabIndex = 5;
-            // 
+            //
+            // panelAyuda  (Etapa 5, C1: hermano de panel2, Dock = Right, oculto por defecto.
+            // OpenChildForm limpia solo panel2, así que nunca lo toca ni lo tapa)
+            //
+            this.panelAyuda.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panelAyuda.Location = new System.Drawing.Point(990, 37);
+            this.panelAyuda.Name = "panelAyuda";
+            this.panelAyuda.Size = new System.Drawing.Size(360, 747);
+            this.panelAyuda.TabIndex = 6;
+            this.panelAyuda.Visible = false;
+            this.panelAyuda.CerrarSolicitado += new System.EventHandler(this.panelAyuda_CerrarSolicitado);
+            this.panelAyuda.NavegacionSolicitada += new System.EventHandler<GUI_08YS.Estilo.DestinoAyudaEventArgs_790MY>(this.panelAyuda_NavegacionSolicitada);
+            //
             // AdministrativoDropDownMenu
             // 
             this.AdministrativoDropDownMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -772,7 +785,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1350, 784);
+            // Orden de acople: panel2 (Fill) va primero en Controls para acoplarse último.
             this.Controls.Add(this.panel2);
+            this.Controls.Add(this.panelAyuda);
             this.Controls.Add(this.panelLateral);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -823,6 +838,7 @@
         private System.Windows.Forms.ToolStripMenuItem ReLoginToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cerrarSesionToolStripMenuItem1;
         private System.Windows.Forms.Panel panel2;
+        private GUI_08YS.Estilo.PanelAyuda_UC_790MY panelAyuda;
         private System.Windows.Forms.ToolStripMenuItem gestionAccesosToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rolesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem familiasToolStripMenuItem;
