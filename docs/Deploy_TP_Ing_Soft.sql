@@ -101,6 +101,23 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+-- Cierres de caja (A4): una fila por jornada; la PK impide el doble cierre.
+-- No forma parte de los dígitos verificadores (TablasMonitoreadas).
+CREATE TABLE [dbo].[CierresCaja](
+	[Fecha] [date] NOT NULL,
+	[Neta] [decimal](12, 2) NOT NULL,
+	[CantidadCuentas] [int] NOT NULL,
+	[Usuario] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_CierresCaja] PRIMARY KEY CLUSTERED
+(
+	[Fecha] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
+)
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE TABLE [dbo].[Clientes](
 	[DNI] [int] NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
