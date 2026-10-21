@@ -17,7 +17,7 @@ Límite: el equipo está al 100 % y no puedo cambiar la escala de Windows. La ap
 | 4 | `3402297` | `MenuDegustacion_UC_790MY`, `PasoDegustacion_790MY`. |
 | 5 | `fd9a9da` | Auditoría (solo informe). |
 | 6 | `4bc6a9b` | Sugerencias del Chef: `IAyudaContextual_790MY`, `AyudaSugerencias_790MY`, `GloboAyuda_790MY`; 6 hijos implementan `ObtenerPistas`. |
-| 7 | (siguiente) | Visita Guiada: `VisitaGuiada_790MY`, `VisitaOverlay_790MY`, `RegistroVisita_790MY`. |
+| 7 | `25896c1` | Visita Guiada: `VisitaGuiada_790MY`, `VisitaOverlay_790MY`, `RegistroVisita_790MY`. |
 
 ## Decisiones tomadas
 1. **F1 solo por `ProcessCmdKey`, sin `HelpRequested`** (spike B1): Windows envía `WM_HELP` aparte de la tecla y llega a la MDI incluso con un `ConfirmModal` abierto.
@@ -65,3 +65,20 @@ Medido navegando con `IrAPantalla` (el mismo `OpenChildForm`):
 
 ### 5.3 Portapapeles
 Forzado con `OpenClipboard` desde otra ventana: `Clipboard.SetText` lanza `ExternalException`; la Ficha muestra el banner ámbar «No se pudo usar el portapapeles…» y deja el valor seleccionado para Ctrl+C. Sin `MessageBox`.
+
+## Fase 8 (opcional): no realizada
+- **8a Manual de Recetas**: el brief pide que el contenido de los PDF lo redacte el propietario a partir de las ECU y prohíbe PDF de relleno. Sin los PDF, un acceso «Manual» solo mostraría «no encontrado», así que no agregué ni el acceso ni la línea del instalador. Cuando existan `docs/Manual/Receta_*.pdf`, faltan: `AbrirManual(receta)` (con `File.Exists` y `Process.Start` con `UseShellExecute`, en `try/catch` y aviso en banner), el botón en cada paso del Menú Degustación y la línea `Source: "docs\Manual\*.pdf"; DestDir: "{app}\Manual"` en `Installer_TP_Fogon.iss`.
+- **8b Animación del sombrero**: no es necesaria para el entregable. El spike B4 la deja viable (≈ 1,6 % de un núcleo) si se quiere más adelante.
+
+## Verificación final
+- Debug y Release: **0 errores**; sin warnings nuevos en los archivos de la etapa.
+- Regresión con la build final: fila (hover, clics, bloqueo, inglés), Menú Degustación (6 «Ir») y Sugerencias (6 pantallas) siguen pasando. Con el panel ya funcionando, Enter en la fila abre el panel y el foco pasa a sus pestañas: es lo esperado.
+- Archivos de prueba en `%LocalAppData%\El Fogon del Sur` borrados (la carpeta no existía antes).
+- Rama `etapa5/sistema-ayuda` con 7 commits sobre `beta`; **sin push**. `Claude outputs/assets/` queda sin versionar: las copias usadas están en `GUI/Resources/`.
+
+## Pendiente del propietario
+1. Ver la fila y el panel en la app real (P2) y aprobar las técnicas de resalte y overlay (P3).
+2. Decidir el ancho del panel con el KDS (discrepancia 1).
+3. Decidir si se corrige `OpenChildForm` (5.2): timers y suscripciones vivas.
+4. Pruebas a 125/150 % y con usuarios reales de cada rol (checklist).
+5. Fusionar en `beta` y hacer push cuando lo apruebe.
