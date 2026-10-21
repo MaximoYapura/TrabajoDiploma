@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
@@ -20,6 +22,17 @@ namespace GUI_08YS.Estilo
         private bool _presionado;
         private Image _imagen;
         private Image _imagenAtenuada;
+        private Image _imagenVisible;
+
+        // Animación (Fase 8b): inclinación al hover, latido y un brillo único.
+        private const float AnguloHover = 10f;
+        private const int DuracionGiro = 150;      // ms
+        private const int DuracionBrillo = 300;    // ms
+        private const float AmplitudLatido = 0.04f;
+        private readonly Stopwatch _reloj = new Stopwatch();
+        private float _angulo, _anguloInicio, _anguloObjetivo;
+        private bool _brilloActivo;
+        private float _progresoBrillo = -1f;
 
         public FilaAyuda_790MY()
         {
@@ -68,8 +81,11 @@ namespace GUI_08YS.Estilo
             lblTecla_790MY.ForeColor = tinta;
 
             Image img = habilitado ? _imagen : ImagenAtenuada();
-            if (!ReferenceEquals(picSombrero_790MY.Image, img))
-                picSombrero_790MY.Image = img;
+            if (!ReferenceEquals(_imagenVisible, img))
+            {
+                _imagenVisible = img;
+                picSombrero_790MY.Invalidate();
+            }
         }
 
         /// <summary>El sombrero recoloreado con TextoDeshabilitado (se conserva la transparencia).</summary>
@@ -104,6 +120,7 @@ namespace GUI_08YS.Estilo
             if (_hover) return;
             _hover = true;
             AplicarEstado();
+            Animar(haciaHover: true);
         }
 
         // Pasar de la imagen al texto dispara MouseLeave en uno y MouseEnter en otro: el hover
@@ -114,6 +131,7 @@ namespace GUI_08YS.Estilo
             _hover = false;
             _presionado = false;
             AplicarEstado();
+            Animar(haciaHover: false);
         }
 
         private void Presionar(MouseButtons boton)
@@ -129,6 +147,102 @@ namespace GUI_08YS.Estilo
             _presionado = false;
             _hover = CursorDentro();
             AplicarEstado();
+        }
+
+        #endregion
+
+        #region Animación del sombrero (Fase 8b, spike B4)
+
+        /// <summary>
+        /// Inclinación hasta 10° en 150 ms (y de vuelta al salir); al entrar, además, un latido
+        /// y un brillo diagonal de 300 ms. Sin efectos de animación en Windows, no se mueve.
+        /// </summary>
+        private void Animar(bool haciaHover)
+        {
+            if (!SystemInformation.UIEffectsEnabled || !Enabled)
+            {
+                DetenerAnimacion();
+                return;
+            }
+            _anguloInicio = _angulo;
+            _anguloObjetivo = haciaHover ? AnguloHover : 0f;
+            _brilloActivo = haciaHover;
+            _progresoBrillo = haciaHover ? 0f : -1f;
+            _reloj.Restart();
+            tmrAnimacion_790MY.Start();
+        }
+
+        private void DetenerAnimacion()
+        {
+            tmrAnimacion_790MY.Stop();
+            _reloj.Reset();
+            _angulo = 0f;
+            _brilloActivo = false;
+            _progresoBrillo = -1f;
+            picSombrero_790MY.Invalidate();
+        }
+
+        private void tmrAnimacion_790MY_Tick(object sender, EventArgs e)
+        {
+            long ms = _reloj.ElapsedMilliseconds;
+            float t = Math.Min(1f, ms / (float)DuracionGiro);
+            float suave = 1f - (1f - t) * (1f - t);            // ease-out
+            _angulo = _anguloInicio + (_anguloObjetivo - _anguloInicio) * suave;
+
+            if (_brilloActivo)
+            {
+                _progresoBrillo = ms / (float)DuracionBrillo;
+                if (_progresoBrillo >= 1f) { _brilloActivo = false; _progresoBrillo = -1f; }
+            }
+            if (t >= 1f && !_brilloActivo)
+            {
+                tmrAnimacion_790MY.Stop();      // asentado: el timer no sigue corriendo
+                _reloj.Reset();
+            }
+            picSombrero_790MY.Invalidate();     // solo el área del ícono
+        }
+
+        /// <summary>Dibuja el sombrero (normal o atenuado) con la inclinación, el latido y el brillo vigentes.</summary>
+        private void picSombrero_790MY_Paint(object sender, PaintEventArgs e)
+        {
+            Image img = _imagenVisible;
+            if (img == null) return;
+            var g = e.Graphics;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            float lado = Math.Min(img.Width, Math.Min(picSombrero_790MY.Width, picSombrero_790MY.Height) - 4);
+            float escala = _progresoBrillo >= 0f ? 1f + AmplitudLatido * (float)Math.Sin(Math.PI * _progresoBrillo) : 1f;
+            var destino = new RectangleF(-lado / 2f, -lado / 2f, lado, lado);
+
+            g.TranslateTransform(picSombrero_790MY.Width / 2f, picSombrero_790MY.Height / 2f);
+            g.RotateTransform(_angulo);
+            g.ScaleTransform(escala, escala);
+            g.DrawImage(img, destino);
+
+            if (_progresoBrillo > 0f && _progresoBrillo < 1f)
+            {
+                // Franja diagonal que cruza el sombrero una vez: se redibuja aclarado solo dentro de ella.
+                var estado = g.Save();
+                g.RotateTransform(25f);
+                float ancho = lado * 0.28f;
+                float x = -lado + (2f * lado) * _progresoBrillo - ancho / 2f;
+                g.SetClip(new RectangleF(x, -lado, ancho, 2f * lado));
+                g.RotateTransform(-25f);
+                using (var attr = new ImageAttributes())
+                {
+                    attr.SetColorMatrix(new ColorMatrix(new[]
+                    {
+                        new float[] { 1, 0, 0, 0, 0 },
+                        new float[] { 0, 1, 0, 0, 0 },
+                        new float[] { 0, 0, 1, 0, 0 },
+                        new float[] { 0, 0, 0, 0.85f, 0 },
+                        new float[] { 0.45f, 0.45f, 0.45f, 0, 1 },
+                    }));
+                    g.DrawImage(img, Rectangle.Round(destino), 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, attr);
+                }
+                g.Restore(estado);
+            }
         }
 
         #endregion
@@ -152,7 +266,7 @@ namespace GUI_08YS.Estilo
 
         protected override void OnEnabledChanged(EventArgs e)
         {
-            if (!Enabled) { _hover = false; _presionado = false; }
+            if (!Enabled) { _hover = false; _presionado = false; DetenerAnimacion(); }
             AplicarEstado();
             Invalidate();
             base.OnEnabledChanged(e);

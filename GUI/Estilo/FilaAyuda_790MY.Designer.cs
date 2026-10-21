@@ -24,6 +24,7 @@ namespace GUI_08YS.Estilo
             this.lblTexto_790MY = new System.Windows.Forms.Label();
             this.lblTecla_790MY = new GUI_08YS.Estilo.TeclaEtiqueta_790MY();
             this.ttAyuda_790MY = new System.Windows.Forms.ToolTip(this.components);
+            this.tmrAnimacion_790MY = new System.Windows.Forms.Timer(this.components);
             this.tlpFila_790MY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picSombrero_790MY)).BeginInit();
             this.SuspendLayout();
@@ -33,19 +34,19 @@ namespace GUI_08YS.Estilo
             //
             this.tlpFila_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(15)))), ((int)(((byte)(15)))));
             this.tlpFila_790MY.ColumnCount = 3;
-            this.tlpFila_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 33F));
+            this.tlpFila_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tlpFila_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpFila_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpFila_790MY.Controls.Add(this.picSombrero_790MY, 0, 0);
             this.tlpFila_790MY.Controls.Add(this.lblTexto_790MY, 1, 0);
             this.tlpFila_790MY.Controls.Add(this.lblTecla_790MY, 2, 0);
             this.tlpFila_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlpFila_790MY.Location = new System.Drawing.Point(5, 3);
+            this.tlpFila_790MY.Location = new System.Drawing.Point(3, 3);
             this.tlpFila_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.tlpFila_790MY.Name = "tlpFila_790MY";
             this.tlpFila_790MY.RowCount = 1;
             this.tlpFila_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpFila_790MY.Size = new System.Drawing.Size(224, 43);
+            this.tlpFila_790MY.Size = new System.Drawing.Size(226, 43);
             this.tlpFila_790MY.TabIndex = 0;
             this.tlpFila_790MY.Click += new System.EventHandler(this.Hijo_Click);
             this.tlpFila_790MY.MouseEnter += new System.EventHandler(this.Hijo_MouseEnter);
@@ -53,15 +54,15 @@ namespace GUI_08YS.Estilo
             this.tlpFila_790MY.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Hijo_MouseDown);
             this.tlpFila_790MY.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Hijo_MouseUp);
             //
-            // picSombrero_790MY  (PNG con transparencia real; el tamaño se elige por escala)
+            // picSombrero_790MY  (PNG con transparencia real, elegido por escala y dibujado en Paint:
+            // 36 px de lado para que la inclinación y el latido no recorten el sombrero de 32 px)
             //
             this.picSombrero_790MY.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.picSombrero_790MY.BackColor = System.Drawing.Color.Transparent;
-            this.picSombrero_790MY.Image = global::GUI_08YS.Properties.Resources.SombreroAyuda32;
-            this.picSombrero_790MY.Location = new System.Drawing.Point(0, 5);
+            this.picSombrero_790MY.Location = new System.Drawing.Point(0, 3);
             this.picSombrero_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.picSombrero_790MY.Name = "picSombrero_790MY";
-            this.picSombrero_790MY.Size = new System.Drawing.Size(32, 32);
+            this.picSombrero_790MY.Size = new System.Drawing.Size(36, 36);
             this.picSombrero_790MY.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picSombrero_790MY.TabIndex = 0;
             this.picSombrero_790MY.TabStop = false;
@@ -70,6 +71,7 @@ namespace GUI_08YS.Estilo
             this.picSombrero_790MY.MouseLeave += new System.EventHandler(this.Hijo_MouseLeave);
             this.picSombrero_790MY.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Hijo_MouseDown);
             this.picSombrero_790MY.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Hijo_MouseUp);
+            this.picSombrero_790MY.Paint += new System.Windows.Forms.PaintEventHandler(this.picSombrero_790MY_Paint);
             //
             // lblTexto_790MY
             //
@@ -78,8 +80,8 @@ namespace GUI_08YS.Estilo
             this.lblTexto_790MY.BackColor = System.Drawing.Color.Transparent;
             this.lblTexto_790MY.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTexto_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
-            this.lblTexto_790MY.Location = new System.Drawing.Point(34, 15);
-            this.lblTexto_790MY.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
+            this.lblTexto_790MY.Location = new System.Drawing.Point(36, 15);
+            this.lblTexto_790MY.Margin = new System.Windows.Forms.Padding(0);
             this.lblTexto_790MY.Name = "lblTexto_790MY";
             this.lblTexto_790MY.Size = new System.Drawing.Size(39, 13);
             this.lblTexto_790MY.TabIndex = 1;
@@ -110,6 +112,11 @@ namespace GUI_08YS.Estilo
             this.lblTecla_790MY.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Hijo_MouseDown);
             this.lblTecla_790MY.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Hijo_MouseUp);
             //
+            // tmrAnimacion_790MY  (Fase 8b: solo corre mientras el sombrero se mueve; 16 ms)
+            //
+            this.tmrAnimacion_790MY.Interval = 16;
+            this.tmrAnimacion_790MY.Tick += new System.EventHandler(this.tmrAnimacion_790MY_Tick);
+            //
             // FilaAyuda_790MY  (misma geometría que los IconButton de la barra: 49 px,
             // borde dorado de 1 px y Padding(4,0,15,0) + 1 px de borde a la izquierda)
             //
@@ -123,7 +130,7 @@ namespace GUI_08YS.Estilo
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(195)))), ((int)(((byte)(140)))));
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "FilaAyuda_790MY";
-            this.Padding = new System.Windows.Forms.Padding(5, 3, 15, 3);
+            this.Padding = new System.Windows.Forms.Padding(3, 3, 15, 3);
             this.Size = new System.Drawing.Size(244, 49);
             this.TabStop = true;
             this.tlpFila_790MY.ResumeLayout(false);
@@ -139,5 +146,6 @@ namespace GUI_08YS.Estilo
         private System.Windows.Forms.Label lblTexto_790MY;
         private GUI_08YS.Estilo.TeclaEtiqueta_790MY lblTecla_790MY;
         private System.Windows.Forms.ToolTip ttAyuda_790MY;
+        private System.Windows.Forms.Timer tmrAnimacion_790MY;
     }
 }
