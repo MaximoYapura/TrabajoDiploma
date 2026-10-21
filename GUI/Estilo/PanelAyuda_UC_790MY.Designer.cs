@@ -18,6 +18,7 @@ namespace GUI_08YS.Estilo
             this.pnlEncabezado_790MY = new System.Windows.Forms.Panel();
             this.lblTitulo_790MY = new System.Windows.Forms.Label();
             this.btnCerrar_790MY = new System.Windows.Forms.Button();
+            this.btnRepetirVisita_790MY = new System.Windows.Forms.Button();
             this.tabAyuda_790MY = new GUI_08YS.Estilo.SlidingTab_UC_790MY();
             this.pnlTabs_790MY = new System.Windows.Forms.Panel();
             this.pnlContenido_790MY = new System.Windows.Forms.Panel();
@@ -32,6 +33,7 @@ namespace GUI_08YS.Estilo
             //
             this.pnlEncabezado_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(240)))), ((int)(((byte)(233)))));
             this.pnlEncabezado_790MY.Controls.Add(this.lblTitulo_790MY);
+            this.pnlEncabezado_790MY.Controls.Add(this.btnRepetirVisita_790MY);
             this.pnlEncabezado_790MY.Controls.Add(this.btnCerrar_790MY);
             this.pnlEncabezado_790MY.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlEncabezado_790MY.Location = new System.Drawing.Point(1, 0);
@@ -70,6 +72,24 @@ namespace GUI_08YS.Estilo
             this.btnCerrar_790MY.Text = "✕";
             this.btnCerrar_790MY.UseVisualStyleBackColor = false;
             this.btnCerrar_790MY.Click += new System.EventHandler(this.btnCerrar_790MY_Click);
+            //
+            // btnRepetirVisita_790MY  (terciario: texto bordó, sin borde)
+            //
+            this.btnRepetirVisita_790MY.AutoSize = true;
+            this.btnRepetirVisita_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRepetirVisita_790MY.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnRepetirVisita_790MY.FlatAppearance.BorderSize = 0;
+            this.btnRepetirVisita_790MY.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(236)))), ((int)(((byte)(238)))));
+            this.btnRepetirVisita_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRepetirVisita_790MY.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline);
+            this.btnRepetirVisita_790MY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(29)))), ((int)(((byte)(47)))));
+            this.btnRepetirVisita_790MY.Location = new System.Drawing.Point(225, 8);
+            this.btnRepetirVisita_790MY.Name = "btnRepetirVisita_790MY";
+            this.btnRepetirVisita_790MY.Size = new System.Drawing.Size(90, 36);
+            this.btnRepetirVisita_790MY.TabIndex = 2;
+            this.btnRepetirVisita_790MY.Text = "Repetir visita";
+            this.btnRepetirVisita_790MY.UseVisualStyleBackColor = false;
+            this.btnRepetirVisita_790MY.Click += new System.EventHandler(this.btnRepetirVisita_790MY_Click);
             //
             // pnlTabs_790MY
             //
@@ -149,6 +169,7 @@ namespace GUI_08YS.Estilo
         private System.Windows.Forms.Panel pnlEncabezado_790MY;
         private System.Windows.Forms.Label lblTitulo_790MY;
         private System.Windows.Forms.Button btnCerrar_790MY;
+        private System.Windows.Forms.Button btnRepetirVisita_790MY;
         private System.Windows.Forms.Panel pnlTabs_790MY;
         private GUI_08YS.Estilo.SlidingTab_UC_790MY tabAyuda_790MY;
         private System.Windows.Forms.Panel pnlContenido_790MY;

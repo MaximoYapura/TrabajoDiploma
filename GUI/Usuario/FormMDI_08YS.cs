@@ -225,6 +225,7 @@ namespace GUI_08YS
             btnAyuda.UpdateIdioma();
             panelAyuda.UpdateIdioma();
             _sugerencias?.Cerrar();
+            _visita?.Cortar();
 
             RefrescarContenidoComboIdioma();
         }
@@ -344,6 +345,7 @@ namespace GUI_08YS
             // Etapa 5 (A4): la ayuda no queda abierta durante el cobro.
             if (bloquear)
             {
+                _visita?.Cortar();
                 _sugerencias?.Cerrar();
                 if (panelAyuda.Visible) CerrarAyuda();
             }
@@ -659,7 +661,7 @@ namespace GUI_08YS
         {
             if (keyData == Keys.F1)
             {
-                if (!_navegacionBloqueada) AbrirAyuda(contextual: true);
+                if (!_navegacionBloqueada && _visita?.Activa != true) AbrirAyuda(contextual: true);
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -705,7 +707,111 @@ namespace GUI_08YS
 
         private void panel2_ControlRemoved(object sender, ControlEventArgs e) => _sugerencias?.Cerrar();
 
-        private void FormMDI_Resize(object sender, EventArgs e) => _sugerencias?.Cerrar();
+        private void FormMDI_Resize(object sender, EventArgs e)
+        {
+            _sugerencias?.Cerrar();
+            _visita?.Cortar();
+        }
+        #endregion
+
+        #region Visita guiada
+        private VisitaGuiada_790MY _visita;
+
+        private VisitaGuiada_790MY Visita
+        {
+            get
+            {
+                if (_visita == null)
+                {
+                    _visita = new VisitaGuiada_790MY(this, visitaOverlay, globoVisita);
+                    _visita.Terminada += (s, e) => RegistroVisita_790MY.MarcarVista(SessionManager_08YS.Instance.Current?.Username);
+                    _visita.Cerrada += (s, e) => PermitirInteraccionDeFondo(true);
+                }
+                return _visita;
+            }
+        }
+
+        /// <summary>Primer ingreso (A7, G4): la visita se lanza una sola vez por usuario de la aplicación.</summary>
+        private void FormMDI_Shown(object sender, EventArgs e)
+        {
+            if (!RegistroVisita_790MY.FueVista(SessionManager_08YS.Instance.Current?.Username))
+                BeginInvoke((Action)IniciarVisita);
+        }
+
+        private void panelAyuda_RepetirVisitaSolicitada(object sender, EventArgs e) => IniciarVisita();
+
+        private void IniciarVisita()
+        {
+            if (_navegacionBloqueada || IsDisposed) return;
+            _sugerencias?.Cerrar();
+            if (panelAyuda.Visible) panelAyuda.Visible = false;
+            // Primero la captura (con el fondo habilitado, para que no salga en gris); después
+            // se deshabilita el fondo para que Tab no llegue a botones que la capa tapa.
+            var partes = new Control[] { panel1, panelLateral, panel2, panel2.Tag as Form };
+            if (Visita.Iniciar(ConstruirPasosVisita(), partes))
+                PermitirInteraccionDeFondo(false);
+        }
+
+        private void PermitirInteraccionDeFondo(bool permitir)
+        {
+            panelLateral.Enabled = permitir && !_navegacionBloqueada;
+            panelIdioma.Enabled = permitir && !_navegacionBloqueada;
+            panel1.Enabled = permitir;     // botones de ventana: la capa los tapa, Tab no debe llegar
+            panel2.Enabled = permitir;
+        }
+
+        /// <summary>
+        /// Pasos derivados de lo que el usuario realmente ve (Fase 7.2): los botones visibles de
+        /// la barra según sus permisos y, en cada uno, las opciones disponibles de su menú.
+        /// </summary>
+        private List<PasoVisita_790MY> ConstruirPasosVisita()
+        {
+            var tr = TraductorManager_08YS.Instance;
+            var menus = new Dictionary<Control, ContextMenuStrip>
+            {
+                { btnPerfil, PerfilDropDownMenu },
+                { btnAdministrativo, AdministrativoDropDownMenu },
+                { btnMaestros, MaestrosDropDownMenu },
+                { btnReservar, ReservasDropDownMenu },
+                { btnAtencion_790MY, AtencionDropDownMenu_790MY },
+                { btnReportes_790MY, ReportesDropDownMenu },
+            };
+
+            var pasos = new List<PasoVisita_790MY>
+            {
+                new PasoVisita_790MY(panelLogo, tr.GetTexto("AY_vis_inicio_t"), tr.GetTexto("AY_vis_inicio_x"))
+            };
+            foreach (Control boton in flowLayoutPanel1.Controls)
+            {
+                if (!boton.Visible || !menus.TryGetValue(boton, out var menu)) continue;
+                var opciones = OpcionesDisponibles(menu.Items);
+                if (opciones.Count == 0) continue;
+                pasos.Add(new PasoVisita_790MY(boton, boton.Text.Trim(),
+                    string.Format(tr.GetTexto("AY_vis_menu_x"), string.Join(", ", opciones))));
+            }
+            pasos.Add(new PasoVisita_790MY(btnAyuda, tr.GetTexto("AY_vis_ayuda_t"),
+                tr.GetTexto(panelAyuda.FichaPermitida ? "AY_vis_ayuda_x_ficha" : "AY_vis_ayuda_x")));
+            pasos.Add(new PasoVisita_790MY(panelIdioma, tr.GetTexto("AY_vis_idioma_t"), tr.GetTexto("AY_vis_idioma_x")));
+            pasos.Add(new PasoVisita_790MY(btnCerrarSesion, btnCerrarSesion.Text.Trim(), tr.GetTexto("AY_vis_cerrar_x")));
+            return pasos;
+        }
+
+        private static List<string> OpcionesDisponibles(ToolStripItemCollection items)
+        {
+            var opciones = new List<string>();
+            foreach (ToolStripItem item in items)
+            {
+                if (!item.Available) continue;
+                if (item is ToolStripMenuItem conHijos && conHijos.HasDropDownItems)
+                    opciones.AddRange(OpcionesDisponibles(conHijos.DropDownItems));
+                else
+                    opciones.Add(item.Text.Trim());
+            }
+            return opciones;
+        }
+        #endregion
+
+        #region Ayuda: panel lateral
 
         private void MostrarAyuda()
         {

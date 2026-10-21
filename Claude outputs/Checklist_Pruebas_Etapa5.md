@@ -97,3 +97,20 @@ Verificado por Claude Code (FormMDI real, teclado real):
 
 Para el propietario:
 - [ ] Recorrer las sugerencias con datos reales (mesas abiertas, pedidos en cocina) para ver el globo con más contenido en pantalla.
+
+## Fase 7 — Visita Guiada (`VisitaGuiada_790MY`, `VisitaOverlay_790MY`, `RegistroVisita_790MY`)
+
+Verificado por Claude Code (los archivos de prueba en `%LocalAppData%\El Fogon del Sur` se borraron al terminar):
+- [x] Primer ingreso de un usuario sin la marca: la visita arranca sola. Captura compuesta por partes con `DrawToBitmap`, atenuada, con un hueco nítido sobre cada elemento.
+- [x] Pasos según lo que el usuario ve (SuperAdmin: 10). Bienvenida (nombre y rol), cada botón visible de la barra con **las opciones disponibles de su menú leídas en vivo**, Ayuda (menciona la Ficha solo si corresponde), Idioma y Cerrar Sesión.
+- [x] Durante la visita: Tab no sale del globo; F1 no hace nada; clics absorbidos por la capa.
+- [x] «Terminar» y «Saltar visita» (o Esc) la marcan como vista: `ayuda.json` = `{"visitasVistas": ["<usuario>"]}`, sin duplicados.
+- [x] «Repetir visita» en el encabezado del panel de ayuda la vuelve a mostrar.
+- [x] Maximizar/restaurar durante la visita la corta **sin** marcarla; la barra vuelve a habilitarse.
+- [x] `ayuda.json` dañado → «no vista» y se reescribe al marcar. Ruta ocupada por una carpeta → sin excepción, «no vista».
+- [x] Inglés: «Welcome! … You can skip it and replay it from Help.»
+
+Para el propietario:
+- [ ] Ingresar con un usuario de cada rol: la visita muestra solo sus botones.
+- [ ] Usuario de Windows sin permisos de administrador (app instalada en Program Files): la marca se guarda en `%LocalAppData%`.
+- [ ] Reducir animaciones: la visita no tiene animaciones (no aplica).

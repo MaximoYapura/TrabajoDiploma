@@ -15,7 +15,9 @@ Límite: el equipo está al 100 % y no puedo cambiar la escala de Windows. La ap
 | 2 | `add08d0` | `PanelAyuda_UC_790MY` (`panelAyuda`, hermano de `panel2`), `IrAPantalla`. |
 | 3 | `2a15bcf` | `FichaIngredientes_UC_790MY`, `ValorCopiable_790MY`. |
 | 4 | `3402297` | `MenuDegustacion_UC_790MY`, `PasoDegustacion_790MY`. |
-| 5 | (este) | Auditoría (solo informe). |
+| 5 | `fd9a9da` | Auditoría (solo informe). |
+| 6 | `4bc6a9b` | Sugerencias del Chef: `IAyudaContextual_790MY`, `AyudaSugerencias_790MY`, `GloboAyuda_790MY`; 6 hijos implementan `ObtenerPistas`. |
+| 7 | (siguiente) | Visita Guiada: `VisitaGuiada_790MY`, `VisitaOverlay_790MY`, `RegistroVisita_790MY`. |
 
 ## Decisiones tomadas
 1. **F1 solo por `ProcessCmdKey`, sin `HelpRequested`** (spike B1): Windows envía `WM_HELP` aparte de la tecla y llega a la MDI incluso con un `ConfirmModal` abierto.
@@ -28,6 +30,13 @@ Límite: el equipo está al 100 % y no puedo cambiar la escala de Windows. La ap
 8. **Pistas del Menú Degustación con textos reales**: rutas y nombres de botones salen de las claves existentes de idiomas.json (`menuClientes`, `RR_btnConfirmar`, `RP_btnEnviar`, `KDS_btn_listo`, etc.), así coinciden con la pantalla en ambos idiomas.
 9. **Paso 6, orden invertido respecto del brief**: «primero una tarjeta terminada en 0002 para ver el rechazo; después, una válida». El rechazo no cierra la mesa, pero el cobro aprobado sí la libera: en el orden del brief habría que abrir otra mesa para ver el rechazo. La pista no muestra el número aprobado porque el Menú Degustación lo ven todos los roles y la Ficha solo el SuperAdmin; la pantalla de cobro ya muestra los números de prueba.
 10. **Banner de error de la Ficha compacto**: lista las secciones que fallaron y un solo detalle técnico (antes repetía el mismo error SQL tres veces).
+11. **Puntos de parada P2 y P3 no se esperaron** porque el propietario autorizó seguir sin pausas mientras estaba ausente. Las técnicas elegidas quedan documentadas acá para su revisión.
+12. **Resalte de Sugerencias (Fase 6)**: el marco son 4 `Panel` opacos de 3 px en `TemaFogon.Oro` y el globo es un `UserControl` opaco. Todos están declarados en `FormMDI_08YS.Designer.cs` sin acople (no alteran el orden de Dock) y `AyudaSugerencias_790MY` solo los ubica. Ningún formulario crea controles visuales.
+13. **Hijos tocados (P4)**: los 6 formularios de la ruta solo agregan `IAyudaContextual_790MY` a su declaración y un método `ObtenerPistas()` que devuelve datos. Usa `nameof(control)`, así que un control renombrado rompe la compilación en lugar de fallar en silencio. Una pista cuyo control no está visible se omite (p. ej. «Agregar» en Registrar Pedido antes de elegir un producto).
+14. **Overlay de la Visita (Fase 7)**: técnica (a) del spike B2. La captura se compone por partes con `DrawToBitmap` (`panel1`, `panelLateral`, `panel2` y el hijo) porque sobre la MDI completa falla. La alternativa `CopyFromScreen` depende de que ninguna ventana tape la app. La capa es un único control opaco que pinta la captura, la oscurece y deja el hueco; no hay transparencia real.
+15. **La visita usa su propio globo** (`globoVisita`): compartir el de las Sugerencias hacía que ambos componentes reaccionaran a los mismos botones.
+16. **Durante la visita se deshabilitan `panel1`, `panelLateral`, `panelIdioma` y `panel2`** (después de la captura, para que no salgan en gris), así Tab no llega a botones tapados. Se restauran al cerrar, respetando `BloquearNavegacion`.
+17. **Cortes que no marcan la visita como vista**: redimensionar, cambiar de idioma o bloquear la navegación. Solo «Terminar» y «Saltar» la marcan, como pide el criterio 7.5.
 
 ## Discrepancias entre el brief y el código (P4)
 1. **KDS con el panel abierto (riesgo de ancho, Fase 2.5).** Con la ventana en su tamaño normal (1350 px) y el panel de 360 px, el KDS queda en 742 px y **la columna del título se parte letra a letra** (`capturas_etapa5/f2_Cocina.png`). A 320 px queda apretado pero legible (`kds_320.png`). Maximizada a 1920 px se ve bien. Registrar Reserva, Caja y cobro y Mesas se ven bien a 742 px. **No modifiqué el KDS ni el ancho.** Opciones: (a) bajar el panel a 320 px; (b) que el panel se superponga en lugar de reducir cuando el hijo activo es el KDS; (c) dejarlo así (la cocina suele usar la ventana maximizada).

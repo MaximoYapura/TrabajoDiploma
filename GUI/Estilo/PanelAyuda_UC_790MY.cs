@@ -28,6 +28,9 @@ namespace GUI_08YS.Estilo
         /// <summary>Un paso del Menú Degustación pidió abrir su pantalla.</summary>
         public event EventHandler<DestinoAyudaEventArgs_790MY> NavegacionSolicitada;
 
+        /// <summary>«Repetir visita» del encabezado.</summary>
+        public event EventHandler RepetirVisitaSolicitada;
+
         public PanelAyuda_UC_790MY()
         {
             InitializeComponent();
@@ -82,6 +85,7 @@ namespace GUI_08YS.Estilo
             lblTitulo_790MY.Text = tr.GetTexto("AY_panel_titulo");
             AccessibleName = lblTitulo_790MY.Text;
             btnCerrar_790MY.AccessibleName = tr.GetTexto("AY_panel_cerrar");
+            btnRepetirVisita_790MY.Text = tr.GetTexto("AY_panel_repetir_visita");
             tabAyuda_790MY.ActualizarTextos();
             ucFicha_790MY?.UpdateIdioma();
             ucDegustacion_790MY.UpdateIdioma();
@@ -99,6 +103,9 @@ namespace GUI_08YS.Estilo
 
         private void btnCerrar_790MY_Click(object sender, EventArgs e)
             => CerrarSolicitado?.Invoke(this, EventArgs.Empty);
+
+        private void btnRepetirVisita_790MY_Click(object sender, EventArgs e)
+            => RepetirVisitaSolicitada?.Invoke(this, EventArgs.Empty);
 
         private void ucDegustacion_790MY_NavegacionSolicitada(object sender, DestinoAyudaEventArgs_790MY e)
             => NavegacionSolicitada?.Invoke(this, e);

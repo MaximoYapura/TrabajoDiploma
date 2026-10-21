@@ -46,6 +46,8 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panelAyuda = new GUI_08YS.Estilo.PanelAyuda_UC_790MY();
             this.globoAyuda = new GUI_08YS.Estilo.GloboAyuda_790MY();
+            this.visitaOverlay = new GUI_08YS.Estilo.VisitaOverlay_790MY();
+            this.globoVisita = new GUI_08YS.Estilo.GloboAyuda_790MY();
             this.pnlResalteArriba = new System.Windows.Forms.Panel();
             this.pnlResalteAbajo = new System.Windows.Forms.Panel();
             this.pnlResalteIzquierda = new System.Windows.Forms.Panel();
@@ -521,6 +523,7 @@
             this.panelAyuda.Visible = false;
             this.panelAyuda.CerrarSolicitado += new System.EventHandler(this.panelAyuda_CerrarSolicitado);
             this.panelAyuda.NavegacionSolicitada += new System.EventHandler<GUI_08YS.Estilo.DestinoAyudaEventArgs_790MY>(this.panelAyuda_NavegacionSolicitada);
+            this.panelAyuda.RepetirVisitaSolicitada += new System.EventHandler(this.panelAyuda_RepetirVisitaSolicitada);
             //
             // globoAyuda  (Etapa 5, Sugerencias del Chef: globo opaco sobre el formulario,
             // sin acople; AyudaSugerencias_790MY lo ubica junto al control resaltado)
@@ -529,6 +532,19 @@
             this.globoAyuda.Name = "globoAyuda";
             this.globoAyuda.TabIndex = 7;
             this.globoAyuda.Visible = false;
+            //
+            // visitaOverlay / globoVisita  (Etapa 5, Visita Guiada: capa opaca con la captura
+            // atenuada y un hueco sobre el elemento; globo propio, sin acople)
+            //
+            this.visitaOverlay.Location = new System.Drawing.Point(0, 0);
+            this.visitaOverlay.Name = "visitaOverlay";
+            this.visitaOverlay.Size = new System.Drawing.Size(1350, 784);
+            this.visitaOverlay.TabIndex = 8;
+            this.visitaOverlay.Visible = false;
+            this.globoVisita.Location = new System.Drawing.Point(600, 300);
+            this.globoVisita.Name = "globoVisita";
+            this.globoVisita.TabIndex = 9;
+            this.globoVisita.Visible = false;
             //
             // pnlResalteArriba / Abajo / Izquierda / Derecha  (marco de resalte: 4 paneles
             // opacos finos en TemaFogon.Oro; el control resaltado queda visible y operable)
@@ -834,6 +850,8 @@
             this.Controls.Add(this.pnlResalteAbajo);
             this.Controls.Add(this.pnlResalteIzquierda);
             this.Controls.Add(this.pnlResalteDerecha);
+            this.Controls.Add(this.visitaOverlay);
+            this.Controls.Add(this.globoVisita);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.IsMdiContainer = true;
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -842,6 +860,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMDI_FormClosing);
             this.Load += new System.EventHandler(this.FormMDI_Load);
             this.Resize += new System.EventHandler(this.FormMDI_Resize);
+            this.Shown += new System.EventHandler(this.FormMDI_Shown);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panelIdioma.ResumeLayout(false);
@@ -885,6 +904,8 @@
         private System.Windows.Forms.Panel panel2;
         private GUI_08YS.Estilo.PanelAyuda_UC_790MY panelAyuda;
         private GUI_08YS.Estilo.GloboAyuda_790MY globoAyuda;
+        private GUI_08YS.Estilo.VisitaOverlay_790MY visitaOverlay;
+        private GUI_08YS.Estilo.GloboAyuda_790MY globoVisita;
         private System.Windows.Forms.Panel pnlResalteArriba;
         private System.Windows.Forms.Panel pnlResalteAbajo;
         private System.Windows.Forms.Panel pnlResalteIzquierda;

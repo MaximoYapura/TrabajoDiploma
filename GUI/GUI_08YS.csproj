@@ -140,6 +140,11 @@
     <Compile Include="Estilo\DestinoAyuda_790MY.cs" />
     <Compile Include="Estilo\IAyudaContextual_790MY.cs" />
     <Compile Include="Estilo\AyudaSugerencias_790MY.cs" />
+    <Compile Include="Estilo\RegistroVisita_790MY.cs" />
+    <Compile Include="Estilo\VisitaGuiada_790MY.cs" />
+    <Compile Include="Estilo\VisitaOverlay_790MY.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Estilo\GloboAyuda_790MY.cs">
       <SubType>UserControl</SubType>
     </Compile>
