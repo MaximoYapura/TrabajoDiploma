@@ -181,8 +181,10 @@ namespace BLL_08YS
 
         private static void ValidarDatos(int dni, string nombre, string apellido, string email, string telefono)
         {
-            if (dni <= 0)
-                throw new ArgumentException("El DNI debe ser un número positivo.");
+            // Misma regla que la GUI (FormClientes_790MY._regexDni): 7 u 8 dígitos.
+            // Cubre también dni <= 0 (un negativo o el 0 no cumplen el patrón).
+            if (!Regex.IsMatch(dni.ToString(), @"^\d{7,8}$"))
+                throw MensajesBLL_790MY.Regla("FC_val_dni_formato");
 
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es obligatorio.");
