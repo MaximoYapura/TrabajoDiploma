@@ -366,3 +366,6 @@ App.secrets.config
 
 # Salida del instalador (Inno Setup)
 Installer/Output/
+
+# Backups de base de datos (BACKUP DATABASE / sqlcmd)
+*.bak
