@@ -1,7 +1,8 @@
 /* =============================================================================
    Deploy_TP_Ing_Soft.sql — Despliegue completo de "El Fogón del Sur"
    -----------------------------------------------------------------------------
-   Script ÚNICO para una PC limpia. Reemplaza a script.sql + Migraciones_790MY +
+   Script ÚNICO para una PC limpia y para actualizar una instalación existente
+   (lo ejecuta el instalador en ambos casos). Reemplaza a script.sql + Migraciones_790MY +
    Seed_TP_Ing_Soft.sql: contiene el esquema final unificado (incluido RF2:
    pedidos, facturación y cobro) y los datos iniciales.
 
@@ -17,14 +18,28 @@
      4. Inserta los Dígitos Verificadores (DVH/DVV) correctos para esos datos:
         el primer login no informa inconsistencias.
 
-   SEGURO DE RE-EJECUTAR
-     - Si TP_Ing_Soft ya existe con su esquema (dbo.Users), NO se modifica nada.
-     - Si existe pero está vacía (p. ej. un despliegue anterior falló), se crea
-       todo dentro de ella.
-     - El esquema y los datos se crean en una única transacción: ante cualquier
-       error no queda una base a medio crear.
+   IDEMPOTENTE: SEGURO DE RE-EJECUTAR (instalación nueva y reinstalación)
+     - Instalación nueva = la base no tiene dbo.Users al empezar (no existe o
+       está vacía). Se crea todo y se cargan los datos semilla y sus DV.
+     - Base existente: solo se crea lo que falte. Tablas con
+       IF OBJECT_ID(...,'U') IS NULL; tipos, índices, DEFAULT, CHECK y claves
+       foráneas con guardas equivalentes (los DEFAULT y las FK se buscan por
+       columna, porque varias FK no tienen nombre fijo); procedimientos y
+       triggers con CREATE OR ALTER. Los cambios de columnas de tablas que ya
+       existen van en la sección "Actualizaciones de esquema"
+       (IF COL_LENGTH(...) IS NULL ALTER TABLE ... ADD ...).
+     - Los datos semilla y los dígitos verificadores (tabla DV) se insertan SOLO
+       en una instalación nueva: en una base con datos no se pisa, duplica ni
+       recalcula nada del cliente (los DV quedan intactos).
+     - Todo corre en una única transacción (XACT_ABORT): ante cualquier error
+       no queda una base a medio crear ni a medio actualizar.
 
-   El instalador busca en la salida las marcas DEPLOY_OK / DEPLOY_OMITIDO.
+   REQUISITO: SQL Server 2016 SP1 o posterior (CREATE OR ALTER y
+   SESSION_CONTEXT). LocalDB 2016+ también sirve.
+
+   El instalador busca en la salida la marca DEPLOY_OK (también acepta
+   DEPLOY_OMITIDO, que emitían versiones anteriores de este script cuando la
+   base ya existía; esta versión ya no la emite: siempre actualiza).
 
    Ejecución manual:
        sqlcmd -S . -E -b -f 65001 -i Deploy_TP_Ing_Soft.sql
@@ -57,18 +72,21 @@ GO
 USE [TP_Ing_Soft];
 GO
 
-IF OBJECT_ID(N'dbo.Users', N'U') IS NOT NULL
-BEGIN
-    PRINT N'TP_Ing_Soft ya tiene su esquema: no se modifica (se conservan sus datos).';
-    PRINT N'DEPLOY_OMITIDO';
-    SET NOEXEC ON;
-END
+/* Instalación nueva o base existente: se decide UNA vez, antes de crear nada, y
+   queda en el contexto de la sesión para los lotes de datos semilla y DV. */
+DECLARE @Nuevo int = CASE WHEN OBJECT_ID(N'dbo.Users', N'U') IS NULL THEN 1 ELSE 0 END;
+EXEC sys.sp_set_session_context @key = N'DeployNuevo', @value = @Nuevo;
+IF @Nuevo = 1
+    PRINT N'Instalación nueva: se crea el esquema completo con los datos iniciales.';
+ELSE
+    PRINT N'TP_Ing_Soft ya tiene su esquema: se agrega solo lo que falte (los datos y los DV no se modifican).';
 GO
 
 BEGIN TRANSACTION;
 GO
 
 /* ─── 2) Tipos, tablas, restricciones e índices ──────────────────────────── */
+IF TYPE_ID(N'dbo.IntList') IS NULL
 CREATE TYPE [dbo].[IntList] AS TABLE(
 	[ID] [int] NOT NULL,
 	PRIMARY KEY CLUSTERED 
@@ -81,6 +99,8 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Bitacora', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Bitacora](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Username] [nvarchar](50) NOT NULL,
@@ -94,7 +114,9 @@ CREATE TABLE [dbo].[Bitacora](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Bitacora') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Bitacora'), N'FechaHora', 'ColumnId'))
 ALTER TABLE [dbo].[Bitacora] ADD  CONSTRAINT [DF_Bitacora_Fecha]  DEFAULT (getdate()) FOR [FechaHora]
 GO
 SET ANSI_NULLS ON
@@ -103,6 +125,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 -- Cierres de caja (A4): una fila por jornada; la PK impide el doble cierre.
 -- No forma parte de los dígitos verificadores (TablasMonitoreadas).
+IF OBJECT_ID(N'dbo.CierresCaja', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[CierresCaja](
 	[Fecha] [date] NOT NULL,
 	[Neta] [decimal](12, 2) NOT NULL,
@@ -113,11 +137,14 @@ CREATE TABLE [dbo].[CierresCaja](
 	[Fecha] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Clientes', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Clientes](
 	[DNI] [int] NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
@@ -131,13 +158,17 @@ CREATE TABLE [dbo].[Clientes](
 	[DNI] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Clientes') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Clientes'), N'Activo', 'ColumnId'))
 ALTER TABLE [dbo].[Clientes] ADD  CONSTRAINT [DF_Clientes_Activo]  DEFAULT ((1)) FOR [Activo]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.DV', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[DV](
 	[Tabla] [nvarchar](100) NOT NULL,
 	[DVH] [nvarchar](max) NOT NULL,
@@ -147,11 +178,14 @@ PRIMARY KEY CLUSTERED
 	[Tabla] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.EmailsAdicionalesCliente', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[EmailsAdicionalesCliente](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[ClienteDNI] [int] NOT NULL,
@@ -161,11 +195,14 @@ CREATE TABLE [dbo].[EmailsAdicionalesCliente](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Empleados', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Empleados](
 	[DNI] [int] NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
@@ -178,7 +215,9 @@ CREATE TABLE [dbo].[Empleados](
 	[DNI] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Empleados_UsuarioDNI' AND object_id = OBJECT_ID(N'dbo.Empleados'))
 CREATE UNIQUE NONCLUSTERED INDEX [UX_Empleados_UsuarioDNI] ON [dbo].[Empleados]
 (
 	[UsuarioDNI] ASC
@@ -186,16 +225,21 @@ CREATE UNIQUE NONCLUSTERED INDEX [UX_Empleados_UsuarioDNI] ON [dbo].[Empleados]
 WHERE ([UsuarioDNI] IS NOT NULL)
 WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Empleados') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Empleados'), N'Activo', 'ColumnId'))
 ALTER TABLE [dbo].[Empleados] ADD  CONSTRAINT [DF_Empleados_Activo]  DEFAULT ((1)) FOR [Activo]
 GO
+IF OBJECT_ID(N'dbo.CK_Empleados_Puesto', N'C') IS NULL
 ALTER TABLE [dbo].[Empleados]  WITH CHECK ADD  CONSTRAINT [CK_Empleados_Puesto] CHECK  (([Puesto]=N'Recepcionista' OR [Puesto]=N'Chef' OR [Puesto]=N'Camarero'))
 GO
+IF OBJECT_ID(N'dbo.CK_Empleados_Puesto') IS NOT NULL
 ALTER TABLE [dbo].[Empleados] CHECK CONSTRAINT [CK_Empleados_Puesto]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Facturas', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Facturas](
 	[NroFactura] [int] IDENTITY(1,1) NOT NULL,
 	[NroReserva] [int] NOT NULL,
@@ -212,7 +256,9 @@ CREATE TABLE [dbo].[Facturas](
 	[NroFactura] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Facturas_Reserva_Abierta' AND object_id = OBJECT_ID(N'dbo.Facturas'))
 CREATE UNIQUE NONCLUSTERED INDEX [UX_Facturas_Reserva_Abierta] ON [dbo].[Facturas]
 (
 	[NroReserva] ASC
@@ -220,6 +266,7 @@ CREATE UNIQUE NONCLUSTERED INDEX [UX_Facturas_Reserva_Abierta] ON [dbo].[Factura
 WHERE ([Estado]=N'Abierta')
 WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Facturas_Reserva_Pagada' AND object_id = OBJECT_ID(N'dbo.Facturas'))
 CREATE UNIQUE NONCLUSTERED INDEX [UX_Facturas_Reserva_Pagada] ON [dbo].[Facturas]
 (
 	[NroReserva] ASC
@@ -227,26 +274,36 @@ CREATE UNIQUE NONCLUSTERED INDEX [UX_Facturas_Reserva_Pagada] ON [dbo].[Facturas
 WHERE ([Estado]=N'Pagada')
 WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Facturas') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Facturas'), N'PorcentajeDescuento', 'ColumnId'))
 ALTER TABLE [dbo].[Facturas] ADD  CONSTRAINT [DF_Facturas_PorcDesc]  DEFAULT ((0)) FOR [PorcentajeDescuento]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Facturas') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Facturas'), N'MontoDescuento', 'ColumnId'))
 ALTER TABLE [dbo].[Facturas] ADD  CONSTRAINT [DF_Facturas_MontoDesc]  DEFAULT ((0)) FOR [MontoDescuento]
 GO
+IF OBJECT_ID(N'dbo.CK_Facturas_Descuento', N'C') IS NULL
 ALTER TABLE [dbo].[Facturas]  WITH CHECK ADD  CONSTRAINT [CK_Facturas_Descuento] CHECK  (([PorcentajeDescuento]>=(0) AND [PorcentajeDescuento]<=(100) AND [MontoDescuento]>=(0) AND [MontoDescuento]<=[Subtotal]))
 GO
+IF OBJECT_ID(N'dbo.CK_Facturas_Descuento') IS NOT NULL
 ALTER TABLE [dbo].[Facturas] CHECK CONSTRAINT [CK_Facturas_Descuento]
 GO
+IF OBJECT_ID(N'dbo.CK_Facturas_Estado', N'C') IS NULL
 ALTER TABLE [dbo].[Facturas]  WITH CHECK ADD  CONSTRAINT [CK_Facturas_Estado] CHECK  (([Estado]=N'Anulada' OR [Estado]=N'Pagada' OR [Estado]=N'Abierta'))
 GO
+IF OBJECT_ID(N'dbo.CK_Facturas_Estado') IS NOT NULL
 ALTER TABLE [dbo].[Facturas] CHECK CONSTRAINT [CK_Facturas_Estado]
 GO
+IF OBJECT_ID(N'dbo.CK_Facturas_Importes', N'C') IS NULL
 ALTER TABLE [dbo].[Facturas]  WITH CHECK ADD  CONSTRAINT [CK_Facturas_Importes] CHECK  (([Subtotal]>(0) AND [IVA]>=(0) AND [SubtotalNeto]=([Subtotal]-[MontoDescuento]) AND [MontoTotal]=([SubtotalNeto]+[IVA])))
 GO
+IF OBJECT_ID(N'dbo.CK_Facturas_Importes') IS NOT NULL
 ALTER TABLE [dbo].[Facturas] CHECK CONSTRAINT [CK_Facturas_Importes]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.FamiliaIntegrada', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[FamiliaIntegrada](
 	[FamiliaPadreID] [int] NOT NULL,
 	[FamiliaID] [int] NOT NULL,
@@ -256,15 +313,20 @@ CREATE TABLE [dbo].[FamiliaIntegrada](
 	[FamiliaPadreID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF OBJECT_ID(N'dbo.CHK_NoAutorreferencia', N'C') IS NULL
 ALTER TABLE [dbo].[FamiliaIntegrada]  WITH CHECK ADD  CONSTRAINT [CHK_NoAutorreferencia] CHECK  (([FamiliaID]<>[FamiliaPadreID]))
 GO
+IF OBJECT_ID(N'dbo.CHK_NoAutorreferencia') IS NOT NULL
 ALTER TABLE [dbo].[FamiliaIntegrada] CHECK CONSTRAINT [CHK_NoAutorreferencia]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.FamiliaPermiso', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[FamiliaPermiso](
 	[FamiliaID] [int] NOT NULL,
 	[PermisoID] [int] NOT NULL,
@@ -274,11 +336,14 @@ CREATE TABLE [dbo].[FamiliaPermiso](
 	[PermisoID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Familias', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Familias](
 	[FamiliaID] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
@@ -287,11 +352,14 @@ PRIMARY KEY CLUSTERED
 	[FamiliaID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.ItemsFactura', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[ItemsFactura](
 	[NroFactura] [int] NOT NULL,
 	[NroItem] [int] NOT NULL,
@@ -305,15 +373,20 @@ CREATE TABLE [dbo].[ItemsFactura](
 	[NroItem] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF OBJECT_ID(N'dbo.CK_ItemsFactura_Cantidad', N'C') IS NULL
 ALTER TABLE [dbo].[ItemsFactura]  WITH CHECK ADD  CONSTRAINT [CK_ItemsFactura_Cantidad] CHECK  (([Cantidad]>(0)))
 GO
+IF OBJECT_ID(N'dbo.CK_ItemsFactura_Cantidad') IS NOT NULL
 ALTER TABLE [dbo].[ItemsFactura] CHECK CONSTRAINT [CK_ItemsFactura_Cantidad]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.ItemsPedido', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[ItemsPedido](
 	[NroPedido] [int] NOT NULL,
 	[NroItem] [int] NOT NULL,
@@ -327,21 +400,27 @@ CREATE TABLE [dbo].[ItemsPedido](
 	[NroItem] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ItemsPedido_Producto' AND object_id = OBJECT_ID(N'dbo.ItemsPedido'))
 CREATE NONCLUSTERED INDEX [IX_ItemsPedido_Producto] ON [dbo].[ItemsPedido]
 (
 	[ProductoID] ASC
 )
 INCLUDE([Cantidad]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF OBJECT_ID(N'dbo.CK_ItemsPedido_Cantidad', N'C') IS NULL
 ALTER TABLE [dbo].[ItemsPedido]  WITH CHECK ADD  CONSTRAINT [CK_ItemsPedido_Cantidad] CHECK  (([Cantidad]>(0)))
 GO
+IF OBJECT_ID(N'dbo.CK_ItemsPedido_Cantidad') IS NOT NULL
 ALTER TABLE [dbo].[ItemsPedido] CHECK CONSTRAINT [CK_ItemsPedido_Cantidad]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Mesas', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Mesas](
 	[NroMesa] [int] NOT NULL,
 	[Capacidad] [int] NOT NULL,
@@ -352,13 +431,17 @@ CREATE TABLE [dbo].[Mesas](
 	[NroMesa] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Mesas') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Mesas'), N'Activo', 'ColumnId'))
 ALTER TABLE [dbo].[Mesas] ADD  CONSTRAINT [DF_Mesas_Activo]  DEFAULT ((1)) FOR [Activo]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Pagos', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Pagos](
 	[IdPago] [int] IDENTITY(1,1) NOT NULL,
 	[NroFactura] [int] NOT NULL,
@@ -377,44 +460,60 @@ CREATE TABLE [dbo].[Pagos](
 	[IdPago] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Pagos_Fecha' AND object_id = OBJECT_ID(N'dbo.Pagos'))
 CREATE NONCLUSTERED INDEX [IX_Pagos_Fecha] ON [dbo].[Pagos]
 (
 	[FechaHoraPago] ASC
 )
 INCLUDE([MetodoPago],[MontoPropina]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Pagos_Factura' AND object_id = OBJECT_ID(N'dbo.Pagos'))
 CREATE UNIQUE NONCLUSTERED INDEX [UX_Pagos_Factura] ON [dbo].[Pagos]
 (
 	[NroFactura] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Pagos') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Pagos'), N'MontoPropina', 'ColumnId'))
 ALTER TABLE [dbo].[Pagos] ADD  CONSTRAINT [DF_Pagos_Propina]  DEFAULT ((0)) FOR [MontoPropina]
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Cuotas', N'C') IS NULL
 ALTER TABLE [dbo].[Pagos]  WITH CHECK ADD  CONSTRAINT [CK_Pagos_Cuotas] CHECK  (([CantidadCuotas] IS NULL OR ([CantidadCuotas]=(12) OR [CantidadCuotas]=(6) OR [CantidadCuotas]=(3) OR [CantidadCuotas]=(1))))
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Cuotas') IS NOT NULL
 ALTER TABLE [dbo].[Pagos] CHECK CONSTRAINT [CK_Pagos_Cuotas]
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Efectivo', N'C') IS NULL
 ALTER TABLE [dbo].[Pagos]  WITH CHECK ADD  CONSTRAINT [CK_Pagos_Efectivo] CHECK  (([MetodoPago]<>N'Efectivo' OR [MontoRecibido]>=[MontoAbonado] AND [Cambio]=([MontoRecibido]-[MontoAbonado])))
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Efectivo') IS NOT NULL
 ALTER TABLE [dbo].[Pagos] CHECK CONSTRAINT [CK_Pagos_Efectivo]
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Importes', N'C') IS NULL
 ALTER TABLE [dbo].[Pagos]  WITH CHECK ADD  CONSTRAINT [CK_Pagos_Importes] CHECK  (([MontoAbonado]>(0) AND [MontoPropina]>=(0)))
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Importes') IS NOT NULL
 ALTER TABLE [dbo].[Pagos] CHECK CONSTRAINT [CK_Pagos_Importes]
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Metodo', N'C') IS NULL
 ALTER TABLE [dbo].[Pagos]  WITH CHECK ADD  CONSTRAINT [CK_Pagos_Metodo] CHECK  (([MetodoPago]=N'Tarjeta' OR [MetodoPago]=N'Efectivo'))
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Metodo') IS NOT NULL
 ALTER TABLE [dbo].[Pagos] CHECK CONSTRAINT [CK_Pagos_Metodo]
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Tarjeta', N'C') IS NULL
 ALTER TABLE [dbo].[Pagos]  WITH CHECK ADD  CONSTRAINT [CK_Pagos_Tarjeta] CHECK  (([MetodoPago]<>N'Tarjeta' OR [NroTarjeta] IS NOT NULL AND [CantidadCuotas] IS NOT NULL AND [NroAutorizacion] IS NOT NULL))
 GO
+IF OBJECT_ID(N'dbo.CK_Pagos_Tarjeta') IS NOT NULL
 ALTER TABLE [dbo].[Pagos] CHECK CONSTRAINT [CK_Pagos_Tarjeta]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Pedidos', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Pedidos](
 	[NroPedido] [int] IDENTITY(1,1) NOT NULL,
 	[ReservaID] [int] NOT NULL,
@@ -429,9 +528,11 @@ CREATE TABLE [dbo].[Pedidos](
 	[NroPedido] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_PADDING ON
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Pedidos_Estado' AND object_id = OBJECT_ID(N'dbo.Pedidos'))
 CREATE NONCLUSTERED INDEX [IX_Pedidos_Estado] ON [dbo].[Pedidos]
 (
 	[Estado] ASC,
@@ -439,20 +540,27 @@ CREATE NONCLUSTERED INDEX [IX_Pedidos_Estado] ON [dbo].[Pedidos]
 )
 INCLUDE([ReservaID]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Pedidos') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Pedidos'), N'StockDescontado', 'ColumnId'))
 ALTER TABLE [dbo].[Pedidos] ADD  CONSTRAINT [DF_Pedidos_StockDescontado]  DEFAULT ((0)) FOR [StockDescontado]
 GO
+IF OBJECT_ID(N'dbo.CK_Pedidos_Estado', N'C') IS NULL
 ALTER TABLE [dbo].[Pedidos]  WITH CHECK ADD  CONSTRAINT [CK_Pedidos_Estado] CHECK  (([Estado]=N'Listo' OR [Estado]=N'EnPreparacion' OR [Estado]=N'Pendiente'))
 GO
+IF OBJECT_ID(N'dbo.CK_Pedidos_Estado') IS NOT NULL
 ALTER TABLE [dbo].[Pedidos] CHECK CONSTRAINT [CK_Pedidos_Estado]
 GO
+IF OBJECT_ID(N'dbo.CK_Pedidos_StockDescontado', N'C') IS NULL
 ALTER TABLE [dbo].[Pedidos]  WITH CHECK ADD  CONSTRAINT [CK_Pedidos_StockDescontado] CHECK  (([Estado]=N'Listo' AND [StockDescontado]=(1) OR [Estado]<>N'Listo' AND [StockDescontado]=(0)))
 GO
+IF OBJECT_ID(N'dbo.CK_Pedidos_StockDescontado') IS NOT NULL
 ALTER TABLE [dbo].[Pedidos] CHECK CONSTRAINT [CK_Pedidos_StockDescontado]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Permisos', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Permisos](
 	[PermisoID] [int] IDENTITY(0,1) NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
@@ -462,11 +570,14 @@ CREATE TABLE [dbo].[Permisos](
 	[PermisoID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Productos', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Productos](
 	[ProductoID] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
@@ -480,29 +591,41 @@ CREATE TABLE [dbo].[Productos](
 	[ProductoID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Productos') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Productos'), N'Activo', 'ColumnId'))
 ALTER TABLE [dbo].[Productos] ADD  CONSTRAINT [DF_Productos_Activo]  DEFAULT ((1)) FOR [Activo]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Productos') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Productos'), N'Categoria', 'ColumnId'))
 ALTER TABLE [dbo].[Productos] ADD  CONSTRAINT [DF_Productos_Categoria]  DEFAULT (N'PlatoPrincipal') FOR [Categoria]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Productos') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Productos'), N'ControlaStock', 'ColumnId'))
 ALTER TABLE [dbo].[Productos] ADD  CONSTRAINT [DF_Productos_ControlaStock]  DEFAULT ((1)) FOR [ControlaStock]
 GO
+IF OBJECT_ID(N'dbo.CK_Productos_Categoria', N'C') IS NULL
 ALTER TABLE [dbo].[Productos]  WITH CHECK ADD  CONSTRAINT [CK_Productos_Categoria] CHECK  (([Categoria]=N'Bebida' OR [Categoria]=N'Postre' OR [Categoria]=N'PlatoPrincipal' OR [Categoria]=N'Entrada'))
 GO
+IF OBJECT_ID(N'dbo.CK_Productos_Categoria') IS NOT NULL
 ALTER TABLE [dbo].[Productos] CHECK CONSTRAINT [CK_Productos_Categoria]
 GO
+IF OBJECT_ID(N'dbo.CK_Productos_Precio', N'C') IS NULL
 ALTER TABLE [dbo].[Productos]  WITH CHECK ADD  CONSTRAINT [CK_Productos_Precio] CHECK  (([Precio]>=(0)))
 GO
+IF OBJECT_ID(N'dbo.CK_Productos_Precio') IS NOT NULL
 ALTER TABLE [dbo].[Productos] CHECK CONSTRAINT [CK_Productos_Precio]
 GO
+IF OBJECT_ID(N'dbo.CK_Productos_Stock', N'C') IS NULL
 ALTER TABLE [dbo].[Productos]  WITH CHECK ADD  CONSTRAINT [CK_Productos_Stock] CHECK  (([StockPorciones]>=(0)))
 GO
+IF OBJECT_ID(N'dbo.CK_Productos_Stock') IS NOT NULL
 ALTER TABLE [dbo].[Productos] CHECK CONSTRAINT [CK_Productos_Stock]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Productos_C', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Productos_C](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[ProductoID] [int] NOT NULL,
@@ -519,12 +642,15 @@ CREATE TABLE [dbo].[Productos_C](
 	[ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Productos_C_Fecha' AND object_id = OBJECT_ID(N'dbo.Productos_C'))
 CREATE NONCLUSTERED INDEX [IX_Productos_C_Fecha] ON [dbo].[Productos_C]
 (
 	[Fecha] DESC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Productos_C_ProductoID_Act' AND object_id = OBJECT_ID(N'dbo.Productos_C'))
 CREATE NONCLUSTERED INDEX [IX_Productos_C_ProductoID_Act] ON [dbo].[Productos_C]
 (
 	[ProductoID] ASC,
@@ -532,14 +658,18 @@ CREATE NONCLUSTERED INDEX [IX_Productos_C_ProductoID_Act] ON [dbo].[Productos_C]
 )
 INCLUDE([Fecha]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Productos_C') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Productos_C'), N'Fecha', 'ColumnId'))
 ALTER TABLE [dbo].[Productos_C] ADD  CONSTRAINT [DF_Productos_C_Fecha]  DEFAULT (getdate()) FOR [Fecha]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Productos_C') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Productos_C'), N'Act', 'ColumnId'))
 ALTER TABLE [dbo].[Productos_C] ADD  CONSTRAINT [DF_Productos_C_Act]  DEFAULT ((1)) FOR [Act]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Reservas', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Reservas](
 	[ReservaID] [int] IDENTITY(1,1) NOT NULL,
 	[ClienteDNI] [int] NOT NULL,
@@ -554,7 +684,9 @@ CREATE TABLE [dbo].[Reservas](
 	[ReservaID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Reservas_Mesa_Turno' AND object_id = OBJECT_ID(N'dbo.Reservas'))
 CREATE NONCLUSTERED INDEX [IX_Reservas_Mesa_Turno] ON [dbo].[Reservas]
 (
 	[MesaNumero] ASC,
@@ -563,14 +695,18 @@ CREATE NONCLUSTERED INDEX [IX_Reservas_Mesa_Turno] ON [dbo].[Reservas]
 )
 INCLUDE([Estado]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 GO
+IF OBJECT_ID(N'dbo.CK_Reservas_Estado', N'C') IS NULL
 ALTER TABLE [dbo].[Reservas]  WITH NOCHECK ADD  CONSTRAINT [CK_Reservas_Estado] CHECK  (([Estado]=N'Finalizada' OR [Estado]=N'Asistida' OR [Estado]=N'Cancelada' OR [Estado]=N'Confirmada'))
 GO
+IF OBJECT_ID(N'dbo.CK_Reservas_Estado') IS NOT NULL
 ALTER TABLE [dbo].[Reservas] CHECK CONSTRAINT [CK_Reservas_Estado]
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Roles', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Roles](
 	[RolID] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [nvarchar](100) NOT NULL,
@@ -579,11 +715,14 @@ PRIMARY KEY CLUSTERED
 	[RolID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.RolFamilia', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[RolFamilia](
 	[RolID] [int] NOT NULL,
 	[FamiliaID] [int] NOT NULL,
@@ -593,11 +732,14 @@ CREATE TABLE [dbo].[RolFamilia](
 	[FamiliaID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.RolPermiso', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[RolPermiso](
 	[RolID] [int] NOT NULL,
 	[PermisoID] [int] NOT NULL,
@@ -607,11 +749,14 @@ CREATE TABLE [dbo].[RolPermiso](
 	[PermisoID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.TelefonosAdicionalesCliente', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[TelefonosAdicionalesCliente](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[ClienteDNI] [int] NOT NULL,
@@ -621,11 +766,14 @@ CREATE TABLE [dbo].[TelefonosAdicionalesCliente](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+IF OBJECT_ID(N'dbo.Users', N'U') IS NULL
+BEGIN
 CREATE TABLE [dbo].[Users](
 	[DNI] [int] NOT NULL,
 	[Username] [nvarchar](50) NOT NULL,
@@ -647,25 +795,39 @@ CREATE TABLE [dbo].[Users](
 	[Username] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
 )
+END
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Users') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Users'), N'Bloqueado', 'ColumnId'))
 ALTER TABLE [dbo].[Users] ADD  CONSTRAINT [DF_Users_Bloqueado]  DEFAULT ((0)) FOR [Bloqueado]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Users') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Users'), N'Activo', 'ColumnId'))
 ALTER TABLE [dbo].[Users] ADD  CONSTRAINT [DF_Users_Activo]  DEFAULT ((1)) FOR [Activo]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID(N'dbo.Users') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID(N'dbo.Users'), N'Idioma', 'ColumnId'))
 ALTER TABLE [dbo].[Users] ADD  CONSTRAINT [DF_Users_Idioma]  DEFAULT ('es') FOR [Idioma]
 GO
+IF OBJECT_ID(N'dbo.CHK_Users_Idioma', N'C') IS NULL
 ALTER TABLE [dbo].[Users]  WITH CHECK ADD  CONSTRAINT [CHK_Users_Idioma] CHECK  (([Idioma]='en' OR [Idioma]='es'))
 GO
+IF OBJECT_ID(N'dbo.CHK_Users_Idioma') IS NOT NULL
 ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [CHK_Users_Idioma]
 GO
 
 
 /* ─── 3) Datos semilla y 4) Dígitos Verificadores (tabla DV) ──────────────
-   Las filas de DV corresponden exactamente a estos datos (DvBLL_08YS). */
+   Las filas de DV corresponden exactamente a estos datos (DvBLL_08YS).
+   SOLO en una instalación nueva (SESSION_CONTEXT 'DeployNuevo' = 1): en una base
+   con datos no se inserta, pisa ni duplica nada, y los DV del cliente quedan
+   intactos (insertar aunque sea una fila semilla los dejaría inconsistentes). */
 -- Clientes
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[Clientes] ([DNI], [Nombre], [Apellido], [Email], [Telefono], [Activo], [Direccion]) VALUES (30000000, N'Cliente', N'Frecuente', N'cliente@fogon.com', N'1100000000', 1, N'Av. Siempre Viva 123')
+END
 GO
 -- DV
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Clientes', N'FfueLzU+cesSdj5UiBiircXdpdTj5j0N4ypXO03dN6D01sJ6oGRcA5kouJIdVb34qiBNSTuVjHSG8cUVhLzbs5Zw3bF02hndW7rE4FJwfvM=', N'AT9IHFWLP85lcxCiz0Ib+4eeyZLDC1MCt7l0y2pUSi7qgJ+ZZCCFgYxpTmAlQxEviD+FBA5A/bw+6eXyABkYFOM9+DnlldEm8a0FX20PB+U=')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Empleados', N'76bUYYAUD637R5lRsWcnFR/IoksAyVChXoFUOuFQsFyN0e7IO/W13losSeAu12HBRjgsGG9UNoZcdwh/YgCy++hA3LPWhl8lO7UgA6Enme/CwVCIVdtIFW09cCwBHK7CvF/LbUUiIR1ncWipPNRkrrt9OZ9cbuSE8NscGRlG5jU=', N'oo2A994cFMBK6lLG23rJduaUtwrCxx2dZ69BmzrzRtOA4GwOBhDZRz224fB6ZPdrpNChgJunx3RU6gzrRIl9k+0LOXfYkQrBuKxpxS7pnGwvqTM+51IAvFDAkFEvRj+/+i89JdJ+dS8LmLOSby/i969HwKD7dgBKuNCQH3OYYFo=')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Facturas', N'ptmmpmry2Awc6TsYuuKCHA==', N'ZUfQd7PynYmY/krYVmYsKg==')
@@ -684,14 +846,20 @@ INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Roles', N'cougKoLpSK6LuvvoaH
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolFamilia', N'O/TplqOE+7KQugh/DwAcc2tW2CeMAufDo2O9gY+rSTE3tiy4OzaChO8Ev44waz6reQoh8aSxNYayzDgqm0cb+A==', N'pBIJXLVaPTAmpkXr6fjrUNBnO4IJ3K/5XSh6Li8qpy+K6G0DSyrEs37nu4dnmxipwARYRmnRFAA05Trhds/n2A==')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolPermiso', N'1ZHbaibjUMIvq/i9x7uEdxHYXfwep/Tkw2313z4yOQPufXZWqaeH0itb2pfW+Bb8', N'idoJuuYcLt7tPVf0Zvce2kyGY649urSUB0cru/wmG+FIzkIBRCKN/8GfYacFIR2b')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Users', N'wSQ6L6QDrv14dS8KCBE8KPeg7vFHZ8SuIy/vcqwvMM7BegE8beOAmBT0A+DOMNDx5dBTSgqrzFn76/58o28tGTxc8CktpgWVtQMhyQKzoJWasnnE1xd0dyHcML/fHpcVL9KZGDXsRyz0gXKppj8F4j+rYIAb97fKdJVTC7WGow0=', N'xioQuckAuprBSBozkpWWjMbHO0S0sb8mvPhZgo8b/+UqGRCfJHJJ2t9dFP8ZD14TSts/ui66udUY/87CkIfna92zwsgaz6e5zcelEPeEosD4SfLBGwonzxaHmq4duk/yNScguGASVjpPz8ap6+wQ/Syph+Z8NR/OlKe3q4MrHwg=')
+END
 GO
 -- Empleados
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (12345678, N'Maximo', N'Yapura', N'Camarero', 12345678, 1)
 INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (22222222, N'Pedro', N'Pascal', N'Recepcionista', NULL, 1)
 INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (30000001, N'Lucas', N'Gomez', N'Camarero', NULL, 1)
 INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (30000002, N'Martina', N'Ruiz', N'Chef', NULL, 1)
+END
 GO
 -- FamiliaPermiso
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (1, 2)
 INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (1, 3)
 INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (1, 4)
@@ -729,8 +897,11 @@ INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (16, 36)
 INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (17, 37)
 INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (18, 38)
 INSERT [dbo].[FamiliaPermiso] ([FamiliaID], [PermisoID]) VALUES (19, 39)
+END
 GO
 -- Familias
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 SET IDENTITY_INSERT [dbo].[Familias] ON
 INSERT [dbo].[Familias] ([FamiliaID], [Nombre]) VALUES (1, N'Gestion de usuarios')
 INSERT [dbo].[Familias] ([FamiliaID], [Nombre]) VALUES (2, N'Gestion de familias')
@@ -750,8 +921,11 @@ INSERT [dbo].[Familias] ([FamiliaID], [Nombre]) VALUES (17, N'Gestion de caja')
 INSERT [dbo].[Familias] ([FamiliaID], [Nombre]) VALUES (18, N'Reportes predictivos')
 INSERT [dbo].[Familias] ([FamiliaID], [Nombre]) VALUES (19, N'Auditoría de productos')
 SET IDENTITY_INSERT [dbo].[Familias] OFF
+END
 GO
 -- Mesas
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (1, 2, N'Ocupada', 1)
 INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (2, 2, N'Libre', 1)
 INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (4, 4, N'Libre', 1)
@@ -764,8 +938,11 @@ INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (10, 2,
 INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (11, 8, N'Libre', 1)
 INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (12, 4, N'Libre', 1)
 INSERT [dbo].[Mesas] ([NroMesa], [Capacidad], [Estado], [Activo]) VALUES (13, 7, N'Libre', 1)
+END
 GO
 -- Permisos
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 SET IDENTITY_INSERT [dbo].[Permisos] ON
 INSERT [dbo].[Permisos] ([PermisoID], [Nombre], [Descripcion]) VALUES (1, N'VerBitacora', N'Consultar eventos del sistema')
 INSERT [dbo].[Permisos] ([PermisoID], [Nombre], [Descripcion]) VALUES (2, N'VerUsuarios', N'Acceder a la pantalla gestion de usuarios con la lista de usuarios en el sistema')
@@ -805,8 +982,11 @@ INSERT [dbo].[Permisos] ([PermisoID], [Nombre], [Descripcion]) VALUES (37, N'Ges
 INSERT [dbo].[Permisos] ([PermisoID], [Nombre], [Descripcion]) VALUES (38, N'GestionReportePredictivo', N'Permite consultar el análisis predictivo de canasta (reglas de asociación y sugerencias)')
 INSERT [dbo].[Permisos] ([PermisoID], [Nombre], [Descripcion]) VALUES (39, N'AuditarProductos', N'Permite consultar la bitácora de cambios de productos y restaurar versiones anteriores (rollback)')
 SET IDENTITY_INSERT [dbo].[Permisos] OFF
+END
 GO
 -- Productos
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 SET IDENTITY_INSERT [dbo].[Productos] ON
 INSERT [dbo].[Productos] ([ProductoID], [Nombre], [Precio], [StockPorciones], [Activo], [Categoria], [ControlaStock]) VALUES (1, N'Bife de chorizo', CAST(18500.00 AS Decimal(10, 2)), 13, 1, N'PlatoPrincipal', 1)
 INSERT [dbo].[Productos] ([ProductoID], [Nombre], [Precio], [StockPorciones], [Activo], [Categoria], [ControlaStock]) VALUES (2, N'Provoleta', CAST(7800.00 AS Decimal(10, 2)), 15, 1, N'Entrada', 1)
@@ -824,8 +1004,11 @@ INSERT [dbo].[Productos] ([ProductoID], [Nombre], [Precio], [StockPorciones], [A
 INSERT [dbo].[Productos] ([ProductoID], [Nombre], [Precio], [StockPorciones], [Activo], [Categoria], [ControlaStock]) VALUES (14, N'Ravioles de ricota', CAST(9200.00 AS Decimal(10, 2)), 14, 1, N'PlatoPrincipal', 1)
 INSERT [dbo].[Productos] ([ProductoID], [Nombre], [Precio], [StockPorciones], [Activo], [Categoria], [ControlaStock]) VALUES (16, N'Copa de Malbec', CAST(4800.00 AS Decimal(10, 2)), 30, 1, N'Bebida', 1)
 SET IDENTITY_INSERT [dbo].[Productos] OFF
+END
 GO
 -- Roles
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 SET IDENTITY_INSERT [dbo].[Roles] ON
 INSERT [dbo].[Roles] ([RolID], [Nombre]) VALUES (1, N'SuperAdmin')
 INSERT [dbo].[Roles] ([RolID], [Nombre]) VALUES (2, N'Supervisor')
@@ -835,8 +1018,11 @@ INSERT [dbo].[Roles] ([RolID], [Nombre]) VALUES (5, N'Gerente')
 INSERT [dbo].[Roles] ([RolID], [Nombre]) VALUES (6, N'Camarero')
 INSERT [dbo].[Roles] ([RolID], [Nombre]) VALUES (7, N'Chef')
 SET IDENTITY_INSERT [dbo].[Roles] OFF
+END
 GO
 -- RolFamilia
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (1, 1)
 INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (1, 2)
 INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (1, 3)
@@ -860,8 +1046,11 @@ INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (4, 11)
 INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (6, 12)
 INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (6, 16)
 INSERT [dbo].[RolFamilia] ([RolID], [FamiliaID]) VALUES (7, 13)
+END
 GO
 -- RolPermiso
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (1, 1)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (1, 16)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (1, 27)
@@ -874,116 +1063,274 @@ INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (4, 24)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (4, 26)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (5, 24)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (5, 27)
+END
 GO
 -- Users
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+BEGIN
 INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (12345678, N'Maximo', 1, N'Maximo', N'Yapura', N'Maximo@gmail.com', N'N4Rf9Gw3hwxmXiqY4tp1IFxaOezlZdSiuYkDZqKOGFQ=', N'CWu49+d6I6N7m98eZq7sUw==', 0, 1, N'es')
+END
 GO
 
 
 /* ─── Claves foráneas (después de los datos) ──────────────────────────── */
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Bitacora')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'Username'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Users'))
 ALTER TABLE [dbo].[Bitacora]  WITH CHECK ADD  CONSTRAINT [FK_Bitacora_Users] FOREIGN KEY([Username])
 REFERENCES [dbo].[Users] ([Username])
 ON UPDATE CASCADE
 GO
+IF OBJECT_ID(N'dbo.FK_Bitacora_Users') IS NOT NULL
 ALTER TABLE [dbo].[Bitacora] CHECK CONSTRAINT [FK_Bitacora_Users]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.EmailsAdicionalesCliente')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ClienteDNI'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Clientes'))
 ALTER TABLE [dbo].[EmailsAdicionalesCliente]  WITH CHECK ADD  CONSTRAINT [FK_EmailsAdicionalesCliente_Clientes] FOREIGN KEY([ClienteDNI])
 REFERENCES [dbo].[Clientes] ([DNI])
 GO
+IF OBJECT_ID(N'dbo.FK_EmailsAdicionalesCliente_Clientes') IS NOT NULL
 ALTER TABLE [dbo].[EmailsAdicionalesCliente] CHECK CONSTRAINT [FK_EmailsAdicionalesCliente_Clientes]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Empleados')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'UsuarioDNI'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Users'))
 ALTER TABLE [dbo].[Empleados]  WITH CHECK ADD  CONSTRAINT [FK_Empleados_Users] FOREIGN KEY([UsuarioDNI])
 REFERENCES [dbo].[Users] ([DNI])
 GO
+IF OBJECT_ID(N'dbo.FK_Empleados_Users') IS NOT NULL
 ALTER TABLE [dbo].[Empleados] CHECK CONSTRAINT [FK_Empleados_Users]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Facturas')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'NroReserva'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Reservas'))
 ALTER TABLE [dbo].[Facturas]  WITH CHECK ADD  CONSTRAINT [FK_Facturas_Reservas] FOREIGN KEY([NroReserva])
 REFERENCES [dbo].[Reservas] ([ReservaID])
 GO
+IF OBJECT_ID(N'dbo.FK_Facturas_Reservas') IS NOT NULL
 ALTER TABLE [dbo].[Facturas] CHECK CONSTRAINT [FK_Facturas_Reservas]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.FamiliaIntegrada')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'FamiliaPadreID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Familias'))
 ALTER TABLE [dbo].[FamiliaIntegrada]  WITH CHECK ADD FOREIGN KEY([FamiliaPadreID])
 REFERENCES [dbo].[Familias] ([FamiliaID])
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.FamiliaIntegrada')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'FamiliaID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Familias'))
 ALTER TABLE [dbo].[FamiliaIntegrada]  WITH CHECK ADD FOREIGN KEY([FamiliaID])
 REFERENCES [dbo].[Familias] ([FamiliaID])
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.FamiliaPermiso')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'FamiliaID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Familias'))
 ALTER TABLE [dbo].[FamiliaPermiso]  WITH CHECK ADD FOREIGN KEY([FamiliaID])
 REFERENCES [dbo].[Familias] ([FamiliaID])
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.FamiliaPermiso')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'PermisoID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Permisos'))
 ALTER TABLE [dbo].[FamiliaPermiso]  WITH CHECK ADD  CONSTRAINT [FK__FamiliaPe__Permi__5165187F] FOREIGN KEY([PermisoID])
 REFERENCES [dbo].[Permisos] ([PermisoID])
 GO
+IF OBJECT_ID(N'dbo.FK__FamiliaPe__Permi__5165187F') IS NOT NULL
 ALTER TABLE [dbo].[FamiliaPermiso] CHECK CONSTRAINT [FK__FamiliaPe__Permi__5165187F]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.ItemsFactura')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'NroFactura'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Facturas'))
 ALTER TABLE [dbo].[ItemsFactura]  WITH CHECK ADD  CONSTRAINT [FK_ItemsFactura_Facturas] FOREIGN KEY([NroFactura])
 REFERENCES [dbo].[Facturas] ([NroFactura])
 GO
+IF OBJECT_ID(N'dbo.FK_ItemsFactura_Facturas') IS NOT NULL
 ALTER TABLE [dbo].[ItemsFactura] CHECK CONSTRAINT [FK_ItemsFactura_Facturas]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.ItemsFactura')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ProductoID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Productos'))
 ALTER TABLE [dbo].[ItemsFactura]  WITH CHECK ADD  CONSTRAINT [FK_ItemsFactura_Productos] FOREIGN KEY([ProductoID])
 REFERENCES [dbo].[Productos] ([ProductoID])
 GO
+IF OBJECT_ID(N'dbo.FK_ItemsFactura_Productos') IS NOT NULL
 ALTER TABLE [dbo].[ItemsFactura] CHECK CONSTRAINT [FK_ItemsFactura_Productos]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.ItemsPedido')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'NroPedido'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Pedidos'))
 ALTER TABLE [dbo].[ItemsPedido]  WITH CHECK ADD  CONSTRAINT [FK_ItemsPedido_Pedidos] FOREIGN KEY([NroPedido])
 REFERENCES [dbo].[Pedidos] ([NroPedido])
 GO
+IF OBJECT_ID(N'dbo.FK_ItemsPedido_Pedidos') IS NOT NULL
 ALTER TABLE [dbo].[ItemsPedido] CHECK CONSTRAINT [FK_ItemsPedido_Pedidos]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.ItemsPedido')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ProductoID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Productos'))
 ALTER TABLE [dbo].[ItemsPedido]  WITH CHECK ADD  CONSTRAINT [FK_ItemsPedido_Productos] FOREIGN KEY([ProductoID])
 REFERENCES [dbo].[Productos] ([ProductoID])
 GO
+IF OBJECT_ID(N'dbo.FK_ItemsPedido_Productos') IS NOT NULL
 ALTER TABLE [dbo].[ItemsPedido] CHECK CONSTRAINT [FK_ItemsPedido_Productos]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Pagos')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'NroFactura'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Facturas'))
 ALTER TABLE [dbo].[Pagos]  WITH CHECK ADD  CONSTRAINT [FK_Pagos_Facturas] FOREIGN KEY([NroFactura])
 REFERENCES [dbo].[Facturas] ([NroFactura])
 GO
+IF OBJECT_ID(N'dbo.FK_Pagos_Facturas') IS NOT NULL
 ALTER TABLE [dbo].[Pagos] CHECK CONSTRAINT [FK_Pagos_Facturas]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Pedidos')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ReservaID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Reservas'))
 ALTER TABLE [dbo].[Pedidos]  WITH CHECK ADD  CONSTRAINT [FK_Pedidos_Reservas] FOREIGN KEY([ReservaID])
 REFERENCES [dbo].[Reservas] ([ReservaID])
 GO
+IF OBJECT_ID(N'dbo.FK_Pedidos_Reservas') IS NOT NULL
 ALTER TABLE [dbo].[Pedidos] CHECK CONSTRAINT [FK_Pedidos_Reservas]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Productos_C')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ProductoID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Productos'))
 ALTER TABLE [dbo].[Productos_C]  WITH NOCHECK ADD  CONSTRAINT [FK_Productos_C_Productos] FOREIGN KEY([ProductoID])
 REFERENCES [dbo].[Productos] ([ProductoID])
 GO
+IF OBJECT_ID(N'dbo.FK_Productos_C_Productos') IS NOT NULL
 ALTER TABLE [dbo].[Productos_C] NOCHECK CONSTRAINT [FK_Productos_C_Productos]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Reservas')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ClienteDNI'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Clientes'))
 ALTER TABLE [dbo].[Reservas]  WITH CHECK ADD  CONSTRAINT [FK_Reservas_Clientes] FOREIGN KEY([ClienteDNI])
 REFERENCES [dbo].[Clientes] ([DNI])
 GO
+IF OBJECT_ID(N'dbo.FK_Reservas_Clientes') IS NOT NULL
 ALTER TABLE [dbo].[Reservas] CHECK CONSTRAINT [FK_Reservas_Clientes]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Reservas')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'CamareroDNI'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Empleados'))
 ALTER TABLE [dbo].[Reservas]  WITH CHECK ADD  CONSTRAINT [FK_Reservas_Empleados] FOREIGN KEY([CamareroDNI])
 REFERENCES [dbo].[Empleados] ([DNI])
 GO
+IF OBJECT_ID(N'dbo.FK_Reservas_Empleados') IS NOT NULL
 ALTER TABLE [dbo].[Reservas] CHECK CONSTRAINT [FK_Reservas_Empleados]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.Reservas')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'MesaNumero'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Mesas'))
 ALTER TABLE [dbo].[Reservas]  WITH CHECK ADD  CONSTRAINT [FK_Reservas_Mesas] FOREIGN KEY([MesaNumero])
 REFERENCES [dbo].[Mesas] ([NroMesa])
 GO
+IF OBJECT_ID(N'dbo.FK_Reservas_Mesas') IS NOT NULL
 ALTER TABLE [dbo].[Reservas] CHECK CONSTRAINT [FK_Reservas_Mesas]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.RolFamilia')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'FamiliaID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Familias'))
 ALTER TABLE [dbo].[RolFamilia]  WITH CHECK ADD FOREIGN KEY([FamiliaID])
 REFERENCES [dbo].[Familias] ([FamiliaID])
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.RolFamilia')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'RolID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Roles'))
 ALTER TABLE [dbo].[RolFamilia]  WITH CHECK ADD FOREIGN KEY([RolID])
 REFERENCES [dbo].[Roles] ([RolID])
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.RolPermiso')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'PermisoID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Permisos'))
 ALTER TABLE [dbo].[RolPermiso]  WITH CHECK ADD  CONSTRAINT [FK__RolPermis__Permi__5441852A] FOREIGN KEY([PermisoID])
 REFERENCES [dbo].[Permisos] ([PermisoID])
 GO
+IF OBJECT_ID(N'dbo.FK__RolPermis__Permi__5441852A') IS NOT NULL
 ALTER TABLE [dbo].[RolPermiso] CHECK CONSTRAINT [FK__RolPermis__Permi__5441852A]
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.RolPermiso')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'RolID'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Roles'))
 ALTER TABLE [dbo].[RolPermiso]  WITH CHECK ADD FOREIGN KEY([RolID])
 REFERENCES [dbo].[Roles] ([RolID])
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_key_columns fkc
+               WHERE fkc.parent_object_id = OBJECT_ID(N'dbo.TelefonosAdicionalesCliente')
+                 AND COL_NAME(fkc.parent_object_id, fkc.parent_column_id) = N'ClienteDNI'
+                 AND fkc.referenced_object_id = OBJECT_ID(N'dbo.Clientes'))
 ALTER TABLE [dbo].[TelefonosAdicionalesCliente]  WITH CHECK ADD  CONSTRAINT [FK_TelefonosAdicionalesCliente_Clientes] FOREIGN KEY([ClienteDNI])
 REFERENCES [dbo].[Clientes] ([DNI])
 GO
+IF OBJECT_ID(N'dbo.FK_TelefonosAdicionalesCliente_Clientes') IS NOT NULL
 ALTER TABLE [dbo].[TelefonosAdicionalesCliente] CHECK CONSTRAINT [FK_TelefonosAdicionalesCliente_Clientes]
+GO
+
+
+/* ─── Actualizaciones de esquema (bases existentes) ──────────────────────
+   IF OBJECT_ID(...) IS NULL no agrega columnas a una tabla que ya existe: cada
+   cambio de columna de una versión nueva va acá, con su guarda, por ejemplo:
+       IF COL_LENGTH('dbo.Tabla', 'Columna') IS NULL
+           ALTER TABLE [dbo].[Tabla] ADD [Columna] int NULL;
+   OJO: agregar una columna a una tabla de los dígitos verificadores
+   (DVManager_08YS.TablasMonitoreadas / sp_GetAllTablesParaDV) cambia su DVH:
+   la aplicación debe recalcular los DV después de actualizar.
+
+   Cambios incluidos (deuda técnica, fases 2 y 4):
+     - A4 CierresCaja: la tabla se crea arriba con su guarda; acá se copian los
+       cierres históricos registrados en la bitácora (Evento 52 =
+       CierreCajaRealizado, texto "Caja dd/MM/yyyy - importe") para no reabrir
+       días ya cerrados. Idempotente (NOT EXISTS por fecha); en una instalación
+       nueva la bitácora está vacía y no inserta nada. CierresCaja no está en los
+       DV. Equivale a Migraciones_790MY/AgregarCierresCaja_790MY.sql.
+     - A5 producto_actualizado: se actualiza con CREATE OR ALTER (sección
+       Triggers); equivale a Migraciones_790MY/VersionarSoloCambiosNegocio_790MY.sql.
+   No hay columnas nuevas en tablas existentes. */
+;WITH Cierres AS (
+    SELECT TRY_CONVERT(date, SUBSTRING(b.TargetUsername, 6, 10), 103) AS Fecha,
+           LTRIM(SUBSTRING(b.TargetUsername, 19, 50))               AS Importe,
+           b.Username,
+           ROW_NUMBER() OVER (PARTITION BY SUBSTRING(b.TargetUsername, 6, 10) ORDER BY b.Id) AS Orden
+    FROM [dbo].[Bitacora] b
+    WHERE b.Evento = 52
+      AND b.TargetUsername LIKE N'Caja [0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9] - %'
+)
+INSERT INTO [dbo].[CierresCaja] ([Fecha], [Neta], [CantidadCuentas], [Usuario])
+SELECT c.Fecha,
+       ISNULL(TRY_CONVERT(decimal(12, 2), REPLACE(REPLACE(c.Importe, N'.', N''), N',', N'.')), 0),
+       (SELECT COUNT(1)
+          FROM [dbo].[Pagos] p
+          INNER JOIN [dbo].[Facturas] f ON f.NroFactura = p.NroFactura
+         WHERE p.FechaHoraPago >= c.Fecha
+           AND p.FechaHoraPago <  DATEADD(DAY, 1, c.Fecha)
+           AND f.Estado = N'Pagada'),
+       c.Username
+FROM Cierres c
+WHERE c.Orden = 1
+  AND c.Fecha IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM [dbo].[CierresCaja] x WHERE x.Fecha = c.Fecha);
 GO
 
 
@@ -997,7 +1344,7 @@ GO
    (Nombre, Precio, Categoria, Activo, ControlaStock) o si no hay vigente; un cambio
    solo de StockPorciones actualiza la fila vigente. Siempre queda una sola Act = 1
    por producto, también durante el rollback (ver VersionarSoloCambiosNegocio_790MY.sql). */
-CREATE TRIGGER [dbo].[producto_actualizado]
+CREATE OR ALTER TRIGGER [dbo].[producto_actualizado]
 ON [dbo].[Productos]
 AFTER INSERT, UPDATE
 AS
@@ -1066,7 +1413,7 @@ GO
 SET QUOTED_IDENTIFIER OFF
 GO
 
-CREATE TRIGGER [dbo].[producto_eliminado]
+CREATE OR ALTER TRIGGER [dbo].[producto_eliminado]
 ON [dbo].[Productos]
 AFTER DELETE
 AS
@@ -1087,7 +1434,7 @@ GO
 SET QUOTED_IDENTIFIER OFF
 GO
 
-CREATE TRIGGER [dbo].[producto_c_actualizado]
+CREATE OR ALTER TRIGGER [dbo].[producto_c_actualizado]
 ON [dbo].[Productos_C]
 AFTER UPDATE
 AS
@@ -1123,7 +1470,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_CreateFamilia]
+CREATE OR ALTER PROCEDURE [dbo].[sp_CreateFamilia]
     @Nombre         NVARCHAR(100),
     @Permisos       dbo.IntList READONLY,
     @SubFamilias    dbo.IntList READONLY,
@@ -1152,7 +1499,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_CreateRol]
+CREATE OR ALTER PROCEDURE [dbo].[sp_CreateRol]
     @Nombre     NVARCHAR(100),
     @Familias   dbo.IntList READONLY,
     @Permisos   dbo.IntList READONLY,
@@ -1181,7 +1528,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_DeleteFamilia] @FamiliaID INT
+CREATE OR ALTER PROCEDURE [dbo].[sp_DeleteFamilia] @FamiliaID INT
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM RolFamilia       WHERE FamiliaID = @FamiliaID)
@@ -1199,7 +1546,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_DeleteRol] @RolID INT
+CREATE OR ALTER PROCEDURE [dbo].[sp_DeleteRol] @RolID INT
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM Users WHERE RolID = @RolID)
@@ -1216,7 +1563,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_EjecutarBackup]
+CREATE OR ALTER PROCEDURE [dbo].[sp_EjecutarBackup]
     @RutaArchivo NVARCHAR(260),
     @NombreBaseDatos NVARCHAR(100)
 AS
@@ -1230,7 +1577,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_GetAllFamilias]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetAllFamilias]
 AS
 BEGIN
     -- RS0: todas las familias con su padre (NULL si es raíz)
@@ -1249,7 +1596,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_GetAllPermisos]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetAllPermisos]
 AS
     SELECT PermisoID, Nombre AS PermisoNombre, Descripcion FROM Permisos;
 GO
@@ -1257,7 +1604,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_GetAllRolesConEstructura]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetAllRolesConEstructura]
 AS
 BEGIN
     SELECT RolID, Nombre FROM Roles;                               -- RS0
@@ -1288,7 +1635,7 @@ GO
 
 /* ───────────────────────── 2) SP de integridad DVH/DVV ─────────────────────────
    El orden de los result-sets DEBE coincidir con DvBLL_08YS.TablasMonitoreadas. */
-CREATE PROCEDURE [dbo].[sp_GetAllTablesParaDV]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetAllTablesParaDV]
 AS
 BEGIN
     SELECT * FROM Users;                                   -- RS0
@@ -1315,7 +1662,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_GetAncestrosFamilia]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetAncestrosFamilia]
     @FamiliaID INT
 AS
 BEGIN
@@ -1352,14 +1699,14 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE [dbo].[sp_GetDVTodo]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetDVTodo]
 AS SELECT Tabla, DVH, DVV FROM DV ORDER BY Tabla;
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_GetRolByID]
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetRolByID]
     @RolID INT
 AS
 BEGIN
@@ -1406,7 +1753,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_ModifyFamilia]
+CREATE OR ALTER PROCEDURE [dbo].[sp_ModifyFamilia]
     @FamiliaID   INT,
     @Nombre      NVARCHAR(100),
     @Permisos    dbo.IntList READONLY,
@@ -1435,7 +1782,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[sp_ModifyRol]
+CREATE OR ALTER PROCEDURE [dbo].[sp_ModifyRol]
     @RolID    INT,
     @Nombre   NVARCHAR(100),
     @Familias dbo.IntList READONLY,
@@ -1465,7 +1812,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE [dbo].[sp_UpsertDVTabla]
+CREATE OR ALTER PROCEDURE [dbo].[sp_UpsertDVTabla]
     @Tabla NVARCHAR(100),
     @DVH   NVARCHAR(MAX),
     @DVV   NVARCHAR(MAX)
@@ -1485,9 +1832,9 @@ GO
 COMMIT TRANSACTION;
 GO
 
-PRINT N'TP_Ing_Soft desplegada: esquema, datos iniciales y DV consistentes.';
+IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
+    PRINT N'TP_Ing_Soft desplegada: esquema, datos iniciales y DV consistentes.';
+ELSE
+    PRINT N'TP_Ing_Soft actualizada: esquema al día, datos y DV sin cambios.';
 PRINT N'DEPLOY_OK';
-GO
-
-SET NOEXEC OFF;
 GO
