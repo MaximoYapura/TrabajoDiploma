@@ -96,13 +96,15 @@ namespace BLL_08YS
 
         /// <summary>
         /// Método de dominio interno: cancela una reserva Confirmada.
-        /// La validación de permiso fue eliminada junto con el formulario de Consulta/Cancelación
-        /// de reservas (refactoring 790MY). Este método se conserva para uso desde otros
-        /// contextos de negocio que puedan invocar la cancelación internamente.
+        /// Se conserva para uso desde otros contextos de negocio que puedan invocar la
+        /// cancelación internamente. Exige el mismo permiso que el alta de reservas
+        /// (RegistrarReserva): la BLL nunca confía en que la GUI haya filtrado el acceso.
         /// Una reserva Asistida o Finalizada ya no puede cancelarse.
         /// </summary>
         public void CancelarReserva(int reservaId)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
+
             if (!_reservaRepository.CancelarReserva(reservaId))
                 throw MensajesBLL_790MY.Regla("msg_rf2_reserva_no_cancelable", reservaId);
 
