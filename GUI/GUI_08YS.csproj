@@ -127,6 +127,15 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Estilo\TemaFogon_790MY.cs" />
+    <Compile Include="Estilo\FilaAyuda_790MY.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Estilo\FilaAyuda_790MY.Designer.cs">
+      <DependentUpon>FilaAyuda_790MY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Estilo\TeclaEtiqueta_790MY.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Estilo\ConfirmModal_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -376,6 +385,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\logo_fogon_bn.jpg" />
+    <None Include="Resources\sombrero_ayuda_32.png" />
+    <None Include="Resources\sombrero_ayuda_40.png" />
+    <None Include="Resources\sombrero_ayuda_48.png" />
+    <None Include="Resources\sombrero_ayuda_64.png" />
     <Content Include="script.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

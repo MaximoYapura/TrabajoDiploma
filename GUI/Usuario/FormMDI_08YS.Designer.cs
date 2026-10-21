@@ -39,6 +39,7 @@
             this.btnAtencion_790MY = new FontAwesome.Sharp.IconButton();
             this.panel3 = new System.Windows.Forms.Panel();
             this.btnCerrarSesion = new FontAwesome.Sharp.IconButton();
+            this.btnAyuda = new GUI_08YS.Estilo.FilaAyuda_790MY();
             this.panelLogo = new System.Windows.Forms.Panel();
             this.lblNombreApellido = new System.Windows.Forms.Label();
             this.lblRolSistema = new System.Windows.Forms.Label();
@@ -264,7 +265,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 57);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(248, 641);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(248, 592);
             this.flowLayoutPanel1.TabIndex = 2;
             // 
             // btnPerfil
@@ -413,15 +414,27 @@
             // 
             // panel3
             // 
+            // Orden de acople: btnAyuda (Top) se agrega último para acoplarse primero;
+            // btnCerrarSesion (Fill) ocupa lo que queda.
             this.panel3.Controls.Add(this.btnCerrarSesion);
+            this.panel3.Controls.Add(this.btnAyuda);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(0, 698);
+            this.panel3.Location = new System.Drawing.Point(0, 649);
             this.panel3.Margin = new System.Windows.Forms.Padding(2);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.panel3.Size = new System.Drawing.Size(248, 49);
+            this.panel3.Size = new System.Drawing.Size(248, 98);
             this.panel3.TabIndex = 1;
-            // 
+            //
+            // btnAyuda  (Etapa 5: fila «Ayuda [F1]» sobre «Cerrar Sesión»)
+            //
+            this.btnAyuda.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnAyuda.Location = new System.Drawing.Point(2, 0);
+            this.btnAyuda.Name = "btnAyuda";
+            this.btnAyuda.Size = new System.Drawing.Size(244, 49);
+            this.btnAyuda.TabIndex = 6;
+            this.btnAyuda.Click += new System.EventHandler(this.btnAyuda_Click);
+            //
             // btnCerrarSesion
             // 
             this.btnCerrarSesion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(10)))), ((int)(((byte)(10)))));
@@ -435,7 +448,7 @@
             this.btnCerrarSesion.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnCerrarSesion.IconSize = 30;
             this.btnCerrarSesion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCerrarSesion.Location = new System.Drawing.Point(2, 0);
+            this.btnCerrarSesion.Location = new System.Drawing.Point(2, 49);
             this.btnCerrarSesion.Margin = new System.Windows.Forms.Padding(2);
             this.btnCerrarSesion.Name = "btnCerrarSesion";
             this.btnCerrarSesion.Padding = new System.Windows.Forms.Padding(4, 0, 15, 0);
@@ -822,6 +835,7 @@
         private FontAwesome.Sharp.IconButton btnReservar;
         private System.Windows.Forms.Panel panel3;
         private FontAwesome.Sharp.IconButton btnCerrarSesion;
+        private GUI_08YS.Estilo.FilaAyuda_790MY btnAyuda;
         private System.Windows.Forms.ToolStripMenuItem gestionRespaldosToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem bitacoraCambiosToolStripMenuItem_790MY;
         private DropdownMenuStrip_08YS MaestrosDropDownMenu;

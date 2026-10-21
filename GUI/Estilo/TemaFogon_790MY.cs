@@ -63,6 +63,14 @@ namespace GUI_08YS.Estilo
         public static readonly Color KdsVerde    = Color.FromArgb(120, 200, 130);
         public static readonly Color KdsRojo     = Color.FromArgb(242, 128, 116);
 
+        // ── Barra lateral de FormMDI_08YS: conserva sus colores reales (Etapa 5) ─
+        // Valores medidos sobre los IconButton del menú (FlatStyle.Flat sin FlatAppearance propio).
+        public static readonly Color BarraFondo      = Color.FromArgb(60, 15, 15);
+        public static readonly Color BarraHover      = Color.FromArgb(72, 18, 18);
+        public static readonly Color BarraPresionado = Color.FromArgb(189, 73, 73);
+        public static readonly Color BarraTinta      = Color.FromArgb(235, 195, 140);
+        public const string BarraFamilia = "Microsoft Sans Serif";
+
         // ── Tipografía (P06, P07): Segoe UI en toda la aplicación, escala fija ─
         public const string Familia = "Segoe UI";
         public static Font FuenteTitulo()    => new Font(Familia, 16F, FontStyle.Bold);

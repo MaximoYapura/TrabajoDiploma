@@ -1095,6 +1095,9 @@
     "CJ_medio_tarjeta": "Tarjeta {0} ({1} cuota(s))",
     "CJ_val_procesando": "Procesando el cobro. No cierre esta pantalla hasta que termine.",
     "msg_fc_cobro_en_curso": "Hay un cobro en curso. Espere a que termine para cambiar de pantalla, cerrar sesión o salir.",
+    "AY_fila_texto": "Ayuda",
+    "AY_fila_tooltip": "Ayuda del Chef (F1)",
+    "AY_fila_accesible": "Ayuda (F1)",
     "CJ_tarjeta_rechazada": "El banco rechazó esta tarjeta. Pruebe con otra tarjeta o cambie a efectivo.",
     "CJ_msg_error_impresion": "No se pudo preparar la impresión ({0}). El comprobante ya está registrado: revise la impresora y vuelva a intentar."
   },
@@ -2195,6 +2198,9 @@
     "CJ_medio_tarjeta": "{0} card ({1} installment(s))",
     "CJ_val_procesando": "Processing the payment. Do not close this screen until it finishes.",
     "msg_fc_cobro_en_curso": "A payment is in progress. Wait for it to finish before switching screens, signing out or exiting.",
+    "AY_fila_texto": "Help",
+    "AY_fila_tooltip": "Chef's Help (F1)",
+    "AY_fila_accesible": "Help (F1)",
     "CJ_tarjeta_rechazada": "The bank declined this card. Try another card or switch to cash.",
     "CJ_msg_error_impresion": "Printing could not be prepared ({0}). The receipt is already recorded: check the printer and try again."
   }

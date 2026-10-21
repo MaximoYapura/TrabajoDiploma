@@ -219,6 +219,9 @@ namespace GUI_08YS
             if (PerfilDropDownMenu != null)
                 TraducirMenuFlotanteCustom(PerfilDropDownMenu);
 
+            // La fila de Ayuda no usa Tag: traduce su texto, ToolTip y nombre accesible.
+            btnAyuda.UpdateIdioma();
+
             RefrescarContenidoComboIdioma();
         }
 
@@ -634,6 +637,33 @@ namespace GUI_08YS
             }
         }
 
+        #endregion
+
+        #region Ayuda
+        /// <summary>
+        /// F1 desde cualquier pantalla (spike B1: llega aquí con el foco dentro del hijo
+        /// embebido). Se consume aunque la navegación esté bloqueada. No se usa
+        /// HelpRequested: Windows lo envía también con un ConfirmModal abierto.
+        /// </summary>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.F1)
+            {
+                if (!_navegacionBloqueada) AbrirAyuda(contextual: true);
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void btnAyuda_Click(object sender, EventArgs e)
+        {
+            if (!_navegacionBloqueada) AbrirAyuda(contextual: false);
+        }
+
+        private void AbrirAyuda(bool contextual)
+        {
+            // TODO Fase 2: alternar el panel de ayuda lateral.
+        }
         #endregion
 
         #region BarraSuperior
