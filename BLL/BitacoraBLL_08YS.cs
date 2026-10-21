@@ -1,6 +1,7 @@
 ﻿using DAL_08YS;
 using DAL_08YS.Repositories_Interfaces;
 using Service_08YS;
+using Service_08YS.Entities.Acceso;
 using Service_08YS.Entities.Bitacora;
 using System;
 using System.Collections.Generic;
@@ -70,10 +71,19 @@ namespace BLL_08YS
         public int ContarIntentosFallidos(string username, int ventanaHoras = 2)
             => _repo.ContarIntentosFallidos(username, ventanaHoras);
 
+        // Consulta de la bitácora: exige VerBitacora. RegistrarEvento* y
+        // ContarIntentosFallidos quedan sin validación porque se usan en el login,
+        // antes de que exista una sesión.
         public List<BitacoraEvento_08YS> GetAll()
-            => _repo.GetAll();
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerBitacora);
+            return _repo.GetAll();
+        }
 
         public List<BitacoraEvento_08YS> Filtrar(BitacoraFiltro_08YS filtro)
-            => _repo.Filtrar(filtro);
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerBitacora);
+            return _repo.Filtrar(filtro);
+        }
     }
 }
