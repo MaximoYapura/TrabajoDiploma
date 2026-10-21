@@ -30,7 +30,8 @@
 ; =============================================================================
 
 #define MyAppName        "El Fogón del Sur"
-#define MyAppVersion     "1.0.0"
+; 1.1.0: Etapa 5 (Ayuda del Chef y Manual de Recetas). Sin cambios en la base de datos.
+#define MyAppVersion     "1.1.0"
 #define MyAppPublisher   "Maximo Yapura"
 #define MyAppExeName     "GUI_08YS.exe"
 #define ReleaseDir       "GUI\bin\Release"
