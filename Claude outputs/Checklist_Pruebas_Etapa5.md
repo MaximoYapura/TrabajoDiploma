@@ -52,3 +52,17 @@ Verificado por Claude Code (FormMDI real, base local en solo lectura, ventana de
 Para el propietario:
 - [ ] Copiar un dato de la Ficha y pegarlo en el formulario de al lado con el panel abierto.
 - [ ] Repetir a 125 % y 150 %.
+
+## Fase 3 — Ficha de Ingredientes (`FichaIngredientes_UC_790MY`, `ValorCopiable_790MY`)
+
+Verificado por Claude Code con la base local (solo lectura):
+- [x] Datos **en vivo** (nada escrito a mano): cliente 30000000; empleados 30000001, 22222222, 30000002, 12345678 con su puesto traducido; mesas 1, 2, 4, 5, 6 (la 3 está fuera de servicio y no se muestra); turno de hoy 22:00.
+- [x] Tarjetas: aprobada `4111 1111 1111 1111` (VISA) y rechazo simulado `4000 0000 0000 0002`, comprobadas en ejecución con `PagoBLL_790MY.ValidarTarjetaLuhn` y `TerminacionRechazoSimulado`; cuotas 1, 3, 6, 12 leídas de `Pago_790MY.CuotasPermitidas`. Sin contraseñas.
+- [x] «Copiar» el DNI del cliente → toast «Copiado: 30000000» → pegado con Ctrl+V en el DNI de Registrar Reserva.
+- [x] Portapapeles tomado por otra ventana: banner ámbar dentro del panel y valor seleccionado para Ctrl+C (sin `MessageBox`).
+- [x] Base inaccesible: banner rojo «No se pudieron leer: Clientes, Empleados, Mesas. Detalle: …» y «No se pudo leer esta sección» en cada una (no queda un panel en blanco).
+- [x] **G3**: rol Camarero con Modo Demostración → la Ficha no existe (solo Menú Degustación, sin pestañas). SuperAdmin con `ModoDemostracion=false` → igual.
+
+Para el propietario:
+- [ ] Base vacía (sin clientes/empleados/mesas): «Todavía no hay datos cargados.» en cada sección.
+- [ ] Cambiar a inglés con la Ficha abierta: títulos, puestos y «Copy» traducidos.

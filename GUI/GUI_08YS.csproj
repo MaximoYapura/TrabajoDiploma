@@ -144,6 +144,12 @@
     <Compile Include="Estilo\PanelAyuda_UC_790MY.Designer.cs">
       <DependentUpon>PanelAyuda_UC_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="Estilo\ValorCopiable_790MY.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Estilo\ValorCopiable_790MY.Designer.cs">
+      <DependentUpon>ValorCopiable_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="Estilo\FichaIngredientes_UC_790MY.cs">
       <SubType>UserControl</SubType>
     </Compile>
