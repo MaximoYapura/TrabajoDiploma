@@ -6,6 +6,7 @@ using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -32,7 +33,10 @@ namespace GUI_08YS.RF2
     {
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
-        /// <summary>Demora simulada de la entidad bancaria antes de procesar el cobro (Etapa 4).</summary>
+        /// <summary>
+        /// Demora simulada de la entidad bancaria antes de procesar el cobro (Etapa 4, E4-D6).
+        /// Solo se aplica con ModoDemostracion=true (desarrollo / defensa); en producción no hay demora.
+        /// </summary>
         private const int LatenciaSimuladaMs = 2500;
 
         private readonly FacturaBLL_790MY _facturaBll;
@@ -606,7 +610,9 @@ namespace GUI_08YS.RF2
             {
                 // Latencia simulada de la pasarela bancaria: permite ver el indicador de carga y
                 // verificar el bloqueo del formulario y del contenedor durante el cobro.
-                await Task.Delay(LatenciaSimuladaMs);
+                // Solo en modo demostración (App.config: ModoDemostracion).
+                if (ModoDemostracionActivo())
+                    await Task.Delay(LatenciaSimuladaMs);
 
                 resultado = await Task.Run(() =>
                 {
@@ -692,6 +698,22 @@ namespace GUI_08YS.RF2
             {
                 contenedor.CierreBloqueado += AvisarCobroEnCurso;
                 contenedor.BloquearNavegacion(true);
+            }
+        }
+
+        /// <summary>
+        /// ModoDemostracion del App.config (mismo criterio que PanelAyuda_UC_790MY):
+        /// ausente, inválido o ilegible equivale a false (producción, sin demora simulada).
+        /// </summary>
+        private static bool ModoDemostracionActivo()
+        {
+            try
+            {
+                return bool.TryParse(ConfigurationManager.AppSettings["ModoDemostracion"], out bool activo) && activo;
+            }
+            catch (ConfigurationErrorsException)
+            {
+                return false;
             }
         }
 
