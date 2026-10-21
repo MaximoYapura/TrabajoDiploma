@@ -74,6 +74,7 @@ namespace BLL_08YS
             return new PagoBLL_790MY(
                 new SqlPagoRepository_790MY(),
                 new SqlFacturaRepository_790MY(),
+                new SqlCierreCajaRepository_790MY(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
 

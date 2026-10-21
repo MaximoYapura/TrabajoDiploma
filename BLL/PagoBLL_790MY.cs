@@ -30,13 +30,15 @@ namespace BLL_08YS
 
         private readonly IPagoRepository_790MY _pagoRepository;
         private readonly IFacturaRepository_790MY _facturaRepository;
+        private readonly ICierreCajaRepository_790MY _cierreCajaRepository;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
         public PagoBLL_790MY(IPagoRepository_790MY pagoRepository, IFacturaRepository_790MY facturaRepository,
-                             BitacoraBLL_08YS bitacoraBll)
+                             ICierreCajaRepository_790MY cierreCajaRepository, BitacoraBLL_08YS bitacoraBll)
         {
             _pagoRepository = pagoRepository ?? throw new ArgumentNullException(nameof(pagoRepository));
             _facturaRepository = facturaRepository ?? throw new ArgumentNullException(nameof(facturaRepository));
+            _cierreCajaRepository = cierreCajaRepository ?? throw new ArgumentNullException(nameof(cierreCajaRepository));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -230,8 +232,9 @@ namespace BLL_08YS
         }
 
         /// <summary>
-        /// Cierre de caja del día: recalcula el arqueo y deja constancia en la bitácora
-        /// (fecha y recaudación neta). No modifica los pagos registrados.
+        /// Cierre de caja del día: recalcula el arqueo, lo registra en la tabla CierresCaja
+        /// y deja constancia en la bitácora (fecha y recaudación neta). No modifica los
+        /// pagos registrados.
         /// </summary>
         public ReporteArqueoCaja_790MY CerrarCaja(DateTime fecha)
         {
@@ -239,33 +242,30 @@ namespace BLL_08YS
             if (reporte.CantidadCuentas == 0)
                 throw MensajesBLL_790MY.Regla("msg_ac_sin_cobros", fecha.ToString("dd/MM/yyyy"));
 
-            // Una sola vez por día: el cierre no tiene tabla propia, su constancia es el
-            // evento CierreCajaRealizado de la bitácora.
+            // Una sola vez por día. La consulta previa da el mensaje sin intentar el INSERT;
+            // la garantía real es la PK (Fecha) de CierresCaja: si otra terminal cerró la
+            // misma jornada en el medio, el repositorio devuelve false.
             if (EstaCajaCerrada(fecha))
                 throw MensajesBLL_790MY.Regla("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy"));
 
+            string usuario = SessionManager_08YS.Instance.Current?.Username ?? "Desconocido";
+            if (!_cierreCajaRepository.Registrar(fecha.Date, reporte.RecaudacionNeta, reporte.CantidadCuentas, usuario))
+                throw MensajesBLL_790MY.Regla("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy"));
+
+            // Texto de la bitácora sin cambios ("Caja dd/MM/yyyy - importe"); cultura
+            // invariante para que la barra no dependa del idioma activo.
             _bitacoraBll.RegistrarEventoPostCommit(Evento.CierreCajaRealizado,
-                PrefijoCierre(fecha) + reporte.RecaudacionNeta.ToString("N2", CulturaMoneda));
+                "Caja " + fecha.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) + " - " +
+                reporte.RecaudacionNeta.ToString("N2", CulturaMoneda));
             return reporte;
         }
 
-        /// <summary>
-        /// True si la caja de <paramref name="fecha"/> ya se cerró, según los eventos
-        /// CierreCajaRealizado de la bitácora ("Caja dd/MM/yyyy - importe").
-        /// </summary>
+        /// <summary>True si la caja de <paramref name="fecha"/> ya se cerró (tabla CierresCaja).</summary>
         public bool EstaCajaCerrada(DateTime fecha)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
-            string prefijo = PrefijoCierre(fecha);
-            return _bitacoraBll
-                .Filtrar(new BitacoraFiltro_08YS { Evento = Evento.CierreCajaRealizado, TargetUsername = prefijo })
-                .Any(e => e.TargetUsername != null && e.TargetUsername.StartsWith(prefijo, StringComparison.Ordinal));
+            return _cierreCajaRepository.Existe(fecha.Date);
         }
-
-        // Mismo texto al registrar y al consultar; cultura invariante para que la barra
-        // no dependa del idioma activo.
-        private static string PrefijoCierre(DateTime fecha)
-            => "Caja " + fecha.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) + " - ";
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
