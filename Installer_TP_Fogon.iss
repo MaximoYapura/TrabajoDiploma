@@ -13,17 +13,26 @@
 ;         (desplegable con las instancias detectadas en el Registro);
 ;       - se copian los binarios de GUI\bin\Release y el PDF de docs\;
 ;       - se ejecuta docs\Deploy_TP_Ing_Soft.sql con sqlcmd sobre esa instancia:
-;         crea TP_Ing_Soft completa (esquema + datos iniciales + DV) si no existe,
-;         y si ya existe no la modifica;
+;         crea TP_Ing_Soft completa (esquema + datos iniciales + DV) si no existe;
 ;       - se crea App.secrets.config a partir de la plantilla (si no existe);
 ;       - se crean los accesos directos (Escritorio y Menú Inicio).
 ;   * Reinstalación / actualización (la clave de registro ya existe):
-;       - se reutilizan la carpeta y la instancia SQL de la instalación anterior;
-;       - solo se reemplazan ejecutables, DLLs y recursos;
-;       - NO se ejecuta el script de despliegue: la base de datos queda intacta;
+;       - se reutilizan la carpeta y la instancia SQL de la instalación anterior
+;         (valor SqlInstance del registro);
+;       - se reemplazan ejecutables, DLLs y recursos;
+;       - ANTES de tocar la base se hace BACKUP DATABASE TP_Ing_Soft a
+;         {app}\Database\Backups\TP_Ing_Soft_<fecha>_<hora>.bak (el servicio de
+;         SQL Server escribe el archivo: la carpeta da permiso de modificación a
+;         las cuentas de servicio; solo sirve con una instancia local);
+;       - si el backup salió bien, se ejecuta el MISMO Deploy_TP_Ing_Soft.sql: es
+;         idempotente, agrega solo lo que falte del esquema (tablas, columnas,
+;         procedimientos, triggers) y no modifica datos ni dígitos verificadores;
+;       - si el backup o el script fallan, se avisa con la ruta del log y no se
+;         borra nada (sin backup el script NO se ejecuta);
 ;       - App.secrets.config (credenciales SMTP) no se toca.
 ;   * Desinstalación: borra toda la carpeta de instalación (incluidos
-;     App.secrets.config y Database\); la base TP_Ing_Soft queda intacta.
+;     App.secrets.config y Database\, con sus Backups\); la base TP_Ing_Soft
+;     queda intacta.
 ;
 ;  MODO DEMOSTRACIÓN (A8)
 ;   * Tarea opcional "Instalar en modo demostración", DESMARCADA por defecto.
@@ -34,8 +43,9 @@
 ;   * GUI\Config\App.config del repositorio conserva ModoDemostracion=true
 ;     (entorno de desarrollo / defensa): el valor de producción lo fija el instalador.
 ;
-;  Requisitos en la PC destino: .NET Framework 4.8, SQL Server con la base
-;  TP_Ing_Soft creada (esquema + migraciones) y sqlcmd en el PATH.
+;  Requisitos en la PC destino: .NET Framework 4.8, SQL Server 2016 SP1 o
+;  posterior (o LocalDB) y sqlcmd en el PATH. La base TP_Ing_Soft la crea o la
+;  actualiza el propio instalador.
 ; =============================================================================
 
 #define MyAppName        "El Fogón del Sur"
@@ -101,9 +111,9 @@ Source: "GUI\Config\App.secrets.config.template"; DestDir: "{app}"; Flags: ignor
 Source: "GUI\Config\App.secrets.config.template"; DestDir: "{app}"; DestName: "App.secrets.config"; \
     Flags: onlyifdoesntexist
 
-; Script único de base de datos (esquema + datos iniciales + DV). Se instala
-; siempre, para poder re-ejecutarlo a mano; el instalador solo lo corre en la
-; instalación limpia (ver [Run]).
+; Script único de base de datos (esquema + datos iniciales + DV), idempotente. Se
+; instala siempre, para poder re-ejecutarlo a mano; el instalador lo corre en la
+; instalación limpia y en la reinstalación (ver [Run]).
 Source: "docs\Deploy_TP_Ing_Soft.sql"; DestDir: "{app}\Database"; Flags: ignoreversion
 
 ; Documentación
@@ -112,6 +122,12 @@ Source: "docs\*.pdf"; DestDir: "{app}\docs"; Flags: ignoreversion
 ; Manual de Recetas (Etapa 5, Fase 8a): un PDF por receta; la Ayuda del Chef los abre
 ; desde {app}\Manual. Arriba se excluyen de la copia de bin para no duplicarlos.
 Source: "docs\Manual\*.pdf"; DestDir: "{app}\Manual"; Flags: ignoreversion
+
+[Dirs]
+; Destino del BACKUP previo a una actualización. Lo escribe el servicio de SQL Server
+; (cuenta NT Service\MSSQL...), que por defecto no puede escribir en Program Files:
+; se le da permiso de modificación al grupo de servicios (SID S-1-5-6) solo en esta carpeta.
+Name: "{app}\Database\Backups"; Permissions: service-modify
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
@@ -127,12 +143,19 @@ Root: HKLM; Subkey: "{#RegKey}"; ValueType: string; ValueName: "Version"; ValueD
 Root: HKLM; Subkey: "{#RegKey}"; ValueType: string; ValueName: "SqlInstance"; ValueData: "{code:GetSqlInstance}"
 
 [Run]
-; Base de datos: solo en la instalación limpia (Check). -b corta ante el primer error
-; y -f 65001 lee el script en UTF-8. La salida queda en Database\Deploy_TP_Ing_Soft.log
-; y VerificarDeploy la revisa (marcas DEPLOY_OK / DEPLOY_OMITIDO).
+; Las entradas se ejecutan en este orden; el Check de cada una se evalúa al llegar a ella.
+; 1) Solo en actualización: BACKUP DATABASE previo. VerificarBackup revisa la salida
+;    (BACKUP_OK / BACKUP_SIN_BASE) y deja el resultado en BackupOk.
+Filename: "{cmd}"; \
+    Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -Q ""{code:ConsultaBackup}"" > ""{app}\Database\Backup_TP_Ing_Soft.log"" 2>&1"; \
+    StatusMsg: "Haciendo una copia de seguridad de la base TP_Ing_Soft..."; \
+    Flags: runhidden waituntilterminated; Check: DebeRespaldarBase; AfterInstall: VerificarBackup
+; 2) Base de datos: instalación limpia o actualización con backup correcto (Check).
+;    -b corta ante el primer error y -f 65001 lee el script en UTF-8. La salida queda en
+;    Database\Deploy_TP_Ing_Soft.log y VerificarDeploy la revisa (marca DEPLOY_OK).
 Filename: "{cmd}"; \
     Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -f 65001 -i ""{app}\Database\Deploy_TP_Ing_Soft.sql"" > ""{app}\Database\Deploy_TP_Ing_Soft.log"" 2>&1"; \
-    StatusMsg: "Creando la base de datos TP_Ing_Soft..."; \
+    StatusMsg: "Creando o actualizando la base de datos TP_Ing_Soft..."; \
     Flags: runhidden waituntilterminated; Check: DebeDesplegarBase; AfterInstall: VerificarDeploy
 
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; \
@@ -160,6 +183,8 @@ var
   SqlPage: TWizardPage;
   SqlCombo: TNewComboBox;
   SqlCmdEncontrado: Boolean;
+  BackupOk: Boolean;
+  ArchivoBackup: String;
 
 { ---------------------------------------------------------------------------
   Utilidades
@@ -328,16 +353,65 @@ end;
   Despliegue de la base (entrada de la sección Run)
   --------------------------------------------------------------------------- }
 
-{ Check de la entrada de [Run]: solo en la instalación limpia y si hay sqlcmd. }
-function DebeDesplegarBase: Boolean;
+{ Ruta del .bak de esta actualización (se calcula una sola vez: la usan la consulta
+  y los mensajes). }
+function GetArchivoBackup: String;
 begin
-  Result := (not IsUpgrade) and SqlCmdEncontrado;
+  if ArchivoBackup = '' then
+    ArchivoBackup := ExpandConstant('{app}\Database\Backups\TP_Ing_Soft_') +
+                     GetDateTimeString('yyyymmdd_hhnnss', #0, #0) + '.bak';
+  Result := ArchivoBackup;
 end;
 
-{ AfterInstall de la entrada de [Run]: revisa la salida de sqlcmd. }
+{ Parámetro -Q de la entrada de backup de [Run]. Si la base no existe (p. ej. se
+  borró a mano) no hay nada que respaldar: el Deploy la vuelve a crear.
+  TRY/CATCH + THROW: un BACKUP fallido no corta el lote, y sin esto se imprimiría
+  BACKUP_OK aunque el archivo no se haya escrito (probado). }
+function ConsultaBackup(Param: String): String;
+begin
+  Result := 'IF DB_ID(N''TP_Ing_Soft'') IS NULL PRINT N''BACKUP_SIN_BASE'' ELSE BEGIN TRY ' +
+            'BACKUP DATABASE [TP_Ing_Soft] TO DISK = N''' + GetArchivoBackup + ''' ' +
+            'WITH INIT, CHECKSUM, NAME = N''TP_Ing_Soft antes de actualizar a {#MyAppVersion}''; ' +
+            'PRINT N''BACKUP_OK''; END TRY BEGIN CATCH THROW; END CATCH';
+end;
+
+{ Check de la entrada de backup de [Run]: solo en una actualización y si hay sqlcmd. }
+function DebeRespaldarBase: Boolean;
+begin
+  Result := IsUpgrade and SqlCmdEncontrado;
+end;
+
+{ AfterInstall de la entrada de backup: sin un backup correcto la base no se toca. }
+procedure VerificarBackup;
+var
+  LogFile, Salida: String;
+begin
+  LogFile := ExpandConstant('{app}\Database\Backup_TP_Ing_Soft.log');
+  Salida := ReadLog(LogFile);
+  BackupOk := (Pos('BACKUP_OK', Salida) > 0) or (Pos('BACKUP_SIN_BASE', Salida) > 0);
+  if BackupOk then
+    Exit;
+
+  MsgBox('No se pudo hacer la copia de seguridad de la base TP_Ing_Soft:' + #13#10#13#10 + Salida + #13#10#13#10 +
+         'Por seguridad la base de datos NO se actualizó y no se borró nada.' + #13#10 +
+         'Detalle en: ' + LogFile + #13#10#13#10 +
+         'La aplicación quedó instalada. Haga un backup de TP_Ing_Soft y actualice la base a mano con:' + #13#10 +
+         'sqlcmd -S "' + GetSqlInstance('') + '" -E -b -f 65001 -i "' +
+         ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.sql') + '"', mbError, MB_OK);
+end;
+
+{ Check de la entrada de Deploy de [Run]: instalación limpia, o actualización con
+  backup correcto; siempre que haya sqlcmd. }
+function DebeDesplegarBase: Boolean;
+begin
+  Result := SqlCmdEncontrado and ((not IsUpgrade) or BackupOk);
+end;
+
+{ AfterInstall de la entrada de Deploy de [Run]: revisa la salida de sqlcmd.
+  DEPLOY_OMITIDO lo emitían versiones anteriores del script; se sigue aceptando. }
 procedure VerificarDeploy;
 var
-  LogFile, ScriptFile, Salida: String;
+  LogFile, ScriptFile, Salida, Respaldo: String;
 begin
   LogFile := ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.log');
   ScriptFile := ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.sql');
@@ -346,7 +420,14 @@ begin
   if (Pos('DEPLOY_OK', Salida) > 0) or (Pos('DEPLOY_OMITIDO', Salida) > 0) then
     Exit;
 
-  MsgBox('No se pudo crear la base de datos TP_Ing_Soft:' + #13#10#13#10 + Salida + #13#10#13#10 +
+  { El script corre en una transacción: ante un error no queda nada a medio hacer. }
+  Respaldo := '';
+  if IsUpgrade and FileExists(GetArchivoBackup) then
+    Respaldo := 'Copia de seguridad previa: ' + GetArchivoBackup + #13#10;
+
+  MsgBox('No se pudo crear o actualizar la base de datos TP_Ing_Soft:' + #13#10#13#10 + Salida + #13#10#13#10 +
+         'Los cambios del script se revirtieron y no se borró nada.' + #13#10 +
+         'Detalle en: ' + LogFile + #13#10 + Respaldo + #13#10 +
          'La aplicación quedó instalada. Puede re-ejecutar el script a mano:' + #13#10 +
          'sqlcmd -S "' + GetSqlInstance('') + '" -E -b -f 65001 -i "' + ScriptFile + '"', mbError, MB_OK);
 end;
@@ -387,12 +468,13 @@ procedure InitializeWizard;
 var
   Descripcion, Etiqueta, Nota: TNewStaticText;
 begin
-  { Reinstalación: se avisa antes de copiar nada que la base no se va a tocar. }
+  { Reinstalación: se avisa antes de copiar nada qué se va a hacer con la base. }
   if IsUpgrade then
     CreateOutputMsgPage(wpWelcome,
       'Reinstalación detectada',
       'Ya existe una instalación de ' + '{#MyAppName}' + ' en este equipo',
-      'Se detectó una versión previa instalada. Se actualizarán los ejecutables conservando la base de datos existente.' + #13#10#13#10 +
+      'Se detectó una versión previa instalada. Se actualizarán los ejecutables conservando los datos existentes: ' +
+      'se hará una copia de seguridad de la base y luego se actualizará su esquema (solo se agrega lo que falte).' + #13#10#13#10 +
       'Carpeta de instalación: ' + WizardForm.PrevAppDir + #13#10 +
       'Instancia de SQL Server: ' + PreviousSqlInstance);
 
@@ -431,12 +513,12 @@ begin
   Nota.Height := ScaleY(60);
   Nota.Caption := 'Si la base TP_Ing_Soft no existe en esa instancia, se crea completa con los datos ' +
     'iniciales (usuario Maximo, mesas, carta, empleados y un cliente de prueba). ' +
-    'Si ya existe, no se modifica.';
+    'Si ya existe, solo se agrega lo que falte del esquema: sus datos no se modifican.';
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-  { En una reinstalación se conserva la instancia anterior y la base no se toca. }
+  { En una reinstalación se conserva la instancia anterior (registro SqlInstance). }
   Result := IsUpgrade and (PageID = SqlPage.ID);
 end;
 
@@ -477,12 +559,17 @@ end;
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo,
   MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
-  if IsUpgrade then
+  if IsUpgrade and SqlCmdEncontrado then
     Result := 'Modo: Reinstalación / Actualización' + NewLine +
-              Space + 'Se reemplazarán los ejecutables y DLLs. La base de datos NO se modifica.' + NewLine + NewLine
+              Space + 'Se reemplazarán los ejecutables y DLLs.' + NewLine +
+              Space + 'Base TP_Ing_Soft: copia de seguridad en Database\Backups y actualización del esquema (los datos no se modifican).' + NewLine + NewLine
+  else if IsUpgrade then
+    Result := 'Modo: Reinstalación / Actualización' + NewLine +
+              Space + 'Se reemplazarán los ejecutables y DLLs.' + NewLine +
+              Space + 'Sin sqlcmd: la base no se actualizará; ejecute Database\Deploy_TP_Ing_Soft.sql a mano (después de un backup).' + NewLine + NewLine
   else if SqlCmdEncontrado then
     Result := 'Modo: Instalación limpia' + NewLine +
-              Space + 'Se creará la base TP_Ing_Soft si no existe (si ya existe, no se modifica).' + NewLine + NewLine
+              Space + 'Se creará la base TP_Ing_Soft si no existe (si ya existe, solo se agrega lo que falte del esquema).' + NewLine + NewLine
   else
     Result := 'Modo: Instalación limpia' + NewLine +
               Space + 'Sin sqlcmd: la base de datos deberá crearse a mano.' + NewLine + NewLine;
