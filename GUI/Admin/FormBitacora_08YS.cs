@@ -5,6 +5,7 @@ using Service_08YS;
 using Service_08YS.Entities.Bitacora;
 using System;
 using GUI_08YS.Estilo;
+using GUI_08YS.RF2;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -82,6 +83,7 @@ namespace GUI
         {
             try
             {
+                bnrAvisos_790MY.Ocultar();
                 dgvEventos.DataSource = null;
 
                 dgvEventos.DataSource = _bll.GetAll();
@@ -90,7 +92,8 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                // Permiso o regla de negocio: banner; falla inesperada: MessageBox (E2-D1).
+                EstiloRF2_790MY.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
         }
 
@@ -182,9 +185,10 @@ namespace GUI
         {
             if (dgvEventos.Rows.Count == 0)
             {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_no_datos_exportar"), TraductorManager_08YS.Instance.GetTexto("atencion"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                bnrAvisos_790MY.Mostrar(TraductorManager_08YS.Instance.GetTexto("msg_no_datos_exportar"), TipoBanner_790MY.Aviso);
                 return;
             }
+            bnrAvisos_790MY.Ocultar();
 
             // REINICIO CLAVE: Volvemos a cero el contador antes de mandar a imprimir
             _indiceFilaActual = 0;
@@ -223,47 +227,48 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                EstiloRF2_790MY.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
         }
 
+        /// <summary>
+        /// Validación de campo (E2-D1): marca la fecha con el ErrorProvider y repite el
+        /// mensaje en el banner. Devuelve false si hay un error.
+        /// </summary>
         private bool ValidarFechas()
         {
             DateTime? desde = dtpDesde.Value.HasValue ? dtpDesde.Value.Value.Date : (DateTime?)null;
             DateTime? hasta = dtpHasta.Value.HasValue ? dtpHasta.Value.Value.Date : (DateTime?)null;
 
-            string tituloError = TraductorManager_08YS.Instance.GetTexto("error_validacion");
+            errValidacion_790MY.SetError(dtpDesde, string.Empty);
+            errValidacion_790MY.SetError(dtpHasta, string.Empty);
+            bnrAvisos_790MY.Ocultar();
 
             if (!desde.HasValue && hasta.HasValue)
-            {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_fecha_partida_req"), tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+                return MarcarErrorFecha(dtpDesde, "msg_fecha_partida_req");
             if (desde.HasValue && !hasta.HasValue)
-            {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_fecha_fin_req"), tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+                return MarcarErrorFecha(dtpHasta, "msg_fecha_fin_req");
             if (desde.HasValue && desde.Value > DateTime.Today)
-            {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_fecha_partida_futura"), tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+                return MarcarErrorFecha(dtpDesde, "msg_fecha_partida_futura");
             if (hasta.HasValue && hasta.Value > DateTime.Today)
-            {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_fecha_fin_futura"), tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+                return MarcarErrorFecha(dtpHasta, "msg_fecha_fin_futura");
             if (desde.HasValue && hasta.HasValue && desde.Value > hasta.Value)
-            {
-                MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_fechas_invertidas"), tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+                return MarcarErrorFecha(dtpDesde, "msg_fechas_invertidas");
             return true;
+        }
+
+        private bool MarcarErrorFecha(Control campo, string clave)
+        {
+            string mensaje = TraductorManager_08YS.Instance.GetTexto(clave);
+            errValidacion_790MY.SetError(campo, mensaje);
+            bnrAvisos_790MY.Mostrar(mensaje);
+            return false;
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
+            errValidacion_790MY.SetError(dtpDesde, string.Empty);
+            errValidacion_790MY.SetError(dtpHasta, string.Empty);
             txtUsername.Text = "";
             txtTargetUsername.Text = "";
             comboBoxModulo.SelectedIndex = -1;

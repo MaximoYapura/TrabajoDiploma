@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -52,8 +53,11 @@
             this.dtpHasta = new CustomControls.IconDateTimePicker();
             this.dtpDesde = new CustomControls.IconDateTimePicker();
             this.txtUsername = new CustomControls.IconPlaceholderTextBox();
+            this.bnrAvisos_790MY = new GUI_08YS.Estilo.Banner_UC_790MY();
+            this.errValidacion_790MY = new System.Windows.Forms.ErrorProvider(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEventos)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).BeginInit();
             this.SuspendLayout();
             // 
             // lblCriticidad
@@ -494,12 +498,25 @@
             this.txtUsername.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.txtUsername.Size = new System.Drawing.Size(524, 46);
             this.txtUsername.TabIndex = 60;
-            // 
+            //
+            // bnrAvisos_790MY
+            //
+            this.bnrAvisos_790MY.Location = new System.Drawing.Point(865, 30);
+            this.bnrAvisos_790MY.Name = "bnrAvisos_790MY";
+            this.bnrAvisos_790MY.Size = new System.Drawing.Size(580, 44);
+            this.bnrAvisos_790MY.TabIndex = 61;
+            //
+            // errValidacion_790MY
+            //
+            this.errValidacion_790MY.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.errValidacion_790MY.ContainerControl = this;
+            //
             // FormBitacora_08YS
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));            this.ClientSize = new System.Drawing.Size(1469, 921);
+            this.Controls.Add(this.bnrAvisos_790MY);
             this.Controls.Add(this.txtTargetUsername);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.comboBoxEvento);
@@ -528,6 +545,7 @@
             this.Load += new System.EventHandler(this.FormBitacora_Load);
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEventos)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errValidacion_790MY)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -555,5 +573,7 @@
         private CustomControls.IconComboBox comboBoxEvento;
         private CustomControls.IconPlaceholderTextBox txtTargetUsername;
         private System.Windows.Forms.Label label2;
+        private GUI_08YS.Estilo.Banner_UC_790MY bnrAvisos_790MY;
+        private System.Windows.Forms.ErrorProvider errValidacion_790MY;
     }
 }
