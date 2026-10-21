@@ -91,6 +91,10 @@ namespace BLL_08YS
         public List<Reserva_790MY> Buscar(DateTime? desde, DateTime? hasta, int? clienteDni, EstadoReserva_790MY? estado)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
+
+            if (desde.HasValue && hasta.HasValue && desde.Value.Date > hasta.Value.Date)
+                throw MensajesBLL_790MY.Regla("msg_rep_rango_fechas_invalido", desde.Value, hasta.Value);
+
             return _reservaRepository.Buscar(desde, hasta, clienteDni, estado);
         }
 
