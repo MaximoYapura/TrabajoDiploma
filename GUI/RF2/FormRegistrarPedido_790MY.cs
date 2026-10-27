@@ -17,7 +17,7 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 namespace GUI_08YS.RF2
 {
     /// <summary>
-    /// CUN-005 Registrar Pedido (Camarero). Muestra las mesas abiertas a cargo del
+    /// CUN-006 Registrar Pedido (Camarero). Muestra las mesas abiertas a cargo del
     /// camarero logueado, el catálogo por categoría con las porciones disponibles
     /// (stock físico - comprometido) y la comanda en curso. El envío a cocina lo
     /// valida y persiste PedidoBLL_790MY (stock, DV y bitácora).

@@ -6,7 +6,7 @@ namespace BE_08YS
     /// <summary>
     /// Ciclo de vida de una reserva.
     /// Confirmada  -> registrada, pendiente de la llegada del cliente.
-    /// Asistida    -> el cliente llego y la mesa fue abierta (CUN-004, incluye Walk-in).
+    /// Asistida    -> el cliente llego y la mesa fue abierta (CUN-004; Walk-in: CUN-005).
     /// Finalizada  -> la atencion concluyo (pago registrado) y la mesa se libero.
     /// Cancelada   -> anulada antes de la llegada del cliente.
     /// Los valores se persisten como texto (nvarchar(20)), por lo que el orden

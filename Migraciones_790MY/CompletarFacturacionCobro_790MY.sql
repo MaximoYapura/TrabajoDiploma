@@ -5,7 +5,7 @@ SET ANSI_NULLS ON
 GO
 /*****************************************************************************
   Migración 790MY: RF2 Facturación y Cobro
-    CUN-006 Generar Factura, CUN-007 Registrar Pago y Arqueo / Cierre de Caja.
+    CUN-007 Cobrar Venta (antes Generar Factura + Registrar Pago) y Arqueo / Cierre de Caja.
 
   Contenido:
     1) Tablas Facturas, ItemsFactura (detalle con precios congelados) y Pagos.

@@ -1,7 +1,7 @@
 USE [TP_Ing_Soft]
 GO
 /*****************************************************************************
-  Migración 790MY: categoría de producto (RF2 - CUN-005 Registrar Pedido)
+  Migración 790MY: categoría de producto (RF2 - CUN-006 Registrar Pedido)
 
   FormRegistrarPedido_790MY muestra el catálogo en pestañas por sección de la
   carta (Entradas, Platos principales, Postres, Bebidas). El valor se guarda

@@ -39,17 +39,17 @@ namespace Service_08YS.Entities.Acceso
         // ── RF2 Atención en mesa (790MY) ─────────────────────────────────
         // El nombre de cada valor debe coincidir con Permisos.Nombre en la BD
         // (ver Migraciones_790MY/CompletarRF2_AtencionMesa_790MY.sql).
-        AbrirMesa,         // CUN-004: abrir mesa con reserva o Walk-in + asignar camarero
+        AbrirMesa,         // CUN-004 / CUN-005: abrir mesa con reserva o Walk-in + asignar camarero
         CerrarMesa,        // finalizar la atención (reserva Finalizada, mesa Libre)
-        RegistrarPedido,   // CUN-005
+        RegistrarPedido,   // CUN-006
         DespacharPedido,   // CUN-008 (Chef): comandas, iniciar preparación, marcar Listo
         CrearEmpleado,     // alta/modificación de empleados
         GestionProductos,  // ABM de la carta (FormProductos_790MY)
 
         // ── RF2 Facturación y cobro (790MY) ──────────────────────────────
         // Ver Migraciones_790MY/CompletarFacturacionCobro_790MY.sql.
-        GenerarFactura,    // CUN-006: cuenta / pre-ticket con importes congelados
-        RegistrarCobro,    // CUN-007: pago, cierre de la reserva y liberación de la mesa
+        GenerarFactura,    // CUN-007 (emisión): cuenta / pre-ticket con importes congelados
+        RegistrarCobro,    // CUN-007 (pago): cobro, cierre de la reserva y liberación de la mesa
         GestionCaja,       // arqueo y cierre de caja diario (Reportes)
 
         // ── Reportes inteligentes (790MY) ────────────────────────────────

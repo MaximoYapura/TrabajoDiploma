@@ -67,7 +67,9 @@ namespace GUI_08YS.RF1
             _cliente    = cliente    ?? throw new ArgumentNullException(nameof(cliente));
             _reservaBll = reservaBll ?? throw new ArgumentNullException(nameof(reservaBll));
 
-            try { _logo = Properties.Resources.LogoElFogon; }
+            // La baldosa del logo es blanca: se usa la versión con fondo bordó (logo_fogon.png es
+            // transparente, pensado para la marca de agua del área de trabajo).
+            try { _logo = new Bitmap(Path.Combine(Application.StartupPath, "Resources", "logo_fogon_bordo.png")); }
             catch (Exception) { _logo = null; }
 
             TraductorManager_08YS.Instance.Suscribir(this);

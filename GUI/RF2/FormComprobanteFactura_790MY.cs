@@ -17,7 +17,7 @@ namespace GUI_08YS.RF2
 {
     /// <summary>
     /// Vista previa e impresión de los comprobantes de Caja y cobro:
-    ///  - Sin pago: cuenta / pre-ticket de la factura Abierta (CUN-006), con la leyenda
+    ///  - Sin pago: cuenta / pre-ticket de la factura Abierta (CUN-007), con la leyenda
     ///    "NO VÁLIDO COMO FACTURA".
     ///  - Con pago: Factura B definitiva en estado PAGADA (CUN-007), con detalle del
     ///    pago, QR simulado, código de verificación y hash SHA-256 calculados por la BLL.

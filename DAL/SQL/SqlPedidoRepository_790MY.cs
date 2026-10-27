@@ -28,7 +28,7 @@ namespace DAL_08YS.SQL
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        // ─── CUN-005: alta con validacion de stock ───────────────────────────
+        // ─── CUN-006: alta con validacion de stock ───────────────────────────
 
         public ResultadoRegistroPedido_790MY RegistrarSiHayStock(Pedido_790MY pedido)
         {

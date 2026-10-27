@@ -7,7 +7,7 @@
 ## Índice
 
 0. Arquitectura transversal (lo que hay que saber antes de defender cualquier módulo)
-1. Casos de Uso Principales: 1.1 Reservas · 1.2 Abrir Mesa · 1.3 Registrar Pedido · 1.4 Despachar Pedido / Cocina (KDS) · 1.5 Caja y Cobro
+1. Casos de Uso Principales: 1.1 Reservas · 1.2 Abrir Mesa (CUN-004 / CUN-005 Walk-In) · 1.3 Registrar Pedido (CUN-006) · 1.4 Despachar Pedido / Cocina (KDS) (CUN-008) · 1.5 Caja y Cobro (CUN-007 Cobrar Venta)
 2. Maestros: 2.1 Clientes · 2.2 Empleados · 2.3 Mesas · 2.4 Productos / Categorías · 2.5 Gestión de Accesos / Roles
 3. Reportes: 3.1 Reporte de Reservas · 3.2 Arqueo y Cierre de Caja · 3.3 Reporte Predictivo (Inteligente)
 4. Bitácora de Cambios (auditoría de productos) y Bitácora del sistema
@@ -187,7 +187,7 @@ Métodos clave de la BLL: `RegistrarReserva`, `Buscar`, `CancelarReserva`, `Obte
 
 ---
 
-### 1.2 Abrir Mesa
+### 1.2 Abrir Mesa (CUN-004) y Registrar Walk-In (CUN-005)
 
 #### A. Idea y Diseño Visual
 
@@ -227,7 +227,7 @@ BE: Reserva_790MY, Mesa_790MY, Empleado_790MY
 
 ---
 
-### 1.3 Registrar Pedido
+### 1.3 Registrar Pedido (CUN-006)
 
 #### A. Idea y Diseño Visual
 
@@ -268,7 +268,7 @@ BE: Pedido_790MY (`EstadoPedido_790MY`: Pendiente/EnPreparacion/Listo), ItemPedi
 
 ---
 
-### 1.4 Despachar Pedido / Cocina (KDS)
+### 1.4 Despachar Pedido / Cocina (KDS) (CUN-008)
 
 #### A. Idea y Diseño Visual
 
@@ -302,7 +302,7 @@ BE: Pedido_790MY, ItemPedido_790MY, Producto_790MY, Empleado_790MY
 
 ---
 
-### 1.5 Caja y Cobro
+### 1.5 Caja y Cobro — Cobrar Venta (CUN-007)
 
 #### A. Idea y Diseño Visual
 
@@ -313,11 +313,11 @@ BE: Pedido_790MY, ItemPedido_790MY, Producto_790MY, Empleado_790MY
 
 #### B. Lógica y Reglas de Negocio
 
-- **Generar factura (CUN-006)** — `FacturaBLL_790MY.GenerarFactura(nroReserva, valorDescuento, TipoDescuento_790MY)` (permiso `GenerarFactura`; sobrecarga con `porcentajeDescuento`):
+- **Cobrar Venta (CUN-007) — emisión de la factura** — `FacturaBLL_790MY.GenerarFactura(nroReserva, valorDescuento, TipoDescuento_790MY)` (permiso `GenerarFactura`; sobrecarga con `porcentajeDescuento`):
   - Sin consumos → `msg_fc_sin_consumos`. Reserva ya pagada → `msg_fc_reserva_ya_pagada`; reserva no Asistida → `msg_rf2_reserva_no_asistida`.
   - `CalcularImportes` (función **pura**, estática, reutilizada por la GUI para recalcular en vivo): descuento por **porcentaje** (0–100, `msg_fc_descuento_porcentaje_invalido`) o por **monto fijo** (0–subtotal, `msg_fc_descuento_monto_invalido`); `neto = subtotal − descuento`; `IVA = neto × 21 %` (`Factura_790MY.AlicuotaIVA = 0.21`) y `MontoTotal = neto + IVA` (**el IVA se suma sobre el neto**, no está incluido en el precio de carta). Redondeo a 2 decimales (`FacturaBLL_790MY.Redondear`).
   - Si ya hay una factura Abierta **con el mismo contenido**, se reutiliza; si cambió, se **anula** la anterior (`FacturaAnulada`) y se genera una nueva (`FacturaGenerada`). Número de comprobante con formato `"B-0001-00000234"` (`NumeroComprobante`).
-- **Registrar cobro (CUN-007)** — `PagoBLL_790MY.RegistrarCobro(SolicitudCobro_790MY)` (permiso `RegistrarCobro`):
+- **Cobrar Venta (CUN-007) — registro del pago** — `PagoBLL_790MY.RegistrarCobro(SolicitudCobro_790MY)` (permiso `RegistrarCobro`):
   - La factura debe estar **Abierta** (`msg_fc_factura_no_abierta`); propina ≥ 0 (`msg_fc_propina_invalida`); `MontoAbonado = MontoTotal + propina`.
   - **Efectivo:** `MontoRecibido ≥ MontoAbonado` (`msg_fc_efectivo_insuficiente`), `Cambio = CalcularCambio(abonado, recibido)`. La GUI además limita el recibido a `FactorMaximoRecibido = 5` veces el total y el vuelto a `VueltoMaximo = 100000`.
   - **Tarjeta:** `ValidarTarjetaLuhn` (13–19 dígitos; acepta espacios y guiones; `msg_fc_tarjeta_invalida`), cuotas ∈ {1, 3, 6, 12} (`Pago_790MY.CuotasPermitidas`; `msg_fc_cuotas_invalidas`), marca por prefijo IIN (`DetectarMarca`), número **enmascarado** `**** **** **** 1111` (`EnmascararTarjeta`; **nunca se guarda el número completo**).
@@ -1057,7 +1057,7 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 
 | Archivo | Rol |
 |---|---|
-| `Installer_TP_Fogon.iss` | Script de **Inno Setup 6** (450 líneas). Genera `Installer\Output\Setup_ElFogon.exe` |
+| `Installer_TP_Fogon.iss` | Script de **Inno Setup 6** (450 líneas). Genera `Installer\Output\Setup_ElFogonDelSur.exe` |
 | `docs\Deploy_TP_Ing_Soft.sql` | Script **único** de base de datos (1430 líneas): esquema + datos semilla + DV. Lo ejecuta el instalador con `sqlcmd` |
 | `GUI\Config\App.secrets.config.template` | Plantilla de credenciales SMTP |
 | `GUI\Config\App.config` | Cadena de conexión `TP_Ing_Soft`, `ModoDemostracion`, `TurnoPrueba_790MY`, SMTP por `configSource` |
@@ -1073,7 +1073,7 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 
 #### A. Idea y Diseño Visual
 
-- **Objetivo:** que una PC "limpia" quede funcionando con **un solo `Setup_ElFogon.exe`**: copia la aplicación, crea la base de datos en una instancia de SQL Server elegida por el usuario, deja la cadena de conexión apuntando a esa instancia y crea accesos directos. También soporta **reinstalar/actualizar** sin tocar los datos: hace un `BACKUP DATABASE` y aplica el mismo script idempotente, que solo agrega lo que falte del esquema *(deuda técnica, fase 4)*.
+- **Objetivo:** que una PC "limpia" quede funcionando con **un solo `Setup_ElFogonDelSur.exe`**: copia la aplicación, crea la base de datos en una instancia de SQL Server elegida por el usuario, deja la cadena de conexión apuntando a esa instancia y crea accesos directos. También soporta **reinstalar/actualizar** sin tocar los datos: hace un `BACKUP DATABASE` y aplica el mismo script idempotente, que solo agrega lo que falte del esquema *(deuda técnica, fase 4)*.
 - **Casilla "Instalar en modo demostración"** (`[Tasks] mododemo`, **desmarcada** por defecto): fija `ModoDemostracion` en `GUI_08YS.exe.config` (`false` = producción; `true` solo si se marca) *(A8)*.
 - **Interfaz del asistente (no usa FontAwesome ni UserControls; es el asistente de Inno Setup):**
   - `WizardStyle=modern`, idioma `Spanish.isl` (`[Languages]`), ícono `GUI\Resources\FogonIcon.ico` (`SetupIconFile`, `UninstallDisplayIcon`), compresión `lzma2` + `SolidCompression=yes`.
@@ -1085,7 +1085,7 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 
 #### B. Lógica y Reglas de Negocio
 
-**Cómo se compila:** primero compilar la solución en **Release** y, desde la raíz del repositorio, ejecutar **`ISCC.exe Installer_TP_Fogon.iss`** (con winget queda en `%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`). El instalador sale en `Installer\Output\Setup_ElFogon.exe` (`OutputDir`, `OutputBaseFilename`).
+**Cómo se compila:** primero compilar la solución en **Release** y, desde la raíz del repositorio, ejecutar **`ISCC.exe Installer_TP_Fogon.iss`** (con winget queda en `%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`). El instalador sale en `Installer\Output\Setup_ElFogonDelSur.exe` (`OutputDir`, `OutputBaseFilename`).
 
 **Dos modos**, decididos en `InitializeSetup` con `IsUpgrade := RegValueExists(HKLM, 'Software\ElFogonDelSur', 'InstallPath')`:
 
@@ -1094,8 +1094,8 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 | Detección | no existe la clave de registro | existe `HKLM\Software\ElFogonDelSur\InstallPath` |
 | Carpeta | la elige el usuario (`DisableDirPage=auto`) | se reutiliza (`UsePreviousAppDir=yes`) |
 | Instancia SQL | la elige en la página personalizada | se lee de `SqlInstance` del registro (si falta, `.`) |
-| Prueba de conexión | sí (`NextButtonClick`) | no |
-| Backup previo | no | **`BACKUP DATABASE TP_Ing_Soft`** a `{app}\Database\Backups\TP_Ing_Soft_<fecha>_<hora>.bak` (`DebeRespaldarBase` / `VerificarBackup`); si falla, aviso con la ruta del log y **el script no se ejecuta** |
+| Prueba de conexión | sí: botón **Probar conexión** (`BtnProbarClick`, muestra versión y edición) y al pulsar Siguiente (`NextButtonClick`) | no |
+| Backup previo | no | **`BACKUP DATABASE TP_Ing_Soft`** a `C:\ProgramData\El Fogon del Sur\Backups\TP_Ing_Soft_<fecha>_<hora>.bak` (si el servicio no puede escribir ahí, en la carpeta de backups de la instancia) (`DebeRespaldarBase` / `VerificarBackup`); si falla, aviso con la ruta del log y **el script no se ejecuta** |
 | Script de BD | **se ejecuta** (crea todo) | **se ejecuta** si el backup salió bien: idempotente, agrega solo lo que falte; datos y DV sin cambios |
 | `ModoDemostracion` | `false` salvo que se marque la casilla | se reescribe con la elección del asistente (propone la anterior) |
 | `App.secrets.config` | se copia de la plantilla | **no se toca** (`onlyifdoesntexist`) |
@@ -1104,17 +1104,17 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 **Validaciones del asistente (`InitializeSetup` / `NextButtonClick`):**
 1. **.NET Framework 4.8:** lee `HKLM\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\Release` y exige `>= 528040` (`NetFx48Release`); si no, pregunta si continúa igual.
 2. **`sqlcmd` en el PATH:** `SqlCmdDisponible` ejecuta `where sqlcmd` (`RunCmd`); si falta, avisa que la base no se podrá crear desde el instalador (se puede hacer a mano con `Database\Deploy_TP_Ing_Soft.sql`) y pregunta si continúa.
-3. **Instancia no vacía** y **prueba de conexión:** `sqlcmd -S "<instancia>" -E -b -l 30 -Q "SELECT 1"` (30 s: LocalDB puede tardar en arrancar la primera vez); si falla, muestra el log y permite continuar.
+3. **Instancia no vacía** y **prueba de conexión** (`ProbarConexion`, usada por el botón *Probar conexión* y por `NextButtonClick`): `sqlcmd -S "<instancia>" -E -b -l 30 -Q "SELECT SERVERPROPERTY(...)"` (30 s: LocalDB puede tardar en arrancar la primera vez); si falla, muestra el log y permite continuar.
 4. **Detección de instancias (`DetectarInstanciasSql`, `LeerInstancias`):** lee `HKLM64`/`HKLM32` `SOFTWARE\Microsoft\SQL Server\Instance Names\SQL`; `MSSQLSERVER` → `"."`, nombradas → `".\NOMBRE"`, y **siempre** agrega `(localdb)\MSSQLLocalDB` al final.
 
 **Despliegue de la base (`[Run]`, dos entradas en orden):**
 ```
-1) cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -Q "<ConsultaBackup>" > "{app}\Database\Backup_TP_Ing_Soft.log" 2>&1
+1) cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -Q "<ConsultaBackup>" > "C:\ProgramData\El Fogon del Sur\Logs\Backup_TP_Ing_Soft.log" 2>&1
       Check: DebeRespaldarBase  ( = IsUpgrade and SqlCmdEncontrado )        AfterInstall: VerificarBackup (BackupOk)
-2) cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -f 65001 -i "{app}\Database\Deploy_TP_Ing_Soft.sql" > "{app}\Database\Deploy_TP_Ing_Soft.log" 2>&1
+2) cmd /C sqlcmd -S "<instancia>" -E -b -l 30 -f 65001 -i "{app}\Database\Deploy_TP_Ing_Soft.sql" > "C:\ProgramData\El Fogon del Sur\Logs\Deploy_TP_Ing_Soft.log" 2>&1
       Check: DebeDesplegarBase  ( = SqlCmdEncontrado and (not IsUpgrade or BackupOk) )   AfterInstall: VerificarDeploy
 ```
-`-E` autenticación de Windows, `-b` corta ante el primer error, `-f 65001` lee UTF-8. En la actualización la instancia sale del registro (`SqlInstance`). `ConsultaBackup` hace `BACKUP DATABASE … WITH INIT, CHECKSUM` dentro de `TRY/CATCH` + `THROW` (un `BACKUP` fallido no corta el lote: sin eso se imprimía la marca aunque el archivo no existiera) y emite `BACKUP_OK` (o `BACKUP_SIN_BASE` si la base no existe). La carpeta `Database\Backups` se crea con `Permissions: service-modify` porque el `.bak` lo escribe el servicio de SQL Server (solo sirve con instancia local). `VerificarDeploy` exige **`DEPLOY_OK`** (sigue aceptando `DEPLOY_OMITIDO`, que emitían versiones anteriores del script); si falta, muestra el log, su ruta, la del backup y el comando para re-ejecutarlo a mano (la aplicación **queda instalada** igual y no se borra nada).
+`-E` autenticación de Windows, `-b` corta ante el primer error, `-f 65001` lee UTF-8. En la actualización la instancia sale del registro (`SqlInstance`). `ConsultaBackup` hace `BACKUP DATABASE … WITH INIT, CHECKSUM` dentro de `TRY/CATCH` + `THROW` (un `BACKUP` fallido no corta el lote: sin eso se imprimía la marca aunque el archivo no existiera) y emite `BACKUP_OK` (o `BACKUP_SIN_BASE` si la base no existe). La carpeta `C:\ProgramData\El Fogon del Sur\Backups` se crea con `Permissions: service-modify` porque el `.bak` lo escribe el servicio de SQL Server (solo sirve con instancia local): dentro de `Program Files` fallaba con *Operating system error 5 (Acceso denegado)*. Si aun así falla, el `CATCH` reintenta con el nombre sin carpeta y SQL Server lo guarda en su carpeta de backups predeterminada (`BACKUP_OK_CARPETA_SQL`). Backups y logs sobreviven a la desinstalación (`uninsneveruninstall`). `VerificarDeploy` exige **`DEPLOY_OK`** (sigue aceptando `DEPLOY_OMITIDO`, que emitían versiones anteriores del script); si falta, muestra el log, su ruta, la del backup y el comando para re-ejecutarlo a mano (la aplicación **queda instalada** igual y no se borra nada).
 
 **Cadena de conexión:** `CurStepChanged(ssPostInstall)` → `ConfigurarConnectionString(GetSqlInstance(''))`, que genera `ConfigurarConexion.ps1` y lo corre con `powershell.exe -NoProfile -ExecutionPolicy Bypass`. Usa `System.Xml.XmlDocument` (`PreserveWhitespace`) + `SqlConnectionStringBuilder` para cambiar **solo** el `Data Source` de `/configuration/connectionStrings/add[@name='TP_Ing_Soft']` en `GUI_08YS.exe.config`, respetando UTF-8 y el resto de la cadena. Si falla, muestra el log e indica editar a mano.
 
@@ -1128,8 +1128,8 @@ Archivos involucrados (todos en la raíz de la solución `TP-Ingenieria-de-Softw
 
 ```
 Visual Studio: Build → Release  ─►  GUI\bin\Release\  (GUI_08YS.exe, DLL, idiomas.json, Resources\, Manual\*.pdf, GUI_08YS.exe.config)
-ISCC.exe Installer_TP_Fogon.iss ─► Installer\Output\Setup_ElFogon.exe
-Setup_ElFogon.exe (administrador)
+ISCC.exe Installer_TP_Fogon.iss ─► Installer\Output\Setup_ElFogonDelSur.exe
+Setup_ElFogonDelSur.exe (administrador)
    InitializeSetup      : .NET 4.8 ✓ · IsUpgrade ✓ · SqlCmdEncontrado ✓
    InitializeWizard     : (reinstalación) página informativa · página "Base de datos" (SqlCombo)
    NextButtonClick      : instancia ≠ vacía · sqlcmd -Q "SELECT 1"
@@ -1179,7 +1179,7 @@ Script **único** y **re-ejecutable** que "reemplaza a script.sql + Migraciones_
 
 #### C. Flujo
 
-`Setup_ElFogon.exe` → `sqlcmd` (cmd.exe) → `Deploy_TP_Ing_Soft.sql` → `Deploy_TP_Ing_Soft.log` → `VerificarDeploy`. Después, la app accede a esa base con `SqlDbFactory_08YS.ConnectionString` (cadena `TP_Ing_Soft` del `.config`).
+`Setup_ElFogonDelSur.exe` → `sqlcmd` (cmd.exe) → `Deploy_TP_Ing_Soft.sql` → `Deploy_TP_Ing_Soft.log` → `VerificarDeploy`. Después, la app accede a esa base con `SqlDbFactory_08YS.ConnectionString` (cadena `TP_Ing_Soft` del `.config`).
 
 #### D. Integración
 
@@ -1279,7 +1279,7 @@ Respuestas pensadas para decirse en 30–60 segundos, con los nombres reales del
 
 20. **¿Cómo se sabe que la visita guiada ya se vio?** — `RegistroVisita_790MY` guarda `{ "visitasVistas": [usernames] }` en `%LocalAppData%\El Fogon del Sur\ayuda.json` (porque `Program Files` no es escribible), con escritura atómica `.tmp` + `Move` y E/S protegida. La clave es el `Username`, no el rol.
 21. **¿Cómo logran el efecto de transparencia en la visita?** — WinForms no soporta transparencia real entre hermanos: se captura la pantalla con `DrawToBitmap` (`VisitaGuiada_790MY.Capturar`) y `VisitaOverlay_790MY` (control opaco) pinta la captura con una sombra `Color.FromArgb(170, 20, 10, 10)` y un "hueco" con borde dorado.
-22. **¿Cómo se despliega en una PC nueva?** — Se compila en Release y `ISCC.exe Installer_TP_Fogon.iss` genera `Setup_ElFogon.exe`. El asistente detecta .NET 4.8 y `sqlcmd`, ofrece las instancias de SQL Server del Registro, prueba la conexión, copia los archivos, corre `sqlcmd -E -b -f 65001 -i Deploy_TP_Ing_Soft.sql` (crea `TP_Ing_Soft` completa, en una transacción y re-ejecutable), verifica `DEPLOY_OK`/`DEPLOY_OMITIDO` y escribe la instancia en `GUI_08YS.exe.config`.
+22. **¿Cómo se despliega en una PC nueva?** — Se compila en Release y `ISCC.exe Installer_TP_Fogon.iss` genera `Setup_ElFogonDelSur.exe`. El asistente detecta .NET 4.8 y `sqlcmd`, ofrece las instancias de SQL Server del Registro, prueba la conexión, copia los archivos, corre `sqlcmd -E -b -f 65001 -i Deploy_TP_Ing_Soft.sql` (crea `TP_Ing_Soft` completa, en una transacción y re-ejecutable), verifica `DEPLOY_OK`/`DEPLOY_OMITIDO` y escribe la instancia en `GUI_08YS.exe.config`.
 23. **¿Qué pasa al reinstalar?** — Si existe `HKLM\Software\ElFogonDelSur\InstallPath` el modo es *actualización*: se reutilizan carpeta e instancia, **no se toca la base** ni `App.secrets.config`.
 24. **¿Dónde están las credenciales SMTP?** — En `App.secrets.config` (fuera del repositorio por `.gitignore` y **excluido del instalador**); se distribuye `App.secrets.config.template`. Sin él, la reserva igual se registra y el PDF se puede guardar.
 25. **¿Qué hace `ModoDemostracion`?** — Si es `true`, cuando la hora no cae en ningún turno (18/20/22 h) la BLL usa `TurnoPrueba_790MY` (22:00) como turno vigente, y habilita la *Ficha de Ingredientes* para SuperAdmin. En producción debe ser `false`.

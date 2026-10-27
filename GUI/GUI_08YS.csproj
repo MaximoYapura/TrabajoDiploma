@@ -212,6 +212,12 @@
     <Compile Include="Estilo\BotonCobro_790MY.Designer.cs">
       <DependentUpon>BotonCobro_790MY.cs</DependentUpon>
     </Compile>
+    <Compile Include="Estilo\AsistenteMaitre_UC_790MY.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Estilo\AsistenteMaitre_UC_790MY.Designer.cs">
+      <DependentUpon>AsistenteMaitre_UC_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="Maestros\FormEmpleados_790MY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -430,6 +436,9 @@
     <Content Include="Resources\logo_fogon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\logo_fogon_bordo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\logo_fogon_bn.jpg" />
     <Content Include="..\docs\Manual\*.pdf">
       <Link>Manual\%(Filename)%(Extension)</Link>
@@ -439,6 +448,11 @@
     <None Include="Resources\sombrero_ayuda_40.png" />
     <None Include="Resources\sombrero_ayuda_48.png" />
     <None Include="Resources\sombrero_ayuda_64.png" />
+    <None Include="Resources\Maitre\Maitre_01_Bienvenida.png" />
+    <None Include="Resources\Maitre\Maitre_02_Pensando.png" />
+    <None Include="Resources\Maitre\Maitre_03_Indicacion.png" />
+    <None Include="Resources\Maitre\Maitre_04_Alerta.png" />
+    <None Include="Resources\Maitre\Maitre_05_Celebracion.png" />
     <Content Include="script.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

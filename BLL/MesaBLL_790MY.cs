@@ -29,7 +29,7 @@ namespace BLL_08YS
         /// <summary>
         /// Turno en curso para el momento indicado (inicio &lt;= hora &lt; inicio + 2h),
         /// o null si el restaurante está fuera del horario de atención.
-        /// Lo usan la apertura de mesas (CUN-004) y el Walk-in.
+        /// Lo usan la apertura de mesas (CUN-004) y el Walk-in (CUN-005).
         /// Fuera de horario, si el modo prueba está activo (App.config), devuelve el
         /// turno de prueba configurado para poder testear sin depender de la hora.
         /// </summary>

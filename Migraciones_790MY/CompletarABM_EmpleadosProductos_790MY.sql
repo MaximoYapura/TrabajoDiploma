@@ -7,7 +7,7 @@ GO
   Migración 790MY: ABM de Empleados y Productos (Maestros, RF2)
 
     1) Productos.ControlaStock: los productos sin control de porciones no se
-       rechazan por stock (CUN-005) ni se descuentan al despachar (CUN-008).
+       rechazan por stock (CUN-006) ni se descuentan al despachar (CUN-008).
     2) Patente GestionProductos (debe coincidir con el enum Permisos) y familia
        "Gestion de carta", asignada a SuperAdmin.
        El ABM de empleados usa la patente CrearEmpleado ya existente.

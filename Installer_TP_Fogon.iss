@@ -5,7 +5,20 @@
 ;  de compilar la solución en Release:
 ;      ISCC.exe Installer_TP_Fogon.iss
 ;  (instalado con winget queda en %LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe)
-;  El setup queda en Installer\Output\Setup_ElFogon.exe
+;  El setup queda en Installer\Output\Setup_ElFogonDelSur.exe
+;
+;  INSTALADOR ÚNICO: no hay instaladores separados por versión. El mismo setup
+;  instala desde cero o actualiza, y Deploy_TP_Ing_Soft.sql decide qué hacer con
+;  la base (sin dbo.Users: esquema + semilla + DV; con dbo.Users: solo agrega lo
+;  que falte y actualiza SP/triggers, sin tocar los datos del cliente).
+;
+;  DATOS FUERA DE PROGRAM FILES
+;   Backups (.bak) y logs (.log) de la base van a {commonappdata}\El Fogon del Sur
+;   (C:\ProgramData\El Fogon del Sur\Backups y \Logs). El .bak lo escribe el
+;   servicio de SQL Server, no el instalador: dentro de Program Files fallaba con
+;   "Operating system error 5 (Acceso denegado)". Si aun así la carpeta no es
+;   escribible para el servicio, el backup se guarda en la carpeta de backups
+;   predeterminada de la instancia (BACKUP ... TO DISK con nombre sin ruta).
 ;
 ;  MODOS
 ;   * Instalación limpia (no existe HKLM\Software\ElFogonDelSur):
@@ -21,9 +34,9 @@
 ;         (valor SqlInstance del registro);
 ;       - se reemplazan ejecutables, DLLs y recursos;
 ;       - ANTES de tocar la base se hace BACKUP DATABASE TP_Ing_Soft a
-;         {app}\Database\Backups\TP_Ing_Soft_<fecha>_<hora>.bak (el servicio de
-;         SQL Server escribe el archivo: la carpeta da permiso de modificación a
-;         las cuentas de servicio; solo sirve con una instancia local);
+;         {commonappdata}\El Fogon del Sur\Backups\TP_Ing_Soft_<fecha>_<hora>.bak
+;         (el servicio de SQL Server escribe el archivo: la carpeta da permiso de
+;         modificación a las cuentas de servicio; solo sirve con una instancia local);
 ;       - si el backup salió bien, se ejecuta el MISMO Deploy_TP_Ing_Soft.sql: es
 ;         idempotente, agrega solo lo que falte del esquema (tablas, columnas,
 ;         procedimientos, triggers) y no modifica datos ni dígitos verificadores;
@@ -31,8 +44,8 @@
 ;         borra nada (sin backup el script NO se ejecuta);
 ;       - App.secrets.config (credenciales SMTP) no se toca.
 ;   * Desinstalación: borra toda la carpeta de instalación (incluidos
-;     App.secrets.config y Database\, con sus Backups\); la base TP_Ing_Soft
-;     queda intacta.
+;     App.secrets.config y Database\); la base TP_Ing_Soft y los backups de
+;     {commonappdata}\El Fogon del Sur quedan intactos.
 ;
 ;  MODO DEMOSTRACIÓN (A8)
 ;   * Tarea opcional "Instalar en modo demostración", DESMARCADA por defecto.
@@ -49,14 +62,19 @@
 ; =============================================================================
 
 #define MyAppName        "El Fogón del Sur"
-; 1.1.0: Etapa 5 (Ayuda del Chef y Manual de Recetas). Sin cambios en la base de datos.
-#define MyAppVersion     "1.1.0"
+; 1.2.0: Maître digital, logo transparente, numeración CUN-004..008 y backups en ProgramData.
+; Sin cambios en el esquema de la base.
+#define MyAppVersion     "1.2.0"
 #define MyAppPublisher   "Maximo Yapura"
 #define MyAppExeName     "GUI_08YS.exe"
 #define ReleaseDir       "GUI\bin\Release"
 #define RegKey           "Software\ElFogonDelSur"
 ; "." = instancia predeterminada (MSSQLSERVER) del equipo local.
 #define DefaultSqlInst   "."
+; Datos que escriben el servicio de SQL Server y sqlcmd: fuera de Program Files.
+#define DataDir          "{commonappdata}\El Fogon del Sur"
+#define BackupDir        DataDir + "\Backups"
+#define LogDir           DataDir + "\Logs"
 
 [Setup]
 AppId={{6F3B2A1C-8E4D-4F7A-9C21-5B0D7E9A4F18}
@@ -74,7 +92,7 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=Installer\Output
-OutputBaseFilename=Setup_ElFogon
+OutputBaseFilename=Setup_ElFogonDelSur
 SetupIconFile=GUI\Resources\FogonIcon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}
@@ -125,9 +143,13 @@ Source: "docs\Manual\*.pdf"; DestDir: "{app}\Manual"; Flags: ignoreversion
 
 [Dirs]
 ; Destino del BACKUP previo a una actualización. Lo escribe el servicio de SQL Server
-; (cuenta NT Service\MSSQL...), que por defecto no puede escribir en Program Files:
-; se le da permiso de modificación al grupo de servicios (SID S-1-5-6) solo en esta carpeta.
-Name: "{app}\Database\Backups"; Permissions: service-modify
+; (cuenta NT Service\MSSQL...), que no puede escribir en Program Files (OS error 5):
+; va a ProgramData y se le da permiso de modificación al grupo de servicios
+; (SID S-1-5-6) solo en esta carpeta. uninsneveruninstall: los backups sobreviven
+; a la desinstalación.
+Name: "{#BackupDir}"; Permissions: service-modify; Flags: uninsneveruninstall
+; Logs de sqlcmd (backup y Deploy): los escribe el propio instalador.
+Name: "{#LogDir}"; Flags: uninsneveruninstall
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
@@ -147,14 +169,14 @@ Root: HKLM; Subkey: "{#RegKey}"; ValueType: string; ValueName: "SqlInstance"; Va
 ; 1) Solo en actualización: BACKUP DATABASE previo. VerificarBackup revisa la salida
 ;    (BACKUP_OK / BACKUP_SIN_BASE) y deja el resultado en BackupOk.
 Filename: "{cmd}"; \
-    Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -Q ""{code:ConsultaBackup}"" > ""{app}\Database\Backup_TP_Ing_Soft.log"" 2>&1"; \
+    Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -Q ""{code:ConsultaBackup}"" > ""{#LogDir}\Backup_TP_Ing_Soft.log"" 2>&1"; \
     StatusMsg: "Haciendo una copia de seguridad de la base TP_Ing_Soft..."; \
     Flags: runhidden waituntilterminated; Check: DebeRespaldarBase; AfterInstall: VerificarBackup
 ; 2) Base de datos: instalación limpia o actualización con backup correcto (Check).
 ;    -b corta ante el primer error y -f 65001 lee el script en UTF-8. La salida queda en
-;    Database\Deploy_TP_Ing_Soft.log y VerificarDeploy la revisa (marca DEPLOY_OK).
+;    {#LogDir}\Deploy_TP_Ing_Soft.log y VerificarDeploy la revisa (marca DEPLOY_OK).
 Filename: "{cmd}"; \
-    Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -f 65001 -i ""{app}\Database\Deploy_TP_Ing_Soft.sql"" > ""{app}\Database\Deploy_TP_Ing_Soft.log"" 2>&1"; \
+    Parameters: "/C sqlcmd -S ""{code:GetSqlInstance}"" -E -b -l 30 -f 65001 -i ""{app}\Database\Deploy_TP_Ing_Soft.sql"" > ""{#LogDir}\Deploy_TP_Ing_Soft.log"" 2>&1"; \
     StatusMsg: "Creando o actualizando la base de datos TP_Ing_Soft..."; \
     Flags: runhidden waituntilterminated; Check: DebeDesplegarBase; AfterInstall: VerificarDeploy
 
@@ -163,8 +185,9 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}
 
 [UninstallDelete]
 ; Limpieza total: también lo que se crea en tiempo de ejecución o después de
-; instalar (log del despliegue, App.secrets.config con credenciales SMTP, etc.).
-; La base de datos TP_Ing_Soft en SQL Server NO se toca.
+; instalar (App.secrets.config con credenciales SMTP, etc.).
+; La base de datos TP_Ing_Soft en SQL Server NO se toca, y tampoco los backups y
+; logs de {#DataDir} (son datos del cliente, no del programa).
 Type: filesandordirs; Name: "{app}\Database"
 Type: files; Name: "{app}\App.secrets.config"
 Type: filesandordirs; Name: "{app}\*"
@@ -182,9 +205,11 @@ var
   PreviousSqlInstance: String;
   SqlPage: TWizardPage;
   SqlCombo: TNewComboBox;
+  BtnProbar: TNewButton;
   SqlCmdEncontrado: Boolean;
   BackupOk: Boolean;
-  ArchivoBackup: String;
+  BackupEnCarpetaSql: Boolean;
+  NombreBackup: String;
 
 { ---------------------------------------------------------------------------
   Utilidades
@@ -353,26 +378,49 @@ end;
   Despliegue de la base (entrada de la sección Run)
   --------------------------------------------------------------------------- }
 
-{ Ruta del .bak de esta actualización (se calcula una sola vez: la usan la consulta
-  y los mensajes). }
+{ Nombre del .bak de esta actualización, sin carpeta (se calcula una sola vez: lo
+  usan la consulta y los mensajes). }
+function GetNombreBackup: String;
+begin
+  if NombreBackup = '' then
+    NombreBackup := 'TP_Ing_Soft_' + GetDateTimeString('yyyymmdd_hhnnss', #0, #0) + '.bak';
+  Result := NombreBackup;
+end;
+
+{ Ruta completa del .bak en ProgramData (fuera de Program Files: OS error 5). }
 function GetArchivoBackup: String;
 begin
-  if ArchivoBackup = '' then
-    ArchivoBackup := ExpandConstant('{app}\Database\Backups\TP_Ing_Soft_') +
-                     GetDateTimeString('yyyymmdd_hhnnss', #0, #0) + '.bak';
-  Result := ArchivoBackup;
+  Result := ExpandConstant('{#BackupDir}\') + GetNombreBackup;
+end;
+
+function GetLogBackup: String;
+begin
+  Result := ExpandConstant('{#LogDir}\Backup_TP_Ing_Soft.log');
+end;
+
+function GetLogDeploy: String;
+begin
+  Result := ExpandConstant('{#LogDir}\Deploy_TP_Ing_Soft.log');
 end;
 
 { Parámetro -Q de la entrada de backup de [Run]. Si la base no existe (p. ej. se
   borró a mano) no hay nada que respaldar: el Deploy la vuelve a crear.
   TRY/CATCH + THROW: un BACKUP fallido no corta el lote, y sin esto se imprimiría
-  BACKUP_OK aunque el archivo no se haya escrito (probado). }
+  BACKUP_OK aunque el archivo no se haya escrito (probado).
+  Si el servicio no puede escribir en ProgramData, se reintenta con el nombre sin
+  carpeta: SQL Server lo guarda en la carpeta de backups predeterminada de la
+  instancia, donde su cuenta de servicio siempre tiene permiso. }
 function ConsultaBackup(Param: String): String;
+var
+  Opciones: String;
 begin
+  Opciones := ' WITH INIT, CHECKSUM, NAME = N''TP_Ing_Soft antes de actualizar a {#MyAppVersion}''; ';
   Result := 'IF DB_ID(N''TP_Ing_Soft'') IS NULL PRINT N''BACKUP_SIN_BASE'' ELSE BEGIN TRY ' +
-            'BACKUP DATABASE [TP_Ing_Soft] TO DISK = N''' + GetArchivoBackup + ''' ' +
-            'WITH INIT, CHECKSUM, NAME = N''TP_Ing_Soft antes de actualizar a {#MyAppVersion}''; ' +
-            'PRINT N''BACKUP_OK''; END TRY BEGIN CATCH THROW; END CATCH';
+            'BACKUP DATABASE [TP_Ing_Soft] TO DISK = N''' + GetArchivoBackup + '''' + Opciones +
+            'PRINT N''BACKUP_OK''; END TRY BEGIN CATCH ' +
+            'PRINT N''Aviso: no se pudo escribir en ' + GetArchivoBackup + ': '' + ERROR_MESSAGE(); ' +
+            'BEGIN TRY BACKUP DATABASE [TP_Ing_Soft] TO DISK = N''' + GetNombreBackup + '''' + Opciones +
+            'PRINT N''BACKUP_OK_CARPETA_SQL''; END TRY BEGIN CATCH THROW; END CATCH END CATCH';
 end;
 
 { Check de la entrada de backup de [Run]: solo en una actualización y si hay sqlcmd. }
@@ -386,9 +434,11 @@ procedure VerificarBackup;
 var
   LogFile, Salida: String;
 begin
-  LogFile := ExpandConstant('{app}\Database\Backup_TP_Ing_Soft.log');
+  LogFile := GetLogBackup;
   Salida := ReadLog(LogFile);
+  { BACKUP_OK también aparece dentro de BACKUP_OK_CARPETA_SQL. }
   BackupOk := (Pos('BACKUP_OK', Salida) > 0) or (Pos('BACKUP_SIN_BASE', Salida) > 0);
+  BackupEnCarpetaSql := Pos('BACKUP_OK_CARPETA_SQL', Salida) > 0;
   if BackupOk then
     Exit;
 
@@ -413,7 +463,7 @@ procedure VerificarDeploy;
 var
   LogFile, ScriptFile, Salida, Respaldo: String;
 begin
-  LogFile := ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.log');
+  LogFile := GetLogDeploy;
   ScriptFile := ExpandConstant('{app}\Database\Deploy_TP_Ing_Soft.sql');
   Salida := ReadLog(LogFile);
 
@@ -422,7 +472,10 @@ begin
 
   { El script corre en una transacción: ante un error no queda nada a medio hacer. }
   Respaldo := '';
-  if IsUpgrade and FileExists(GetArchivoBackup) then
+  if IsUpgrade and BackupEnCarpetaSql then
+    Respaldo := 'Copia de seguridad previa: ' + GetNombreBackup +
+                ' (en la carpeta de backups de la instancia de SQL Server)' + #13#10
+  else if IsUpgrade and FileExists(GetArchivoBackup) then
     Respaldo := 'Copia de seguridad previa: ' + GetArchivoBackup + #13#10;
 
   MsgBox('No se pudo crear o actualizar la base de datos TP_Ing_Soft:' + #13#10#13#10 + Salida + #13#10#13#10 +
@@ -435,6 +488,50 @@ end;
 { ---------------------------------------------------------------------------
   Asistente
   --------------------------------------------------------------------------- }
+
+{ Prueba de conexión con autenticación integrada (30 s: LocalDB puede tardar en
+  arrancar la primera vez). Detalle: versión y edición del motor, o el error. }
+function ProbarConexion(const Instancia: String; var Detalle: String): Boolean;
+var
+  LogFile: String;
+begin
+  LogFile := ExpandConstant('{tmp}\sql_check.log');
+  Result := RunCmd('sqlcmd -S "' + Instancia + '" -E -b -l 30 -h -1 -W -Q "SET NOCOUNT ON; ' +
+                   'SELECT CAST(SERVERPROPERTY(''ProductVersion'') AS nvarchar(30)) + N'' - '' + ' +
+                   'CAST(SERVERPROPERTY(''Edition'') AS nvarchar(80))"', LogFile) = 0;
+  Detalle := ReadLog(LogFile);
+end;
+
+{ Botón "Probar conexión" de la página de instancia. }
+procedure BtnProbarClick(Sender: TObject);
+var
+  Instancia, Detalle: String;
+begin
+  Instancia := Trim(SqlCombo.Text);
+  if Instancia = '' then
+  begin
+    MsgBox('Elija o escriba la instancia de SQL Server.', mbError, MB_OK);
+    Exit;
+  end;
+  if not SqlCmdEncontrado then
+  begin
+    MsgBox('No se encontró sqlcmd en el PATH: no se puede probar la conexión.', mbError, MB_OK);
+    Exit;
+  end;
+
+  WizardForm.NextButton.Enabled := False;
+  try
+    if ProbarConexion(Instancia, Detalle) then
+      MsgBox('Conexión correcta con "' + Instancia + '".' + #13#10#13#10 +
+             'SQL Server ' + Detalle + #13#10#13#10 +
+             'Se requiere SQL Server 2016 SP1 (13.0.4001) o posterior.', mbInformation, MB_OK)
+    else
+      MsgBox('No se pudo conectar a la instancia "' + Instancia + '":' + #13#10#13#10 + Detalle,
+             mbError, MB_OK);
+  finally
+    WizardForm.NextButton.Enabled := True;
+  end;
+end;
 
 function InitializeSetup: Boolean;
 var
@@ -501,8 +598,17 @@ begin
   SqlCombo.Parent := SqlPage.Surface;
   SqlCombo.Style := csDropDown;
   SqlCombo.Top := Etiqueta.Top + Etiqueta.Height + ScaleY(4);
-  SqlCombo.Width := SqlPage.SurfaceWidth;
+  SqlCombo.Width := SqlPage.SurfaceWidth - ScaleX(120);
   DetectarInstanciasSql;
+
+  BtnProbar := TNewButton.Create(SqlPage);
+  BtnProbar.Parent := SqlPage.Surface;
+  BtnProbar.Caption := 'Probar conexión';
+  BtnProbar.Left := SqlCombo.Left + SqlCombo.Width + ScaleX(8);
+  BtnProbar.Top := SqlCombo.Top - ScaleY(1);
+  BtnProbar.Width := SqlPage.SurfaceWidth - BtnProbar.Left;
+  BtnProbar.Height := SqlCombo.Height + ScaleY(2);
+  BtnProbar.OnClick := @BtnProbarClick;
 
   Nota := TNewStaticText.Create(SqlPage);
   Nota.Parent := SqlPage.Surface;
@@ -524,7 +630,7 @@ end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
-  Instancia, LogFile: String;
+  Instancia, Detalle: String;
 begin
   Result := True;
   if CurPageID <> SqlPage.ID then
@@ -546,12 +652,10 @@ begin
     Exit;
   end;
 
-  { Prueba de conexión (30 s: LocalDB puede tardar en arrancar la primera vez). }
-  LogFile := ExpandConstant('{tmp}\sql_check.log');
-  if RunCmd('sqlcmd -S "' + Instancia + '" -E -b -l 30 -Q "SELECT 1"', LogFile) <> 0 then
+  if not ProbarConexion(Instancia, Detalle) then
   begin
     Result := MsgBox('No se pudo conectar a la instancia "' + Instancia + '":' + #13#10#13#10 +
-                     ReadLog(LogFile) + #13#10#13#10 +
+                     Detalle + #13#10#13#10 +
                      '¿Continuar igualmente?', mbConfirmation, MB_YESNO) = IDYES;
   end;
 end;
@@ -562,7 +666,8 @@ begin
   if IsUpgrade and SqlCmdEncontrado then
     Result := 'Modo: Reinstalación / Actualización' + NewLine +
               Space + 'Se reemplazarán los ejecutables y DLLs.' + NewLine +
-              Space + 'Base TP_Ing_Soft: copia de seguridad en Database\Backups y actualización del esquema (los datos no se modifican).' + NewLine + NewLine
+              Space + 'Base TP_Ing_Soft: copia de seguridad en ' + ExpandConstant('{#BackupDir}') +
+                      ' y actualización del esquema (los datos no se modifican).' + NewLine + NewLine
   else if IsUpgrade then
     Result := 'Modo: Reinstalación / Actualización' + NewLine +
               Space + 'Se reemplazarán los ejecutables y DLLs.' + NewLine +

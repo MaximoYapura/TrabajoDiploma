@@ -13,7 +13,7 @@ using System.Text;
 namespace BLL_08YS
 {
     /// <summary>
-    /// CUN-006 Generar Factura.
+    /// CUN-007 Cobrar Venta: emisión de la cuenta / factura (primera mitad del flujo de cobro).
     ///
     /// La cuenta se arma con los ítems de los pedidos Listo (entregados) de la reserva,
     /// con el precio que quedó congelado en cada pedido. Al generar la factura se copia
@@ -77,9 +77,9 @@ namespace BLL_08YS
         }
 
         /// <summary>
-        /// CUN-006 pasos 2 a 4: consumos entregados de la reserva con subtotal, descuento,
+        /// CUN-007 pasos 2 y 3: consumos entregados de la reserva con subtotal, descuento,
         /// IVA (21 %) y total. Si ya existe una factura Abierta se informa para reutilizar
-        /// su descuento. Lanza el escenario 2.1 si no hay consumos facturables.
+        /// su descuento. Lanza el escenario 1.1 si no hay consumos facturables.
         /// </summary>
         public DetalleCuentaDTO_790MY ObtenerDetalleConsumoMesa(int nroReserva,
             decimal valorDescuento = 0m, TipoDescuento_790MY tipoDescuento = TipoDescuento_790MY.Porcentaje)
@@ -108,7 +108,7 @@ namespace BLL_08YS
         }
 
         /// <summary>
-        /// CUN-006 paso 4 (y escenario 4.1). Función pura: la GUI la usa para recalcular en
+        /// CUN-007 paso 3 (y escenario 3.1). Función pura: la GUI la usa para recalcular en
         /// tiempo real mientras se edita el descuento, y GenerarFactura la vuelve a aplicar.
         /// El IVA (21 %) se calcula sobre el subtotal con descuento; importes a 2 decimales.
         /// </summary>
@@ -148,7 +148,7 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-006 — Generar factura
+        //  CUN-007 Cobrar Venta — emisión de la factura
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>Descuento expresado como porcentaje (atajo de la firma general).</summary>
@@ -156,7 +156,7 @@ namespace BLL_08YS
             => GenerarFactura(nroReserva, porcentajeDescuento, TipoDescuento_790MY.Porcentaje);
 
         /// <summary>
-        /// CUN-006 pasos 5 a 7: registra la factura Abierta con importes congelados y la
+        /// CUN-007 paso 8: registra la factura Abierta con importes congelados y la
         /// devuelve completa (con mesa, cliente y camarero) para mostrar la cuenta.
         /// Si ya hay una factura Abierta con el mismo detalle e importes, se reutiliza
         /// (imprimir dos veces el pre-ticket no consume números de factura).
@@ -289,7 +289,7 @@ namespace BLL_08YS
         }
 
         /// <summary>
-        /// Precondición CUN-006/007: reserva Asistida (mesa ocupada) y, si el usuario es
+        /// Precondición CUN-007: reserva Asistida (mesa ocupada) y, si el usuario es
         /// camarero, asignada a él.
         /// </summary>
         private Reserva_790MY ValidarReservaCobrable(int nroReserva)

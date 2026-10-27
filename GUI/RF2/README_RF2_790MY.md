@@ -6,17 +6,17 @@ y se vuelve a validar con `SessionManager_08YS.Instance.ValidatePermission(...)`
 
 | Opción | Formulario | Patente | Caso de uso | BLL |
 |---|---|---|---|---|
-| Abrir Mesa | `FormAbrirMesa_790MY` | `AbrirMesa` | CUN-004 (con reserva y Walk-in) | `ReservaBLL_790MY.AbrirMesa` / `AbrirMesaWalkIn`, `EmpleadoBLL_790MY.GetCamarerosActivos` |
-| Registrar Pedido | `FormRegistrarPedido_790MY` | `RegistrarPedido` | CUN-005 | `PedidoBLL_790MY.RegistrarPedido` |
+| Abrir Mesa | `FormAbrirMesa_790MY` | `AbrirMesa` | CUN-004 (con reserva) + CUN-005 (Walk-in) | `ReservaBLL_790MY.AbrirMesa` / `AbrirMesaWalkIn`, `EmpleadoBLL_790MY.GetCamarerosActivos` |
+| Registrar Pedido | `FormRegistrarPedido_790MY` | `RegistrarPedido` | CUN-006 | `PedidoBLL_790MY.RegistrarPedido` |
 | Despachar Pedido | `FormCocinaKDS_790MY` | `DespacharPedido` | CUN-008 | `PedidoBLL_790MY.IniciarPreparacion` / `MarcarPedidoListo` |
-| Caja y Cobro | `FormFacturacionCobro_790MY` | `GenerarFactura` / `RegistrarCobro` | CUN-006 + CUN-007 | `FacturaBLL_790MY`, `PagoBLL_790MY` |
+| Caja y Cobro | `FormFacturacionCobro_790MY` | `GenerarFactura` / `RegistrarCobro` | CUN-007 (Cobrar Venta) | `FacturaBLL_790MY`, `PagoBLL_790MY` |
 
 En **Reportes**: Arqueo y Cierre de Caja (`GUI/Reportes/FormArqueoCaja_790MY`, patente `GestionCaja`,
 `PagoBLL_790MY.GenerarReporteArqueoCaja` / `CerrarCaja`).
 
 SuperAdmin recibe las cuatro familias nuevas desde `Migraciones_790MY/CompletarRF2_AtencionMesa_790MY.sql`.
 
-## Facturación y cobro (CUN-006 / CUN-007)
+## Facturación y cobro (CUN-007 Cobrar Venta)
 
 - **Consumos facturables**: ítems de pedidos `Listo` de la reserva, con el precio congelado en
   el pedido. Al generar la factura el detalle se copia a `ItemsFactura`.
@@ -69,7 +69,7 @@ Ejecutar en orden, con la aplicación cerrada:
    y `Pagos`, RS15..RS17 de `sp_GetAllTablesParaDV`, patentes `GenerarFactura`,
    `RegistrarCobro`, `GestionCaja` (SuperAdmin; el rol Camarero recibe facturación y cobro).
 
-Para probar CUN-005, el usuario logueado tiene que estar vinculado a un empleado con puesto
+Para probar CUN-006, el usuario logueado tiene que estar vinculado a un empleado con puesto
 Camarero (`Empleados.UsuarioDNI`).
 
 ## Testing
@@ -101,5 +101,5 @@ Camarero (`Empleados.UsuarioDNI`).
   `Productos.ControlaStock`, patente `GestionProductos`, familia "Gestion de carta" para SuperAdmin).
 - Un camarero con mesas abiertas no puede cambiar de cargo ni darse de baja.
 - El stock físico no puede bajarse por debajo de lo comprometido por pedidos sin despachar.
-- Un producto con `ControlaStock = false` no se rechaza por stock en CUN-005 ni se descuenta en CUN-008.
+- Un producto con `ControlaStock = false` no se rechaza por stock en CUN-006 ni se descuenta en CUN-008.
 - Pendiente: historial de precios y stock mínimo configurable (hoy el umbral de "Bajo" es fijo).

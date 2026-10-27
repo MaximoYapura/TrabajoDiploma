@@ -18,6 +18,8 @@ namespace GUI_08YS.Estilo
         public static readonly Color Marca        = Color.FromArgb(97, 13, 16);    // #610D10 (estimado del logo)
         public static readonly Color OroClaro     = Color.FromArgb(242, 217, 166); // #F2D9A6
         public static readonly Color Oro          = Color.FromArgb(232, 185, 100); // #E8B964
+        // Fondo del área de trabajo (panel2 de FormMDI_08YS) y del Maître digital: el mismo
+        // valor en los dos (RGB Matching), así el rectángulo del asistente no se distingue.
         public static readonly Color Crema        = Color.FromArgb(250, 248, 245); // #FAF8F5
         public static readonly Color Panel        = Color.FromArgb(244, 240, 233); // #F4F0E9
         public static readonly Color Tarjeta      = Color.White;
@@ -62,6 +64,11 @@ namespace GUI_08YS.Estilo
         public static readonly Color KdsAzul     = Color.FromArgb(99, 170, 240);
         public static readonly Color KdsVerde    = Color.FromArgb(120, 200, 130);
         public static readonly Color KdsRojo     = Color.FromArgb(242, 128, 116);
+
+        // ── Maître digital: globo oscuro sobre el área de trabajo crema ─
+        public static readonly Color MaitreGlobo     = Color.FromArgb(43, 21, 19);    // #2B1513
+        public static readonly Color MaitreTexto     = Color.FromArgb(234, 223, 207); // #EADFCF
+        public static readonly Color MaitreSeparador = Color.FromArgb(74, 42, 38);    // #4A2A26
 
         // ── Barra lateral de FormMDI_08YS: conserva sus colores reales (Etapa 5) ─
         // Valores medidos sobre los IconButton del menú (FlatStyle.Flat sin FlatAppearance propio).

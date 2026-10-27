@@ -72,7 +72,7 @@ namespace DAL_08YS.SQL
             }
         }
 
-        // ─── CUN-006 ─────────────────────────────────────────────────────────
+        // ─── CUN-007 ─────────────────────────────────────────────────────────
 
         public ResultadoGenerarFactura_790MY GenerarFactura(Factura_790MY factura, out int? nroFacturaAnulada)
         {

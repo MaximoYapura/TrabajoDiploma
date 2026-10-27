@@ -11,10 +11,10 @@ using System.Linq;
 namespace BLL_08YS
 {
     /// <summary>
-    /// CUN-005 Registrar Pedido y CUN-008 Despachar Pedido.
+    /// CUN-006 Registrar Pedido y CUN-008 Despachar Pedido.
     ///
     /// Stock en dos momentos:
-    ///  - CUN-005 valida (sin descontar) contra las porciones DISPONIBLES =
+    ///  - CUN-006 valida (sin descontar) contra las porciones DISPONIBLES =
     ///    StockPorciones - porciones comprometidas por pedidos Pendiente/EnPreparacion.
     ///    Contar lo comprometido evita la sobreventa entre pedidos que todavía no se
     ///    despacharon, sin adelantar el descuento definitivo.
@@ -43,7 +43,7 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-005 — Camarero
+        //  CUN-006 — Camarero
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace BLL_08YS
                     throw MensajesBLL_790MY.Regla("msg_rf2_pedido_ya_despachado", nroPedido);
 
                 case ResultadoDespacho_790MY.StockFisicoInsuficiente:
-                    // No debería ocurrir (CUN-005 reserva las porciones), salvo un ajuste
+                    // No debería ocurrir (CUN-006 reserva las porciones), salvo un ajuste
                     // manual de inventario. Se revirtió todo: el pedido sigue sin despachar.
                     _bitacoraBll.RegistrarEventoPostCommit(Evento.StockDescuentoFallido, $"Pedido {nroPedido}");
                     throw MensajesBLL_790MY.Regla("msg_rf2_stock_fisico_insuficiente", nroPedido);

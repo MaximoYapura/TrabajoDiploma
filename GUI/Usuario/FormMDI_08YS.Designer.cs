@@ -44,6 +44,7 @@
             this.lblNombreApellido = new System.Windows.Forms.Label();
             this.lblRolSistema = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.asistenteMaitre = new GUI_08YS.Estilo.AsistenteMaitre_UC_790MY();
             this.panelAyuda = new GUI_08YS.Estilo.PanelAyuda_UC_790MY();
             this.globoAyuda = new GUI_08YS.Estilo.GloboAyuda_790MY();
             this.visitaOverlay = new GUI_08YS.Estilo.VisitaOverlay_790MY();
@@ -92,6 +93,7 @@
             this.flowLayoutPanel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panelLogo.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.AdministrativoDropDownMenu.SuspendLayout();
             this.MaestrosDropDownMenu.SuspendLayout();
             this.ReservasDropDownMenu.SuspendLayout();
@@ -509,14 +511,30 @@
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(248)))), ((int)(((byte)(245)))));
+            // Área de trabajo real: los hijos se embeben aquí (TopLevel = false), no en el
+            // MdiClient. Su fondo es la misma constante que usa el Maître (RGB Matching).
+            this.panel2.BackColor = GUI_08YS.Estilo.TemaFogon_790MY.Crema;
+            this.panel2.Controls.Add(this.asistenteMaitre);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(248, 37);
             this.panel2.Margin = new System.Windows.Forms.Padding(2);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1102, 747);
             this.panel2.TabIndex = 5;
+            this.panel2.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.panel2_ControlAdded);
             this.panel2.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.panel2_ControlRemoved);
+            this.panel2.Resize += new System.EventHandler(this.panel2_Resize);
+            //
+            // asistenteMaitre  (Maître digital: abajo a la derecha de panel2, margen derecho
+            // 28 px y pegado al borde inferior. Oculto hasta que FormMDI_Load evalúa si hay hijos)
+            //
+            this.asistenteMaitre.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.asistenteMaitre.Location = new System.Drawing.Point(474, 315);
+            this.asistenteMaitre.Margin = new System.Windows.Forms.Padding(0);
+            this.asistenteMaitre.Name = "asistenteMaitre";
+            this.asistenteMaitre.Size = new System.Drawing.Size(600, 432);
+            this.asistenteMaitre.TabIndex = 0;
+            this.asistenteMaitre.Visible = false;
             //
             // panelAyuda  (Etapa 5, C1: hermano de panel2, Dock = Right, oculto por defecto.
             // OpenChildForm limpia solo panel2, así que nunca lo toca ni lo tapa)
@@ -923,6 +941,7 @@
             this.panel3.ResumeLayout(false);
             this.panelLogo.ResumeLayout(false);
             this.panelLogo.PerformLayout();
+            this.panel2.ResumeLayout(false);
             this.AdministrativoDropDownMenu.ResumeLayout(false);
             this.MaestrosDropDownMenu.ResumeLayout(false);
             this.ReservasDropDownMenu.ResumeLayout(false);
@@ -961,6 +980,7 @@
         private System.Windows.Forms.ToolStripMenuItem ReLoginToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cerrarSesionToolStripMenuItem1;
         private System.Windows.Forms.Panel panel2;
+        private GUI_08YS.Estilo.AsistenteMaitre_UC_790MY asistenteMaitre;
         private GUI_08YS.Estilo.PanelAyuda_UC_790MY panelAyuda;
         private GUI_08YS.Estilo.GloboAyuda_790MY globoAyuda;
         private GUI_08YS.Estilo.VisitaOverlay_790MY visitaOverlay;

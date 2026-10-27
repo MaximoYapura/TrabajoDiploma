@@ -349,7 +349,8 @@ namespace BLL_08YS
             {
                 if (_logoCache != null) return _logoCache;
 
-                string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_fogon.png");
+                // Versión con fondo bordó: el PDF es blanco y el logo transparente (dorado) no se leería.
+                string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_fogon_bordo.png");
                 if (!File.Exists(ruta)) return null;
 
                 try

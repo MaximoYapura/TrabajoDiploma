@@ -207,7 +207,7 @@ namespace BLL_08YS
         }
 
         /// <summary>
-        /// CUN-004 escenario alternativo (Walk-in). La mesa se elige con el mismo
+        /// CUN-005 Registrar Walk-In (extiende el paso 3 de CUN-004). La mesa se elige con el mismo
         /// FormSeleccionarMesa_790MY usado en RF1, abierto con DateTime.Today y el turno
         /// en curso (MesaBLL_790MY.ObtenerTurnoVigenteObligatorio). Se crea la reserva en
         /// tiempo real directamente en estado Asistida, con camarero, y la mesa queda

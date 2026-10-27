@@ -15,7 +15,7 @@ namespace DAL_08YS.Interfaces_Repositories
         ReservaNoAsistida
     }
 
-    /// <summary>Resultado del alta transaccional de un pedido (CUN-005).</summary>
+    /// <summary>Resultado del alta transaccional de un pedido (CUN-006).</summary>
     public class ResultadoRegistroPedido_790MY
     {
         public EstadoRegistroPedido_790MY Estado { get; set; }
@@ -37,7 +37,7 @@ namespace DAL_08YS.Interfaces_Repositories
     public interface IPedidoRepository_790MY
     {
         /// <summary>
-        /// CUN-005. En una unica transaccion SERIALIZABLE:
+        /// CUN-006. En una unica transaccion SERIALIZABLE:
         ///  1) bloquea (UPDLOCK/HOLDLOCK) las filas de Productos involucradas, en orden de ID;
         ///  2) verifica producto vigente y StockPorciones - comprometidas >= cantidad pedida;
         ///  3) toma el precio vigente como PrecioUnitario de cada item;

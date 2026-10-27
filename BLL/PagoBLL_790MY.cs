@@ -12,17 +12,17 @@ using System.Security.Cryptography;
 namespace BLL_08YS
 {
     /// <summary>
-    /// CUN-007 Registrar Pago y reporte de Arqueo / Cierre de Caja.
+    /// CUN-007 Cobrar Venta (registro del pago) y reporte de Arqueo / Cierre de Caja.
     ///
     /// El pago, el paso de la factura a Pagada, la reserva a Finalizada y la mesa a Libre
     /// ocurren en una única transacción del repositorio. Un rechazo bancario no toca la
-    /// base de negocio: solo deja constancia en la bitácora (escenario 8.1).
+    /// base de negocio: solo deja constancia en la bitácora (escenario 7.1).
     /// </summary>
     public class PagoBLL_790MY
     {
         /// <summary>
         /// Terminación de tarjeta que la entidad bancaria simulada siempre rechaza,
-        /// para poder probar el escenario 8.1 (p. ej. 4000 0000 0000 0002, Luhn válido).
+        /// para poder probar el escenario 7.1 (p. ej. 4000 0000 0000 0002, Luhn válido).
         /// </summary>
         public const string TerminacionRechazoSimulado = "0002";
 
@@ -113,7 +113,7 @@ namespace BLL_08YS
             => montoRecibido - montoAbonado;
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-007 — Registrar pago
+        //  CUN-007 Cobrar Venta — registro del pago
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace BLL_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarCobro);
             if (solicitud == null) throw new ArgumentNullException(nameof(solicitud));
 
-            // Paso 1-2 / escenario 1.1: factura Abierta.
+            // Pasos 1-2: factura Abierta.
             Factura_790MY factura = _facturaRepository.GetById(solicitud.NroFactura);
             if (factura == null || factura.Estado != EstadoFactura_790MY.Abierta)
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_no_abierta", solicitud.NroFactura);
@@ -155,7 +155,7 @@ namespace BLL_08YS
             }
             else
             {
-                // Pasos 5-7 / escenario 4.3.
+                // Paso 5 / escenarios 5.1-5.2: datos del medio de pago.
                 if (!ValidarTarjetaLuhn(solicitud.NroTarjeta))
                     throw MensajesBLL_790MY.Regla("msg_fc_tarjeta_invalida");
                 if (!Pago_790MY.CuotasPermitidas.Contains(solicitud.CantidadCuotas))
@@ -165,7 +165,7 @@ namespace BLL_08YS
                 pago.MarcaTarjeta = DetectarMarca(solicitud.NroTarjeta);
                 pago.CantidadCuotas = solicitud.CantidadCuotas;
 
-                // Pasos 7-8 / escenario 8.1: autorización de la entidad bancaria simulada.
+                // Pasos 6-7 / escenario 7.1: autorización de la entidad bancaria simulada.
                 if (!SolicitarAutorizacionBancaria(solicitud.NroTarjeta, pago.MontoAbonado, out string autorizacion))
                 {
                     _bitacoraBll.RegistrarEventoPostCommit(Evento.PagoRechazado,
@@ -176,7 +176,7 @@ namespace BLL_08YS
                 pago.NroAutorizacion = autorizacion;
             }
 
-            // Paso 9-10: confirmación transaccional.
+            // Pasos 8-9: confirmación transaccional.
             pago.FechaHoraPago = Truncar(DateTime.Now);
             ResultadoRegistroCobro_790MY resultado = _pagoRepository.RegistrarCobro(pago, out int reservaId, out int mesaNumero);
             switch (resultado)

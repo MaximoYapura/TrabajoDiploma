@@ -18,8 +18,8 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 namespace GUI_08YS.RF2
 {
     /// <summary>
-    /// Caja y cobro unificado: CUN-006 Generar Factura (cuenta / pre-ticket) y su
-    /// extensión CUN-007 Registrar Pago.
+    /// Caja y cobro unificado: CUN-007 Cobrar Venta. Cuenta / pre-ticket, factura y
+    /// pago forman un único flujo (antes Generar Factura y Registrar Pago).
     ///  - Izquierda: mesas ocupadas (reservas Asistidas).
     ///  - Centro: consumos entregados, descuento (% o monto fijo), subtotal, IVA y total.
     ///  - Derecha: medio de pago, propina, validación en tiempo real (Luhn / vuelto) y
@@ -213,7 +213,7 @@ namespace GUI_08YS.RF2
 
         #endregion
 
-        #region Cuenta (panel central) — CUN-006
+        #region Cuenta (panel central) — CUN-007
 
         private void SeleccionarMesa(int reservaId)
         {
@@ -316,7 +316,7 @@ namespace GUI_08YS.RF2
             if (!_cargando) Recalcular();
         }
 
-        /// <summary>CUN-006 paso 4: valida el descuento y recalcula subtotal, IVA y total.</summary>
+        /// <summary>CUN-007 paso 3: valida el descuento y recalcula subtotal, IVA y total.</summary>
         private void Recalcular()
         {
             _importes = null;
@@ -370,7 +370,7 @@ namespace GUI_08YS.RF2
                 SessionManager_08YS.Instance.ValidatePermission(Permisos.GenerarFactura);
                 TryParseImporte(txtDescuento_790MY.Text, out decimal valor, permitirVacio: true);
 
-                // CUN-006 pasos 5-7: factura Abierta con importes congelados.
+                // CUN-007 paso 8 (pre-ticket): factura Abierta con importes congelados.
                 Factura_790MY factura = _facturaBll.GenerarFactura(_detalle.ReservaID, valor, TipoDescuentoSeleccionado);
 
                 using (var comprobante = new FormComprobanteFactura_790MY(factura, null))
@@ -560,7 +560,7 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>
-        /// CUN-007 paso 9 en adelante. Todos los valores de pantalla se leen ANTES del
+        /// CUN-007 pasos 5 a 9. Todos los valores de pantalla se leen ANTES del
         /// Task.Run: el hilo secundario solo ejecuta GenerarFactura + RegistrarCobro con datos
         /// ya capturados (leer un control desde otro hilo lanza InvalidOperationException).
         /// Los textos, el banner y el comprobante se resuelven después del await, ya en el hilo
@@ -592,7 +592,7 @@ namespace GUI_08YS.RF2
                 return;
             }
 
-            // Paso 9: el camarero verifica los datos y confirma (E4-D2).
+            // Paso 5 (5.3 en efectivo): el camarero verifica los datos y confirma (E4-D2).
             string medio = metodo == MetodoPago_790MY.Efectivo
                 ? E.T("CJ_efectivo").Trim()
                 : E.T("CJ_medio_tarjeta", PagoBLL_790MY.DetectarMarca(nroTarjeta), cuotas);
@@ -616,7 +616,7 @@ namespace GUI_08YS.RF2
 
                 resultado = await Task.Run(() =>
                 {
-                    // CUN-006 (punto de extensión 8.1): factura vigente con los importes mostrados.
+                    // CUN-007 paso 8: factura vigente con los importes mostrados.
                     var reloj = Stopwatch.StartNew();
                     Factura_790MY factura = generarFactura
                         ? _facturaBll.GenerarFactura(reservaId, valorDescuento, tipoDescuento)
@@ -653,7 +653,7 @@ namespace GUI_08YS.RF2
 
             if (error is PagoRechazadoException_790MY rechazo)
             {
-                // Escenario 8.1: sin cambios de estado; se solicita otro medio de pago (E4-D5).
+                // Escenario 7.1: sin cambios de estado; se solicita otro medio de pago (E4-D5).
                 MostrarRechazo(rechazo);
                 return;
             }

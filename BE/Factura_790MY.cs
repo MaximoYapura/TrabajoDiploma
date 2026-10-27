@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace BE_08YS
 {
     /// <summary>
-    /// Abierta  -> generada (CUN-006) con importes congelados, pendiente de cobro.
+    /// Abierta  -> generada (CUN-007) con importes congelados, pendiente de cobro.
     /// Pagada   -> cobrada por el total (CUN-007); la reserva queda Finalizada.
     /// Anulada  -> reemplazada por una factura nueva (p. ej. se agregaron consumos
     ///             o se cambió el descuento antes del cobro). Nunca se borra.
@@ -17,7 +17,7 @@ namespace BE_08YS
         Anulada
     }
 
-    /// <summary>Forma en que el camarero expresa el descuento comercial (CUN-006, paso 3).</summary>
+    /// <summary>Forma en que el camarero expresa el descuento comercial (CUN-007, paso 3).</summary>
     public enum TipoDescuento_790MY
     {
         Porcentaje,

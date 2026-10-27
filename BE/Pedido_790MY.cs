@@ -5,7 +5,7 @@ using System.Linq;
 namespace BE_08YS
 {
     /// <summary>
-    /// Pendiente      -> registrado por el Camarero (CUN-005), stock validado pero no descontado.
+    /// Pendiente      -> registrado por el Camarero (CUN-006), stock validado pero no descontado.
     /// EnPreparacion  -> el Chef inicio la elaboracion (CUN-008, paso 3).
     /// Listo          -> el Chef lo finalizo; el stock ya fue descontado (CUN-008, paso 6/7).
     /// </summary>

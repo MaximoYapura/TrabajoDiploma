@@ -21,7 +21,7 @@ namespace DAL_08YS.Interfaces_Repositories
         List<ItemFactura_790MY> ObtenerConsumosFacturables(int reservaId);
 
         /// <summary>
-        /// CUN-006. En una transacción: verifica que la reserva siga Asistida y no tenga
+        /// CUN-007. En una transacción: verifica que la reserva siga Asistida y no tenga
         /// factura Pagada, anula la factura Abierta anterior (si la hay) e inserta la
         /// nueva factura (Abierta) con su detalle. Asigna factura.NroFactura si Ok.
         /// nroFacturaAnulada devuelve la factura reemplazada (o null).

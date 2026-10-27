@@ -278,7 +278,8 @@ namespace GUI_08YS.Reportes
             tablaEnc.SetWidths(new float[] { 1.6f, 2.4f });
 
             // Celda logo
-            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_fogon.png");
+            // Versión con fondo bordó: sobre el encabezado blanco el logo transparente no se leería.
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_fogon_bordo.png");
             PdfPCell celdaLogo;
             if (File.Exists(logoPath))
             {

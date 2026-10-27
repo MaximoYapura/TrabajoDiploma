@@ -2,7 +2,7 @@ USE [TP_Ing_Soft]
 GO
 /*****************************************************************************
   Migración 790MY: RF2 Atención en mesa
-    CUN-004 Abrir Mesa (con reserva y Walk-in), CUN-005 Registrar Pedido,
+    CUN-004 Abrir Mesa, CUN-005 Registrar Walk-In, CUN-006 Registrar Pedido,
     CUN-008 Despachar Pedido.
 
   Contenido:
@@ -245,7 +245,7 @@ IF NOT EXISTS (SELECT 1 FROM [dbo].[Empleados] WHERE DNI = 30000002)
 GO
 
 -- Empleado CON usuario asociado: reemplazar <DNI_USUARIO> por el DNI de un registro
--- existente en Users (por ejemplo el usuario con el que se probará CUN-005).
+-- existente en Users (por ejemplo el usuario con el que se probará CUN-006).
 -- INSERT INTO [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo])
 -- SELECT u.DNI, u.Nombre, u.Apellido, N'Camarero', u.DNI, 1 FROM [dbo].[Users] u WHERE u.DNI = <DNI_USUARIO>
 -- GO

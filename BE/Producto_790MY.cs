@@ -83,7 +83,7 @@
 
         /// <summary>
         /// False para productos sin control de porciones (p. ej. preparaciones a pedido):
-        /// no se rechazan por stock en CUN-005 ni se descuentan en CUN-008.
+        /// no se rechazan por stock en CUN-006 ni se descuentan en CUN-008.
         /// </summary>
         public bool ControlaStock { get; set; } = true;
 

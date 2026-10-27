@@ -17,7 +17,7 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 namespace GUI_08YS.RF2
 {
     /// <summary>
-    /// CUN-004 Abrir Mesa. Recepción da ingreso al salón a un cliente con reserva
+    /// CUN-004 Abrir Mesa y su extensión CUN-005 Registrar Walk-In. Recepción da ingreso al salón a un cliente con reserva
     /// Confirmada del turno en curso, o a un Walk-in (sin reserva) eligiendo la mesa
     /// en el plano de FormSeleccionarMesa_790MY, y asigna el camarero responsable.
     /// Autorización, validaciones, DV y bitácora los resuelve ReservaBLL_790MY.

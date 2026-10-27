@@ -52,7 +52,7 @@ namespace GUI_08YS
                 { nameof(registrarReservaToolStripMenuItem), Permisos.RegistrarReserva },
             };
 
-        // RF2 Atención en mesa: una patente por caso de uso (CUN-004, CUN-005, CUN-008).
+        // RF2 Atención en mesa: una patente por caso de uso (CUN-004/005, CUN-006, CUN-008).
         private static readonly Dictionary<string, Permisos> _mapaMenuAtencion =
             new Dictionary<string, Permisos>
             {
@@ -170,7 +170,7 @@ namespace GUI_08YS
 
             PermissionFilter_08YS.AplicarMenuStrip(AtencionDropDownMenu_790MY, _mapaMenuAtencion);
 
-            // Caja y cobro (CUN-006 / CUN-007): alcanza con cualquiera de las dos patentes.
+            // Caja y cobro (CUN-007 Cobrar Venta): alcanza con cualquiera de las dos patentes.
             cajaCobroToolStripMenuItem_790MY.Visible = accesoCaja;
 
             // Reportes: visible si el rol tiene acceso al módulo de reportes, al arqueo de caja
@@ -234,6 +234,7 @@ namespace GUI_08YS
             // La fila de Ayuda no usa Tag: traduce su texto, ToolTip y nombre accesible.
             btnAyuda.UpdateIdioma();
             panelAyuda.UpdateIdioma();
+            asistenteMaitre.UpdateIdioma();
             _sugerencias?.Cerrar();
             _visita?.Cortar();
 
@@ -302,6 +303,35 @@ namespace GUI_08YS
 
             // Marca de agua corporativa sobre el área de contenido (panel2)
             panel2.Paint += Panel2_PintarMarcaDeAgua;
+
+            EvaluarAsistente();
+        }
+
+        private Bitmap _logoMarcaDeAgua;
+
+        /// <summary>Logo de la marca de agua, cargado una vez (Resources crea un Bitmap por acceso).</summary>
+        private Bitmap LogoMarcaDeAgua
+        {
+            get
+            {
+                if (_logoMarcaDeAgua == null)
+                {
+                    try   { _logoMarcaDeAgua = Resources.LogoElFogon; }
+                    catch { _logoMarcaDeAgua = null; }
+                }
+                return _logoMarcaDeAgua;
+            }
+        }
+
+        /// <summary>
+        /// Rectángulo de la marca de agua en panel2: 40 % del ancho del área, centrado.
+        /// Lo usan el dibujo del logo y el Maître digital (para no taparlo).
+        /// </summary>
+        private static Rectangle RectanguloLogo(Size area, Image img)
+        {
+            int w = (int)(area.Width * 0.40);
+            int h = (int)(img.Height * ((float)w / Math.Max(1, img.Width)));
+            return new Rectangle((area.Width - w) / 2, (area.Height - h) / 2, w, h);
         }
 
         /// <summary>
@@ -311,22 +341,17 @@ namespace GUI_08YS
         /// </summary>
         private void Panel2_PintarMarcaDeAgua(object sender, PaintEventArgs e)
         {
-            Bitmap img;
-            try   { img = Resources.LogoElFogon; }
-            catch { return; }
-
+            Bitmap img = LogoMarcaDeAgua;
             if (img == null) return;
 
             var panel = (Panel)sender;
 
             // Si hay un formulario hijo abierto, no dibujar la marca de agua
-            if (panel.Controls.Count > 0) return;
+            // (el Maître digital vive en panel2, así que se cuentan solo los formularios).
+            if (panel.Controls.OfType<Form>().Any()) return;
 
-            int w = (int)(panel.ClientSize.Width * 0.40);
-            if (w <= 0) return;
-            int h = (int)(img.Height * ((float)w / Math.Max(1, img.Width)));
-            int x = (panel.ClientSize.Width  - w) / 2;
-            int y = (panel.ClientSize.Height - h) / 2;
+            var destino = RectanguloLogo(panel.ClientSize, img);
+            if (destino.Width <= 0) return;
 
             // Dibujar con opacidad al 12 % (Matrix33 controla el canal alfa)
             using (var attr = new ImageAttributes())
@@ -335,12 +360,49 @@ namespace GUI_08YS
                 attr.SetColorMatrix(cm);
                 e.Graphics.DrawImage(
                     img,
-                    new Rectangle(x, y, w, h),
+                    destino,
                     0, 0, img.Width, img.Height,
                     GraphicsUnit.Pixel,
                     attr);
             }
         }
+
+        #region Maître digital
+        private bool _evaluacionAsistentePendiente;
+
+        /// <summary>
+        /// Equivalente a MdiChildActivate / FormClosed de un MDI clásico: los hijos se embeben en
+        /// panel2 (MdiChildren siempre está vacío), así que se escucha su colección. Se difiere
+        /// con BeginInvoke porque MostrarHijo quita el hijo anterior antes de agregar el nuevo
+        /// (el asistente no debe asomar entre medio) y porque un hijo que se cierra sale de la
+        /// colección recién cuando se libera, después de su FormClosed.
+        /// </summary>
+        private void ProgramarEvaluacionAsistente()
+        {
+            if (_evaluacionAsistentePendiente || !IsHandleCreated || IsDisposed || Disposing) return;
+            _evaluacionAsistentePendiente = true;
+            BeginInvoke((Action)(() =>
+            {
+                _evaluacionAsistentePendiente = false;
+                EvaluarAsistente();
+            }));
+        }
+
+        /// <summary>Visible solo sin pantalla abierta y si su modo (completo o compacto) no tapa el logo.</summary>
+        private void EvaluarAsistente()
+        {
+            if (IsDisposed) return;
+            bool sinHijos = !panel2.Controls.OfType<Form>().Any();
+            Bitmap logo = LogoMarcaDeAgua;
+            var zonaLogo = logo != null ? RectanguloLogo(panel2.ClientSize, logo) : Rectangle.Empty;
+            asistenteMaitre.Visible = sinHijos && asistenteMaitre.AjustarModo(zonaLogo);
+        }
+
+        private void panel2_ControlAdded(object sender, ControlEventArgs e) => ProgramarEvaluacionAsistente();
+
+        // El área cambia al maximizar o al abrir/cerrar el panel de Ayuda (Dock = Right).
+        private void panel2_Resize(object sender, EventArgs e) => EvaluarAsistente();
+        #endregion
 
         /// <summary>
         /// Etapa 4 (E4-D6): mientras un formulario hijo ejecuta una operación que no debe
@@ -452,7 +514,9 @@ namespace GUI_08YS
 
         private void MostrarHijo(Form childForm)
         {
-            panel2.Controls.Clear();
+            // Solo se quitan los formularios: Clear() también sacaría al Maître digital de panel2.
+            foreach (var hijoAnterior in panel2.Controls.OfType<Form>().ToList())
+                panel2.Controls.Remove(hijoAnterior);
             childForm.TopLevel = false;
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
@@ -806,7 +870,11 @@ namespace GUI_08YS
             MostrarAyuda();
         }
 
-        private void panel2_ControlRemoved(object sender, ControlEventArgs e) => _sugerencias?.Cerrar();
+        private void panel2_ControlRemoved(object sender, ControlEventArgs e)
+        {
+            _sugerencias?.Cerrar();
+            ProgramarEvaluacionAsistente();
+        }
 
         private void FormMDI_Resize(object sender, EventArgs e)
         {
