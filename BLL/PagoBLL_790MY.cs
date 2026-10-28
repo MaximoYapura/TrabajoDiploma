@@ -29,15 +29,15 @@ namespace BLL_08YS
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
         private readonly IPagoRepository_790MY _pagoRepository;
-        private readonly IFacturaRepository_790MY _facturaRepository;
+        private readonly FacturaBLL_790MY _facturaBll;
         private readonly ICierreCajaRepository_790MY _cierreCajaRepository;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public PagoBLL_790MY(IPagoRepository_790MY pagoRepository, IFacturaRepository_790MY facturaRepository,
+        public PagoBLL_790MY(IPagoRepository_790MY pagoRepository, FacturaBLL_790MY facturaBll,
                              ICierreCajaRepository_790MY cierreCajaRepository, BitacoraBLL_08YS bitacoraBll)
         {
             _pagoRepository = pagoRepository ?? throw new ArgumentNullException(nameof(pagoRepository));
-            _facturaRepository = facturaRepository ?? throw new ArgumentNullException(nameof(facturaRepository));
+            _facturaBll = facturaBll ?? throw new ArgumentNullException(nameof(facturaBll));
             _cierreCajaRepository = cierreCajaRepository ?? throw new ArgumentNullException(nameof(cierreCajaRepository));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
@@ -127,8 +127,9 @@ namespace BLL_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarCobro);
             if (solicitud == null) throw new ArgumentNullException(nameof(solicitud));
 
-            // Pasos 1-2: factura Abierta.
-            Factura_790MY factura = _facturaRepository.GetById(solicitud.NroFactura);
+            // Pasos 1-2: factura Abierta. RegistrarCobro ya habilita el acceso a Caja
+            // que exige FacturaBLL_790MY.ObtenerFactura.
+            Factura_790MY factura = _facturaBll.ObtenerFactura(solicitud.NroFactura);
             if (factura == null || factura.Estado != EstadoFactura_790MY.Abierta)
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_no_abierta", solicitud.NroFactura);
 
@@ -201,7 +202,7 @@ namespace BLL_08YS
 
             return new ResultadoCobroDTO_790MY
             {
-                Factura = _facturaRepository.GetById(factura.NroFactura) ?? factura,
+                Factura = _facturaBll.ObtenerFactura(factura.NroFactura) ?? factura,
                 Pago = pago
             };
         }
