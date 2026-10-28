@@ -70,6 +70,7 @@
     <Compile Include="PedidoBLL_790MY.cs" />
     <Compile Include="ProductoBLL_790MY.cs" />
     <Compile Include="ProductoCBLL_790MY.cs" />
+    <Compile Include="DiferenciaVersion_790MY.cs" />
     <Compile Include="FacturaBLL_790MY.cs" />
     <Compile Include="PagoBLL_790MY.cs" />
     <Compile Include="MesaCobroDTO_790MY.cs" />
@@ -78,6 +79,11 @@
     <Compile Include="ResultadoCobroDTO_790MY.cs" />
     <Compile Include="ReporteArqueoCaja_790MY.cs" />
     <Compile Include="ReportePredictivoBLL_790MY.cs" />
+    <Compile Include="OrdenReglas_790MY.cs" />
+    <Compile Include="ReglaAsociacion_790MY.cs" />
+    <Compile Include="TipoSugerencia_790MY.cs" />
+    <Compile Include="SugerenciaInteligente_790MY.cs" />
+    <Compile Include="ResumenCanasta_790MY.cs" />
     <Compile Include="Exceptions\PagoRechazadoException_790MY.cs" />
     <Compile Include="Exceptions\StockInsuficienteException_790MY.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
