@@ -68,44 +68,6 @@ namespace DAL_08YS.SQL
             return lista;
         }
 
-        public List<Mesa_790MY> GetDisponibles(DateTime fecha, TimeSpan hora, int comensales)
-        {
-            var lista = new List<Mesa_790MY>();
-
-            using (var con = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand { Connection = con })
-            {
-                // Ocupan la mesa las reservas Confirmadas y Asistidas del mismo turno
-                // (Reserva_790MY.EstadosQueOcupanMesa). Canceladas y Finalizadas no bloquean.
-                // Las mesas dadas de baja (Activo = 0 / FueraDeServicio) nunca son disponibles.
-                string ocupa = FiltroOcupacionMesa_790MY.CondicionEstado(cmd, "r");
-                cmd.CommandText =
-                    "SELECT m.NroMesa, m.Capacidad, m.Estado, m.Activo " +
-                    "FROM Mesas m " +
-                    "WHERE m.Capacidad >= @Comensales " +
-                    "  AND m.Activo = 1 AND m.Estado <> @FueraDeServicio " +
-                    "  AND NOT EXISTS ( " +
-                    "      SELECT 1 FROM Reservas r " +
-                    "      WHERE r.MesaNumero = m.NroMesa " +
-                    "        AND r.Fecha = @Fecha AND r.Hora = @Hora " +
-                    "        AND " + ocupa +
-                    "  ) " +
-                    "ORDER BY m.Capacidad, m.NroMesa";
-
-                cmd.Parameters.AddWithValue("@Fecha",           fecha.Date);
-                cmd.Parameters.AddWithValue("@Hora",            hora);
-                cmd.Parameters.AddWithValue("@Comensales",      comensales);
-                cmd.Parameters.AddWithValue("@FueraDeServicio", EstadoMesa_790MY.FueraDeServicio.ToString());
-                con.Open();
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                        lista.Add(MapearMesa(reader));
-                }
-            }
-            return lista;
-        }
-
         public void Add(Mesa_790MY mesa)
         {
             const string sql =

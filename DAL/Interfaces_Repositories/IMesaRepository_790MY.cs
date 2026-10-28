@@ -8,7 +8,6 @@ namespace DAL_08YS.Interfaces_Repositories
     {
         bool Exists(int nroMesa);
         List<Mesa_790MY> GetAll();
-        List<Mesa_790MY> GetDisponibles(DateTime fecha, TimeSpan hora, int comensales);
         void Add(Mesa_790MY mesa);
         void Update(Mesa_790MY mesa);
         void UpdateEstado(int nroMesa, EstadoMesa_790MY estado);
