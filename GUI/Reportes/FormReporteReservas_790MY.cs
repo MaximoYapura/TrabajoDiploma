@@ -39,6 +39,7 @@ namespace GUI_08YS.Reportes
         public FormReporteReservas_790MY()
         {
             InitializeComponent();
+            Estilo.TemaFogon_790MY.ActivarDobleBufer(dgvReporteReservas_790MY);
             _reservaBll = BLLFactory_790MY.CreateReservaBLL();
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);

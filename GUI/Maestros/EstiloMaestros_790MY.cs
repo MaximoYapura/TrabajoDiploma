@@ -17,6 +17,7 @@ namespace GUI_08YS.Maestros
 
         public static void EstilizarGrilla(DataGridView dgv)
         {
+            Estilo.TemaFogon_790MY.ActivarDobleBufer(dgv);
             dgv.EnableHeadersVisualStyles = false;
             dgv.BorderStyle = BorderStyle.None;
             dgv.BackgroundColor = Color.White;

@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace GUI_08YS.Estilo
@@ -120,6 +121,7 @@ namespace GUI_08YS.Estilo
         /// </summary>
         public static void EstilizarGrilla(DataGridView dgv)
         {
+            ActivarDobleBufer(dgv);
             dgv.EnableHeadersVisualStyles = false;
             dgv.BorderStyle = BorderStyle.None;
             dgv.BackgroundColor = Tarjeta;
@@ -145,6 +147,19 @@ namespace GUI_08YS.Estilo
             dgv.DefaultCellStyle.SelectionBackColor = AccionSuave;
             dgv.DefaultCellStyle.SelectionForeColor = Tinta;
             dgv.DefaultCellStyle.Padding = new Padding(8, 0, 0, 0);
+        }
+
+        /// <summary>
+        /// DataGridView trae DoubleBuffered = false (propiedad protegida). Pintando directo a
+        /// la ventana, algunos equipos muestran el texto de celdas y encabezados como bloques
+        /// sólidos del color del texto; con doble búfer se dibuja bien y además sin parpadeo.
+        /// Los formularios con WS_EX_COMPOSITED (Bitácora, Usuarios, Acceso) ya lo tenían.
+        /// </summary>
+        public static void ActivarDobleBufer(DataGridView dgv)
+        {
+            typeof(Control)
+                .GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.SetValue(dgv, true, null);
         }
 
         // Texto de ayuda dentro de un TextBox vacío (cue banner nativo de Windows).
