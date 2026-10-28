@@ -52,9 +52,9 @@ namespace BLL_08YS
         {
             return new PedidoBLL_790MY(
                 new SqlPedidoRepository_790MY(),
-                new SqlProductoRepository_790MY(),
-                new SqlReservaRepository_790MY(),
-                new SqlEmpleadoRepository_790MY(),
+                CreateProductoBLL(),
+                CreateReservaBLL(),
+                CreateEmpleadoBLL(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
 

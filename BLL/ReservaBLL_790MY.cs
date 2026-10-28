@@ -234,6 +234,16 @@ namespace BLL_08YS
             return reserva;
         }
 
+        // ─── Consultas para otras BLL ────────────────────────────────────────
+        // Sin ValidatePermission: las usan PedidoBLL y FacturaBLL, que ya validaron su
+        // propia patente. Exigir VerReservas o AbrirMesa le negaría el acceso al Camarero.
+
+        internal Reserva_790MY ObtenerPorId(int reservaId)
+            => _reservaRepository.GetById(reservaId);
+
+        internal List<Reserva_790MY> ObtenerAsistidasPorCamarero(int camareroDni)
+            => _reservaRepository.GetAsistidasPorCamarero(camareroDni);
+
         // ─── Helpers ─────────────────────────────────────────────────────────
 
         private static void ValidarComensales(Mesa_790MY mesa, int comensales)

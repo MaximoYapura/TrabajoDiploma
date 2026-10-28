@@ -26,19 +26,19 @@ namespace BLL_08YS
         private const int LargoMaximoObservaciones = 200;
 
         private readonly IPedidoRepository_790MY _pedidoRepository;
-        private readonly IProductoRepository_790MY _productoRepository;
-        private readonly IReservaRepository_790MY _reservaRepository;
-        private readonly IEmpleadoRepository_790MY _empleadoRepository;
+        private readonly ProductoBLL_790MY _productoBll;
+        private readonly ReservaBLL_790MY _reservaBll;
+        private readonly EmpleadoBLL_790MY _empleadoBll;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public PedidoBLL_790MY(IPedidoRepository_790MY pedidoRepository, IProductoRepository_790MY productoRepository,
-                               IReservaRepository_790MY reservaRepository, IEmpleadoRepository_790MY empleadoRepository,
+        public PedidoBLL_790MY(IPedidoRepository_790MY pedidoRepository, ProductoBLL_790MY productoBll,
+                               ReservaBLL_790MY reservaBll, EmpleadoBLL_790MY empleadoBll,
                                BitacoraBLL_08YS bitacoraBll)
         {
             _pedidoRepository = pedidoRepository ?? throw new ArgumentNullException(nameof(pedidoRepository));
-            _productoRepository = productoRepository ?? throw new ArgumentNullException(nameof(productoRepository));
-            _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
-            _empleadoRepository = empleadoRepository ?? throw new ArgumentNullException(nameof(empleadoRepository));
+            _productoBll = productoBll ?? throw new ArgumentNullException(nameof(productoBll));
+            _reservaBll = reservaBll ?? throw new ArgumentNullException(nameof(reservaBll));
+            _empleadoBll = empleadoBll ?? throw new ArgumentNullException(nameof(empleadoBll));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -54,14 +54,14 @@ namespace BLL_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
             Empleado_790MY camarero = ObtenerCamareroDeSesion();
-            return _reservaRepository.GetAsistidasPorCamarero(camarero.DNI);
+            return _reservaBll.ObtenerAsistidasPorCamarero(camarero.DNI);
         }
 
         /// <summary>Catálogo con porciones disponibles (stock - comprometido).</summary>
         public List<Producto_790MY> ObtenerCatalogo()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
-            return _productoRepository.GetActivos();
+            return _productoBll.ObtenerActivos();
         }
 
         public Pedido_790MY RegistrarPedido(int reservaId, IList<ItemPedido_790MY> items)
@@ -83,7 +83,7 @@ namespace BLL_08YS
             }
 
             // Precondición: mesa ocupada con reserva Asistida asignada a este camarero.
-            Reserva_790MY reserva = _reservaRepository.GetById(reservaId)
+            Reserva_790MY reserva = _reservaBll.ObtenerPorId(reservaId)
                 ?? throw MensajesBLL_790MY.Regla("msg_rf2_reserva_inexistente", reservaId);
 
             if (reserva.Estado != EstadoReserva_790MY.Asistida)
@@ -146,7 +146,7 @@ namespace BLL_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
             Empleado_790MY camarero = ObtenerCamareroDeSesion();
 
-            var mesasAbiertas = new HashSet<int>(_reservaRepository.GetAsistidasPorCamarero(camarero.DNI).Select(r => r.ReservaID));
+            var mesasAbiertas = new HashSet<int>(_reservaBll.ObtenerAsistidasPorCamarero(camarero.DNI).Select(r => r.ReservaID));
             return _pedidoRepository
                 .Buscar(null, camarero.DNI, null)
                 .Where(p => mesasAbiertas.Contains(p.ReservaID))
@@ -181,14 +181,14 @@ namespace BLL_08YS
 
         /// <summary>
         /// Nombre de los camareros activos por DNI, para mostrar en cada comanda quién
-        /// la pidió. Se consulta el repositorio (no EmpleadoBLL) para no exigir al Chef
-        /// el permiso de ABM de empleados.
+        /// la pidió. Se usa la consulta interna de EmpleadoBLL (sin ValidatePermission)
+        /// para no exigir al Chef el permiso de ABM de empleados.
         /// </summary>
         public Dictionary<int, Empleado_790MY> ObtenerCamarerosPorDni()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
-            return _empleadoRepository
-                .GetActivosPorPuesto(PuestoEmpleado_790MY.Camarero)
+            return _empleadoBll
+                .ObtenerCamarerosActivos()
                 .ToDictionary(e => e.DNI);
         }
 
@@ -258,10 +258,7 @@ namespace BLL_08YS
         /// </summary>
         private Empleado_790MY ObtenerCamareroDeSesion()
         {
-            User_08YS usuario = SessionManager_08YS.Instance.Current
-                ?? throw new UnauthorizedAccessException(MensajesBLL_790MY.Texto("msg_rf2_sin_sesion"));
-
-            Empleado_790MY empleado = _empleadoRepository.GetByUsuarioDni(usuario.DNI);
+            Empleado_790MY empleado = _empleadoBll.ObtenerEmpleadoDeSesion();
             if (empleado == null || !empleado.Activo || empleado.Puesto != PuestoEmpleado_790MY.Camarero)
                 throw MensajesBLL_790MY.Regla("msg_rf2_usuario_no_camarero");
 

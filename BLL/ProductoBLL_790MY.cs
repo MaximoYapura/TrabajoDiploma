@@ -76,6 +76,14 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ProductoDadoDeBaja, $"Prod {producto.ProductoID} {producto.Nombre}");
         }
 
+        // ─── Consultas para otras BLL ────────────────────────────────────────
+        // Sin ValidatePermission: el Camarero (PedidoBLL, RegistrarPedido) no tiene
+        // GestionProductos; cada llamador ya validó su propia patente.
+
+        /// <summary>Productos activos con sus porciones disponibles (carta de Registrar Pedido).</summary>
+        internal List<Producto_790MY> ObtenerActivos()
+            => _productoRepository.GetActivos();
+
         // ─── Validaciones ────────────────────────────────────────────────────
 
         private Producto_790MY ObtenerExistente(int productoId)
