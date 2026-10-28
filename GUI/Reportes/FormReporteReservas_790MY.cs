@@ -26,16 +26,6 @@ namespace GUI_08YS.Reportes
         // El panel de resumen de filtros aplicados (_pnlResumenFiltros y sus labels)
         // se declara y configura en FormReporteReservas_790MY.Designer.cs.
 
-        /// <summary>
-        /// Wrapper para los ítems del ComboBox de estado.
-        /// </summary>
-        private class EstadoItem
-        {
-            public string Display { get; set; }
-            public EstadoReserva_790MY? Valor { get; set; }
-            public override string ToString() => Display;
-        }
-
         public FormReporteReservas_790MY()
         {
             InitializeComponent();
@@ -103,11 +93,11 @@ namespace GUI_08YS.Reportes
             int idx = cboEstado_790MY.SelectedIndex < 0 ? 0 : cboEstado_790MY.SelectedIndex;
 
             cboEstado_790MY.Items.Clear();
-            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbEstadoTodos"), Valor = null });
-            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbConfirmada"),  Valor = EstadoReserva_790MY.Confirmada });
-            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbCancelada"),   Valor = EstadoReserva_790MY.Cancelada });
-            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbAsistida"),    Valor = EstadoReserva_790MY.Asistida });
-            cboEstado_790MY.Items.Add(new EstadoItem { Display = t.GetTexto("REP_cmbFinalizada"),  Valor = EstadoReserva_790MY.Finalizada });
+            cboEstado_790MY.Items.Add(new OpcionCombo_790MY<EstadoReserva_790MY?> { Texto = t.GetTexto("REP_cmbEstadoTodos"), Valor = null });
+            cboEstado_790MY.Items.Add(new OpcionCombo_790MY<EstadoReserva_790MY?> { Texto = t.GetTexto("REP_cmbConfirmada"),  Valor = EstadoReserva_790MY.Confirmada });
+            cboEstado_790MY.Items.Add(new OpcionCombo_790MY<EstadoReserva_790MY?> { Texto = t.GetTexto("REP_cmbCancelada"),   Valor = EstadoReserva_790MY.Cancelada });
+            cboEstado_790MY.Items.Add(new OpcionCombo_790MY<EstadoReserva_790MY?> { Texto = t.GetTexto("REP_cmbAsistida"),    Valor = EstadoReserva_790MY.Asistida });
+            cboEstado_790MY.Items.Add(new OpcionCombo_790MY<EstadoReserva_790MY?> { Texto = t.GetTexto("REP_cmbFinalizada"),  Valor = EstadoReserva_790MY.Finalizada });
 
             cboEstado_790MY.SelectedIndex = (idx >= 0 && idx < cboEstado_790MY.Items.Count) ? idx : 0;
         }
@@ -151,7 +141,7 @@ namespace GUI_08YS.Reportes
             }
 
             EstadoReserva_790MY? estado = null;
-            if (cboEstado_790MY.SelectedItem is EstadoItem item)
+            if (cboEstado_790MY.SelectedItem is OpcionCombo_790MY<EstadoReserva_790MY?> item)
                 estado = item.Valor;
 
             try

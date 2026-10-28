@@ -124,10 +124,12 @@
       <DependentUpon>FormMesas_790MY.cs</DependentUpon>
     </Compile>
     <Compile Include="Maestros\EstiloMaestros_790MY.cs" />
+    <Compile Include="Maestros\ModoEdicion_790MY.cs" />
     <Compile Include="Maestros\MesaCard_790MY.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Estilo\TemaFogon_790MY.cs" />
+    <Compile Include="Estilo\OpcionCombo_790MY.cs" />
     <Compile Include="Estilo\FilaAyuda_790MY.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -344,7 +344,7 @@
             // cmbHora_790MY
             //
             this.cmbHora_790MY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbHora_790MY.DisplayMember = "Display";
+            this.cmbHora_790MY.DisplayMember = "Texto";
             this.cmbHora_790MY.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbHora_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F);
             this.cmbHora_790MY.Location = new System.Drawing.Point(182, 28);

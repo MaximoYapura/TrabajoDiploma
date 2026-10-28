@@ -17,8 +17,6 @@ namespace GUI_08YS.Maestros
 {
     public partial class FormClientes_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
-        private enum ModoEdicion { Reposo, Alta, Modificacion }
-
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
             new Dictionary<string, Permisos>
             {
@@ -35,7 +33,7 @@ namespace GUI_08YS.Maestros
 
         private readonly ClienteBLL_790MY _clienteBll;
 
-        private ModoEdicion _modo = ModoEdicion.Reposo;
+        private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
         private List<Cliente_790MY> _todos = new List<Cliente_790MY>();
         private List<string> _emailsAdicionalesEdicion = new List<string>();
         private List<string> _telefonosAdicionalesEdicion = new List<string>();
@@ -67,7 +65,7 @@ namespace GUI_08YS.Maestros
         {
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
             CargarGrilla(null);
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
             UpdateIdioma();
         }
 
@@ -100,7 +98,7 @@ namespace GUI_08YS.Maestros
             }
 
             ActualizarResumen(visibles.Count);
-            if (_modo == ModoEdicion.Reposo)
+            if (_modo == ModoEdicion_790MY.Reposo)
             {
                 MostrarFicha();
                 ActualizarHabilitacionBotonesAccion();
@@ -158,7 +156,7 @@ namespace GUI_08YS.Maestros
         /// <summary>DNI que debe quedar elegido al refiltrar: el que se edita o el de la fila actual.</summary>
         private int? DniEnFoco()
         {
-            if (_modo == ModoEdicion.Modificacion && int.TryParse(txtDni_790MY.Text.Trim(), out int dni))
+            if (_modo == ModoEdicion_790MY.Modificacion && int.TryParse(txtDni_790MY.Text.Trim(), out int dni))
                 return dni;
             return ClienteSeleccionado()?.DNI;
         }
@@ -173,7 +171,7 @@ namespace GUI_08YS.Maestros
         {
             if (_ignorarSeleccion) return;
 
-            if (_modo == ModoEdicion.Reposo)
+            if (_modo == ModoEdicion_790MY.Reposo)
             {
                 // Un aviso sobre el cliente anterior (por ejemplo, una baja rechazada) ya no aplica.
                 bnrAvisos_790MY.Ocultar();
@@ -191,7 +189,7 @@ namespace GUI_08YS.Maestros
         private void ResolverCambioDeFila()
         {
             Cliente_790MY destino = ClienteSeleccionado();
-            int? dniEditado = _modo == ModoEdicion.Modificacion && int.TryParse(txtDni_790MY.Text.Trim(), out int d) ? d : (int?)null;
+            int? dniEditado = _modo == ModoEdicion_790MY.Modificacion && int.TryParse(txtDni_790MY.Text.Trim(), out int d) ? d : (int?)null;
             if (destino != null && dniEditado.HasValue && destino.DNI == dniEditado.Value)
                 return;
             if (destino == null && dgvClientes_790MY.SelectedRows.Count == 0)
@@ -251,11 +249,11 @@ namespace GUI_08YS.Maestros
             var t = TraductorManager_08YS.Instance;
             switch (_modo)
             {
-                case ModoEdicion.Alta:
+                case ModoEdicion_790MY.Alta:
                     lblDetalleTitulo_790MY.Text = t.GetTexto("FC_ficha_nuevo");
                     lblDetalleAyuda_790MY.Text = t.GetTexto("FC_ficha_requeridos");
                     break;
-                case ModoEdicion.Modificacion:
+                case ModoEdicion_790MY.Modificacion:
                     lblDetalleTitulo_790MY.Text = t.GetTexto("FC_ficha_editar");
                     lblDetalleAyuda_790MY.Text = t.GetTexto("FC_ficha_requeridos");
                     break;
@@ -281,13 +279,13 @@ namespace GUI_08YS.Maestros
             btnEliminar_790MY.Enabled = haySeleccion;
         }
 
-        private void EstablecerModo(ModoEdicion modo)
+        private void EstablecerModo(ModoEdicion_790MY modo)
         {
             _modo = modo;
-            bool editando = modo != ModoEdicion.Reposo;
+            bool editando = modo != ModoEdicion_790MY.Reposo;
 
             // ReadOnly (y no Enabled = false) para que la ficha se lea bien en reposo.
-            txtDni_790MY.ReadOnly = modo != ModoEdicion.Alta;
+            txtDni_790MY.ReadOnly = modo != ModoEdicion_790MY.Alta;
             txtApellidos_790MY.ReadOnly = !editando;
             txtNombres_790MY.ReadOnly = !editando;
             txtEmail_790MY.ReadOnly = !editando;
@@ -389,7 +387,7 @@ namespace GUI_08YS.Maestros
              + "\u001E" + string.Join("\u001F", _telefonosAdicionalesEdicion);
 
         private bool HayCambiosSinGuardar()
-            => _modo != ModoEdicion.Reposo && HuellaFicha() != _huellaInicial;
+            => _modo != ModoEdicion_790MY.Reposo && HuellaFicha() != _huellaInicial;
 
         private void btnAnadir_790MY_Click(object sender, EventArgs e)
         {
@@ -398,7 +396,7 @@ namespace GUI_08YS.Maestros
             _ignorarSeleccion = false;
 
             LimpiarCampos();
-            EstablecerModo(ModoEdicion.Alta);
+            EstablecerModo(ModoEdicion_790MY.Alta);
             _huellaInicial = HuellaFicha();
             txtDni_790MY.Focus();
         }
@@ -409,7 +407,7 @@ namespace GUI_08YS.Maestros
                 return;
 
             CargarCamposDesde(seleccionado);
-            EstablecerModo(ModoEdicion.Modificacion);
+            EstablecerModo(ModoEdicion_790MY.Modificacion);
             _huellaInicial = HuellaFicha();
             txtApellidos_790MY.Focus();
         }
@@ -532,7 +530,7 @@ namespace GUI_08YS.Maestros
 
         private void LlenarEtiquetas(FlowLayoutPanel panel, List<string> valores)
         {
-            bool editando = _modo != ModoEdicion.Reposo;
+            bool editando = _modo != ModoEdicion_790MY.Reposo;
             var t = TraductorManager_08YS.Instance;
 
             panel.SuspendLayout();
@@ -596,7 +594,7 @@ namespace GUI_08YS.Maestros
         // borra apenas se corrige, pero uno nuevo recién aparece al salir del campo.
         private void CampoFicha_TextChanged(object sender, EventArgs e)
         {
-            if (_cargandoCampos || _modo == ModoEdicion.Reposo) return;
+            if (_cargandoCampos || _modo == ModoEdicion_790MY.Reposo) return;
 
             // Un error devuelto por la BLL (DNI duplicado, etc.) se da por atendido al editar.
             if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
@@ -605,7 +603,7 @@ namespace GUI_08YS.Maestros
 
         private void CampoFicha_Leave(object sender, EventArgs e)
         {
-            if (_modo == ModoEdicion.Reposo) return;
+            if (_modo == ModoEdicion_790MY.Reposo) return;
             _camposTocados.Add((Control)sender);
             ActualizarValidacion();
         }
@@ -649,7 +647,7 @@ namespace GUI_08YS.Maestros
 
         private void ActualizarValidacion()
         {
-            if (_modo == ModoEdicion.Reposo)
+            if (_modo == ModoEdicion_790MY.Reposo)
             {
                 foreach (TextBox caja in CamposFicha()) errValidacion_790MY.SetError(caja, string.Empty);
                 if (_resumenVisible) OcultarResumen();
@@ -736,7 +734,7 @@ namespace GUI_08YS.Maestros
 
             try
             {
-                if (_modo == ModoEdicion.Alta)
+                if (_modo == ModoEdicion_790MY.Alta)
                 {
                     _clienteBll.RegistrarCliente(dni, nombre, apellido, email, celular, direccion,
                                                   _emailsAdicionalesEdicion, _telefonosAdicionalesEdicion);
@@ -744,12 +742,12 @@ namespace GUI_08YS.Maestros
                     // Alta (E2-D4): la ficha queda limpia y lista para el siguiente cliente.
                     // Se recarga la grilla en reposo para que la selección no dispare
                     // el aviso de «Guardar o descartar».
-                    _modo = ModoEdicion.Reposo;
+                    _modo = ModoEdicion_790MY.Reposo;
                     CargarGrilla(null);
                     ToastHost_790MY.Mostrar(dgvClientes_790MY,
                         string.Format(t.GetTexto("msg_fc_registrado_ok"), nombre, apellido));
                     LimpiarCampos();
-                    EstablecerModo(ModoEdicion.Alta);
+                    EstablecerModo(ModoEdicion_790MY.Alta);
                     _huellaInicial = HuellaFicha();
                     txtDni_790MY.Focus();
                     return true;
@@ -764,9 +762,9 @@ namespace GUI_08YS.Maestros
 
                 _clienteBll.ActualizarCliente(cliente);
 
-                _modo = ModoEdicion.Reposo;
+                _modo = ModoEdicion_790MY.Reposo;
                 CargarGrilla(dni);
-                EstablecerModo(ModoEdicion.Reposo);
+                EstablecerModo(ModoEdicion_790MY.Reposo);
                 ToastHost_790MY.Mostrar(dgvClientes_790MY, t.GetTexto("msg_fc_modificado_ok"));
                 return true;
             }
@@ -791,7 +789,7 @@ namespace GUI_08YS.Maestros
 
         private void btnCancelar_790MY_Click(object sender, EventArgs e)
         {
-            int? dni = _modo == ModoEdicion.Modificacion ? DniEnFoco() : null;
+            int? dni = _modo == ModoEdicion_790MY.Modificacion ? DniEnFoco() : null;
             SalirDeEdicion();
             _ignorarSeleccion = true;
             dgvClientes_790MY.ClearSelection();
@@ -803,7 +801,7 @@ namespace GUI_08YS.Maestros
 
         private void SalirDeEdicion()
         {
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         private void btnGuardarCambios_790MY_Click(object sender, EventArgs e)

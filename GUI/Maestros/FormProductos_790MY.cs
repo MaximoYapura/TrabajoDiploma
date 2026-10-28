@@ -20,15 +20,6 @@ namespace GUI_08YS.Maestros
     /// </summary>
     public partial class FormProductos_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
-        private enum ModoEdicion { Reposo, Alta, Modificacion }
-
-        private sealed class Opcion<T>
-        {
-            public T Valor { get; set; }
-            public string Texto { get; set; }
-            public override string ToString() => Texto;
-        }
-
         private const int UmbralBajoStock = 5;
 
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
@@ -41,7 +32,7 @@ namespace GUI_08YS.Maestros
 
         private readonly ProductoBLL_790MY _productoBll;
         private List<Producto_790MY> _productos = new List<Producto_790MY>();
-        private ModoEdicion _modo = ModoEdicion.Reposo;
+        private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
@@ -72,7 +63,7 @@ namespace GUI_08YS.Maestros
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
             UpdateIdioma();
             Cargar();
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         #region Datos y grilla
@@ -92,13 +83,13 @@ namespace GUI_08YS.Maestros
 
         private void Filtro_Changed(object sender, EventArgs e)
         {
-            if (_modo == ModoEdicion.Reposo) RenderizarGrilla(Seleccionado?.ProductoID);
+            if (_modo == ModoEdicion_790MY.Reposo) RenderizarGrilla(Seleccionado?.ProductoID);
         }
 
         private void RenderizarGrilla(int? seleccionarId)
         {
             string texto = txtBuscar_790MY.Text.Trim();
-            var categoria = (cmbFiltroCategoria_790MY.SelectedItem as Opcion<CategoriaProducto_790MY?>)?.Valor;
+            var categoria = (cmbFiltroCategoria_790MY.SelectedItem as OpcionCombo_790MY<CategoriaProducto_790MY?>)?.Valor;
 
             var visibles = _productos
                 .Where(p => texto.Length == 0
@@ -196,7 +187,7 @@ namespace GUI_08YS.Maestros
 
         private void dgvProductos_790MY_SelectionChanged(object sender, EventArgs e)
         {
-            if (_modo != ModoEdicion.Reposo) return;
+            if (_modo != ModoEdicion_790MY.Reposo) return;
             // Un aviso sobre el producto anterior (por ejemplo, una baja rechazada) ya no aplica.
             bnrAvisos_790MY.Ocultar();
             MostrarSeleccion();
@@ -227,16 +218,16 @@ namespace GUI_08YS.Maestros
         private void CargarCombosFijos()
         {
             int filtro = Math.Max(0, cmbFiltroCategoria_790MY.SelectedIndex);
-            object categoriaActual = (cmbCategoria_790MY.SelectedItem as Opcion<CategoriaProducto_790MY>)?.Valor;
+            object categoriaActual = (cmbCategoria_790MY.SelectedItem as OpcionCombo_790MY<CategoriaProducto_790MY>)?.Valor;
 
             cmbFiltroCategoria_790MY.Items.Clear();
-            cmbFiltroCategoria_790MY.Items.Add(new Opcion<CategoriaProducto_790MY?> { Valor = null, Texto = E.T("FP_todas_categorias") });
+            cmbFiltroCategoria_790MY.Items.Add(new OpcionCombo_790MY<CategoriaProducto_790MY?> { Valor = null, Texto = E.T("FP_todas_categorias") });
             cmbCategoria_790MY.Items.Clear();
 
             foreach (CategoriaProducto_790MY c in Enum.GetValues(typeof(CategoriaProducto_790MY)))
             {
-                cmbFiltroCategoria_790MY.Items.Add(new Opcion<CategoriaProducto_790MY?> { Valor = c, Texto = E.T("RP_cat_" + c) });
-                cmbCategoria_790MY.Items.Add(new Opcion<CategoriaProducto_790MY> { Valor = c, Texto = E.T("RP_cat_" + c) });
+                cmbFiltroCategoria_790MY.Items.Add(new OpcionCombo_790MY<CategoriaProducto_790MY?> { Valor = c, Texto = E.T("RP_cat_" + c) });
+                cmbCategoria_790MY.Items.Add(new OpcionCombo_790MY<CategoriaProducto_790MY> { Valor = c, Texto = E.T("RP_cat_" + c) });
             }
 
             cmbFiltroCategoria_790MY.SelectedIndexChanged -= Filtro_Changed;
@@ -248,7 +239,7 @@ namespace GUI_08YS.Maestros
 
         private void SeleccionarCategoria(CategoriaProducto_790MY categoria)
         {
-            cmbCategoria_790MY.SelectedItem = cmbCategoria_790MY.Items.Cast<Opcion<CategoriaProducto_790MY>>()
+            cmbCategoria_790MY.SelectedItem = cmbCategoria_790MY.Items.Cast<OpcionCombo_790MY<CategoriaProducto_790MY>>()
                 .FirstOrDefault(o => o.Valor == categoria);
         }
 
@@ -256,10 +247,10 @@ namespace GUI_08YS.Maestros
 
         #region Modo de edición
 
-        private void EstablecerModo(ModoEdicion modo)
+        private void EstablecerModo(ModoEdicion_790MY modo)
         {
             _modo = modo;
-            bool editando = modo != ModoEdicion.Reposo;
+            bool editando = modo != ModoEdicion_790MY.Reposo;
 
             txtNombre_790MY.ReadOnly = !editando;
             cmbCategoria_790MY.Enabled = nudPrecio_790MY.Enabled = chkControlaStock_790MY.Enabled = chkActivo_790MY.Enabled = editando;
@@ -270,7 +261,7 @@ namespace GUI_08YS.Maestros
             dgvProductos_790MY.Enabled = !editando;
             txtBuscar_790MY.Enabled = cmbFiltroCategoria_790MY.Enabled = chkSoloActivos_790MY.Enabled = !editando;
 
-            string clave = modo == ModoEdicion.Alta ? "FE_modo_alta" : modo == ModoEdicion.Modificacion ? "FE_modo_modificacion" : "FE_modo_consulta";
+            string clave = modo == ModoEdicion_790MY.Alta ? "FE_modo_alta" : modo == ModoEdicion_790MY.Modificacion ? "FE_modo_modificacion" : "FE_modo_consulta";
             chipModo_790MY.Text = E.T(clave);
             chipModo_790MY.BackColor = editando ? E.BordoSuave : Color.FromArgb(238, 232, 222);
             chipModo_790MY.ForeColor = editando ? E.Bordo : Color.FromArgb(80, 72, 66);
@@ -298,36 +289,36 @@ namespace GUI_08YS.Maestros
 
         private void chkControlaStock_790MY_CheckedChanged(object sender, EventArgs e)
         {
-            nudStock_790MY.Enabled = _modo != ModoEdicion.Reposo && chkControlaStock_790MY.Checked;
+            nudStock_790MY.Enabled = _modo != ModoEdicion_790MY.Reposo && chkControlaStock_790MY.Checked;
         }
 
         private void btnAnadir_790MY_Click(object sender, EventArgs e)
         {
             dgvProductos_790MY.ClearSelection();
             LimpiarCampos();
-            EstablecerModo(ModoEdicion.Alta);
+            EstablecerModo(ModoEdicion_790MY.Alta);
             txtNombre_790MY.Focus();
         }
 
         private void btnModificar_790MY_Click(object sender, EventArgs e)
         {
             if (Seleccionado == null) return;
-            EstablecerModo(ModoEdicion.Modificacion);
+            EstablecerModo(ModoEdicion_790MY.Modificacion);
             txtNombre_790MY.Focus();
         }
 
         private void btnCancelar_790MY_Click(object sender, EventArgs e)
         {
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         private void btnGuardar_790MY_Click(object sender, EventArgs e)
         {
-            var categoria = (cmbCategoria_790MY.SelectedItem as Opcion<CategoriaProducto_790MY>)?.Valor
+            var categoria = (cmbCategoria_790MY.SelectedItem as OpcionCombo_790MY<CategoriaProducto_790MY>)?.Valor
                             ?? CategoriaProducto_790MY.PlatoPrincipal;
 
             var producto = new Producto_790MY(
-                _modo == ModoEdicion.Modificacion ? Seleccionado?.ProductoID ?? 0 : 0,
+                _modo == ModoEdicion_790MY.Modificacion ? Seleccionado?.ProductoID ?? 0 : 0,
                 txtNombre_790MY.Text,
                 nudPrecio_790MY.Value,
                 (int)nudStock_790MY.Value,
@@ -339,7 +330,7 @@ namespace GUI_08YS.Maestros
 
             try
             {
-                if (_modo == ModoEdicion.Alta)
+                if (_modo == ModoEdicion_790MY.Alta)
                     _productoBll.RegistrarProducto(producto);
                 else
                     _productoBll.ModificarProducto(producto);
@@ -350,23 +341,23 @@ namespace GUI_08YS.Maestros
                 return;
             }
 
-            string exito = E.T(_modo == ModoEdicion.Alta ? "FP_msg_alta_ok" : "FP_msg_modificacion_ok", producto.Nombre);
-            if (_modo == ModoEdicion.Alta)
+            string exito = E.T(_modo == ModoEdicion_790MY.Alta ? "FP_msg_alta_ok" : "FP_msg_modificacion_ok", producto.Nombre);
+            if (_modo == ModoEdicion_790MY.Alta)
             {
                 // Alta (E2-D4): la ficha queda limpia y con foco en el nombre para cargar otro producto.
-                _modo = ModoEdicion.Reposo;
+                _modo = ModoEdicion_790MY.Reposo;
                 Cargar();
                 dgvProductos_790MY.ClearSelection();
                 LimpiarCampos();
-                EstablecerModo(ModoEdicion.Alta);
+                EstablecerModo(ModoEdicion_790MY.Alta);
                 txtNombre_790MY.Focus();
             }
             else
             {
                 // Modificación (E2-D4): queda elegido el producto con los datos guardados.
-                _modo = ModoEdicion.Reposo;
+                _modo = ModoEdicion_790MY.Reposo;
                 Cargar(producto.ProductoID);
-                EstablecerModo(ModoEdicion.Reposo);
+                EstablecerModo(ModoEdicion_790MY.Reposo);
             }
             E.MostrarExitoToast(dgvProductos_790MY, exito);
         }
@@ -414,10 +405,10 @@ namespace GUI_08YS.Maestros
 
             if (_productoBll == null) return;
             CargarCombosFijos();
-            if (_modo == ModoEdicion.Reposo)
+            if (_modo == ModoEdicion_790MY.Reposo)
             {
                 RenderizarGrilla(Seleccionado?.ProductoID);
-                EstablecerModo(ModoEdicion.Reposo);
+                EstablecerModo(ModoEdicion_790MY.Reposo);
             }
         }
 

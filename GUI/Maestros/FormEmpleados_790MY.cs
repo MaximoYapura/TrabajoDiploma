@@ -20,15 +20,6 @@ namespace GUI_08YS.Maestros
     /// </summary>
     public partial class FormEmpleados_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
-        private enum ModoEdicion { Reposo, Alta, Modificacion }
-
-        private sealed class Opcion<T>
-        {
-            public T Valor { get; set; }
-            public string Texto { get; set; }
-            public override string ToString() => Texto;
-        }
-
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
             new Dictionary<string, Permisos>
             {
@@ -39,7 +30,7 @@ namespace GUI_08YS.Maestros
 
         private readonly EmpleadoBLL_790MY _empleadoBll;
         private List<Empleado_790MY> _empleados = new List<Empleado_790MY>();
-        private ModoEdicion _modo = ModoEdicion.Reposo;
+        private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
@@ -71,7 +62,7 @@ namespace GUI_08YS.Maestros
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
             UpdateIdioma();
             Cargar();
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         #region Datos y grilla
@@ -91,13 +82,13 @@ namespace GUI_08YS.Maestros
 
         private void Filtro_Changed(object sender, EventArgs e)
         {
-            if (_modo == ModoEdicion.Reposo) RenderizarGrilla(Seleccionado?.DNI);
+            if (_modo == ModoEdicion_790MY.Reposo) RenderizarGrilla(Seleccionado?.DNI);
         }
 
         private void RenderizarGrilla(int? seleccionarDni)
         {
             string texto = txtBuscar_790MY.Text.Trim();
-            var cargo = (cmbFiltroCargo_790MY.SelectedItem as Opcion<PuestoEmpleado_790MY?>)?.Valor;
+            var cargo = (cmbFiltroCargo_790MY.SelectedItem as OpcionCombo_790MY<PuestoEmpleado_790MY?>)?.Valor;
 
             var visibles = _empleados
                 .Where(emp => texto.Length == 0
@@ -157,7 +148,7 @@ namespace GUI_08YS.Maestros
 
         private void dgvEmpleados_790MY_SelectionChanged(object sender, EventArgs e)
         {
-            if (_modo != ModoEdicion.Reposo) return;
+            if (_modo != ModoEdicion_790MY.Reposo) return;
             // Un aviso sobre el empleado anterior (por ejemplo, una baja rechazada) ya no aplica.
             bnrAvisos_790MY.Ocultar();
             MostrarSeleccion();
@@ -200,15 +191,15 @@ namespace GUI_08YS.Maestros
         {
             int filtro = Math.Max(0, cmbFiltroCargo_790MY.SelectedIndex);
             cmbFiltroCargo_790MY.Items.Clear();
-            cmbFiltroCargo_790MY.Items.Add(new Opcion<PuestoEmpleado_790MY?> { Valor = null, Texto = E.T("FE_todos_cargos") });
+            cmbFiltroCargo_790MY.Items.Add(new OpcionCombo_790MY<PuestoEmpleado_790MY?> { Valor = null, Texto = E.T("FE_todos_cargos") });
 
-            object puestoActual = (cmbCargo_790MY.SelectedItem as Opcion<PuestoEmpleado_790MY>)?.Valor;
+            object puestoActual = (cmbCargo_790MY.SelectedItem as OpcionCombo_790MY<PuestoEmpleado_790MY>)?.Valor;
             cmbCargo_790MY.Items.Clear();
 
             foreach (PuestoEmpleado_790MY p in Enum.GetValues(typeof(PuestoEmpleado_790MY)))
             {
-                cmbFiltroCargo_790MY.Items.Add(new Opcion<PuestoEmpleado_790MY?> { Valor = p, Texto = E.T("FE_puesto_" + p) });
-                cmbCargo_790MY.Items.Add(new Opcion<PuestoEmpleado_790MY> { Valor = p, Texto = E.T("FE_puesto_" + p) });
+                cmbFiltroCargo_790MY.Items.Add(new OpcionCombo_790MY<PuestoEmpleado_790MY?> { Valor = p, Texto = E.T("FE_puesto_" + p) });
+                cmbCargo_790MY.Items.Add(new OpcionCombo_790MY<PuestoEmpleado_790MY> { Valor = p, Texto = E.T("FE_puesto_" + p) });
             }
 
             cmbFiltroCargo_790MY.SelectedIndexChanged -= Filtro_Changed;
@@ -220,7 +211,7 @@ namespace GUI_08YS.Maestros
 
         private void SeleccionarPuesto(PuestoEmpleado_790MY puesto)
         {
-            cmbCargo_790MY.SelectedItem = cmbCargo_790MY.Items.Cast<Opcion<PuestoEmpleado_790MY>>()
+            cmbCargo_790MY.SelectedItem = cmbCargo_790MY.Items.Cast<OpcionCombo_790MY<PuestoEmpleado_790MY>>()
                 .FirstOrDefault(o => o.Valor == puesto);
         }
 
@@ -228,12 +219,12 @@ namespace GUI_08YS.Maestros
 
         #region Modo de edición
 
-        private void EstablecerModo(ModoEdicion modo)
+        private void EstablecerModo(ModoEdicion_790MY modo)
         {
             _modo = modo;
-            bool editando = modo != ModoEdicion.Reposo;
+            bool editando = modo != ModoEdicion_790MY.Reposo;
 
-            txtDni_790MY.ReadOnly = modo != ModoEdicion.Alta;
+            txtDni_790MY.ReadOnly = modo != ModoEdicion_790MY.Alta;
             txtNombre_790MY.ReadOnly = txtApellido_790MY.ReadOnly = !editando;
             cmbCargo_790MY.Enabled = chkActivo_790MY.Enabled = editando;
 
@@ -242,7 +233,7 @@ namespace GUI_08YS.Maestros
             dgvEmpleados_790MY.Enabled = !editando;
             txtBuscar_790MY.Enabled = cmbFiltroCargo_790MY.Enabled = chkSoloActivos_790MY.Enabled = !editando;
 
-            string clave = modo == ModoEdicion.Alta ? "FE_modo_alta" : modo == ModoEdicion.Modificacion ? "FE_modo_modificacion" : "FE_modo_consulta";
+            string clave = modo == ModoEdicion_790MY.Alta ? "FE_modo_alta" : modo == ModoEdicion_790MY.Modificacion ? "FE_modo_modificacion" : "FE_modo_consulta";
             chipModo_790MY.Text = E.T(clave);
             chipModo_790MY.BackColor = editando ? E.BordoSuave : Color.FromArgb(238, 232, 222);
             chipModo_790MY.ForeColor = editando ? E.Bordo : Color.FromArgb(80, 72, 66);
@@ -275,20 +266,20 @@ namespace GUI_08YS.Maestros
         {
             dgvEmpleados_790MY.ClearSelection();
             LimpiarCampos();
-            EstablecerModo(ModoEdicion.Alta);
+            EstablecerModo(ModoEdicion_790MY.Alta);
             txtDni_790MY.Focus();
         }
 
         private void btnModificar_790MY_Click(object sender, EventArgs e)
         {
             if (Seleccionado == null) return;
-            EstablecerModo(ModoEdicion.Modificacion);
+            EstablecerModo(ModoEdicion_790MY.Modificacion);
             txtNombre_790MY.Focus();
         }
 
         private void btnCancelar_790MY_Click(object sender, EventArgs e)
         {
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         private void btnGuardar_790MY_Click(object sender, EventArgs e)
@@ -303,14 +294,14 @@ namespace GUI_08YS.Maestros
                 return;
             }
 
-            var puesto = (cmbCargo_790MY.SelectedItem as Opcion<PuestoEmpleado_790MY>)?.Valor ?? PuestoEmpleado_790MY.Camarero;
+            var puesto = (cmbCargo_790MY.SelectedItem as OpcionCombo_790MY<PuestoEmpleado_790MY>)?.Valor ?? PuestoEmpleado_790MY.Camarero;
             // UsuarioDNI no se envía: el alta queda sin usuario y la DAL no lo modifica al
             // actualizar, así se conserva el vínculo existente (p. ej. el del administrador).
             var empleado = new Empleado_790MY(dni, txtNombre_790MY.Text, txtApellido_790MY.Text, puesto, activo: chkActivo_790MY.Checked);
 
             try
             {
-                if (_modo == ModoEdicion.Alta)
+                if (_modo == ModoEdicion_790MY.Alta)
                     _empleadoBll.RegistrarEmpleado(empleado);
                 else
                     _empleadoBll.ModificarEmpleado(empleado);
@@ -321,23 +312,23 @@ namespace GUI_08YS.Maestros
                 return;
             }
 
-            string exito = E.T(_modo == ModoEdicion.Alta ? "FE_msg_alta_ok" : "FE_msg_modificacion_ok", empleado.NombreCompleto);
-            if (_modo == ModoEdicion.Alta)
+            string exito = E.T(_modo == ModoEdicion_790MY.Alta ? "FE_msg_alta_ok" : "FE_msg_modificacion_ok", empleado.NombreCompleto);
+            if (_modo == ModoEdicion_790MY.Alta)
             {
                 // Alta (E2-D4): la ficha queda limpia y con foco en el DNI para cargar otro empleado.
-                _modo = ModoEdicion.Reposo;
+                _modo = ModoEdicion_790MY.Reposo;
                 Cargar();
                 dgvEmpleados_790MY.ClearSelection();
                 LimpiarCampos();
-                EstablecerModo(ModoEdicion.Alta);
+                EstablecerModo(ModoEdicion_790MY.Alta);
                 txtDni_790MY.Focus();
             }
             else
             {
                 // Modificación (E2-D4): queda elegido el empleado con los datos guardados.
-                _modo = ModoEdicion.Reposo;
+                _modo = ModoEdicion_790MY.Reposo;
                 Cargar(dni);
-                EstablecerModo(ModoEdicion.Reposo);
+                EstablecerModo(ModoEdicion_790MY.Reposo);
             }
             E.MostrarExitoToast(dgvEmpleados_790MY, exito);
         }
@@ -391,10 +382,10 @@ namespace GUI_08YS.Maestros
 
             if (_empleadoBll == null) return;
             CargarCombosFijos();
-            if (_modo == ModoEdicion.Reposo)
+            if (_modo == ModoEdicion_790MY.Reposo)
             {
                 RenderizarGrilla(Seleccionado?.DNI);
-                EstablecerModo(ModoEdicion.Reposo);
+                EstablecerModo(ModoEdicion_790MY.Reposo);
             }
         }
 

@@ -51,13 +51,6 @@ namespace GUI_08YS.RF1
                 { nameof(btnConfirmar_790MY), Permisos.RegistrarReserva },
             };
 
-        private class TurnoItem
-        {
-            public string Display { get; set; }
-            public TimeSpan Hora { get; set; }
-            public override string ToString() => Display;
-        }
-
         public FormRegistrarReserva_790MY()
         {
             InitializeComponent();
@@ -96,7 +89,7 @@ namespace GUI_08YS.RF1
             // Los textos de los turnos usan el mismo formato que el comprobante
             // (DisplayMember se configura en el Designer).
             foreach (var inicio in new[] { new TimeSpan(18, 0, 0), new TimeSpan(20, 0, 0), new TimeSpan(22, 0, 0) })
-                cmbHora_790MY.Items.Add(new TurnoItem { Display = ReservaBLL_790MY.FormatearTurno(inicio), Hora = inicio });
+                cmbHora_790MY.Items.Add(new OpcionCombo_790MY<TimeSpan> { Texto = ReservaBLL_790MY.FormatearTurno(inicio), Valor = inicio });
 
             UpdateIdioma();
             LimpiarFormulario();
@@ -183,8 +176,8 @@ namespace GUI_08YS.RF1
             AsignarValor(lblResFechaV_790MY, $"{dia} {dtpFecha_790MY.Value:dd/MM/yyyy}", vacio);
 
             // Turno
-            var turno = cmbHora_790MY.SelectedItem as TurnoItem;
-            AsignarValor(lblResTurnoV_790MY, turno?.Display, vacio);
+            var turno = cmbHora_790MY.SelectedItem as OpcionCombo_790MY<TimeSpan>;
+            AsignarValor(lblResTurnoV_790MY, turno?.Texto, vacio);
 
             // Comensales
             int comensales = (int)nudComensales_790MY.Value;
@@ -330,7 +323,7 @@ namespace GUI_08YS.RF1
                 return;
             }
 
-            TimeSpan hora       = ((TurnoItem)cmbHora_790MY.SelectedItem).Hora;
+            TimeSpan hora       = ((OpcionCombo_790MY<TimeSpan>)cmbHora_790MY.SelectedItem).Valor;
             int      comensales = (int)nudComensales_790MY.Value;
             DateTime fecha      = dtpFecha_790MY.Value.Date;
 
@@ -376,7 +369,7 @@ namespace GUI_08YS.RF1
                 return;
             }
 
-            TimeSpan hora = ((TurnoItem)cmbHora_790MY.SelectedItem).Hora;
+            TimeSpan hora = ((OpcionCombo_790MY<TimeSpan>)cmbHora_790MY.SelectedItem).Valor;
             int comensales = (int)nudComensales_790MY.Value;
 
             Reserva_790MY reserva;

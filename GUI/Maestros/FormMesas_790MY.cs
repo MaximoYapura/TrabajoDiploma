@@ -14,8 +14,6 @@ namespace GUI_08YS.Maestros
 {
     public partial class FormMesas_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
-        private enum ModoEdicion { Reposo, Alta, Modificacion }
-
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
             new Dictionary<string, Permisos>
             {
@@ -25,7 +23,7 @@ namespace GUI_08YS.Maestros
             };
 
         private readonly MesaBLL_790MY _mesaBll;
-        private ModoEdicion _modo = ModoEdicion.Reposo;
+        private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
 
         // Estado original de la mesa que se esta editando. El maestro solo ofrece
         // «Disponible» / «Fuera de servicio»; Ocupada y Reservada son estados operativos
@@ -51,7 +49,7 @@ namespace GUI_08YS.Maestros
         {
             PermissionFilter_08YS.Aplicar(this, _mapaPermisos);
             CargarTablero();
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         #region Tablero
@@ -88,7 +86,7 @@ namespace GUI_08YS.Maestros
 
         private void Tarjeta_Click(object sender, EventArgs e)
         {
-            if (_modo != ModoEdicion.Reposo) return;
+            if (_modo != ModoEdicion_790MY.Reposo) return;
             _seleccionada = ((MesaCard_790MY)sender).Mesa;
             // Un aviso sobre la mesa anterior (por ejemplo, una baja rechazada) ya no aplica.
             bnrAvisos_790MY.Ocultar();
@@ -100,7 +98,7 @@ namespace GUI_08YS.Maestros
             foreach (MesaCard_790MY tarjeta in _tarjetas)
                 tarjeta.Seleccionada = _seleccionada != null && tarjeta.Mesa.NroMesa == _seleccionada.NroMesa;
 
-            if (_modo == ModoEdicion.Reposo)
+            if (_modo == ModoEdicion_790MY.Reposo)
             {
                 MostrarDetalle(_seleccionada);
                 ActualizarHabilitacionBotonesAccion();
@@ -189,10 +187,10 @@ namespace GUI_08YS.Maestros
             btnEliminar_790MY.Enabled = haySeleccion;
         }
 
-        private void EstablecerModo(ModoEdicion modo)
+        private void EstablecerModo(ModoEdicion_790MY modo)
         {
             _modo = modo;
-            bool editando = modo != ModoEdicion.Reposo;
+            bool editando = modo != ModoEdicion_790MY.Reposo;
 
             // NroMesa siempre es de solo lectura (ReadOnly = true en el Designer):
             // se auto-asigna en Alta y no se permite cambiar la PK en Modificación.
@@ -201,8 +199,8 @@ namespace GUI_08YS.Maestros
             nudCapacidad_790MY.Enabled = editando;
 
             // El estado solo se cambia al modificar: la BLL da de alta toda mesa como Libre.
-            rdoDisponible_790MY.Enabled    = modo == ModoEdicion.Modificacion;
-            rdoFueraServicio_790MY.Enabled = modo == ModoEdicion.Modificacion;
+            rdoDisponible_790MY.Enabled    = modo == ModoEdicion_790MY.Modificacion;
+            rdoFueraServicio_790MY.Enabled = modo == ModoEdicion_790MY.Modificacion;
 
             btnAplicar_790MY.Enabled  = editando;
             btnCancelar_790MY.Enabled = editando;
@@ -225,11 +223,11 @@ namespace GUI_08YS.Maestros
             var t = TraductorManager_08YS.Instance;
             switch (_modo)
             {
-                case ModoEdicion.Alta:
+                case ModoEdicion_790MY.Alta:
                     lblDetalleTitulo_790MY.Text = t.GetTexto("FM_detalle_nueva");
                     lblDetalleAyuda_790MY.Text = string.Empty;
                     break;
-                case ModoEdicion.Modificacion:
+                case ModoEdicion_790MY.Modificacion:
                     lblDetalleTitulo_790MY.Text = string.Format(t.GetTexto("FM_detalle_editar"), txtNumero_790MY.Text);
                     lblDetalleAyuda_790MY.Text = string.Empty;
                     break;
@@ -269,7 +267,7 @@ namespace GUI_08YS.Maestros
                 txtNumero_790MY.Text = "1";
             }
 
-            EstablecerModo(ModoEdicion.Alta);
+            EstablecerModo(ModoEdicion_790MY.Alta);
             nudCapacidad_790MY.Focus();
         }
 
@@ -284,7 +282,7 @@ namespace GUI_08YS.Maestros
             _activoEdicion             = seleccionada.Activo;
             MostrarEstado(_estadoEdicion);
 
-            EstablecerModo(ModoEdicion.Modificacion);
+            EstablecerModo(ModoEdicion_790MY.Modificacion);
             nudCapacidad_790MY.Focus();
         }
 
@@ -334,17 +332,17 @@ namespace GUI_08YS.Maestros
             }
 
             int capacidad = (int)nudCapacidad_790MY.Value;
-            EstadoMesa_790MY estado = _modo == ModoEdicion.Modificacion ? EstadoAGuardar() : EstadoMesa_790MY.Libre;
+            EstadoMesa_790MY estado = _modo == ModoEdicion_790MY.Modificacion ? EstadoAGuardar() : EstadoMesa_790MY.Libre;
 
             try
             {
-                if (_modo == ModoEdicion.Alta)
+                if (_modo == ModoEdicion_790MY.Alta)
                 {
                     _mesaBll.RegistrarMesa(numero, capacidad);
 
                     // Alta (E2-D4): el tablero muestra la mesa nueva y la ficha queda lista para otra.
                     _seleccionada = null;
-                    _modo = ModoEdicion.Reposo;
+                    _modo = ModoEdicion_790MY.Reposo;
                     CargarTablero();
                     PrepararAlta();
                     ToastHost_790MY.Mostrar(flpTablero_790MY,
@@ -358,9 +356,9 @@ namespace GUI_08YS.Maestros
 
                 _seleccionada = new Mesa_790MY(numero, capacidad, estado);
                 LimpiarCampos();
-                _modo = ModoEdicion.Reposo;
+                _modo = ModoEdicion_790MY.Reposo;
                 CargarTablero();
-                EstablecerModo(ModoEdicion.Reposo);
+                EstablecerModo(ModoEdicion_790MY.Reposo);
                 ToastHost_790MY.Mostrar(flpTablero_790MY,
                     string.Format(t.GetTexto("msg_fm_modificada_ok"), numero));
             }
@@ -385,7 +383,7 @@ namespace GUI_08YS.Maestros
         private void btnCancelar_790MY_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
-            EstablecerModo(ModoEdicion.Reposo);
+            EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
         private void btnSalir_790MY_Click(object sender, EventArgs e)
