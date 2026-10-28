@@ -28,8 +28,8 @@ namespace GUI_08YS.RF2
         private const int AnchoTicket = 400;
 
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
-        private static readonly Color Tinta = Color.FromArgb(30, 28, 26);
-        private static readonly Color TintaSuave = Color.FromArgb(95, 90, 85);
+        internal static readonly Color Tinta = Color.FromArgb(30, 28, 26);
+        internal static readonly Color TintaSuave = Color.FromArgb(95, 90, 85);
         private static readonly Color Papel = Color.White;
         private static readonly Color TintaLogo = Color.Black;
 
@@ -156,7 +156,7 @@ namespace GUI_08YS.RF2
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
 
-            using (var t = new Ticket(g, origenX, origenY, AnchoTicket))
+            using (var t = new TicketFactura_790MY(g, origenX, origenY, AnchoTicket))
             {
                 DibujarEncabezado(t);
                 if (EsFactura) DibujarDatosFactura(t); else DibujarDatosPreTicket(t);
@@ -170,7 +170,7 @@ namespace GUI_08YS.RF2
             }
         }
 
-        private void DibujarEncabezado(Ticket t)
+        private void DibujarEncabezado(TicketFactura_790MY t)
         {
             t.Espacio(22);
             if (_logo != null)
@@ -208,7 +208,7 @@ namespace GUI_08YS.RF2
             t.Espacio(8);
         }
 
-        private void DibujarDatosPreTicket(Ticket t)
+        private void DibujarDatosPreTicket(TicketFactura_790MY t)
         {
             t.Centrado(E.T("CJ_tk_preticket_titulo"), t.FTitulo);
             t.Espacio(8);
@@ -223,7 +223,7 @@ namespace GUI_08YS.RF2
             t.Espacio(10);
         }
 
-        private void DibujarDatosFactura(Ticket t)
+        private void DibujarDatosFactura(TicketFactura_790MY t)
         {
             // "FACTURA" + recuadro con la letra del comprobante.
             float altoCaja = 44f;
@@ -248,7 +248,7 @@ namespace GUI_08YS.RF2
             t.Espacio(8);
         }
 
-        private void DibujarItems(Ticket t)
+        private void DibujarItems(TicketFactura_790MY t)
         {
             t.Separador(grueso: false);
             t.Espacio(8);
@@ -269,7 +269,7 @@ namespace GUI_08YS.RF2
             t.Espacio(8);
         }
 
-        private void DibujarTotales(Ticket t)
+        private void DibujarTotales(TicketFactura_790MY t)
         {
             t.Fila(E.T("CJ_tk_subtotal"), "$ " + Numero(_factura.Subtotal));
             t.Fila(E.T("CJ_tk_descuento", _factura.PorcentajeDescuento.ToString("0.##", CulturaMoneda)),
@@ -285,7 +285,7 @@ namespace GUI_08YS.RF2
             t.Espacio(12);
         }
 
-        private void DibujarPiePreTicket(Ticket t)
+        private void DibujarPiePreTicket(TicketFactura_790MY t)
         {
             t.Centrado(E.T("CJ_tk_gracias_preferencia"), t.FCuerpo);
             t.Centrado(E.T("CJ_tk_solicite_factura"), t.FCuerpo);
@@ -293,7 +293,7 @@ namespace GUI_08YS.RF2
             t.Centrado(E.T("CJ_tk_preticket_pie", _factura.MesaNumero), t.FMini, suave: true);
         }
 
-        private void DibujarPago(Ticket t)
+        private void DibujarPago(TicketFactura_790MY t)
         {
             // ─── Recuadro "DETALLE DE PAGO" ───
             float inicio = t.Y;
@@ -353,7 +353,7 @@ namespace GUI_08YS.RF2
             t.Recuadro(E.T("CJ_tk_maqueta"), t.FMini, 1f, angosto: true);
         }
 
-        private void DibujarSello(Ticket t)
+        private void DibujarSello(TicketFactura_790MY t)
         {
             var estado = t.G.Save();
             float cx = t.X + t.Ancho / 2f, cy = t.Y + 40;
@@ -427,7 +427,7 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>Patrón tipo QR derivado del hash (simulación visual, no decodificable).</summary>
-        private static void DibujarQrSimulado(Ticket t, string hash)
+        private static void DibujarQrSimulado(TicketFactura_790MY t, string hash)
         {
             const int modulos = 25;
             const float lado = 5f;
@@ -553,140 +553,5 @@ namespace GUI_08YS.RF2
             => valor.ToString(valor == decimal.Truncate(valor) ? "N0" : "N2", CulturaMoneda);
 
         #endregion
-
-        /// <summary>Cursor de escritura del ticket: posición vertical, márgenes y fuentes.</summary>
-        private sealed class Ticket : IDisposable
-        {
-            private const float MargenLateral = 22f;
-
-            public Graphics G { get; }
-            public float X { get; private set; }
-            public float Y { get; private set; }
-            public float Ancho { get; private set; }
-
-            public readonly Font FCuerpo = new Font("Courier New", 9.5f);
-            public readonly Font FChica = new Font("Courier New", 8.5f);
-            public readonly Font FMini = new Font("Courier New", 7.5f);
-            public readonly Font FNegrita = new Font("Courier New", 9.5f, FontStyle.Bold);
-            public readonly Font FNegritaChica = new Font("Courier New", 8.5f, FontStyle.Bold);
-            public readonly Font FTitulo = new Font("Courier New", 12f, FontStyle.Bold);
-            public readonly Font FTotal = new Font("Courier New", 15f, FontStyle.Bold);
-            public readonly Font FLetra = new Font("Courier New", 18f, FontStyle.Bold);
-            public readonly Font FSello = new Font("Courier New", 24f, FontStyle.Bold);
-            public readonly Font FMarca = new Font("Georgia", 20f, FontStyle.Bold);
-            public readonly SolidBrush Pincel = new SolidBrush(Tinta);
-            public readonly SolidBrush PincelSuave = new SolidBrush(TintaSuave);
-
-            private readonly StringFormat _centro = new StringFormat { Alignment = StringAlignment.Center };
-            private readonly StringFormat _derecha = new StringFormat { Alignment = StringAlignment.Far };
-
-            public Ticket(Graphics g, float x, float y, float anchoTotal)
-            {
-                G = g;
-                X = x + MargenLateral;
-                Y = y;
-                Ancho = anchoTotal - 2 * MargenLateral;
-            }
-
-            public void Espacio(float alto) => Y += alto;
-
-            /// <summary>Achica (positivo) o restaura (negativo) el área de escritura.</summary>
-            public void Margen(float delta)
-            {
-                X += delta;
-                Ancho -= 2 * delta;
-            }
-
-            public void Centrado(string texto, Font fuente, bool suave = false)
-            {
-                var area = new RectangleF(X, Y, Ancho, 1000);
-                SizeF med = G.MeasureString(texto, fuente, (int)Ancho, _centro);
-                G.DrawString(texto, fuente, suave ? PincelSuave : Pincel, area, _centro);
-                Y += med.Height + 2;
-            }
-
-            public void Izquierda(string texto, Font fuente, bool suave = false)
-            {
-                SizeF med = G.MeasureString(texto, fuente, (int)Ancho);
-                G.DrawString(texto, fuente, suave ? PincelSuave : Pincel, new RectangleF(X, Y, Ancho, med.Height + 2));
-                Y += med.Height + 2;
-            }
-
-            public void Fila(string izquierda, string derecha, bool negritaIzq = false, bool negritaDer = false)
-            {
-                Font fi = negritaIzq ? FNegrita : FCuerpo;
-                Font fd = negritaDer ? FNegrita : FCuerpo;
-                float alto = Math.Max(G.MeasureString(izquierda, fi).Height, G.MeasureString(derecha, fd).Height);
-                G.DrawString(izquierda, fi, Pincel, X, Y);
-                G.DrawString(derecha, fd, Pincel, new RectangleF(X, Y, Ancho, alto + 2), _derecha);
-                Y += alto + 3;
-            }
-
-            public void FilaGrande(string izquierda, string derecha)
-            {
-                SizeF med = G.MeasureString(derecha, FTotal);
-                G.DrawString(izquierda, FNegrita, Pincel, X, Y + (med.Height - G.MeasureString(izquierda, FNegrita).Height) / 2f + 2);
-                G.DrawString(derecha, FTotal, Pincel, new RectangleF(X, Y, Ancho, med.Height + 2), _derecha);
-                Y += med.Height + 2;
-            }
-
-            /// <summary>Cant | Descripción (con salto de línea) | P.Unit | Subt.</summary>
-            public void Columnas(string cant, string descripcion, string precio, string subtotal, Font fuente)
-            {
-                float wCant = 36, wPrecio = 78, wSub = 78;
-                float wDesc = Ancho - wCant - wPrecio - wSub - 8;
-                SizeF medDesc = G.MeasureString(descripcion, fuente, (int)wDesc);
-                float alto = Math.Max(medDesc.Height, G.MeasureString("0", fuente).Height);
-
-                G.DrawString(cant, fuente, Pincel, X, Y);
-                G.DrawString(descripcion, fuente, Pincel, new RectangleF(X + wCant, Y, wDesc, alto + 2));
-                G.DrawString(precio, fuente, Pincel, new RectangleF(X + wCant + wDesc, Y, wPrecio, alto), _derecha);
-                G.DrawString(subtotal, fuente, Pincel, new RectangleF(X + Ancho - wSub, Y, wSub, alto), _derecha);
-                Y += alto + 4;
-            }
-
-            public void Linea(Color color, float grosor)
-            {
-                using (var lapiz = new Pen(color, grosor))
-                    G.DrawLine(lapiz, X, Y, X + Ancho, Y);
-            }
-
-            public void Separador(bool grueso)
-            {
-                using (var lapiz = new Pen(Tinta, grueso ? 2f : 1f) { DashStyle = DashStyle.Dash })
-                    G.DrawLine(lapiz, X, Y, X + Ancho, Y);
-                Y += grueso ? 2 : 1;
-            }
-
-            public void Recuadro(string texto, Font fuente, float grosor, bool angosto = false)
-            {
-                float ancho = angosto ? Math.Min(Ancho, G.MeasureString(texto, fuente).Width + 24) : Ancho;
-                float x = X + (Ancho - ancho) / 2f;
-                SizeF med = G.MeasureString(texto, fuente, (int)(ancho - 20), _centro);
-                var rect = new RectangleF(x, Y, ancho, med.Height + 16);
-                using (var lapiz = new Pen(Tinta, grosor))
-                    G.DrawRectangle(lapiz, rect.X, rect.Y, rect.Width, rect.Height);
-                G.DrawString(texto, fuente, Pincel, new RectangleF(rect.X + 10, rect.Y + 8, rect.Width - 20, med.Height + 2), _centro);
-                Y += rect.Height;
-            }
-
-            public void Tijera()
-            {
-                using (var simbolo = new Font("Segoe UI Symbol", 11f))
-                    G.DrawString("✂", simbolo, PincelSuave, X, Y - 11);
-                using (var lapiz = new Pen(TintaSuave, 1f) { DashStyle = DashStyle.Dash })
-                    G.DrawLine(lapiz, X + 22, Y, X + Ancho, Y);
-            }
-
-            public void Dispose()
-            {
-                foreach (var f in new[] { FCuerpo, FChica, FMini, FNegrita, FNegritaChica, FTitulo, FTotal, FLetra, FSello, FMarca })
-                    f.Dispose();
-                Pincel.Dispose();
-                PincelSuave.Dispose();
-                _centro.Dispose();
-                _derecha.Dispose();
-            }
-        }
     }
 }
