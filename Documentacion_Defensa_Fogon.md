@@ -28,7 +28,7 @@
 | `BLL_08YS` | Reglas de negocio, validaciones, orquestación | `BLL_08YS` |
 | `DAL_08YS` | Acceso a datos ADO.NET (`System.Data.SqlClient`), repositorios | `DAL_08YS`, `DAL_08YS.SQL`, `DAL_08YS.Interfaces_Repositories`, `DAL_08YS.Instalador` |
 | `BE_08YS` | Entidades de negocio | `BE_08YS` |
-| `MPP_08YS` | Mappers (p. ej. `ClienteMapper_790MY_OBSOLETO` en `MPP/ClienteMapper_790MY.cs`, marcado como obsoleto) | — |
+| `MPP_08YS` | Mappers de seguridad y bitácora (`AccessMapper_08YS`, `BitacoraMapper_08YS`, `UserMapper_08YS`) | — |
 | `Service_08YS` | Servicios transversales: sesión, traductor, bitácora (entidades), seguridad, encriptación | `Service_08YS`, `Service_08YS.Entities.Acceso`, `.Bitacora` |
 
 Convención de sufijos: `_790MY` y `_08YS` identifican a los dos autores/etapas del código; ambos conviven y se usan tal cual en este documento.
@@ -60,6 +60,23 @@ Si la instalación de la BD falla, `Program.cs` muestra un `MessageBox` (error f
 - `BLLFactory_790MY`: `CreateClienteBLL`, `CreateMesaBLL`, `CreateReservaBLL`, `CreateEmpleadoBLL`, `CreateProductoBLL`, `CreatePedidoBLL`, `CreateFacturaBLL`, `CreatePagoBLL`, `CreateReportePredictivoBLL`, `CreateProductoCBLL`.
 - Los repositorios 790MY (`SqlXxxRepository_790MY`) reciben la cadena de conexión; los 08YS usan `IDbFactory_08YS` / `SqlDbFactory_08YS` (con `SqlDbFactory_08YS.ConnectionString`, leída de `App.config`, cadena `TP_Ing_Soft`).
 - Todos los repositorios se consumen **por interfaz** (`IXxxRepository_790MY` / `_08YS`) → las BLL no conocen SQL (inversión de dependencias, testeable con dobles).
+
+#### 0.4.1 Relaciones entre BLL (BLL → BLL)
+
+Cada BLL lee solo el repositorio de **su** entidad; cuando necesita datos de otra entidad pasa por la BLL dueña. `BLLFactory_790MY` arma el grafo (sin ciclos):
+
+```
+Nivel 0: ClienteBLL, ProductoBLL, MesaBLL*, EmpleadoBLL*
+ReservaBLL   -> ClienteBLL, MesaBLL, EmpleadoBLL
+PedidoBLL    -> ReservaBLL, ProductoBLL, EmpleadoBLL
+FacturaBLL   -> ReservaBLL, PedidoBLL, EmpleadoBLL
+PagoBLL      -> FacturaBLL
+ProductoCBLL -> ProductoBLL
+```
+
+- **Permisos:** la BLL destino expone métodos `internal` **sin** `ValidatePermission` (p. ej. `EmpleadoBLL_790MY.ObtenerEmpleadoDeSesion/ObtenerCamarerosActivos/ObtenerPorDni`, `ReservaBLL_790MY.ObtenerPorId/ObtenerAsistidasPorCamarero/ObtenerAsistidas`, `ProductoBLL_790MY.ObtenerActivos/ObtenerPorId/ExisteNombre`, `PedidoBLL_790MY.ContarNoDespachados`, `ClienteBLL_790MY.ExisteActivo`, `MesaBLL_790MY.ObtenerPorNumero`). El método público de origen valida **su** patente al principio; así el Chef (solo `DespacharPedido`) o el Camarero (sin `VerReservas`, `AbrirMesa` ni `GestionProductos`) no necesitan permisos ajenos. `internal` impide que la GUI los llame.
+- **\* Excepción:** `MesaBLL_790MY.EliminarMesa` y `EmpleadoBLL_790MY.ValidarSinMesasAbiertas/ContarMesasAbiertas` siguen leyendo `IReservaRepository_790MY` (chequeos de integridad de solo lectura antes de la baja). Pasar por `ReservaBLL` formaría un ciclo `ReservaBLL → MesaBLL/EmpleadoBLL → ReservaBLL` y la fábrica entraría en recursión infinita.
+- Sin cambios: `EmpleadoBLL → IUserRepository_08YS`, `ReportePredictivoBLL → IFacturaRepository_790MY` y las relaciones de usuarios, familias y roles (`_08YS`).
 
 ### 0.5 Patrón estándar de una operación de BLL
 
@@ -141,11 +158,11 @@ Turnos: 18:00, 20:00 y 22:00 (2 h cada uno) en `MesaBLL_790MY.TurnosValidos`. `M
 
 - **Caso de uso central:** `ReservaBLL_790MY.RegistrarReserva` (permiso `Permisos.RegistrarReserva`).
 - **Reglas:**
-  - Mesa informada (`msg_rf2_falta_mesa`); cliente existente **y activo** (`GetByDni` filtra `Activo = 1`; si no: `msg_rf2_cliente_inexistente`); `ValidarComensales` (comensales > 0 y ≤ capacidad: `msg_rf2_comensales_invalidos` / `msg_rf2_capacidad_insuficiente`); fecha+hora **no pasada** (`msg_rf2_reserva_en_pasado`).
+  - Mesa informada (`msg_rf2_falta_mesa`); cliente existente **y activo** (`ClienteBLL_790MY.ExisteActivo`, que usa `GetByDni` y filtra `Activo = 1`; si no: `msg_rf2_cliente_inexistente`); `ValidarComensales` (comensales > 0 y ≤ capacidad: `msg_rf2_comensales_invalidos` / `msg_rf2_capacidad_insuficiente`); fecha+hora **no pasada** (`msg_rf2_reserva_en_pasado`).
   - La mesa debe estar libre en esa fecha/turno. La disponibilidad se re-valida **dentro de la transacción** (`AddSiMesaDisponible(reserva, ocuparMesaFisica: false)`: la reserva no ocupa físicamente la mesa, solo la compromete en ese turno). Si falla: `msg_rf2_mesa_no_disponible`.
-  - Los turnos 18/20/22 h se ofrecen desde la GUI (`TurnoItem` + `ReservaBLL_790MY.FormatearTurno`) y `MesaBLL_790MY.TurnosValidos`.
+  - Los turnos 18/20/22 h se ofrecen desde la GUI (`OpcionCombo_790MY<TimeSpan>` + `ReservaBLL_790MY.FormatearTurno`) y `MesaBLL_790MY.TurnosValidos`.
   - Mapa (`MesaBLL_790MY.ObtenerMesasMapa(fecha, hora, comensales)`) devuelve `MesaMapaDTO_790MY` con `EstadoMapa_790MY`: **DisponibleRecomendada** (la de capacidad mínima suficiente = *best fit*), **Disponible**, **Ocupada**, **Incompatible** (capacidad insuficiente).
-  - Cancelación: `CancelarReserva(reservaId)`; si el repositorio devuelve `false` (la reserva ya no es cancelable) → `msg_rf2_reserva_no_cancelable`; evento `ReservaCancelada`. Nota: este método **no** llama a `ValidatePermission` (ver mejoras).
+  - Cancelación: hoy no hay un caso de uso que cancele reservas. `CancelarReserva` se eliminó en la refactorización de limpieza (no tenía llamadores); el estado `Cancelada` y `Evento.ReservaCancelada` se conservan por los datos y la bitácora históricos.
   - Si la mesa se ocupó entre que se mostró el mapa y se confirmó → se rechaza y se registra `Evento.ReservaRechazadaDisponibilidad`.
 - **Validaciones de cliente (en GUI):** DNI `^\d{7,8}$`, email `^[^@\s]+@[^@\s]+\.[^@\s]+$`, celular `^\d+$`. La BLL del cliente exige `dni > 0` y unicidad (ver §2.1). *Nota: la regla "7–8 dígitos" vive solo en la GUI; la BLL no la repite* (mejora).
 - **Excepciones:** `ArgumentException` traducida desde `MensajesBLL_790MY.Regla` → banner. Nunca `MessageBox`.
@@ -158,6 +175,7 @@ FormRegistrarReserva_790MY
   ├─ FormSeleccionarMesa_790MY → MesaBLL_790MY.ObtenerMesasMapa(fecha, hora, comensales)
   │        └─ IMesaRepository_790MY → SqlMesaRepository_790MY  (usa FiltroOcupacionMesa_790MY)
   └─ ReservaBLL_790MY.RegistrarReserva(...)
+           ├─ ClienteBLL_790MY.ExisteActivo(dni)   // internal, sin ValidatePermission
            └─ IReservaRepository_790MY.AddSiMesaDisponible(reserva)   // SqlReservaRepository_790MY
                   → transacción SERIALIZABLE, UPDLOCK + HOLDLOCK, INSERT solo si la mesa sigue libre
            → DVManager_08YS.Recalcular()
@@ -165,7 +183,7 @@ FormRegistrarReserva_790MY
 BE: Reserva_790MY, Mesa_790MY, Cliente_790MY
 ```
 
-Métodos clave de la BLL: `RegistrarReserva`, `Buscar`, `CancelarReserva`, `ObtenerReservasParaApertura`, `ContarMesasACargo`, `AbrirMesa`, `AbrirMesaWalkIn`, `FinalizarReserva`, `ValidarComensales`, `ValidarCamarero`.
+Métodos clave de la BLL: `RegistrarReserva`, `Buscar`, `ObtenerReservasParaApertura`, `ContarMesasACargo`, `AbrirMesa`, `AbrirMesaWalkIn`, `ValidarComensales`, `ValidarCamarero`. Para otras BLL expone consultas `internal` sin `ValidatePermission` (`ObtenerPorId`, `ObtenerAsistidasPorCamarero`, `ObtenerAsistidas`; ver §Relaciones entre BLL).
 
 `FiltroOcupacionMesa_790MY` (DAL) construye el fragmento SQL de "mesa ocupada" a partir de `Reserva_790MY.EstadosQueOcupanMesa` y `Pedido_790MY.EstadosConStockComprometido`, de modo que el criterio de ocupación existe **en un solo lugar**.
 
@@ -173,13 +191,13 @@ Métodos clave de la BLL: `RegistrarReserva`, `Buscar`, `CancelarReserva`, `Obte
 
 #### D. Clases Auxiliares e Integración
 
-- **Comprobante PDF** (`ReservaBLL_790MY.Comprobante.cs`, `GenerarComprobantePDF`): iTextSharp, tamaño A5, banda de marca bordó, logo cacheado a 256 px desde `Resources/logo_fogon.png`, código de barras `Barcode128` con el texto `"RES-" + número`, "tiles" de datos, pie con `PieComprobante : PdfPageEventHelper`, textos localizados (`TraductorManager_08YS`). Helpers: `FormatearTurno`, `FormatearNumeroReserva` (formato `"D6"`), `NombreArchivoComprobante`.
+- **Comprobante PDF** (`ReservaBLL_790MY.Comprobante.cs`, `GenerarComprobantePDF`): iTextSharp, tamaño A5, banda de marca bordó, logo cacheado a 256 px desde `Resources/logo_fogon.png`, código de barras `Barcode128` con el texto `"RES-" + número`, "tiles" de datos, pie con `PieComprobante_790MY : PdfPageEventHelper` (archivo propio, `internal`), textos localizados (`TraductorManager_08YS`). Helpers: `FormatearTurno`, `FormatearNumeroReserva` (formato `"D6"`), `NombreArchivoComprobante`.
 - **Email** (`EnviarComprobanteEmail`, `EmailConfigurado`): `System.Net.Mail` + sección `system.net/mailSettings/smtp` (`configSource="App.secrets.config"`). **Nunca lanza** (devuelve resultado para que la GUI avise sin perder la reserva).
 - **Traducciones:** prefijo `RR_` y `msg_*`.
 - **Dependencias externas:** SMTP, iTextSharp, BouncyCastle.
 
 **Observaciones / mejoras (1.1):**
-0. `ReservaBLL_790MY.CancelarReserva` no valida patente (a diferencia de `RegistrarReserva`/`AbrirMesa`); conviene agregar `ValidatePermission`.
+0. *(Resuelto)* `ReservaBLL_790MY.CancelarReserva` no validaba patente; primero se le agregó `ValidatePermission` y después se eliminó por no tener llamadores (refactorización de limpieza, fase 1).
 1. Repetir la validación de DNI 7–8 dígitos en `ClienteBLL_790MY` (hoy solo `dni > 0`).
 2. `FormComprobanteReserva_790MY` no fue auditado.
 3. El tamaño del mapa (4×3 = 12) coincide con el tope de 12 mesas de `MesaBLL_790MY.RegistrarMesa`; si se sube el tope hay que rediseñar la grilla.
@@ -202,8 +220,8 @@ Métodos clave de la BLL: `RegistrarReserva`, `Buscar`, `CancelarReserva`, `Obte
   - `AbrirMesa(reservaId, camareroDni)`: la reserva debe existir (`msg_rf2_reserva_inexistente`); si ya está *Asistida* → `msg_rf2_reserva_ya_asistida`; si no es *Confirmada* → `msg_rf2_reserva_no_abrible`; debe ser **de hoy y del turno vigente** (`reserva.Fecha.Date == DateTime.Today` y `reserva.Hora == turno`; si no, `msg_rf2_reserva_fuera_de_turno`); la mesa no puede estar `FueraDeServicio` (`msg_rf2_mesa_fuera_servicio`) ni físicamente ocupada (`msg_rf2_mesa_fisicamente_ocupada`); y la apertura es atómica (`AbrirReserva`: `UPDATE` **condicional con `OUTPUT`**; si otro puesto la abrió antes → `msg_rf2_apertura_concurrente`).
   - `AbrirMesaWalkIn(clienteDni, mesa, comensales, camareroDni)`: exige turno en curso (`msg_rf2_fuera_de_turno`), cliente activo, `ValidarComensales`, `ValidarCamarero`; crea una `Reserva_790MY` ya en estado **Asistida** con `CamareroDNI` y la inserta con `AddSiMesaDisponible(reserva, ocuparMesaFisica: true)` (misma lógica de ocupación; si falla, evento `ReservaRechazadaDisponibilidad`).
   - `ObtenerReservasParaApertura(nroReserva?, clienteDni?)`: nómina de reservas Confirmadas **de hoy del turno vigente** (lista vacía fuera de horario de atención).
-  - `FinalizarReserva`: no se puede finalizar si hay pedidos pendientes de despacho (`msg_rf2_reserva_con_pedidos_pendientes`) ni si el estado no corresponde (`msg_rf2_reserva_no_finalizable`).
-  - El camarero se valida con `ValidarCamarero` y `ContarMesasACargo`; se listan solo los activos con `EmpleadoBLL_790MY.GetCamarerosActivos`.
+  - El cierre de la atención (reserva *Finalizada* y mesa *Libre*) ocurre dentro de la transacción del cobro (`PagoBLL_790MY.RegistrarCobro` → `IPagoRepository_790MY.RegistrarCobro`, §1.5). El antiguo `ReservaBLL_790MY.FinalizarReserva` se eliminó en la refactorización de limpieza: no tenía llamadores.
+  - El camarero se valida con `ValidarCamarero` (usa `EmpleadoBLL_790MY.ObtenerPorDni`, `internal`) y `ContarMesasACargo`; se listan solo los activos con `EmpleadoBLL_790MY.GetCamarerosActivos`. La mesa de la reserva se busca con `MesaBLL_790MY.ObtenerPorNumero` (`internal`).
   - Eventos: `ReservaAsistida`, `MesaAbierta`, `WalkInRegistrado`, `CamareroAsignado`.
 - **Excepciones:** reglas → `ArgumentException` traducida → banner; rechazo por disponibilidad → `Evento.ReservaRechazadaDisponibilidad`.
 
@@ -214,6 +232,7 @@ FormAbrirMesa_790MY
   → ReservaBLL_790MY.ObtenerReservasParaApertura()
   → EmpleadoBLL_790MY.GetCamarerosActivos()
   → ReservaBLL_790MY.AbrirMesa(reservaId, camarero)  |  AbrirMesaWalkIn(cliente, mesa, comensales, camarero)
+        → EmpleadoBLL_790MY.ObtenerPorDni · MesaBLL_790MY.ObtenerPorNumero · ClienteBLL_790MY.ExisteActivo   // internal
         → IReservaRepository_790MY.AbrirReserva(...)  (UPDATE condicional + OUTPUT)  // SqlReservaRepository_790MY
         → DVManager_08YS.Recalcular() → BitacoraBLL_08YS.RegistrarEventoPostCommit(...)
 BE: Reserva_790MY, Mesa_790MY, Empleado_790MY
@@ -251,12 +270,13 @@ BE: Reserva_790MY, Mesa_790MY, Empleado_790MY
 
 ```
 FormRegistrarPedido_790MY
-  → PedidoBLL_790MY.ObtenerMesasAsignadas()   → IReservaRepository_790MY
-  → PedidoBLL_790MY.ObtenerCatalogo()         → IProductoRepository_790MY
+  → PedidoBLL_790MY.ObtenerMesasAsignadas()   → ReservaBLL_790MY.ObtenerAsistidasPorCamarero (internal)
+  → PedidoBLL_790MY.ObtenerCatalogo()         → ProductoBLL_790MY.ObtenerActivos (internal)
   → PedidoBLL_790MY.RegistrarPedido(reservaId, items)
+        → EmpleadoBLL_790MY.ObtenerEmpleadoDeSesion · ReservaBLL_790MY.ObtenerPorId   // internal
         → IPedidoRepository_790MY.RegistrarSiHayStock(pedido)   // SqlPedidoRepository_790MY
         → DVManager_08YS.Recalcular() → RegistrarEventoPostCommit(Evento.PedidoRegistrado, "Pedido N - Mesa M")
-  → timerAvisos: PedidoBLL_790MY.ObtenerPedidosDeMisMesas() / ObtenerPedidosListosDelCamarero()
+  → timerAvisos: PedidoBLL_790MY.ObtenerPedidosDeMisMesas()
 BE: Pedido_790MY (`EstadoPedido_790MY`: Pendiente/EnPreparacion/Listo), ItemPedido_790MY, Producto_790MY (PorcionesDisponibles, ControlaStock, Admite), Reserva_790MY
 ```
 
@@ -281,7 +301,7 @@ BE: Pedido_790MY (`EstadoPedido_790MY`: Pendiente/EnPreparacion/Listo), ItemPedi
 
 - `IniciarPreparacion(nroPedido)` → pasa Pendiente → EnPreparacion (el repositorio devuelve `false` si no estaba Pendiente → `msg_rf2_pedido_no_iniciable` con el estado traducido, o `msg_rf2_pedido_inexistente`). Evento `PedidoEnPreparacion`.
 - `MarcarPedidoListo(nroPedido)` → **marca Listo y descuenta stock en la misma transacción** (`MarcarListoYDescontarStock(nroPedido, DateTime.Now, out porciones)`). Resultado `ResultadoDespacho_790MY`: Ok / NoEncontrado / YaProcesado (`msg_rf2_pedido_ya_despachado`) / StockFisicoInsuficiente (`msg_rf2_stock_fisico_insuficiente`, evento `StockDescuentoFallido`, Criticidad Alto). **Idempotencia** con el flag `StockDescontado`: reprocesar no vuelve a descontar. Eventos `PedidoListo` y `StockDescontado`.
-- Lectura: `ObtenerComandasCocina`, `ObtenerListosDelDia(maximo = 10)`, `ObtenerCamarerosPorDni` (para mostrar el camarero de cada ticket); todas con `ValidatePermission(DespacharPedido)`.
+- Lectura: `ObtenerComandasCocina`, `ObtenerListosDelDia(maximo = 10)`, `ObtenerCamarerosPorDni` (para mostrar el camarero de cada ticket; usa `EmpleadoBLL_790MY.ObtenerCamarerosActivos`, `internal`, para no exigirle al Chef `CrearEmpleado`); todas con `ValidatePermission(DespacharPedido)`.
 
 #### C. Flujo por capas
 
@@ -309,7 +329,7 @@ BE: Pedido_790MY, ItemPedido_790MY, Producto_790MY, Empleado_790MY
 - **Objetivo:** el cajero elige una mesa con consumos, ve la cuenta, aplica descuento, genera la factura, registra el cobro (efectivo o tarjeta) y el sistema libera la mesa.
 - **Formulario:** `FormFacturacionCobro_790MY` (3 paneles: mesas por cobrar / cuenta / cobro) y `FormComprobanteFactura_790MY` (vista previa e impresión).
 - **UI:** `SlidingTab_UC_790MY sldMetodo_790MY` (Efectivo | Tarjeta); `BotonCobro_790MY` con *spinner* GDI+ mientras procesa; campos con formato moneda `es-AR`; recálculo en vivo de importes mientras se edita el descuento; banner de rechazo.
-- **Comprobante:** `FormComprobanteFactura_790MY` dibuja con **GDI+** sobre `PrintDocument`/`PrintPreviewDialog` (no usa PDF), incluye un **QR simulado** (`DibujarQrSimulado`) y el **hash SHA-256** del comprobante (`FacturaBLL_790MY.CalcularHashComprobante` + `CodigoVerificacion`); clase interna `Ticket`.
+- **Comprobante:** `FormComprobanteFactura_790MY` dibuja con **GDI+** sobre `PrintDocument`/`PrintPreviewDialog` (no usa PDF), incluye un **QR simulado** (`DibujarQrSimulado`) y el **hash SHA-256** del comprobante (`FacturaBLL_790MY.CalcularHashComprobante` + `CodigoVerificacion`); el cursor de dibujo es `TicketFactura_790MY` (`internal`, archivo propio en `GUI/RF2`).
 
 #### B. Lógica y Reglas de Negocio
 
@@ -331,13 +351,18 @@ BE: Pedido_790MY, ItemPedido_790MY, Producto_790MY, Empleado_790MY
 ```
 FormFacturacionCobro_790MY
   → FacturaBLL_790MY.ObtenerMesasParaCobrar() → MesaCobroDTO_790MY
+        → EmpleadoBLL_790MY.ObtenerEmpleadoDeSesion / ObtenerCamarerosActivos      // internal
+        → ReservaBLL_790MY.ObtenerAsistidasPorCamarero | ObtenerAsistidas           // internal
   → FacturaBLL_790MY.ObtenerDetalleConsumoMesa(nroReserva, ...) → DetalleCuentaDTO_790MY
+        → ReservaBLL_790MY.ObtenerPorId · PedidoBLL_790MY.ContarNoDespachados       // internal
   → FacturaBLL_790MY.CalcularImportes(subtotal, valor, tipo)       // estático, sin BD
   → FacturaBLL_790MY.GenerarFactura(...)    → IFacturaRepository_790MY (SqlFacturaRepository_790MY)
-  → PagoBLL_790MY.RegistrarCobro(SolicitudCobro_790MY) → IPagoRepository_790MY.RegistrarCobro (SqlPagoRepository_790MY)
+  → PagoBLL_790MY.RegistrarCobro(SolicitudCobro_790MY)
+        → FacturaBLL_790MY.ObtenerFactura(nro)                                     // público; RegistrarCobro ya habilita Caja
+        → IPagoRepository_790MY.RegistrarCobro (SqlPagoRepository_790MY)
   → ResultadoCobroDTO_790MY { Factura, Pago } → FormComprobanteFactura_790MY
-BE: Factura_790MY (+ ItemFactura_790MY), Pago_790MY (MetodoPago: Efectivo/Tarjeta), SolicitudCobro_790MY, CobroArqueo_790MY
-DTOs (BLL/CobroDTOs_790MY.cs): MesaCobroDTO, ImportesCuenta, DetalleCuentaDTO, ResultadoCobroDTO, ReporteArqueoCaja_790MY
+BE: Factura_790MY, ItemFactura_790MY, Pago_790MY (MetodoPago: Efectivo/Tarjeta), SolicitudCobro_790MY, CobroArqueo_790MY (un archivo por tipo)
+DTOs (BLL, un archivo por clase): MesaCobroDTO_790MY, ImportesCuenta_790MY, DetalleCuentaDTO_790MY, ResultadoCobroDTO_790MY, ReporteArqueoCaja_790MY
 ```
 
 #### D. Auxiliares
@@ -356,7 +381,7 @@ DTOs (BLL/CobroDTOs_790MY.cs): MesaCobroDTO, ImportesCuenta, DetalleCuentaDTO, R
 
 Los cuatro ABM de negocio (`FormClientes_790MY`, `FormEmpleados_790MY`, `FormMesas_790MY`, `FormProductos_790MY`) viven en `GUI/Maestros` (namespace `GUI_08YS.Maestros`) y comparten el mismo esqueleto de interfaz, que conviene defender **una sola vez**:
 
-- **Modos de edición:** enum privado `ModoEdicion { Reposo, Alta, Modificacion }` en cada formulario. `EstablecerModo(...)` habilita/deshabilita campos y botones según el modo; en *Reposo* solo se puede navegar la grilla.
+- **Modos de edición:** enum compartido `ModoEdicion_790MY { Reposo, Alta, Modificacion }` (`GUI/Maestros/ModoEdicion_790MY.cs`, `internal`), usado por los cuatro ABM. `EstablecerModo(...)` habilita/deshabilita campos y botones según el modo; en *Reposo* solo se puede navegar la grilla.
 - **Decisión E2-D4 (alta continua):** tras un alta, la ficha queda **limpia y con foco** en el primer campo para cargar otro registro; tras una modificación, queda **seleccionado** el registro con los datos ya guardados.
 - **Retroalimentación al usuario (decisión E2-D1):** error de regla de negocio → `Banner_UC_790MY` (`bnrAvisos_790MY`) + `ErrorProvider` (`errValidacion_790MY`) en el campo; éxito → `ToastHost_790MY.Mostrar(...)`; baja → `ConfirmModal_790MY.Confirmar(...)`; error inesperado (base de datos, excepción no prevista) → `MessageBox` nativo (`MostrarErrorFatal`).
 - **Estilo:** `EstiloMaestros_790MY` (`GUI_08YS.Maestros`) aporta `EstilizarGrilla`, `EstilizarBoton`, `PintarPildora` y `PintarEstado` (píldoras de estado dibujadas en `CellPainting`); el color de encabezado de grilla es `EstiloMaestros_790MY.Encabezado = (110, 26, 46)`. Los formularios RF2 (Empleados, Productos) usan además el alias `E` de `EstiloRF2_790MY`.
@@ -407,7 +432,7 @@ Después de cada escritura: DVManager_08YS.Recalcular() → BitacoraBLL_08YS.Reg
 ```
 
 - `SqlClienteRepository_790MY.GetAll()` filtra `WHERE Activo = 1` y completa los emails/teléfonos adicionales (consulta por cliente: patrón *N+1*, ver mejoras). `GetByDni` también filtra `Activo = 1`.
-- `ClienteMapper_790MY_OBSOLETO` (archivo `MPP/ClienteMapper_790MY.cs`, proyecto `MPP_08YS`) está marcado como obsoleto.
+- *(Resuelto)* `ClienteMapper_790MY_OBSOLETO` (clase vacía en `MPP_08YS`) se eliminó en la refactorización de limpieza.
 
 #### D. Clases Auxiliares e Integración
 
@@ -427,7 +452,7 @@ Después de cada escritura: DVManager_08YS.Recalcular() → BitacoraBLL_08YS.Reg
 #### A. Idea y Diseño Visual
 
 - **Objetivo:** alta, modificación y baja de empleados (`Camarero`, `Chef`, `Recepcionista`); es el dato que habilita la asignación de camareros a mesas (`FormAbrirMesa_790MY`) y el vínculo opcional con un usuario del sistema.
-- **Formulario:** `FormEmpleados_790MY` (`IIdiomaObserver_08YS`, `IAyudaContextual_790MY`), con `TableLayoutPanel` de dos columnas (lista + ficha), grilla `dgvEmpleados_790MY` dibujada en `dgvEmpleados_790MY_CellPainting` (píldora de puesto y de estado con `EstiloMaestros_790MY.PintarPildora/PintarEstado`), filtros (`Filtro_Changed`), `cmbCargo_790MY` cargado con la clase genérica interna `Opcion<T>` (`CargarCombosFijos`, `SeleccionarPuesto`), `chkActivo_790MY`, `lblAviso_790MY` y placeholder de búsqueda con **P/Invoke** `SendMessage(..., EM_SETCUEBANNER = 0x1501, ...)` (`UpdateIdioma`).
+- **Formulario:** `FormEmpleados_790MY` (`IIdiomaObserver_08YS`, `IAyudaContextual_790MY`), con `TableLayoutPanel` de dos columnas (lista + ficha), grilla `dgvEmpleados_790MY` dibujada en `dgvEmpleados_790MY_CellPainting` (píldora de puesto y de estado con `EstiloMaestros_790MY.PintarPildora/PintarEstado`), filtros (`Filtro_Changed`), `cmbCargo_790MY` cargado con la clase genérica compartida `OpcionCombo_790MY<T>` (`GUI/Estilo`; `CargarCombosFijos`, `SeleccionarPuesto`), `chkActivo_790MY`, `lblAviso_790MY` y placeholder de búsqueda con **P/Invoke** `SendMessage(..., EM_SETCUEBANNER = 0x1501, ...)` (`UpdateIdioma`).
 - **UX:** `lblAviso_790MY` muestra un aviso (`FE_aviso_mesas`) cuando el camarero seleccionado tiene mesas abiertas (`ActualizarAvisoMesas` → `ContarMesasAbiertas`); `txtDni_790MY_KeyPress` bloquea cualquier carácter que no sea dígito; `txtDni_790MY.MaxLength = 9`, nombre y apellido `MaxLength = 100`.
 
 #### B. Lógica y Reglas de Negocio
@@ -454,7 +479,7 @@ FormEmpleados_790MY ── BLLFactory_790MY.CreateEmpleadoBLL() ──► Emplea
 SqlEmpleadoRepository_790MY : GetAll, GetByDni, Exists, GetActivosPorPuesto, Add, Update, UsuarioVinculadoAOtroEmpleado
         ▼
 BE: Empleado_790MY (DNI, Nombre, Apellido, Puesto : PuestoEmpleado_790MY, UsuarioDNI : int?, Activo,
-                    TieneUsuario, NombreCompleto)   enum PuestoEmpleado_790MY { Camarero, Chef, Recepcionista }
+                    NombreCompleto)                 enum PuestoEmpleado_790MY { Camarero, Chef, Recepcionista }
 ```
 
 #### D. Clases Auxiliares e Integración
@@ -523,7 +548,7 @@ BE: Mesa_790MY (NroMesa, Capacidad, Estado : EstadoMesa_790MY, Activo)
 
 - **Objetivo:** ABM de la **carta**: nombre, categoría, precio, stock en porciones y si el producto **controla stock** o no (bebidas o platos sin límite).
 - **Formulario:** `FormProductos_790MY` (RF2, `E = EstiloRF2_790MY`); patente `Permisos.GestionProductos`.
-- **Categorías:** **no existe una tabla de categorías**; son el enum `CategoriaProducto_790MY { Entrada, PlatoPrincipal, Postre, Bebida }` guardado como texto en `Productos.Categoria` (el comentario de la entidad aclara que el orden del enum no afecta a los datos). `CargarCombosFijos` arma el combo con `Opcion<CategoriaProducto_790MY>` y traduce con `RP_cat_<Categoria>`.
+- **Categorías:** **no existe una tabla de categorías**; son el enum `CategoriaProducto_790MY { Entrada, PlatoPrincipal, Postre, Bebida }` guardado como texto en `Productos.Categoria` (el comentario de la entidad aclara que el orden del enum no afecta a los datos). `CargarCombosFijos` arma el combo con `OpcionCombo_790MY<CategoriaProducto_790MY>` y traduce con `RP_cat_<Categoria>`.
 - **UI programada:** grilla `dgvProductos_790MY` con `CellPainting` propio: `PintarStock` dibuja el stock con semáforo; `NumericUpDown` para precio (`nudPrecio_790MY`) y stock (`nudStock_790MY`); `chkControlaStock_790MY` (`chkControlaStock_790MY_CheckedChanged` deshabilita el stock si no se controla), `chkActivo_790MY`, `cmbCategoria_790MY`; placeholder con `EM_SETCUEBANNER`; `Banner` + `Toast` + `ConfirmModal`.
 
 #### B. Lógica y Reglas de Negocio
@@ -636,7 +661,7 @@ Menú *Reportes* de `FormMDI_08YS` (permiso de visibilidad `Permisos.VerReportes
 #### A. Idea y Diseño Visual
 
 - **Objetivo:** consultar las reservas por rango de fechas, cliente y estado, y **exportar** el resultado a un PDF auditable.
-- **UI:** filtros en la parte superior — `dtpDesde_790MY` y `dtpHasta_790MY` (`DateTimePicker` con casilla `Checked`: sin tildar = sin filtro), `txtDniCliente_790MY`, `cboEstado_790MY` (cargado en `CargarEstados` con la clase interna `EstadoItem`/`Display`), botones *Buscar*, *Limpiar*, *Generar PDF* y *Cerrar*; panel descriptivo del resumen de filtros aplicados (`InicializarPanelResumen`, `ActualizarResumenFiltros`) y grilla `dgvReporteReservas_790MY` con formateo de celdas (`dgvReporteReservas_790MY_CellFormatting`). `Banner_UC_790MY` para avisos, `ErrorProvider` para el DNI, `ToastHost_790MY` cuando se guarda el PDF.
+- **UI:** filtros en la parte superior — `dtpDesde_790MY` y `dtpHasta_790MY` (`DateTimePicker` con casilla `Checked`: sin tildar = sin filtro), `txtDniCliente_790MY`, `cboEstado_790MY` (cargado en `CargarEstados` con `OpcionCombo_790MY<EstadoReserva_790MY?>`), botones *Buscar*, *Limpiar*, *Generar PDF* y *Cerrar*; panel descriptivo del resumen de filtros aplicados (`InicializarPanelResumen`, `ActualizarResumenFiltros`) y grilla `dgvReporteReservas_790MY` con formateo de celdas (`dgvReporteReservas_790MY_CellFormatting`). `Banner_UC_790MY` para avisos, `ErrorProvider` para el DNI, `ToastHost_790MY` cuando se guarda el PDF.
 - **Librerías:** `iTextSharp.text` / `iTextSharp.text.pdf` para el documento; `System.Diagnostics.Process` para abrirlo; `System.Text.RegularExpressions`.
 
 #### B. Lógica y Reglas de Negocio
@@ -724,7 +749,7 @@ FormArqueoCaja_790MY ── BLLFactory_790MY.CreatePagoBLL() ──► PagoBLL_7
                               FROM Pagos ⨝ Facturas ⨝ Reservas  WHERE FechaHoraPago ∈ [fecha, fecha+1) AND f.Estado = Pagada
         ▼
   BE: CobroArqueo_790MY (IdPago, NroFactura, FechaHoraPago, MesaNumero, MetodoPago, MontoDescuento,
-                         MontoPropina, ImporteCobrado)   →   DTO: ReporteArqueoCaja_790MY (BLL/CobroDTOs_790MY.cs)
+                         MontoPropina, ImporteCobrado)   →   DTO: ReporteArqueoCaja_790MY (BLL/ReporteArqueoCaja_790MY.cs)
   btnCerrarCaja_790MY_Click → ConfirmModal_790MY.Confirmar → PagoBLL_790MY.CerrarCaja(fecha)
         → BitacoraBLL_08YS.RegistrarEventoPostCommit(Evento.CierreCajaRealizado, "Caja … - importe")
   EstaCajaCerrada → BitacoraBLL_08YS.Filtrar(BitacoraFiltro_08YS) → SqlBitacoraRepository_08YS.Filtrar
@@ -848,8 +873,8 @@ El área pedida es la *Bitácora de Cambios* (4.1). La bitácora del sistema (4.
   1. `ValidatePermission(Permisos.AuditarProductos)`.
   2. `versionHistorica` nula → `ArgumentNullException`; `Act = true` → `BC_msg_ya_vigente`.
   3. **Relee** la versión de la base (`ObtenerPorId`) porque la grilla puede estar vieja (otro rollback, una edición, un descuento de stock en el medio) → `BC_msg_version_inexistente` / `BC_msg_ya_vigente`.
-  4. El producto debe seguir existiendo en `Productos` (`IProductoRepository_790MY.GetById`) → si no, `BC_msg_producto_eliminado`.
-  5. **Mismas reglas que `ProductoBLL_790MY.ModificarProducto`:** nombre no duplicado (`ExisteNombre`, `msg_rf2_producto_duplicado`) y, si controla stock, el stock restaurado no puede ser menor que las `PorcionesComprometidas` por pedidos abiertos (`msg_rf2_producto_stock_bajo_comprometido`).
+  4. El producto debe seguir existiendo en `Productos` (`ProductoBLL_790MY.ObtenerPorId`, `internal`) → si no, `BC_msg_producto_eliminado`.
+  5. **Mismas reglas que `ProductoBLL_790MY.ModificarProducto`:** nombre no duplicado (`ProductoBLL_790MY.ExisteNombre`, `internal`, `msg_rf2_producto_duplicado`) y, si controla stock, el stock restaurado no puede ser menor que las `PorcionesComprometidas` por pedidos abiertos (`msg_rf2_producto_stock_bajo_comprometido`).
   6. `ActivarVersion(version.ID)` → recalcula DV (`DVManager_08YS.Recalcular()`) → `RegistrarEventoPostCommit(Evento.ProductoVersionRestaurada, "Prod {ProductoID} v{ID} {Nombre}")` (módulo `Stock`, criticidad **Alto**).
 - **El historial no se borra:** restaurar crea una **fila vigente nueva**; por eso el propio rollback se puede deshacer restaurando la versión que estaba vigente antes.
 - **Excepciones:** la BLL solo lanza (`MensajesBLL_790MY.Regla` → `ArgumentException`, `UnauthorizedAccessException`); la GUI las muestra con `E.MostrarErrorEnBanner`. Tras un error de rollback se **recarga** la grilla antes de mostrar el banner (`Cargar` limpia el banner al empezar). No hay `MessageBox`.
@@ -873,7 +898,7 @@ FormBitacoraCambios_790MY ── BLLFactory_790MY.CreateProductoCBLL() ──►
    MostrarDetalle()        → ObtenerVigente(productoID) + ObtenerDiferencias(sel, vigente)  → ArmarTablaDiff()
 Rollback:
    btnRestaurar_790MY_Click → ConfirmModal_790MY.Confirmar → ProductoCBLL_790MY.RestaurarVersion(sel)
-        → ObtenerPorId · IProductoRepository_790MY.GetById/ExisteNombre
+        → ObtenerPorId · ProductoBLL_790MY.ObtenerPorId/ExisteNombre (internal)
         → SqlProductoCRepository_790MY.ActivarVersion(id):  UPDATE Productos_C SET Act = 1 WHERE ID = @ID AND Act = 0
               └─ dispara los 3 triggers en cadena (una sola sentencia, una sola transacción implícita)
         → DVManager_08YS.Recalcular() → BitacoraBLL_08YS.RegistrarEventoPostCommit(Evento.ProductoVersionRestaurada, …)
@@ -1243,7 +1268,7 @@ Respuestas pensadas para decirse en 30–60 segundos, con los nombres reales del
 
 **Arquitectura**
 
-1. **¿Por qué una arquitectura en capas y cómo la hacen cumplir?** — Cuatro capas (`GUI_08YS` → `BLL_08YS` → `DAL_08YS` → `BE_08YS`, más `Service_08YS` y `MPP_08YS`). La GUI solo habla con la BLL (incluso el arranque: `Program` llama a `BLLInstalador_08YS`, no a `DAL_08YS`); la BLL depende de **interfaces** (`IReservaRepository_790MY`, `IPagoRepository_790MY`, etc.), implementadas en `DAL_08YS.SQL`. Las dependencias se inyectan a mano en `BLLFactory_08YS` / `BLLFactory_790MY`.
+1. **¿Por qué una arquitectura en capas y cómo la hacen cumplir?** — Cuatro capas (`GUI_08YS` → `BLL_08YS` → `DAL_08YS` → `BE_08YS`, más `Service_08YS` y `MPP_08YS`). La GUI solo habla con la BLL (incluso el arranque: `Program` llama a `BLLInstalador_08YS`, no a `DAL_08YS`); la BLL depende de **interfaces** (`IReservaRepository_790MY`, `IPagoRepository_790MY`, etc.), implementadas en `DAL_08YS.SQL`. Las dependencias se inyectan a mano en `BLLFactory_08YS` / `BLLFactory_790MY`. Cada BLL lee solo el repositorio de su entidad; para datos de otra entidad llama a la BLL dueña (métodos `internal` sin `ValidatePermission`, ver §0.4.1).
 2. **¿Qué significan los sufijos `_790MY` y `_08YS`?** — Identifican a los dos autores del equipo (cada uno firma sus clases). Conviven en la misma solución y comparten sesión, bitácora y traductor.
 3. **¿Cómo separan diseño y lógica en WinForms?** — `FormX.Designer.cs` solo diseño visual dentro de `InitializeComponent()`; `FormX.cs` solo eventos y llamadas a la BLL. *Excepción reconocida:* controles dinámicos creados en `.cs` (`CrearTarjetasKpi`, `ArmarTablaDiff`, `CrearTarjeta`, `MesaVisualControl_790MY`) porque su cantidad depende de los datos (ver mejoras §8).
 4. **¿Cómo manejan los errores sin `MessageBox` en la BLL?** — La BLL **solo lanza excepciones** (`MensajesBLL_790MY.Regla(clave, args)` → `ArgumentException` con texto traducido; `UnauthorizedAccessException` para permisos). La GUI las muestra con `EstiloRF2_790MY.MostrarErrorEnBanner` (`Banner_UC_790MY`), marca el campo con `ErrorProvider` y confirma con `ToastHost_790MY`; `ConfirmModal_790MY` para acciones destructivas. `MessageBox` queda solo para errores fatales (decisión E2-D1).
@@ -1296,7 +1321,7 @@ Priorización: **A** = riesgo funcional o de seguridad (corregir antes de produc
 | # | Hallazgo | Dónde |
 |---|---|---|
 | A1 | Validaciones **solo en la GUI** (DNI 7–8 dígitos en cliente; DNI de empleado sin regla; rango `desde ≤ hasta` en reporte de reservas): replicarlas en la BLL<br>✅ **Resuelto (fase 1):** `ClienteBLL_790MY.ValidarDatos` exige `^\d{7,8}$` (`FC_val_dni_formato`) y `ReservaBLL_790MY.Buscar` rechaza `desde > hasta` (`msg_rep_rango_fechas_invalido`). *Pendiente:* DNI de empleado (no estaba en el plan). | 1.1, 2.1, 2.2, 3.1 |
-| A2 | `ReservaBLL_790MY.CancelarReserva` **no valida permiso** (todas las demás operaciones sí)<br>✅ **Resuelto (fase 1):** valida `Permisos.RegistrarReserva`. | 1.1 |
+| A2 | `ReservaBLL_790MY.CancelarReserva` **no valida permiso** (todas las demás operaciones sí)<br>✅ **Resuelto (fase 1):** valida `Permisos.RegistrarReserva`. Después, la refactorización de limpieza eliminó `CancelarReserva` y `FinalizarReserva` por no tener llamadores. | 1.1 |
 | A3 | Orden inseguro en `FamiliaBLL_08YS`/`RolBLL_08YS`: se valida y consulta `IsInUse` **antes** de `ValidatePermission` (filtra información)<br>✅ **Resuelto (fase 1):** `ValidatePermission` es lo primero en Crear/Modificar/Eliminar de ambas BLL. | 2.5 |
 | A4 | Cierre de caja sin tabla propia: depende del prefijo de un string en `Bitacora.TargetUsername` (50 caracteres) y no es atómico entre terminales<br>✅ **Resuelto (fase 2):** tabla `CierresCaja` (PK `Fecha`) con `ICierreCajaRepository_790MY`; doble cierre = violación de PK → `msg_ac_caja_ya_cerrada`; migración con copia de cierres históricos. *Pendiente:* `CierresCaja` fuera de los DV. | 3.2 |
 | A5 | `Productos_C` versiona **cada descuento de stock**; restaurar una versión también restaura su stock viejo<br>✅ **Resuelto (fase 2):** `producto_actualizado` versiona solo cambios de negocio; un cambio solo de stock actualiza la vigente (siempre una sola `Act = 1`). *Pendiente:* el rollback (`producto_c_actualizado`) sigue restaurando el stock de la versión. | 2.4, 4.1 |
