@@ -74,6 +74,9 @@
     <Compile Include="SQL\SqlUserRepository_08YS.cs" />
     <Compile Include="Interfaces_Repositories\IEmpleadoRepository_790MY.cs" />
     <Compile Include="Interfaces_Repositories\IPedidoRepository_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\EstadoRegistroPedido_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\ResultadoRegistroPedido_790MY.cs" />
+    <Compile Include="Interfaces_Repositories\ResultadoDespacho_790MY.cs" />
     <Compile Include="Interfaces_Repositories\IProductoRepository_790MY.cs" />
     <Compile Include="SQL\FiltroOcupacionMesa_790MY.cs" />
     <Compile Include="SQL\SqlEmpleadoRepository_790MY.cs" />

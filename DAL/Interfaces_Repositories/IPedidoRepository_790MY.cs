@@ -4,36 +4,6 @@ using System.Collections.Generic;
 
 namespace DAL_08YS.Interfaces_Repositories
 {
-    public enum EstadoRegistroPedido_790MY
-    {
-        Ok,
-        /// <summary>Algun producto no alcanza (stock fisico - porciones comprometidas).</summary>
-        StockInsuficiente,
-        /// <summary>Algun producto no existe, esta inactivo o no tiene precio vigente.</summary>
-        ProductoNoVigente,
-        /// <summary>La reserva dejo de estar Asistida antes del commit.</summary>
-        ReservaNoAsistida
-    }
-
-    /// <summary>Resultado del alta transaccional de un pedido (CUN-006).</summary>
-    public class ResultadoRegistroPedido_790MY
-    {
-        public EstadoRegistroPedido_790MY Estado { get; set; }
-        public int ProductoID { get; set; }
-        public string ProductoNombre { get; set; }
-        public int PorcionesDisponibles { get; set; }
-    }
-
-    public enum ResultadoDespacho_790MY
-    {
-        Ok,
-        NoEncontrado,
-        /// <summary>El pedido ya estaba Listo / con StockDescontado: no se descuenta de nuevo.</summary>
-        YaProcesado,
-        /// <summary>El stock fisico no alcanza para descontar (se revierte todo).</summary>
-        StockFisicoInsuficiente
-    }
-
     public interface IPedidoRepository_790MY
     {
         /// <summary>
