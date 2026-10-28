@@ -326,9 +326,6 @@
     <Compile Include="UserControls\IconComboBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\UserControlMesa_790MY.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="Usuario\FormCambiarContraseña_08YS.cs">
       <SubType>Form</SubType>
     </Compile>
