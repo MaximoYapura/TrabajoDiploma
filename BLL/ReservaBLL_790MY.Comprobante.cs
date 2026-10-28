@@ -50,7 +50,7 @@ namespace BLL_08YS
         private static readonly BaseColor PdfTexto      = new BaseColor(45, 42, 40);
         private static readonly BaseColor PdfGris       = new BaseColor(110, 100, 95);
         private static readonly BaseColor PdfTile       = new BaseColor(248, 243, 238);
-        private static readonly BaseColor PdfTileBorde  = new BaseColor(230, 220, 205);
+        internal static readonly BaseColor PdfTileBorde  = new BaseColor(230, 220, 205);
         private static readonly BaseColor PdfLinea      = new BaseColor(235, 228, 218);
         private static readonly BaseColor PdfNotaFondo  = new BaseColor(252, 246, 236);
         private static readonly BaseColor PdfVerde      = new BaseColor(30, 110, 60);
@@ -99,7 +99,7 @@ namespace BLL_08YS
                 // El pie se dibuja en OnEndPage: queda anclado al borde inferior de
                 // cada página aunque un dato largo (p. ej. un email extenso) haga
                 // crecer el contenido.
-                writer.PageEvent = new PieComprobante(
+                writer.PageEvent = new PieComprobante_790MY(
                     string.Format(t.GetTexto("CR_doc_emitido"), DateTime.Now.ToString("dd/MM/yyyy HH:mm"), UsuarioEmisor()),
                     t.GetTexto("CR_doc_gracias"), fPie, fGracias);
                 doc.AddTitle($"{t.GetTexto("CR_doc_titulo")} {nro}");
@@ -238,41 +238,6 @@ namespace BLL_08YS
 
                 doc.Close();
                 return ms.ToArray();
-            }
-        }
-
-        /// <summary>Pie del comprobante: línea punteada, datos de emisión y agradecimiento.</summary>
-        private sealed class PieComprobante : PdfPageEventHelper
-        {
-            private readonly string _emitido;
-            private readonly string _gracias;
-            private readonly Font _fPie;
-            private readonly Font _fGracias;
-
-            public PieComprobante(string emitido, string gracias, Font fPie, Font fGracias)
-            {
-                _emitido  = emitido;
-                _gracias  = gracias;
-                _fPie     = fPie;
-                _fGracias = fGracias;
-            }
-
-            public override void OnEndPage(PdfWriter writer, Document document)
-            {
-                PdfContentByte cb = writer.DirectContent;
-                float ancho = document.PageSize.Width;
-
-                cb.SaveState();
-                cb.SetColorStroke(PdfTileBorde);
-                cb.SetLineWidth(1f);
-                cb.SetLineDash(1.5f, 3f, 0f);
-                cb.MoveTo(30f, 58f);
-                cb.LineTo(ancho - 30f, 58f);
-                cb.Stroke();
-                cb.RestoreState();
-
-                ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER, new Phrase(_emitido, _fPie), ancho / 2f, 42f, 0);
-                ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER, new Phrase(_gracias, _fGracias), ancho / 2f, 26f, 0);
             }
         }
 

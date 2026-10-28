@@ -59,6 +59,7 @@
     <Compile Include="EstadoMapa_790MY.cs" />
     <Compile Include="MesaBLL_790MY.cs" />
     <Compile Include="MesaMapaDTO_790MY.cs" />
+    <Compile Include="PieComprobante_790MY.cs" />
     <Compile Include="ReservaBLL_790MY.cs" />
     <Compile Include="ReservaBLL_790MY.Comprobante.cs">
       <DependentUpon>ReservaBLL_790MY.cs</DependentUpon>
