@@ -19,15 +19,15 @@ namespace BLL_08YS
         public const int DiasPorDefecto = 30;
 
         private readonly IProductoCRepository_790MY _productoCRepository;
-        private readonly IProductoRepository_790MY _productoRepository;
+        private readonly ProductoBLL_790MY _productoBll;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
         public ProductoCBLL_790MY(IProductoCRepository_790MY productoCRepository,
-                                  IProductoRepository_790MY productoRepository,
+                                  ProductoBLL_790MY productoBll,
                                   BitacoraBLL_08YS bitacoraBll)
         {
             _productoCRepository = productoCRepository ?? throw new ArgumentNullException(nameof(productoCRepository));
-            _productoRepository = productoRepository ?? throw new ArgumentNullException(nameof(productoRepository));
+            _productoBll = productoBll ?? throw new ArgumentNullException(nameof(productoBll));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -109,11 +109,11 @@ namespace BLL_08YS
                 throw MensajesBLL_790MY.Regla("BC_msg_ya_vigente", version.ID);
 
             // Sin producto en Productos (borrado físico) el trigger no tiene qué restaurar.
-            Producto_790MY actual = _productoRepository.GetById(version.ProductoID)
+            Producto_790MY actual = _productoBll.ObtenerPorId(version.ProductoID)
                 ?? throw MensajesBLL_790MY.Regla("BC_msg_producto_eliminado", version.ProductoID);
 
             // Mismas reglas que ProductoBLL_790MY.ModificarProducto.
-            if (_productoRepository.ExisteNombre(version.Nombre, version.ProductoID))
+            if (_productoBll.ExisteNombre(version.Nombre, version.ProductoID))
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_duplicado", version.Nombre);
 
             if (version.ControlaStock && version.StockPorciones < actual.PorcionesComprometidas)

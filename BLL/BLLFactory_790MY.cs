@@ -86,7 +86,7 @@ namespace BLL_08YS
         {
             return new ProductoCBLL_790MY(
                 new SqlProductoCRepository_790MY(),
-                new SqlProductoRepository_790MY(),
+                CreateProductoBLL(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
     }

@@ -77,12 +77,19 @@ namespace BLL_08YS
         }
 
         // ─── Consultas para otras BLL ────────────────────────────────────────
-        // Sin ValidatePermission: el Camarero (PedidoBLL, RegistrarPedido) no tiene
-        // GestionProductos; cada llamador ya validó su propia patente.
+        // Sin ValidatePermission: el Camarero (PedidoBLL, RegistrarPedido) y la auditoría
+        // (ProductoCBLL, AuditarProductos) no tienen GestionProductos; cada llamador ya
+        // validó su propia patente.
 
         /// <summary>Productos activos con sus porciones disponibles (carta de Registrar Pedido).</summary>
         internal List<Producto_790MY> ObtenerActivos()
             => _productoRepository.GetActivos();
+
+        internal Producto_790MY ObtenerPorId(int productoId)
+            => _productoRepository.GetById(productoId);
+
+        internal bool ExisteNombre(string nombre, int exceptoId)
+            => _productoRepository.ExisteNombre(nombre, exceptoId);
 
         // ─── Validaciones ────────────────────────────────────────────────────
 
