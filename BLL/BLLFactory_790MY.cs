@@ -62,9 +62,9 @@ namespace BLL_08YS
         {
             return new FacturaBLL_790MY(
                 new SqlFacturaRepository_790MY(),
-                new SqlReservaRepository_790MY(),
-                new SqlPedidoRepository_790MY(),
-                new SqlEmpleadoRepository_790MY(),
+                CreateReservaBLL(),
+                CreatePedidoBLL(),
+                CreateEmpleadoBLL(),
                 BLLFactory_08YS.CreateBitacoraBLL());
         }
 

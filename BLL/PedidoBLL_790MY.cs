@@ -249,6 +249,15 @@ namespace BLL_08YS
             return _pedidoRepository.GetById(nroPedido);
         }
 
+        // ─── Consultas para otras BLL ────────────────────────────────────────
+
+        /// <summary>
+        /// Pedidos Pendiente / EnPreparacion de la reserva. Sin ValidatePermission: lo usa
+        /// FacturaBLL_790MY, que ya validó el acceso a Caja (el cajero no tiene RegistrarPedido).
+        /// </summary>
+        internal int ContarNoDespachados(int reservaId)
+            => _pedidoRepository.ContarNoDespachados(reservaId);
+
         // ─── Helpers ─────────────────────────────────────────────────────────
 
         /// <summary>

@@ -24,19 +24,19 @@ namespace BLL_08YS
     public class FacturaBLL_790MY
     {
         private readonly IFacturaRepository_790MY _facturaRepository;
-        private readonly IReservaRepository_790MY _reservaRepository;
-        private readonly IPedidoRepository_790MY _pedidoRepository;
-        private readonly IEmpleadoRepository_790MY _empleadoRepository;
+        private readonly ReservaBLL_790MY _reservaBll;
+        private readonly PedidoBLL_790MY _pedidoBll;
+        private readonly EmpleadoBLL_790MY _empleadoBll;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public FacturaBLL_790MY(IFacturaRepository_790MY facturaRepository, IReservaRepository_790MY reservaRepository,
-                                IPedidoRepository_790MY pedidoRepository, IEmpleadoRepository_790MY empleadoRepository,
+        public FacturaBLL_790MY(IFacturaRepository_790MY facturaRepository, ReservaBLL_790MY reservaBll,
+                                PedidoBLL_790MY pedidoBll, EmpleadoBLL_790MY empleadoBll,
                                 BitacoraBLL_08YS bitacoraBll)
         {
             _facturaRepository = facturaRepository ?? throw new ArgumentNullException(nameof(facturaRepository));
-            _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
-            _pedidoRepository = pedidoRepository ?? throw new ArgumentNullException(nameof(pedidoRepository));
-            _empleadoRepository = empleadoRepository ?? throw new ArgumentNullException(nameof(empleadoRepository));
+            _reservaBll = reservaBll ?? throw new ArgumentNullException(nameof(reservaBll));
+            _pedidoBll = pedidoBll ?? throw new ArgumentNullException(nameof(pedidoBll));
+            _empleadoBll = empleadoBll ?? throw new ArgumentNullException(nameof(empleadoBll));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -55,8 +55,8 @@ namespace BLL_08YS
 
             Empleado_790MY camarero = ObtenerCamareroDeSesion();
             List<Reserva_790MY> reservas = camarero != null
-                ? _reservaRepository.GetAsistidasPorCamarero(camarero.DNI)
-                : _reservaRepository.Buscar(null, null, null, EstadoReserva_790MY.Asistida);
+                ? _reservaBll.ObtenerAsistidasPorCamarero(camarero.DNI)
+                : _reservaBll.ObtenerAsistidas();
 
             Dictionary<int, Empleado_790MY> camareros = CamarerosPorDni();
 
@@ -103,7 +103,7 @@ namespace BLL_08YS
                 Items = items,
                 Importes = CalcularImportes(items.Sum(i => i.Subtotal), valorDescuento, tipoDescuento),
                 FacturaAbierta = abierta,
-                PedidosSinDespachar = _pedidoRepository.ContarNoDespachados(nroReserva)
+                PedidosSinDespachar = _pedidoBll.ContarNoDespachados(nroReserva)
             };
         }
 
@@ -294,7 +294,7 @@ namespace BLL_08YS
         /// </summary>
         private Reserva_790MY ValidarReservaCobrable(int nroReserva)
         {
-            Reserva_790MY reserva = _reservaRepository.GetById(nroReserva)
+            Reserva_790MY reserva = _reservaBll.ObtenerPorId(nroReserva)
                 ?? throw MensajesBLL_790MY.Regla("msg_rf2_reserva_inexistente", nroReserva);
 
             if (reserva.Estado != EstadoReserva_790MY.Asistida)
@@ -313,17 +313,14 @@ namespace BLL_08YS
         /// </summary>
         private Empleado_790MY ObtenerCamareroDeSesion()
         {
-            User_08YS usuario = SessionManager_08YS.Instance.Current
-                ?? throw new UnauthorizedAccessException(MensajesBLL_790MY.Texto("msg_rf2_sin_sesion"));
-
-            Empleado_790MY empleado = _empleadoRepository.GetByUsuarioDni(usuario.DNI);
+            Empleado_790MY empleado = _empleadoBll.ObtenerEmpleadoDeSesion();
             return empleado != null && empleado.Activo && empleado.Puesto == PuestoEmpleado_790MY.Camarero
                 ? empleado
                 : null;
         }
 
         private Dictionary<int, Empleado_790MY> CamarerosPorDni()
-            => _empleadoRepository.GetActivosPorPuesto(PuestoEmpleado_790MY.Camarero).ToDictionary(e => e.DNI);
+            => _empleadoBll.ObtenerCamarerosActivos().ToDictionary(e => e.DNI);
 
         private static string NombreCamarero(Dictionary<int, Empleado_790MY> camareros, int? dni)
             => dni.HasValue && camareros.TryGetValue(dni.Value, out var e) ? $"{e.Nombre} {e.Apellido}" : "-";

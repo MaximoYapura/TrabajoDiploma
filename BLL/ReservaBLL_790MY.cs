@@ -244,6 +244,10 @@ namespace BLL_08YS
         internal List<Reserva_790MY> ObtenerAsistidasPorCamarero(int camareroDni)
             => _reservaRepository.GetAsistidasPorCamarero(camareroDni);
 
+        /// <summary>Todas las reservas Asistidas (mesas ocupadas), de cualquier camarero.</summary>
+        internal List<Reserva_790MY> ObtenerAsistidas()
+            => _reservaRepository.Buscar(null, null, null, EstadoReserva_790MY.Asistida);
+
         // ─── Helpers ─────────────────────────────────────────────────────────
 
         private static void ValidarComensales(Mesa_790MY mesa, int comensales)
