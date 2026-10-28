@@ -89,31 +89,9 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>
-        /// Camino legacy (MessageBox nativo). Lo siguen usando
-        /// las pantallas aún no migradas (FormFacturacionCobro_790MY se migró en la Etapa 4);
-        /// las migradas usan <see cref="MostrarErrorEnBanner"/>.
-        /// Reglas de negocio (ArgumentException) como advertencia, permisos como acceso
-        /// denegado y cualquier otra falla como error.
-        /// </summary>
-        public static void MostrarError(IWin32Window owner, Exception ex)
-        {
-            if (ex is UnauthorizedAccessException)
-                MessageBox.Show(owner, ex.Message, T("acceso_denegado"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
-            else if (ex is ArgumentException)
-                MessageBox.Show(owner, ex.Message, T("titulo_datos_invalidos"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            else
-                MessageBox.Show(owner, T("RF2_msg_error_inesperado", ex.Message), T("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        /// <summary>Camino legacy (MessageBox nativo); las pantallas migradas usan <see cref="MostrarExitoToast"/>.</summary>
-        public static void MostrarExito(IWin32Window owner, string mensaje)
-            => MessageBox.Show(owner, mensaje, T("exito"), MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        /// <summary>
-        /// Etapa 2 (E2-D1/E2-D4): mismo criterio que <see cref="MostrarError"/>, pero las
-        /// reglas de negocio y los permisos van al banner del formulario. Solo las fallas
+        /// Etapa 2 (E2-D1/E2-D4): las reglas de negocio (ArgumentException) y los permisos
+        /// (UnauthorizedAccessException) van al banner del formulario. Solo las fallas
         /// inesperadas conservan el MessageBox nativo (error fatal).
-        /// Nombre distinto a propósito: una sobrecarga con Control capturaría las llamadas legacy.
         /// </summary>
         public static void MostrarErrorEnBanner(Banner_UC_790MY banner, Exception ex)
         {

@@ -81,11 +81,6 @@ namespace GUI_08YS.Estilo
 
         // ── Tipografía (P06, P07): Segoe UI en toda la aplicación, escala fija ─
         public const string Familia = "Segoe UI";
-        public static Font FuenteTitulo()    => new Font(Familia, 16F, FontStyle.Bold);
-        public static Font FuenteSubtitulo() => new Font(Familia, 12F, FontStyle.Bold);
-        public static Font FuenteCuerpo()    => new Font(Familia, 10F);
-        public static Font FuenteEtiqueta()  => new Font(Familia, 9F, FontStyle.Bold);
-        public static Font FuenteAyuda()     => new Font(Familia, 8.25F);
 
         // ── Espaciado y radios (P08): múltiplos de 4, radios 6/10/12, sin sombras ─
         public const int Espacio1 = 4;
