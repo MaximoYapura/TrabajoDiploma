@@ -45,8 +45,31 @@ namespace BLL_08YS
         public List<Empleado_790MY> GetCamarerosActivos()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
-            return _empleadoRepository.GetActivosPorPuesto(PuestoEmpleado_790MY.Camarero);
+            return ObtenerCamarerosActivos();
         }
+
+        // ─── Consultas para otras BLL ────────────────────────────────────────
+        // Sin ValidatePermission: las usan ReservaBLL, PedidoBLL y FacturaBLL, que ya
+        // validaron su propia patente (AbrirMesa, RegistrarPedido, DespacharPedido,
+        // Caja). Exigir CrearEmpleado acá le negaría el acceso a Recepción, Camarero y Chef.
+
+        /// <summary>
+        /// Empleado vinculado al usuario logueado (Users.DNI -> Empleados.UsuarioDNI), o
+        /// null si no tiene. Cada llamador aplica su regla (activo, puesto Camarero).
+        /// </summary>
+        internal Empleado_790MY ObtenerEmpleadoDeSesion()
+        {
+            User_08YS usuario = SessionManager_08YS.Instance.Current
+                ?? throw new UnauthorizedAccessException(MensajesBLL_790MY.Texto("msg_rf2_sin_sesion"));
+
+            return _empleadoRepository.GetByUsuarioDni(usuario.DNI);
+        }
+
+        internal List<Empleado_790MY> ObtenerCamarerosActivos()
+            => _empleadoRepository.GetActivosPorPuesto(PuestoEmpleado_790MY.Camarero);
+
+        internal Empleado_790MY ObtenerPorDni(int dni)
+            => _empleadoRepository.GetByDni(dni);
 
         public void RegistrarEmpleado(Empleado_790MY empleado)
         {
@@ -105,6 +128,9 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.EmpleadoDadoDeBaja, $"Empleado {dni}");
         }
 
+        // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
+        // ReservaBLL_790MY formaría un ciclo ReservaBLL -> EmpleadoBLL -> ReservaBLL y
+        // BLLFactory_790MY entraría en recursión infinita.
         /// <summary>Mesas abiertas (reservas Asistidas) a cargo del empleado.</summary>
         public int ContarMesasAbiertas(int dni)
         {
@@ -114,6 +140,8 @@ namespace BLL_08YS
 
         // ─── Validaciones ────────────────────────────────────────────────────
 
+        // Excepción: chequeo de integridad de solo lectura antes de la baja; usa
+        // IReservaRepository_790MY directo por el mismo motivo que ContarMesasAbiertas.
         private void ValidarSinMesasAbiertas(int dni)
         {
             int abiertas = _reservaRepository.GetAsistidasPorCamarero(dni).Count;

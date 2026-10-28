@@ -25,17 +25,17 @@ namespace BLL_08YS
         private readonly IReservaRepository_790MY _reservaRepository;
         private readonly IClienteRepository_790MY _clienteRepository;
         private readonly IMesaRepository_790MY _mesaRepository;
-        private readonly IEmpleadoRepository_790MY _empleadoRepository;
+        private readonly EmpleadoBLL_790MY _empleadoBll;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
         public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository,
-                                IMesaRepository_790MY mesaRepository, IEmpleadoRepository_790MY empleadoRepository,
+                                IMesaRepository_790MY mesaRepository, EmpleadoBLL_790MY empleadoBll,
                                 BitacoraBLL_08YS bitacoraBll)
         {
             _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
             _clienteRepository = clienteRepository ?? throw new ArgumentNullException(nameof(clienteRepository));
             _mesaRepository = mesaRepository ?? throw new ArgumentNullException(nameof(mesaRepository));
-            _empleadoRepository = empleadoRepository ?? throw new ArgumentNullException(nameof(empleadoRepository));
+            _empleadoBll = empleadoBll ?? throw new ArgumentNullException(nameof(empleadoBll));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -247,12 +247,12 @@ namespace BLL_08YS
 
         /// <summary>
         /// El camarero responsable debe existir, estar activo y tener puesto Camarero.
-        /// Se consulta el repositorio de empleados directamente (no EmpleadoBLL) para no
+        /// Se usa la consulta interna de EmpleadoBLL (sin ValidatePermission) para no
         /// exigir el permiso de ABM de empleados a quien solo tiene AbrirMesa.
         /// </summary>
         private Empleado_790MY ValidarCamarero(int camareroDni)
         {
-            Empleado_790MY empleado = _empleadoRepository.GetByDni(camareroDni);
+            Empleado_790MY empleado = _empleadoBll.ObtenerPorDni(camareroDni);
             if (empleado == null || !empleado.Activo || empleado.Puesto != PuestoEmpleado_790MY.Camarero)
                 throw MensajesBLL_790MY.Regla("msg_rf2_camarero_invalido", camareroDni);
             return empleado;
