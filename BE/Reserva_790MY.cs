@@ -105,17 +105,6 @@ namespace BE_08YS
             set { _camareroDni = value; }
         }
 
-        /// <summary>True si, por su estado, la reserva bloquea la mesa en su turno.</summary>
-        public bool OcupaMesa
-        {
-            get
-            {
-                foreach (var e in EstadosQueOcupanMesa)
-                    if (e == _estado) return true;
-                return false;
-            }
-        }
-
         // Solo para lectura/visualizacion (no se persiste, no participa de Add):
         // lo completan las consultas de busqueda que hacen JOIN con Clientes,
         // para no tener que ir a buscar el cliente aparte solo para mostrar su nombre.

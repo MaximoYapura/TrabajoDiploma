@@ -77,8 +77,6 @@ namespace BE_08YS
             set { _activo = value; }
         }
 
-        public bool TieneUsuario => _usuarioDni.HasValue;
-
         public string NombreCompleto => $"{_nombre} {_apellido}";
 
         public override string ToString() => NombreCompleto;
