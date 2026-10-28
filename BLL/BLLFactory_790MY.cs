@@ -24,11 +24,11 @@ namespace BLL_08YS
         public static ReservaBLL_790MY CreateReservaBLL()
         {
             IReservaRepository_790MY  reservaRepo  = new SqlReservaRepository_790MY();
-            IClienteRepository_790MY  clienteRepo  = new SqlClienteRepository_790MY();
-            IMesaRepository_790MY     mesaRepo     = new SqlMesaRepository_790MY();
+            ClienteBLL_790MY          clienteBll   = CreateClienteBLL();
+            MesaBLL_790MY             mesaBll      = CreateMesaBLL();
             EmpleadoBLL_790MY         empleadoBll  = CreateEmpleadoBLL();
             BitacoraBLL_08YS          bitacoraBll  = BLLFactory_08YS.CreateBitacoraBLL();
-            return new ReservaBLL_790MY(reservaRepo, clienteRepo, mesaRepo, empleadoBll, bitacoraBll);
+            return new ReservaBLL_790MY(reservaRepo, clienteBll, mesaBll, empleadoBll, bitacoraBll);
         }
 
         public static EmpleadoBLL_790MY CreateEmpleadoBLL()

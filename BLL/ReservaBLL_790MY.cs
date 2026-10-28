@@ -23,18 +23,18 @@ namespace BLL_08YS
     public partial class ReservaBLL_790MY
     {
         private readonly IReservaRepository_790MY _reservaRepository;
-        private readonly IClienteRepository_790MY _clienteRepository;
-        private readonly IMesaRepository_790MY _mesaRepository;
+        private readonly ClienteBLL_790MY _clienteBll;
+        private readonly MesaBLL_790MY _mesaBll;
         private readonly EmpleadoBLL_790MY _empleadoBll;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository,
-                                IMesaRepository_790MY mesaRepository, EmpleadoBLL_790MY empleadoBll,
+        public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, ClienteBLL_790MY clienteBll,
+                                MesaBLL_790MY mesaBll, EmpleadoBLL_790MY empleadoBll,
                                 BitacoraBLL_08YS bitacoraBll)
         {
             _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
-            _clienteRepository = clienteRepository ?? throw new ArgumentNullException(nameof(clienteRepository));
-            _mesaRepository = mesaRepository ?? throw new ArgumentNullException(nameof(mesaRepository));
+            _clienteBll = clienteBll ?? throw new ArgumentNullException(nameof(clienteBll));
+            _mesaBll = mesaBll ?? throw new ArgumentNullException(nameof(mesaBll));
             _empleadoBll = empleadoBll ?? throw new ArgumentNullException(nameof(empleadoBll));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
@@ -54,9 +54,9 @@ namespace BLL_08YS
             if (mesa == null)
                 throw MensajesBLL_790MY.Regla("msg_rf2_falta_mesa");
 
-            // GetByDni filtra por Activo = 1: un cliente dado de baja logicamente
+            // ExisteActivo filtra por Activo = 1: un cliente dado de baja logicamente
             // no deberia poder hacer reservas.
-            if (_clienteRepository.GetByDni(clienteDni) == null)
+            if (!_clienteBll.ExisteActivo(clienteDni))
                 throw MensajesBLL_790MY.Regla("msg_rf2_cliente_inexistente");
 
             ValidarComensales(mesa, comensales);
@@ -164,7 +164,7 @@ namespace BLL_08YS
 
             Empleado_790MY camarero = ValidarCamarero(camareroDni);
 
-            Mesa_790MY mesa = _mesaRepository.GetAll().FirstOrDefault(m => m.NroMesa == reserva.MesaNumero);
+            Mesa_790MY mesa = _mesaBll.ObtenerPorNumero(reserva.MesaNumero);
             if (mesa == null || !mesa.Activo || mesa.Estado == EstadoMesa_790MY.FueraDeServicio)
                 throw MensajesBLL_790MY.Regla("msg_rf2_mesa_fuera_servicio", reserva.MesaNumero);
             if (mesa.Estado == EstadoMesa_790MY.Ocupada)
@@ -208,7 +208,7 @@ namespace BLL_08YS
 
             // La FK Reservas -> Clientes exige un cliente registrado y activo; si no existe,
             // la GUI debe ofrecer el alta (FormRegistrarCliente_790MY) antes de reintentar.
-            if (_clienteRepository.GetByDni(clienteDni) == null)
+            if (!_clienteBll.ExisteActivo(clienteDni))
                 throw MensajesBLL_790MY.Regla("msg_rf2_cliente_inexistente");
 
             ValidarComensales(mesa, comensales);

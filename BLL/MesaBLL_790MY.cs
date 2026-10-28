@@ -115,6 +115,13 @@ namespace BLL_08YS
         }
 
         /// <summary>
+        /// Mesa con ese número, o null. Sin ValidatePermission: lo usa ReservaBLL_790MY
+        /// en CUN-004, que ya validó AbrirMesa (Recepción no tiene VerMesas).
+        /// </summary>
+        internal Mesa_790MY ObtenerPorNumero(int nroMesa)
+            => _mesaRepository.GetAll().FirstOrDefault(m => m.NroMesa == nroMesa);
+
+        /// <summary>
         /// Devuelve el próximo número de mesa disponible: Max(NroMesa) + 1, o 1 si no hay mesas.
         /// </summary>
         public int GetProximoNumero()
@@ -240,6 +247,9 @@ namespace BLL_08YS
                 throw new ArgumentException("La mesa que intenta eliminar no existe.");
 
             // ── Integridad referencial: historial completo (activas + pasadas) ──────────
+            // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
+            // ReservaBLL_790MY formaría un ciclo ReservaBLL -> MesaBLL -> ReservaBLL y
+            // BLLFactory_790MY entraría en recursión infinita.
             // Se consulta el repositorio de reservas para verificar si existen reservas
             // asociadas a esta mesa, sin importar su estado ni fecha.
             // Si las hay, se prohíbe la eliminación y se informa al usuario.

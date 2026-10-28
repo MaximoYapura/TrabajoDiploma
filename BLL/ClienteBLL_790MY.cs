@@ -95,6 +95,14 @@ namespace BLL_08YS
             return _clienteRepository.GetByDni(dni);
         }
 
+        /// <summary>
+        /// True si existe un cliente activo con ese DNI (GetByDni filtra Activo = 1).
+        /// Sin ValidatePermission: lo usa ReservaBLL_790MY, que ya validó RegistrarReserva
+        /// o AbrirMesa; exigir VerClientes le negaría el alta de reservas a Recepción.
+        /// </summary>
+        internal bool ExisteActivo(int dni)
+            => _clienteRepository.GetByDni(dni) != null;
+
         // ── Serialización / Deserialización XML de colecciones ──────────────
         //
         // Formato único: XML nativo de .NET (System.Xml.Serialization.XmlSerializer).
