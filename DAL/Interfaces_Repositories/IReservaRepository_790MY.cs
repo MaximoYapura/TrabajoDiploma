@@ -26,20 +26,11 @@ namespace DAL_08YS.Interfaces_Repositories
         /// <summary>Reservas Asistidas (mesas abiertas) a cargo del camarero.</summary>
         List<Reserva_790MY> GetAsistidasPorCamarero(int camareroDni);
 
-        /// <summary>Confirmada -> Cancelada. False si la reserva no estaba Confirmada.</summary>
-        bool CancelarReserva(int reservaId);
-
         /// <summary>
         /// CUN-004. En una transaccion: Confirmada -> Asistida + CamareroDNI y
         /// Mesa -> Ocupada. False (sin cambios) si la reserva ya no esta Confirmada
         /// o la mesa esta fisicamente ocupada / fuera de servicio.
         /// </summary>
         bool AbrirReserva(int reservaId, int camareroDni);
-
-        /// <summary>
-        /// En una transaccion: Asistida -> Finalizada y Mesa -> Libre (si no queda
-        /// otra reserva Asistida en esa mesa). False si la reserva no estaba Asistida.
-        /// </summary>
-        bool FinalizarReserva(int reservaId);
     }
 }

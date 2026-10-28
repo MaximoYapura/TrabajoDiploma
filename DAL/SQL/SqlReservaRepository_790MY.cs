@@ -160,22 +160,6 @@ namespace DAL_08YS.SQL
 
         // ─── Transiciones de estado ──────────────────────────────────────────
 
-        public bool CancelarReserva(int reservaId)
-        {
-            const string sql = "UPDATE Reservas SET Estado = @Cancelada WHERE ReservaID = @ReservaID AND Estado = @Confirmada";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
-            {
-                command.Parameters.Add("@Cancelada", SqlDbType.NVarChar, 20).Value = EstadoReserva_790MY.Cancelada.ToString();
-                command.Parameters.Add("@Confirmada", SqlDbType.NVarChar, 20).Value = EstadoReserva_790MY.Confirmada.ToString();
-                command.Parameters.Add("@ReservaID", SqlDbType.Int).Value = reservaId;
-
-                connection.Open();
-                return command.ExecuteNonQuery() > 0;
-            }
-        }
-
         public bool AbrirReserva(int reservaId, int camareroDni)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -218,64 +202,6 @@ namespace DAL_08YS.SQL
                         }
 
                         ActualizarEstadoMesa(connection, tx, mesaNumero, EstadoMesa_790MY.Ocupada);
-
-                        tx.Commit();
-                        return true;
-                    }
-                    catch
-                    {
-                        IntentarRollback(tx);
-                        throw;
-                    }
-                }
-            }
-        }
-
-        public bool FinalizarReserva(int reservaId)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (SqlTransaction tx = connection.BeginTransaction(IsolationLevel.Serializable))
-                {
-                    try
-                    {
-                        int mesaNumero;
-
-                        using (var cmd = new SqlCommand(@"
-                                UPDATE Reservas
-                                SET Estado = @Finalizada
-                                OUTPUT inserted.MesaNumero
-                                WHERE ReservaID = @ReservaID AND Estado = @Asistida", connection, tx))
-                        {
-                            cmd.Parameters.Add("@Finalizada", SqlDbType.NVarChar, 20).Value = EstadoReserva_790MY.Finalizada.ToString();
-                            cmd.Parameters.Add("@Asistida", SqlDbType.NVarChar, 20).Value = EstadoReserva_790MY.Asistida.ToString();
-                            cmd.Parameters.Add("@ReservaID", SqlDbType.Int).Value = reservaId;
-
-                            object resultado = cmd.ExecuteScalar();
-                            if (resultado == null || resultado == DBNull.Value)
-                            {
-                                tx.Rollback();
-                                return false;
-                            }
-                            mesaNumero = Convert.ToInt32(resultado);
-                        }
-
-                        // La mesa se libera solo si no quedo otra atencion abierta en ella
-                        // (defensa ante datos inconsistentes; en flujo normal no ocurre).
-                        using (var liberar = new SqlCommand(@"
-                                UPDATE Mesas SET Estado = @Libre
-                                WHERE NroMesa = @NroMesa
-                                  AND Estado = @Ocupada
-                                  AND NOT EXISTS (SELECT 1 FROM Reservas
-                                                  WHERE MesaNumero = @NroMesa AND Estado = @Asistida)", connection, tx))
-                        {
-                            liberar.Parameters.Add("@Libre", SqlDbType.NVarChar, 20).Value = EstadoMesa_790MY.Libre.ToString();
-                            liberar.Parameters.Add("@Ocupada", SqlDbType.NVarChar, 20).Value = EstadoMesa_790MY.Ocupada.ToString();
-                            liberar.Parameters.Add("@Asistida", SqlDbType.NVarChar, 20).Value = EstadoReserva_790MY.Asistida.ToString();
-                            liberar.Parameters.Add("@NroMesa", SqlDbType.Int).Value = mesaNumero;
-                            liberar.ExecuteNonQuery();
-                        }
 
                         tx.Commit();
                         return true;

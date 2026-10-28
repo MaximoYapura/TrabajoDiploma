@@ -26,18 +26,16 @@ namespace BLL_08YS
         private readonly IClienteRepository_790MY _clienteRepository;
         private readonly IMesaRepository_790MY _mesaRepository;
         private readonly IEmpleadoRepository_790MY _empleadoRepository;
-        private readonly IPedidoRepository_790MY _pedidoRepository;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
         public ReservaBLL_790MY(IReservaRepository_790MY reservaRepository, IClienteRepository_790MY clienteRepository,
                                 IMesaRepository_790MY mesaRepository, IEmpleadoRepository_790MY empleadoRepository,
-                                IPedidoRepository_790MY pedidoRepository, BitacoraBLL_08YS bitacoraBll)
+                                BitacoraBLL_08YS bitacoraBll)
         {
             _reservaRepository = reservaRepository ?? throw new ArgumentNullException(nameof(reservaRepository));
             _clienteRepository = clienteRepository ?? throw new ArgumentNullException(nameof(clienteRepository));
             _mesaRepository = mesaRepository ?? throw new ArgumentNullException(nameof(mesaRepository));
             _empleadoRepository = empleadoRepository ?? throw new ArgumentNullException(nameof(empleadoRepository));
-            _pedidoRepository = pedidoRepository ?? throw new ArgumentNullException(nameof(pedidoRepository));
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
@@ -96,24 +94,6 @@ namespace BLL_08YS
                 throw MensajesBLL_790MY.Regla("msg_rep_rango_fechas_invalido", desde.Value, hasta.Value);
 
             return _reservaRepository.Buscar(desde, hasta, clienteDni, estado);
-        }
-
-        /// <summary>
-        /// Método de dominio interno: cancela una reserva Confirmada.
-        /// Se conserva para uso desde otros contextos de negocio que puedan invocar la
-        /// cancelación internamente. Exige el mismo permiso que el alta de reservas
-        /// (RegistrarReserva): la BLL nunca confía en que la GUI haya filtrado el acceso.
-        /// Una reserva Asistida o Finalizada ya no puede cancelarse.
-        /// </summary>
-        public void CancelarReserva(int reservaId)
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
-
-            if (!_reservaRepository.CancelarReserva(reservaId))
-                throw MensajesBLL_790MY.Regla("msg_rf2_reserva_no_cancelable", reservaId);
-
-            DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEventoPostCommit(Evento.ReservaCancelada, reservaId.ToString());
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -227,7 +207,7 @@ namespace BLL_08YS
                 throw MensajesBLL_790MY.Regla("msg_rf2_falta_mesa");
 
             // La FK Reservas -> Clientes exige un cliente registrado y activo; si no existe,
-            // la GUI debe ofrecer el alta (FormRegistrarClienteModal_790MY) antes de reintentar.
+            // la GUI debe ofrecer el alta (FormRegistrarCliente_790MY) antes de reintentar.
             if (_clienteRepository.GetByDni(clienteDni) == null)
                 throw MensajesBLL_790MY.Regla("msg_rf2_cliente_inexistente");
 
@@ -252,37 +232,6 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.CamareroAsignado, $"Cam {camarero.DNI} - Mesa {reserva.MesaNumero}");
 
             return reserva;
-        }
-
-        // ═══════════════════════════════════════════════════════════════════
-        //  RF2 — Cierre de la atención (paso 14 de PN2)
-        // ═══════════════════════════════════════════════════════════════════
-
-        /// <summary>
-        /// Asistida -> Finalizada y la mesa vuelve a Libre (una transacción).
-        /// Lo invocará el registro del pago; no se permite mientras haya pedidos sin
-        /// despachar, porque dejarían porciones comprometidas para siempre.
-        /// </summary>
-        public void FinalizarReserva(int reservaId)
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.CerrarMesa);
-
-            Reserva_790MY reserva = _reservaRepository.GetById(reservaId)
-                ?? throw MensajesBLL_790MY.Regla("msg_rf2_reserva_inexistente", reservaId);
-
-            if (reserva.Estado != EstadoReserva_790MY.Asistida)
-                throw MensajesBLL_790MY.Regla("msg_rf2_reserva_no_finalizable", reservaId);
-
-            int pendientes = _pedidoRepository.ContarNoDespachados(reservaId);
-            if (pendientes > 0)
-                throw MensajesBLL_790MY.Regla("msg_rf2_reserva_con_pedidos_pendientes", reservaId, pendientes);
-
-            if (!_reservaRepository.FinalizarReserva(reservaId))
-                throw MensajesBLL_790MY.Regla("msg_rf2_reserva_no_finalizable", reservaId);
-
-            DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEventoPostCommit(Evento.ReservaFinalizada, $"Reserva {reservaId}");
-            _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaEstadoActualizado, $"Mesa {reserva.MesaNumero} Libre");
         }
 
         // ─── Helpers ─────────────────────────────────────────────────────────
