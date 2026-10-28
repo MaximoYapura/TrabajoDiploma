@@ -47,10 +47,15 @@
     <Compile Include="Reserva_790MY.cs" />
     <Compile Include="Empleado_790MY.cs" />
     <Compile Include="Pedido_790MY.cs" />
+    <Compile Include="ItemPedido_790MY.cs" />
     <Compile Include="Producto_790MY.cs" />
     <Compile Include="Producto_C_790MY.cs" />
     <Compile Include="Factura_790MY.cs" />
+    <Compile Include="ItemFactura_790MY.cs" />
+    <Compile Include="CanastaFactura_790MY.cs" />
     <Compile Include="Pago_790MY.cs" />
+    <Compile Include="SolicitudCobro_790MY.cs" />
+    <Compile Include="CobroArqueo_790MY.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

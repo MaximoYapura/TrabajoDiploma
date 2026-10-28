@@ -48,30 +48,4 @@ namespace BE_08YS
             ? Math.Round(MontoAbonado / CantidadCuotas.Value, 2, MidpointRounding.AwayFromZero)
             : (decimal?)null;
     }
-
-    /// <summary>Datos que el camarero ingresa para cobrar (entrada de PagoBLL.RegistrarCobro).</summary>
-    public class SolicitudCobro_790MY
-    {
-        public int NroFactura { get; set; }
-        public MetodoPago_790MY MetodoPago { get; set; }
-        public decimal MontoPropina { get; set; }
-        public decimal? MontoRecibido { get; set; }
-        public string NroTarjeta { get; set; }
-        public int CantidadCuotas { get; set; } = 1;
-    }
-
-    /// <summary>Una cuenta cobrada, para el detalle del arqueo de caja.</summary>
-    public class CobroArqueo_790MY
-    {
-        public int IdPago { get; set; }
-        public int NroFactura { get; set; }
-        public DateTime FechaHoraPago { get; set; }
-        public int MesaNumero { get; set; }
-        public MetodoPago_790MY MetodoPago { get; set; }
-        public decimal MontoDescuento { get; set; }
-        public decimal MontoPropina { get; set; }
-
-        /// <summary>Total de la factura (descuento deducido, IVA incluido, sin propina).</summary>
-        public decimal ImporteCobrado { get; set; }
-    }
 }

@@ -55,29 +55,4 @@ namespace BE_08YS
         /// <summary>"B-0001-00000234"</summary>
         public string NumeroComprobante => $"B-{PuntoVenta:0000}-{NroFactura:00000000}";
     }
-
-    public class ItemFactura_790MY
-    {
-        public int NroFactura { get; set; }
-        public int NroItem { get; set; }
-        public int ProductoID { get; set; }
-        public string Descripcion { get; set; }
-        public int Cantidad { get; set; }
-        public decimal PrecioUnitario { get; set; }
-
-        public decimal Subtotal => PrecioUnitario * Cantidad;
-    }
-
-    /// <summary>
-    /// "Canasta" de una cuenta cobrada para el análisis predictivo (reglas de asociación):
-    /// qué productos distintos se pidieron juntos en la misma factura, sin importar cantidades.
-    /// </summary>
-    public class CanastaFactura_790MY
-    {
-        public int NroFactura { get; set; }
-        public DateTime FechaEmision { get; set; }
-
-        /// <summary>ProductoID -> descripción congelada en la factura.</summary>
-        public Dictionary<int, string> Productos { get; } = new Dictionary<int, string>();
-    }
 }
