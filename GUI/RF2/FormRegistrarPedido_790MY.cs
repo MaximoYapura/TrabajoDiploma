@@ -25,15 +25,6 @@ namespace GUI_08YS.RF2
     /// </summary>
     public partial class FormRegistrarPedido_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
-        /// <summary>Renglón de la comanda todavía no enviada.</summary>
-        private sealed class ItemComanda
-        {
-            public Producto_790MY Producto { get; set; }
-            public int Cantidad { get; set; }
-            public string Observaciones { get; set; }
-            public decimal Subtotal => Producto.Precio * Cantidad;
-        }
-
         private const int UmbralBajoStock = 3;
 
         private readonly PedidoBLL_790MY _pedidoBll;
@@ -51,7 +42,7 @@ namespace GUI_08YS.RF2
         private List<Producto_790MY> _catalogo = new List<Producto_790MY>();
 
         // Una comanda por mesa: cambiar de mesa no pierde lo que se estaba cargando.
-        private readonly Dictionary<int, List<ItemComanda>> _comandas = new Dictionary<int, List<ItemComanda>>();
+        private readonly Dictionary<int, List<ItemComanda_790MY>> _comandas = new Dictionary<int, List<ItemComanda_790MY>>();
         // Avisos de "pedido listo" ya retirados en esta sesión de la pantalla.
         private readonly HashSet<int> _retirados = new HashSet<int>();
 
@@ -98,13 +89,13 @@ namespace GUI_08YS.RF2
 
         private IWin32Window VentanaPropietaria => (this.TopLevelControl as Form) ?? (IWin32Window)this;
 
-        private List<ItemComanda> ComandaActual
+        private List<ItemComanda_790MY> ComandaActual
         {
             get
             {
-                if (_mesaSel == null) return new List<ItemComanda>();
+                if (_mesaSel == null) return new List<ItemComanda_790MY>();
                 if (!_comandas.TryGetValue(_mesaSel.ReservaID, out var lista))
-                    _comandas[_mesaSel.ReservaID] = lista = new List<ItemComanda>();
+                    _comandas[_mesaSel.ReservaID] = lista = new List<ItemComanda_790MY>();
                 return lista;
             }
         }
@@ -504,7 +495,7 @@ namespace GUI_08YS.RF2
             if (existente != null)
                 existente.Cantidad += cantidad;
             else
-                ComandaActual.Add(new ItemComanda { Producto = _productoSel, Cantidad = cantidad, Observaciones = obsNormalizada });
+                ComandaActual.Add(new ItemComanda_790MY { Producto = _productoSel, Cantidad = cantidad, Observaciones = obsNormalizada });
 
             _productoSel = null;
             RenderizarProductos();
@@ -558,7 +549,7 @@ namespace GUI_08YS.RF2
             btnEnviar_790MY.ForeColor = btnEnviar_790MY.IconColor = habilitado ? Color.White : E.Gris;
         }
 
-        private Control CrearRenglon(ItemComanda item, int ancho)
+        private Control CrearRenglon(ItemComanda_790MY item, int ancho)
         {
             var card = new PanelRedondeado_790MY
             {
