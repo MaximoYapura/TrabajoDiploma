@@ -10,7 +10,7 @@ Ejecución de `PROMPT_Refactorizacion_Limpieza.md`: Paso 0 y fases 1, 2, 3, 4 y 
 
 ## Ramas
 
-**Están apiladas** (cada una sale de la anterior, no de `beta`): las fases tocan los mismos archivos y sin merge a `beta` entre fases no se podían crear todas desde `beta`. Mergear la última (`refactor/fase6-documentacion`) en `beta` trae todo; para revisar de a una, mirá cada rama contra la anterior.
+**Están apiladas** (cada una sale de la anterior, no de `beta`): las fases tocan los mismos archivos y sin merge a `beta` entre fases no se podían crear todas desde `beta`. Mergear la última (`refactor/fase5-limpieza`) en `beta` trae todo; para revisar de a una, mirá cada rama contra la anterior.
 
 | Orden | Rama | Commits nuevos | Contenido |
 |---|---|---|---|
@@ -27,6 +27,7 @@ Ejecución de `PROMPT_Refactorizacion_Limpieza.md`: Paso 0 y fases 1, 2, 3, 4 y 
 | 11 | `refactor/fase4-factura` | 1 | 4.5 |
 | 12 | `refactor/fase4-productoc` | 1 | 4.6 (opcional, hecha) |
 | 13 | `refactor/fase6-documentacion` | 2 | Fase 6 + este informe |
+| 14 | `refactor/fase5-limpieza` | 2 | Fase 5: borrado de la lista A de claves (aprobado después del informe) |
 
 Todas pusheadas a `origin`. Sin merge a `beta` ni a `main`, sin push a `main`. Commits sin línea de co-autoría. Total contra `beta`: 69 archivos, +913 / −1159.
 
@@ -128,7 +129,7 @@ ProductoCBLL -> Producto
 ### Claves de `GUI/idiomas.json`
 Búsqueda por texto (palabra completa) en todos los `.cs`/`.resx` y además en `.sql`, otros `.json`, `.config`, `.iss` y `.vdproj`. Las claves armadas en código (`"PREFIJO_" + x`, `$"PREFIJO_{x}"`) se separan aparte. `es` = 1313 claves y `en` = 1314: `en` tiene una clave `"-"` que no existe en `es`.
 
-**A. Sin referencias, candidatas a borrar (72):**
+**A. Sin referencias, candidatas a borrar (72) — ✅ borradas en `refactor/fase5-limpieza`** (es y en; JSON válido, es 1313 → 1241, en 1314 → 1242; al re-correr el análisis solo quedan sin uso las 14 de la lista B):
 `GR_titulo`, `GR_lblDesde`, `GR_lblHasta`, `GR_lblDni`, `GR_lblEstado`, `GR_colNro`, `GR_colDni`, `GR_colCliente`, `GR_colMesa`, `GR_colFecha`, `GR_colHora`, `GR_colComensales`, `GR_colEstado`, `GR_cmbEstadoTodos`, `GR_cmbConfirmada`, `GR_cmbCancelada`, `msg_gr_dni_invalido`, `msg_gr_error_buscar`, `msg_gr_cancelada_ok`, `FM_colNumero`, `FM_colCapacidad`, `FM_colEstado`, `msg_fm_capacidad_invalida_num`, `msg_fm_mesa_existente`, `SM_titulo`, `SM_comensales`, `SM_lblSinResultados`, `SM_lblPlano`, `LS_btnQuitar`, `UC_mesa_lblMesa`, `UC_mesa_lblPersonas` (eran del `UserControlMesa` borrado), `RR_lblClienteNoEncontrado`, `msg_rr_cliente_no_encontrado`, `msg_reserva_registrada`, `msg_reserva_cancelada`, `msg_seleccionar_reserva`, `msg_reserva_no_cancelable`, `msg_cliente_no_encontrado`, `msg_cliente_registrado`, `msg_cliente_modificado`, `msg_cliente_eliminado`, `msg_confirmar_eliminar_cliente`, `msg_seleccionar_cliente`, `msg_campos_obligatorios`, `msg_mesa_registrada`, `msg_mesa_modificada`, `msg_mesa_eliminada`, `msg_confirmar_eliminar_mesa`, `msg_seleccionar_mesa`, `msg_nro_mesa_duplicado`, `msg_nro_mesa_invalido`, `msg_capacidad_invalida`, `capacidad_invalida_titulo`, `msg_serializar_ok`, `msg_deserializar_ok`, `msg_seleccionar_archivo_serializar`, `msg_seleccionar_archivo_deserializar`, `titulo_datos_invalidos` (la usaba el `MostrarError` borrado), `titulo_confirmar_baja`, `titulo_confirmar_cancelacion`, `titulo_falta_seleccionar`, `titulo_falta_ruta`, `titulo_fc_sin_seleccion`, `REP_pdf_generado`, `KDS_minutos`, `msg_fc_confirmar_cobro`, `CJ_confirmar_titulo`, `CJ_confirmar_tarjeta`, `CJ_pago_rechazado_titulo`, `msg_rf2_reserva_con_pedidos_pendientes`, `msg_rf2_reserva_no_cancelable`, `msg_rf2_reserva_no_finalizable` (estas tres, de lo borrado en 1.2).
 
 **B. Sin referencias, pero parecen de pantallas `_08YS` (roles, familias, contraseña). Por la regla no las propongo (14):**
@@ -159,6 +160,8 @@ Búsqueda por texto (palabra completa) en todos los `.cs`/`.resx` y además en `
 ## Pendiente de tu lado
 
 1. Probar las checklists (sobre todo la Fase 4 por rol y la Fase 3 a distintas escalas).
-2. Decidir el borrado de la lista A de claves (y si querés, la B).
+2. Decidir si también se borra la lista B de claves (pantallas `_08YS`). La A ya está borrada.
 3. Limpiar los `using` con Visual Studio.
-4. Mergear en `beta` (alcanza con `refactor/fase6-documentacion`, que contiene todo) y recompilar el instalador desde ahí.
+4. Mergear en `beta` (alcanza con `refactor/fase5-limpieza`, que contiene todo) y recompilar el instalador desde ahí.
+
+**Checklist manual de la Fase 5:** recorrer en es y en las pantallas de Reservas, Abrir mesa, Registrar pedido, KDS, Caja y cobro, Arqueo y los cuatro ABM. No debería aparecer ningún texto entre corchetes (`[clave]`).
