@@ -206,13 +206,6 @@ namespace BLL_08YS
             };
         }
 
-        /// <summary>Pago confirmado de una factura (null si todavía no se cobró).</summary>
-        public Pago_790MY ObtenerPagoDeFactura(int nroFactura)
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarCobro);
-            return _pagoRepository.GetPorFactura(nroFactura);
-        }
-
         // ═══════════════════════════════════════════════════════════════════
         //  Arqueo y cierre de caja
         // ═══════════════════════════════════════════════════════════════════

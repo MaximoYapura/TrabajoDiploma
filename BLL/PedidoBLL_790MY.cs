@@ -137,23 +137,6 @@ namespace BLL_08YS
         }
 
         /// <summary>
-        /// Pedidos Listos de las mesas del camarero logueado: es el mecanismo de
-        /// "notificación mediante el sistema" del CUN-008 paso 8 (la GUI lo consulta
-        /// periódicamente; no existe aún infraestructura de mensajería push).
-        /// </summary>
-        public List<Pedido_790MY> ObtenerPedidosListosDelCamarero()
-        {
-            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
-            Empleado_790MY camarero = ObtenerCamareroDeSesion();
-
-            var mesasAbiertas = new HashSet<int>(_reservaRepository.GetAsistidasPorCamarero(camarero.DNI).Select(r => r.ReservaID));
-            return _pedidoRepository
-                .Buscar(new[] { EstadoPedido_790MY.Listo }, camarero.DNI, null)
-                .Where(p => mesasAbiertas.Contains(p.ReservaID))
-                .ToList();
-        }
-
-        /// <summary>
         /// Todos los pedidos (cualquier estado) de las mesas abiertas del camarero
         /// logueado. FormRegistrarPedido_790MY los usa para las etiquetas de estado
         /// de cada mesa ("# 229 · Listo").
