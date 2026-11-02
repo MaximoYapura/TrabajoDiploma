@@ -25,13 +25,10 @@ namespace BLL_08YS
     {
         #region Constantes y formato compartido (PDF, email y vista previa)
 
-        /// <summary>Duración de un turno de reserva (los turnos del sistema son de 2 horas).</summary>
-        public static readonly TimeSpan DuracionTurno = TimeSpan.FromHours(2);
-
         /// <summary>Devuelve el turno como "20:00 - 22:00" (el fin de 22:00 se muestra como 24:00).</summary>
         public static string FormatearTurno(TimeSpan inicio)
         {
-            TimeSpan fin = inicio + DuracionTurno;
+            TimeSpan fin = inicio + MesaBLL_790MY.DuracionTurno;
             return $"{(int)inicio.TotalHours:00}:{inicio.Minutes:00} - {(int)fin.TotalHours:00}:{fin.Minutes:00}";
         }
 
