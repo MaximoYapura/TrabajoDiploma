@@ -109,8 +109,8 @@ namespace BLL_08YS
         // Todas las operaciones trabajan SIEMPRE sobre List<Cliente_790MY>: exportar
         // 1 cliente o N clientes produce el mismo documento (<ArrayOfCliente_790MY>),
         // y al importar se acepta tanto esa colección como un único <Cliente_790MY>
-        // suelto, que se devuelve como lista de 1 elemento. No requieren permiso
-        // adicional: el llamador ya lo validó en la GUI.
+        // suelto, que se devuelve como lista de 1 elemento. Exigen VerClientes, igual
+        // que el listado del que salen los clientes exportados.
 
         private static readonly XmlSerializer _serializerLista   = new XmlSerializer(typeof(List<Cliente_790MY>));
         private static readonly XmlSerializer _serializerCliente = new XmlSerializer(typeof(Cliente_790MY));
@@ -120,6 +120,7 @@ namespace BLL_08YS
         /// <exception cref="ArgumentException">La lista está vacía.</exception>
         public string SerializarClientesXML(List<Cliente_790MY> clientes)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             if (clientes == null) throw new ArgumentNullException(nameof(clientes));
             if (clientes.Count == 0) throw new ArgumentException("Debe indicar al menos un cliente para serializar.");
 
@@ -137,6 +138,7 @@ namespace BLL_08YS
         /// <exception cref="ArgumentException">El contenido está vacío o no es un XML válido de clientes.</exception>
         public List<Cliente_790MY> DeserializarClientesXML(string contenidoXml)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             if (string.IsNullOrWhiteSpace(contenidoXml))
                 throw new ArgumentException("El contenido XML a deserializar está vacío.");
 
@@ -167,6 +169,7 @@ namespace BLL_08YS
         /// <summary>Serializa la lista de clientes y la guarda en el archivo XML indicado.</summary>
         public void SerializarArchivoXML(List<Cliente_790MY> clientes, string rutaArchivo)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
             string xml = SerializarClientesXML(clientes);
             File.WriteAllText(rutaArchivo, xml, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
@@ -175,6 +178,7 @@ namespace BLL_08YS
         /// <summary>Lee el archivo XML indicado y devuelve la lista de clientes que contiene.</summary>
         public List<Cliente_790MY> DeserializarArchivoXML(string rutaArchivo)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
             if (!File.Exists(rutaArchivo)) throw new ArgumentException($"El archivo '{rutaArchivo}' no existe.");
             return DeserializarClientesXML(File.ReadAllText(rutaArchivo, Encoding.UTF8));

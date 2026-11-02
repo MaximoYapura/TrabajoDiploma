@@ -3,6 +3,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.draw;
 using Service_08YS;
+using Service_08YS.Entities.Acceso;
 using System;
 using System.Configuration;
 using System.Globalization;
@@ -67,6 +68,7 @@ namespace BLL_08YS
         /// </summary>
         public byte[] GenerarComprobantePDF(Reserva_790MY reserva, Cliente_790MY cliente)
         {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
             if (reserva == null) throw new ArgumentNullException(nameof(reserva));
             if (cliente == null) throw new ArgumentNullException(nameof(cliente));
 
@@ -395,6 +397,19 @@ namespace BLL_08YS
         {
             mensaje = null;
             var t = TraductorManager_08YS.Instance;
+
+            // Corre dentro de Task.Run: SessionManager_08YS es un singleton y la sesión es
+            // la misma en cualquier hilo. Sin permiso se informa como el resto de los
+            // motivos, sin lanzar.
+            try
+            {
+                SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                mensaje = ex.Message;
+                return false;
+            }
 
             if (cliente == null || reserva == null)
             {
