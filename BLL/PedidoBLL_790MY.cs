@@ -25,6 +25,12 @@ namespace BLL_08YS
     {
         private const int LargoMaximoObservaciones = 200;
 
+        /// <summary>
+        /// Tope de unidades de un mismo producto por pedido cuando el producto no controla
+        /// stock (los que lo controlan quedan limitados por sus porciones disponibles).
+        /// </summary>
+        public const int MaximoPorItemSinControl = 99;
+
         private readonly IPedidoRepository_790MY _pedidoRepository;
         private readonly ProductoBLL_790MY _productoBll;
         private readonly ReservaBLL_790MY _reservaBll;
@@ -91,6 +97,13 @@ namespace BLL_08YS
 
             if (reserva.CamareroDNI != camarero.DNI)
                 throw MensajesBLL_790MY.Regla("msg_rf2_mesa_no_asignada", reserva.MesaNumero);
+
+            foreach (var renglones in items.GroupBy(i => i.ProductoID))
+            {
+                Producto_790MY producto = _productoBll.ObtenerPorId(renglones.Key);
+                if (producto != null && !producto.ControlaStock && renglones.Sum(i => i.Cantidad) > MaximoPorItemSinControl)
+                    throw MensajesBLL_790MY.Regla("msg_rf2_pedido_cantidad_maxima", producto.Nombre, MaximoPorItemSinControl);
+            }
 
             DateTime ahora = DateTime.Now;
             var pedido = new Pedido_790MY(reservaId, ahora.Date, new TimeSpan(ahora.Hour, ahora.Minute, ahora.Second))

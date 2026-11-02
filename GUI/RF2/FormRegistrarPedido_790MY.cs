@@ -382,10 +382,8 @@ namespace GUI_08YS.RF2
         }
 
         /// <summary>Porciones que todavía pueden agregarse descontando lo ya cargado en la comanda.</summary>
-        private const int MaximoSinControl = 99;
-
         private int DisponibleParaAgregar(Producto_790MY producto)
-            => (producto.ControlaStock ? producto.PorcionesDisponibles : MaximoSinControl) - ComandaActual.Where(i => i.Producto.Equals(producto)).Sum(i => i.Cantidad);
+            => (producto.ControlaStock ? producto.PorcionesDisponibles : PedidoBLL_790MY.MaximoPorItemSinControl) - ComandaActual.Where(i => i.Producto.Equals(producto)).Sum(i => i.Cantidad);
 
         private void RenderizarProductos()
         {
