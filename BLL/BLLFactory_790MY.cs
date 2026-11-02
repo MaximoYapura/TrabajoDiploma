@@ -9,8 +9,9 @@ namespace BLL_08YS
         public static ClienteBLL_790MY CreateClienteBLL()
         {
             IClienteRepository_790MY repo = new SqlClienteRepository_790MY();
+            IReservaRepository_790MY reservaRepo = new SqlReservaRepository_790MY();
             BitacoraBLL_08YS bitacoraBll = BLLFactory_08YS.CreateBitacoraBLL();
-            return new ClienteBLL_790MY(repo, bitacoraBll);
+            return new ClienteBLL_790MY(repo, reservaRepo, bitacoraBll);
         }
 
         public static MesaBLL_790MY CreateMesaBLL()

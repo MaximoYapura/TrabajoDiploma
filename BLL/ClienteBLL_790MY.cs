@@ -19,11 +19,14 @@ namespace BLL_08YS
     public class ClienteBLL_790MY
     {
         private readonly IClienteRepository_790MY _clienteRepository;
+        private readonly IReservaRepository_790MY _reservaRepository;
         private readonly BitacoraBLL_08YS _bitacoraBll;
 
-        public ClienteBLL_790MY(IClienteRepository_790MY clienteRepository, BitacoraBLL_08YS bitacoraBll)
+        public ClienteBLL_790MY(IClienteRepository_790MY clienteRepository, IReservaRepository_790MY reservaRepository,
+                                BitacoraBLL_08YS bitacoraBll)
         {
             _clienteRepository = clienteRepository;
+            _reservaRepository = reservaRepository;
             _bitacoraBll = bitacoraBll;
         }
 
@@ -57,7 +60,8 @@ namespace BLL_08YS
 
             ValidarDatos(cliente.DNI, cliente.Nombre, cliente.Apellido, cliente.Email, cliente.Telefono);
 
-            if (!_clienteRepository.Exists(cliente.DNI))
+            // GetByDni filtra Activo = 1: un cliente dado de baja no se modifica.
+            if (_clienteRepository.GetByDni(cliente.DNI) == null)
                 throw new ArgumentException("El cliente que intenta modificar no existe o fue dado de baja.");
 
             _clienteRepository.Update(cliente);
@@ -69,8 +73,16 @@ namespace BLL_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
 
-            if (!_clienteRepository.Exists(dni))
+            if (_clienteRepository.GetByDni(dni) == null)
                 throw new ArgumentException("El cliente que intenta eliminar no existe o ya fue dado de baja.");
+
+            // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
+            // ReservaBLL_790MY formaría un ciclo ReservaBLL -> ClienteBLL -> ReservaBLL y
+            // BLLFactory_790MY entraría en recursión infinita.
+            int reservasPendientes = _reservaRepository
+                .Buscar(DateTime.Today, null, dni, EstadoReserva_790MY.Confirmada).Count;
+            if (reservasPendientes > 0)
+                throw MensajesBLL_790MY.Regla("msg_fc_cliente_con_reservas", reservasPendientes);
 
             _clienteRepository.DeleteLogico(dni);
             DVManager_08YS.Recalcular();
