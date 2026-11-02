@@ -190,6 +190,38 @@ namespace BLL_08YS
             return reserva;
         }
 
+        // ─── Consultas del Walk-in (patente AbrirMesa) ───────────────────────
+        // Recepción abre mesas sin VerClientes ni VerMesas: estas consultas validan
+        // AbrirMesa y delegan en métodos internal de ClienteBLL y MesaBLL.
+
+        /// <summary>Cliente activo con ese DNI, o null.</summary>
+        public Cliente_790MY ObtenerClienteWalkIn(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
+            return _clienteBll.ObtenerActivo(dni);
+        }
+
+        /// <summary>True si el DNI está registrado pero dado de baja (no se puede reservar).</summary>
+        public bool ExisteClienteInactivo(int dni)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
+            return _clienteBll.ExisteInactivo(dni);
+        }
+
+        /// <summary>Turno en curso; lanza la regla de negocio si no hay turno.</summary>
+        public TimeSpan ObtenerTurnoVigenteObligatorio()
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
+            return _mesaBll.ObtenerTurnoVigenteObligatorio();
+        }
+
+        /// <summary>Plano del salón para el turno (mismo cálculo que MesaBLL_790MY.ObtenerMesasMapa).</summary>
+        public List<MesaMapaDTO_790MY> ObtenerMesasMapa(DateTime fecha, TimeSpan hora, int comensales)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
+            return _mesaBll.ObtenerMapa(fecha, hora, comensales);
+        }
+
         /// <summary>
         /// CUN-005 Registrar Walk-In (extiende el paso 3 de CUN-004). La mesa se elige con el mismo
         /// FormSeleccionarMesa_790MY usado en RF1, abierto con DateTime.Today y el turno

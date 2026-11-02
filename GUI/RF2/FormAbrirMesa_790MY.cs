@@ -26,8 +26,6 @@ namespace GUI_08YS.RF2
     {
         private readonly ReservaBLL_790MY  _reservaBll;
         private readonly EmpleadoBLL_790MY _empleadoBll;
-        private readonly ClienteBLL_790MY  _clienteBll;
-        private readonly MesaBLL_790MY     _mesaBll;
 
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
             new Dictionary<string, Permisos>
@@ -61,8 +59,6 @@ namespace GUI_08YS.RF2
 
             _reservaBll  = BLLFactory_790MY.CreateReservaBLL();
             _empleadoBll = BLLFactory_790MY.CreateEmpleadoBLL();
-            _clienteBll  = BLLFactory_790MY.CreateClienteBLL();
-            _mesaBll     = BLLFactory_790MY.CreateMesaBLL();
 
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) =>
@@ -142,15 +138,15 @@ namespace GUI_08YS.RF2
 
         /// <summary>
         /// Contadores del salón para el turno en curso. Usa el mismo cálculo de ocupación
-        /// que el plano (MesaBLL_790MY.ObtenerMesasMapa); si el usuario no tiene VerMesas
-        /// o no hay turno, los contadores se ocultan sin afectar la apertura.
+        /// que el plano (ReservaBLL_790MY.ObtenerMesasMapa, patente AbrirMesa); si no hay turno
+        /// o la consulta falla, los contadores se ocultan sin afectar la apertura.
         /// </summary>
         private void ActualizarContadores()
         {
             int reservadas = _reservas.Count;
             chipReservadas_790MY.Text = E.T("AM_chip_reservadas", reservadas);
 
-            if (!_turno.HasValue || !SessionManager_08YS.Instance.HasPermission(Permisos.VerMesas))
+            if (!_turno.HasValue)
             {
                 chipLibres_790MY.Visible = chipOcupadas_790MY.Visible = false;
                 return;
@@ -158,7 +154,7 @@ namespace GUI_08YS.RF2
 
             try
             {
-                var mapa = _mesaBll.ObtenerMesasMapa(DateTime.Today, _turno.Value, 1);
+                var mapa = _reservaBll.ObtenerMesasMapa(DateTime.Today, _turno.Value, 1);
                 int libres = mapa.Count(m => m.EsSeleccionable);
                 int ocupadas = Math.Max(0, mapa.Count(m => m.EstadoMapa == EstadoMapa_790MY.Ocupada) - reservadas);
 
@@ -399,10 +395,10 @@ namespace GUI_08YS.RF2
 
             try
             {
-                _clienteWalkIn = _clienteBll.GetByDni(dni);
+                _clienteWalkIn = _reservaBll.ObtenerClienteWalkIn(dni);
                 if (_clienteWalkIn != null) return;
 
-                if (_clienteBll.Exists(dni))
+                if (_reservaBll.ExisteClienteInactivo(dni))
                 {
                     bnrAvisos_790MY.Mostrar(E.T("RR_aviso_cliente_inactivo", dni), TipoBanner_790MY.Aviso);
                     return;
@@ -451,8 +447,8 @@ namespace GUI_08YS.RF2
 
             try
             {
-                turno = _mesaBll.ObtenerTurnoVigenteObligatorio();
-                var mapa = _mesaBll.ObtenerMesasMapa(DateTime.Today, turno, comensales);
+                turno = _reservaBll.ObtenerTurnoVigenteObligatorio();
+                var mapa = _reservaBll.ObtenerMesasMapa(DateTime.Today, turno, comensales);
                 if (mapa == null || !mapa.Any(m => m.EsSeleccionable))
                 {
                     bnrAvisos_790MY.Mostrar(E.T("RR_aviso_sin_disponibilidad"), TipoBanner_790MY.Aviso);

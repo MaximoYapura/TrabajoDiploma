@@ -139,7 +139,15 @@ namespace BLL_08YS
         public List<MesaMapaDTO_790MY> ObtenerMesasMapa(DateTime fecha, TimeSpan hora, int comensales)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
+            return ObtenerMapa(fecha, hora, comensales);
+        }
 
+        /// <summary>
+        /// Cuerpo de ObtenerMesasMapa sin ValidatePermission: lo usa ReservaBLL_790MY en el
+        /// Walk-in, que ya validó AbrirMesa (Recepción no tiene VerMesas).
+        /// </summary>
+        internal List<MesaMapaDTO_790MY> ObtenerMapa(DateTime fecha, TimeSpan hora, int comensales)
+        {
             if (fecha.Date < DateTime.Today)
                 throw MensajesBLL_790MY.Regla("msg_rf2_fecha_anterior_hoy");
 

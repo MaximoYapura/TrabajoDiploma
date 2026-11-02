@@ -115,6 +115,14 @@ namespace BLL_08YS
         internal bool ExisteActivo(int dni)
             => _clienteRepository.GetByDni(dni) != null;
 
+        /// <summary>Cliente activo con ese DNI, o null. Sin ValidatePermission (Walk-in, ver ExisteActivo).</summary>
+        internal Cliente_790MY ObtenerActivo(int dni)
+            => _clienteRepository.GetByDni(dni);
+
+        /// <summary>True si el DNI está registrado pero dado de baja. Sin ValidatePermission (Walk-in).</summary>
+        internal bool ExisteInactivo(int dni)
+            => _clienteRepository.Exists(dni) && _clienteRepository.GetByDni(dni) == null;
+
         // ── Serialización / Deserialización XML de colecciones ──────────────
         //
         // Formato único: XML nativo de .NET (System.Xml.Serialization.XmlSerializer).
