@@ -67,6 +67,19 @@ namespace DAL_08YS.SQL
                             }
                         }
 
+                        // 1b) Caja del día abierta. HOLDLOCK sobre el rango: un cierre de otra
+                        // terminal espera a que termine este cobro.
+                        using (var cmd = new SqlCommand(
+                                "SELECT COUNT(1) FROM CierresCaja WITH (UPDLOCK, HOLDLOCK) WHERE Fecha = @Fecha", connection, tx))
+                        {
+                            cmd.Parameters.Add("@Fecha", SqlDbType.Date).Value = pago.FechaHoraPago.Date;
+                            if ((int)cmd.ExecuteScalar() > 0)
+                            {
+                                tx.Rollback();
+                                return ResultadoRegistroCobro_790MY.CajaCerrada;
+                            }
+                        }
+
                         // 1c) Factura vigente: mismos consumos que ObtenerConsumosFacturables
                         // (pedidos Listo de la reserva), sumados.
                         using (var cmd = new SqlCommand(@"

@@ -14,14 +14,17 @@ namespace DAL_08YS.Interfaces_Repositories
         /// <summary>Quedan pedidos Pendiente/EnPreparacion: se comprometería stock para siempre.</summary>
         PedidosSinDespachar,
         /// <summary>Los consumos Listo de la reserva ya no suman el subtotal de la factura (hay que reemitirla).</summary>
-        FacturaDesactualizada
+        FacturaDesactualizada,
+        /// <summary>La caja del día del pago ya se cerró (existe la fila en CierresCaja).</summary>
+        CajaCerrada
     }
 
     public interface IPagoRepository_790MY
     {
         /// <summary>
         /// CUN-007. En una única transacción SERIALIZABLE:
-        ///  1) bloquea la factura y verifica que siga Abierta y que el subtotal coincida con los consumos Listo actuales;
+        ///  1) bloquea la factura y verifica que siga Abierta, que la caja del día del pago
+        ///     no esté cerrada y que el subtotal coincida con los consumos Listo actuales;
         ///  2) verifica que la reserva siga Asistida y sin pedidos sin despachar;
         ///  3) inserta el Pago;
         ///  4) Factura -> Pagada, Reserva -> Finalizada, Mesa -> Libre.

@@ -196,6 +196,8 @@ namespace BLL_08YS
                     throw MensajesBLL_790MY.Regla("msg_fc_pedidos_sin_despachar", factura.MesaNumero);
                 case ResultadoRegistroCobro_790MY.FacturaDesactualizada:
                     throw MensajesBLL_790MY.Regla("msg_fc_factura_desactualizada", factura.MesaNumero);
+                case ResultadoRegistroCobro_790MY.CajaCerrada:
+                    throw MensajesBLL_790MY.Regla("msg_fc_caja_cerrada", pago.FechaHoraPago.ToString("dd/MM/yyyy"));
                 default:
                     throw new InvalidOperationException(resultado.ToString());
             }
@@ -247,6 +249,11 @@ namespace BLL_08YS
             // misma jornada en el medio, el repositorio devuelve false.
             if (EstaCajaCerrada(fecha))
                 throw MensajesBLL_790MY.Regla("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy"));
+
+            // Con mesas abiertas quedarían cobros fuera del arqueo (y no se podrían registrar).
+            int mesasAbiertas = _facturaBll.ContarMesasAbiertas();
+            if (mesasAbiertas > 0)
+                throw MensajesBLL_790MY.Regla("msg_ac_mesas_abiertas", mesasAbiertas);
 
             string usuario = SessionManager_08YS.Instance.Current?.Username ?? "Desconocido";
             if (!_cierreCajaRepository.Registrar(fecha.Date, reporte.RecaudacionNeta, reporte.CantidadCuentas, usuario))

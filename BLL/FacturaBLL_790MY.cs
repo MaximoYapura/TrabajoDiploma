@@ -238,6 +238,10 @@ namespace BLL_08YS
             return MismoContenido(factura, items, importes);
         }
 
+        /// <summary>Mesas abiertas (reservas Asistidas) de cualquier camarero.</summary>
+        internal int ContarMesasAbiertas()
+            => _reservaBll.ObtenerAsistidas().Count;
+
         // ═══════════════════════════════════════════════════════════════════
         //  Integridad del comprobante
         // ═══════════════════════════════════════════════════════════════════
