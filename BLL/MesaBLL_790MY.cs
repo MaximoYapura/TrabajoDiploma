@@ -231,8 +231,36 @@ namespace BLL_08YS
 
             ValidarDatos(mesa.NroMesa, mesa.Capacidad);
 
-            if (!_mesaRepository.Exists(mesa.NroMesa))
+            Mesa_790MY actual = ObtenerPorNumero(mesa.NroMesa);
+            if (actual == null)
                 throw new ArgumentException("La mesa que intenta modificar no existe.");
+
+            // El maestro solo pasa la mesa a FueraDeServicio o la devuelve a Libre desde ahí;
+            // Ocupada y Reservada son estados operativos de Reservas y Atención en mesa.
+            EstadoMesa_790MY? nuevoEstado = null;
+            if (mesa.Estado == EstadoMesa_790MY.FueraDeServicio && actual.Estado != EstadoMesa_790MY.FueraDeServicio)
+                nuevoEstado = EstadoMesa_790MY.FueraDeServicio;
+            else if (mesa.Estado != EstadoMesa_790MY.FueraDeServicio && actual.Estado == EstadoMesa_790MY.FueraDeServicio)
+                nuevoEstado = EstadoMesa_790MY.Libre;
+
+            // Excepción: se lee IReservaRepository_790MY directo (ver EliminarMesa).
+            if (nuevoEstado == EstadoMesa_790MY.FueraDeServicio
+                && (actual.Estado == EstadoMesa_790MY.Ocupada
+                    || _reservaRepository.Buscar(null, null, null, EstadoReserva_790MY.Asistida)
+                                         .Any(r => r.MesaNumero == mesa.NroMesa)))
+                throw MensajesBLL_790MY.Regla("msg_fm_mesa_ocupada_fuera_servicio", mesa.NroMesa);
+
+            int comensalesReservados = _reservaRepository
+                .Buscar(DateTime.Today, null, null, EstadoReserva_790MY.Confirmada)
+                .Where(r => r.MesaNumero == mesa.NroMesa)
+                .Select(r => r.CantidadComensales)
+                .DefaultIfEmpty(0)
+                .Max();
+            if (mesa.Capacidad < comensalesReservados)
+                throw MensajesBLL_790MY.Regla("msg_fm_capacidad_bajo_reservas", mesa.NroMesa, comensalesReservados);
+
+            if (nuevoEstado.HasValue && !_mesaRepository.UpdateEstado(mesa.NroMesa, actual.Estado, nuevoEstado.Value))
+                throw MensajesBLL_790MY.Regla("msg_fm_mesa_cambio_estado", mesa.NroMesa);
 
             _mesaRepository.Update(mesa);
             DVManager_08YS.Recalcular();
@@ -265,7 +293,9 @@ namespace BLL_08YS
             // ── Baja por estado: FueraDeServicio (no DELETE físico) ──────────────────────
             // La mesa no tiene reservas en absoluto: se marca como FueraDeServicio
             // en lugar de eliminarse físicamente, para preservar la integridad del modelo.
-            _mesaRepository.UpdateEstado(numero, EstadoMesa_790MY.FueraDeServicio);
+            Mesa_790MY actual = ObtenerPorNumero(numero);
+            if (!_mesaRepository.UpdateEstado(numero, actual.Estado, EstadoMesa_790MY.FueraDeServicio))
+                throw MensajesBLL_790MY.Regla("msg_fm_mesa_cambio_estado", numero);
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEvento(Evento.MesaEliminada, targetUsername: numero.ToString());
         }

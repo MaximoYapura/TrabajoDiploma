@@ -90,7 +90,7 @@ namespace DAL_08YS.SQL
         {
             const string sql =
                 "UPDATE Mesas " +
-                "SET Capacidad = @Capacidad, Estado = @Estado, Activo = @Activo " +
+                "SET Capacidad = @Capacidad, Activo = @Activo " +
                 "WHERE NroMesa = @NroMesa";
 
             using (var con = new SqlConnection(_connectionString))
@@ -98,23 +98,23 @@ namespace DAL_08YS.SQL
             {
                 cmd.Parameters.AddWithValue("@NroMesa",   mesa.NroMesa);
                 cmd.Parameters.AddWithValue("@Capacidad", mesa.Capacidad);
-                cmd.Parameters.AddWithValue("@Estado",    mesa.Estado.ToString());
                 cmd.Parameters.AddWithValue("@Activo",    mesa.Activo);
                 con.Open();
                 cmd.ExecuteNonQuery();
             }
         }
 
-        public void UpdateEstado(int nroMesa, EstadoMesa_790MY estado)
+        public bool UpdateEstado(int nroMesa, EstadoMesa_790MY estadoEsperado, EstadoMesa_790MY estado)
         {
             using (var con = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand(
-                "UPDATE Mesas SET Estado = @Estado WHERE NroMesa = @NroMesa", con))
+                "UPDATE Mesas SET Estado = @Estado WHERE NroMesa = @NroMesa AND Estado = @EstadoEsperado", con))
             {
                 cmd.Parameters.AddWithValue("@NroMesa", nroMesa);
                 cmd.Parameters.AddWithValue("@Estado",  estado.ToString());
+                cmd.Parameters.AddWithValue("@EstadoEsperado", estadoEsperado.ToString());
                 con.Open();
-                cmd.ExecuteNonQuery();
+                return cmd.ExecuteNonQuery() > 0;
             }
         }
 
