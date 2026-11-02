@@ -649,6 +649,7 @@ namespace GUI_08YS.RF2
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormRegistrarPedido_790MY";
             this.Text = "Registrar Pedido";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormRegistrarPedido_790MY_FormClosing);
             this.Load += new System.EventHandler(this.FormRegistrarPedido_790MY_Load);
             this.pnlAviso_790MY.ResumeLayout(false);
             this.tlpMain_790MY.ResumeLayout(false);

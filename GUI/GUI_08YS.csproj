@@ -141,6 +141,7 @@
     </Compile>
     <Compile Include="Estilo\DestinoAyuda_790MY.cs" />
     <Compile Include="Estilo\IAyudaContextual_790MY.cs" />
+    <Compile Include="Estilo\IConfirmarSalida_790MY.cs" />
     <Compile Include="Estilo\AyudaSugerencias_790MY.cs" />
     <Compile Include="Estilo\RegistroVisita_790MY.cs" />
     <Compile Include="Estilo\ManualRecetas_790MY.cs" />

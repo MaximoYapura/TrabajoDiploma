@@ -23,7 +23,7 @@ namespace GUI_08YS.RF2
     /// valida y persiste PedidoBLL_790MY (stock, DV y bitácora).
     /// También consulta periódicamente los pedidos Listos de sus mesas (CUN-008 paso 8).
     /// </summary>
-    public partial class FormRegistrarPedido_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
+    public partial class FormRegistrarPedido_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY, IConfirmarSalida_790MY
     {
         private const int UmbralBajoStock = 3;
 
@@ -88,6 +88,34 @@ namespace GUI_08YS.RF2
         }
 
         private IWin32Window VentanaPropietaria => (this.TopLevelControl as Form) ?? (IWin32Window)this;
+
+        // El usuario ya aceptó descartar las comandas: no se vuelve a preguntar en el mismo cierre.
+        private bool _salidaConfirmada;
+
+        /// <summary>
+        /// M8: las comandas sin enviar a cocina se pierden al salir de la pantalla; se pide
+        /// confirmación al navegar (FormClosing) y al cerrar sesión o salir (FormMDI_08YS).
+        /// </summary>
+        public bool ConfirmarSalida()
+        {
+            int mesasConComanda = _comandas.Count(c => c.Value.Count > 0);
+            if (_salidaConfirmada || mesasConComanda == 0)
+                return true;
+
+            _salidaConfirmada = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
+                E.T("RP_salir_titulo"),
+                E.T("RP_salir_texto", mesasConComanda),
+                E.T("RP_salir_descartar"),
+                E.T("RP_salir_seguir"));
+            return _salidaConfirmada;
+        }
+
+        private void FormRegistrarPedido_790MY_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.WindowsShutDown) return;
+            if (!ConfirmarSalida())
+                e.Cancel = true;
+        }
 
         private List<ItemComanda_790MY> ComandaActual
         {

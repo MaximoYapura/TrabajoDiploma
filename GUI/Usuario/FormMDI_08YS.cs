@@ -103,6 +103,7 @@ namespace GUI_08YS
 
         private void OnSesionInvalidada()
         {
+            _sesionInvalidada = true;
             MessageBox.Show(TraductorManager_08YS.Instance.GetTexto("msg_sesion_invalidada"),
                             TraductorManager_08YS.Instance.GetTexto("sesion_invalidada"),
                             MessageBoxButtons.OK,
@@ -429,12 +430,27 @@ namespace GUI_08YS
 
         private bool _navegacionBloqueada;
 
+        // M8: el cierre forzado por sesión invalidada no se puede cancelar.
+        private bool _sesionInvalidada;
+
+        /// <summary>M8: la pantalla abierta puede pedir confirmación (comandas sin enviar).</summary>
+        private bool PantallaActualPermiteSalir()
+            => !(panel2.Tag is IConfirmarSalida_790MY pantalla) || ((Form)pantalla).IsDisposed
+               || pantalla.ConfirmarSalida();
+
         private void FormMDI_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_navegacionBloqueada && e.CloseReason != CloseReason.WindowsShutDown)
             {
                 e.Cancel = true;
                 CierreBloqueado?.Invoke();
+                return;
+            }
+
+            // M8 (Entrega 2): salir de la app con trabajo sin guardar en la pantalla abierta.
+            if (e.CloseReason == CloseReason.UserClosing && !_sesionInvalidada && !PantallaActualPermiteSalir())
+            {
+                e.Cancel = true;
                 return;
             }
 
@@ -766,7 +782,7 @@ namespace GUI_08YS
                                          MessageBoxButtons.YesNo,
                                          MessageBoxIcon.Question);
 
-            if (respuesta == DialogResult.Yes)
+            if (respuesta == DialogResult.Yes && PantallaActualPermiteSalir())
             {
                 CerrarSesion?.Invoke();
                 this.Close();
@@ -781,7 +797,7 @@ namespace GUI_08YS
                                         MessageBoxButtons.YesNo,
                                         MessageBoxIcon.Question);
 
-            if (respuesta == DialogResult.Yes)
+            if (respuesta == DialogResult.Yes && PantallaActualPermiteSalir())
             {
                 _userBLL.Logout();
                 CerrarSesion?.Invoke();
