@@ -61,6 +61,10 @@ namespace BLL_08YS
 
             ValidarComensales(mesa, comensales);
 
+            // Solo se reserva al inicio de un turno de atención (18, 20 o 22 h).
+            if (!MesaBLL_790MY.Turnos.Contains(hora))
+                throw MensajesBLL_790MY.Regla("msg_rf2_turno_invalido");
+
             DateTime fechaHora = fecha.Date + hora;
             if (fechaHora <= DateTime.Now)
                 throw MensajesBLL_790MY.Regla("msg_rf2_reserva_en_pasado");
