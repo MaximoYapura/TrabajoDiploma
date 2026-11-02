@@ -240,6 +240,13 @@ namespace BLL_08YS
             return MismoContenido(factura, items, importes);
         }
 
+        /// <summary>
+        /// Factura completa (ítems, mesa y camarero) sin exigir RegistrarCobro ni GenerarFactura:
+        /// la usa la exportación del Arqueo de Caja, que ya validó GestionCaja.
+        /// </summary>
+        internal Factura_790MY ObtenerPorNumero(int nroFactura)
+            => _facturaRepository.GetById(nroFactura);
+
         /// <summary>Mesas abiertas (reservas Asistidas) de cualquier camarero.</summary>
         internal int ContarMesasAbiertas()
             => _reservaBll.ObtenerAsistidas().Count;

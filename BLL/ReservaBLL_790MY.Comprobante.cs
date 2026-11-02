@@ -43,14 +43,14 @@ namespace BLL_08YS
 
         #region Paleta El Fogón del Sur
 
-        private static readonly BaseColor PdfBordo      = new BaseColor(120, 25, 25);
-        private static readonly BaseColor PdfDorado     = new BaseColor(235, 195, 140);
-        private static readonly BaseColor PdfTexto      = new BaseColor(45, 42, 40);
-        private static readonly BaseColor PdfGris       = new BaseColor(110, 100, 95);
-        private static readonly BaseColor PdfTile       = new BaseColor(248, 243, 238);
+        internal static readonly BaseColor PdfBordo     = new BaseColor(120, 25, 25);
+        internal static readonly BaseColor PdfDorado    = new BaseColor(235, 195, 140);
+        internal static readonly BaseColor PdfTexto     = new BaseColor(45, 42, 40);
+        internal static readonly BaseColor PdfGris      = new BaseColor(110, 100, 95);
+        internal static readonly BaseColor PdfTile      = new BaseColor(248, 243, 238);
         internal static readonly BaseColor PdfTileBorde  = new BaseColor(230, 220, 205);
-        private static readonly BaseColor PdfLinea      = new BaseColor(235, 228, 218);
-        private static readonly BaseColor PdfNotaFondo  = new BaseColor(252, 246, 236);
+        internal static readonly BaseColor PdfLinea     = new BaseColor(235, 228, 218);
+        internal static readonly BaseColor PdfNotaFondo = new BaseColor(252, 246, 236);
         private static readonly BaseColor PdfVerde      = new BaseColor(30, 110, 60);
         private static readonly BaseColor PdfVerdeFondo = new BaseColor(225, 242, 230);
 
@@ -296,7 +296,7 @@ namespace BLL_08YS
         private static string Capitalizar(string texto, CultureInfo cultura)
             => string.IsNullOrEmpty(texto) ? texto : char.ToUpper(texto[0], cultura) + texto.Substring(1);
 
-        private static string UsuarioEmisor()
+        internal static string UsuarioEmisor()
         {
             var actual = SessionManager_08YS.Instance.Current;
             return actual != null ? $"{actual.Nombre} {actual.Apellido}".Trim() : "-";
@@ -307,7 +307,7 @@ namespace BLL_08YS
         private static byte[] _logoCache;
         private static readonly object _logoLock = new object();
 
-        private static byte[] ObtenerLogoPng()
+        internal static byte[] ObtenerLogoPng()
         {
             lock (_logoLock)
             {

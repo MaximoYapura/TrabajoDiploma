@@ -7,8 +7,11 @@ using Service_08YS;
 using Service_08YS.Entities.Acceso;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Windows.Forms;
 using GUI_08YS.Estilo;
 using E = GUI_08YS.RF2.EstiloRF2_790MY;
@@ -32,6 +35,7 @@ namespace GUI_08YS.Reportes
             new Dictionary<string, Permisos>
             {
                 { nameof(btnCerrarCaja_790MY), Permisos.GestionCaja },
+                { nameof(btnExportarFactura_790MY), Permisos.GestionCaja },
             };
 
         /// <summary>Tarjeta KPI: clave del título, ícono y si es la destacada (recaudación neta).</summary>
@@ -150,6 +154,7 @@ namespace GUI_08YS.Reportes
             {
                 int fila = dgvCobros_790MY.Rows.Add(
                     c.FechaHoraPago.ToString("HH:mm"),
+                    FacturaBLL_790MY.FormatearComprobante(c.NroFactura),
                     E.T("AC_mesa_nro", c.MesaNumero),
                     c.MetodoPago == MetodoPago_790MY.Efectivo ? E.T("CJ_efectivo").Trim() : E.T("CJ_tarjeta").Trim(),
                     c.MontoDescuento == 0 ? "—" : "- " + Moneda(c.MontoDescuento),
@@ -160,6 +165,7 @@ namespace GUI_08YS.Reportes
                     dgvCobros_790MY.Rows[fila].Cells[colDescuento_790MY.Index].Style.ForeColor = RojoImporte;
             }
             dgvCobros_790MY.ClearSelection();
+            btnExportarFactura_790MY.Enabled = false;
 
             lblSinCobros_790MY.Text = E.T("msg_ac_sin_cobros", r.Fecha.ToString("dd/MM/yyyy"));
             lblSinCobros_790MY.Visible = r.CantidadCuentas == 0;
@@ -223,6 +229,59 @@ namespace GUI_08YS.Reportes
             {
                 E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
             }
+        }
+
+        /// <summary>El cobro elegido en la grilla (la fila guarda el CobroArqueo_790MY con su NroFactura).</summary>
+        private CobroArqueo_790MY CobroSeleccionado
+            => dgvCobros_790MY.SelectedRows.Count > 0 ? dgvCobros_790MY.SelectedRows[0].Tag as CobroArqueo_790MY : null;
+
+        private void dgvCobros_790MY_SelectionChanged(object sender, EventArgs e)
+            => btnExportarFactura_790MY.Enabled = CobroSeleccionado != null;
+
+        /// <summary>Exporta la Factura B del cobro elegido en PDF A4 (PagoBLL_790MY.ExportarFacturaPDF).</summary>
+        private void btnExportarFactura_790MY_Click(object sender, EventArgs e)
+        {
+            CobroArqueo_790MY cobro = CobroSeleccionado;
+            if (cobro == null) return;
+            bnrAvisos_790MY.Ocultar();
+
+            byte[] pdf;
+            try
+            {
+                pdf = _pagoBll.ExportarFacturaPDF(cobro.NroFactura);
+            }
+            catch (Exception ex)
+            {
+                E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
+                return;
+            }
+
+            string ruta;
+            using (var dlg = new SaveFileDialog())
+            {
+                dlg.Filter   = "PDF (*.pdf)|*.pdf";
+                dlg.FileName = FacturaBLL_790MY.NombreArchivoFacturaPdf(cobro.NroFactura);
+                dlg.Title    = E.T("AC_btn_exportar_factura").Trim();
+                if (dlg.ShowDialog(VentanaPropietaria) != DialogResult.OK) return;
+                ruta = dlg.FileName;
+            }
+
+            try
+            {
+                File.WriteAllBytes(ruta, pdf);
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException)
+            {
+                // Ruta inválida, sin permiso o archivo abierto: el usuario puede elegir otra ubicación.
+                bnrAvisos_790MY.Mostrar(E.T("msg_ac_pdf_error_guardar", ex.Message), TipoBanner_790MY.Error, cerrable: true);
+                return;
+            }
+
+            E.MostrarExitoToast(this, E.T("AC_toast_pdf", Path.GetFileName(ruta)));
+
+            // Sin visor de PDF asociado, el archivo ya quedó guardado.
+            try { Process.Start(new ProcessStartInfo(ruta) { UseShellExecute = true }); }
+            catch (Win32Exception) { }
         }
 
         #endregion
@@ -303,6 +362,7 @@ namespace GUI_08YS.Reportes
         {
             E.TraducirTags(this);
             colHora_790MY.HeaderText = E.T("AC_col_hora");
+            colFactura_790MY.HeaderText = E.T("AC_col_factura");
             colMesa_790MY.HeaderText = E.T("AC_col_mesa");
             colMedio_790MY.HeaderText = E.T("AC_col_medio");
             colDescuento_790MY.HeaderText = E.T("AC_col_descuento");

@@ -27,10 +27,12 @@ namespace GUI_08YS.Reportes
             this.btnSiguiente_790MY = new FontAwesome.Sharp.IconButton();
             this.lblResumen_790MY = new System.Windows.Forms.Label();
             this.btnCerrarCaja_790MY = new FontAwesome.Sharp.IconButton();
+            this.btnExportarFactura_790MY = new FontAwesome.Sharp.IconButton();
             this.tlpKpis_790MY = new System.Windows.Forms.TableLayoutPanel();
             this.lblNota_790MY = new System.Windows.Forms.Label();
             this.dgvCobros_790MY = new System.Windows.Forms.DataGridView();
             this.colHora_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colFactura_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMesa_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMedio_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDescuento_790MY = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -63,24 +65,27 @@ namespace GUI_08YS.Reportes
             // tlpFiltro_790MY
             //
             this.tlpFiltro_790MY.AutoSize = true;
-            this.tlpFiltro_790MY.ColumnCount = 5;
+            this.tlpFiltro_790MY.ColumnCount = 6;
             this.tlpFiltro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
             this.tlpFiltro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.tlpFiltro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
             this.tlpFiltro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpFiltro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpFiltro_790MY.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpFiltro_790MY.Controls.Add(this.lblFecha_790MY, 1, 0);
             this.tlpFiltro_790MY.Controls.Add(this.btnAnterior_790MY, 0, 1);
             this.tlpFiltro_790MY.Controls.Add(this.dtpFecha_790MY, 1, 1);
             this.tlpFiltro_790MY.Controls.Add(this.btnSiguiente_790MY, 2, 1);
             this.tlpFiltro_790MY.Controls.Add(this.lblResumen_790MY, 3, 1);
-            this.tlpFiltro_790MY.Controls.Add(this.btnCerrarCaja_790MY, 4, 0);
+            this.tlpFiltro_790MY.Controls.Add(this.btnExportarFactura_790MY, 4, 0);
+            this.tlpFiltro_790MY.Controls.Add(this.btnCerrarCaja_790MY, 5, 0);
             this.tlpFiltro_790MY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlpFiltro_790MY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 16);
             this.tlpFiltro_790MY.Name = "tlpFiltro_790MY";
             this.tlpFiltro_790MY.RowCount = 2;
             this.tlpFiltro_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
             this.tlpFiltro_790MY.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 48F));
+            this.tlpFiltro_790MY.SetRowSpan(this.btnExportarFactura_790MY, 2);
             this.tlpFiltro_790MY.SetRowSpan(this.btnCerrarCaja_790MY, 2);
             this.tlpFiltro_790MY.TabIndex = 0;
             //
@@ -172,6 +177,30 @@ namespace GUI_08YS.Reportes
             this.btnCerrarCaja_790MY.UseVisualStyleBackColor = false;
             this.btnCerrarCaja_790MY.Click += new System.EventHandler(this.btnCerrarCaja_790MY_Click);
             //
+            // btnExportarFactura_790MY  (factura B del cobro elegido en PDF A4)
+            //
+            this.btnExportarFactura_790MY.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.btnExportarFactura_790MY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
+            this.btnExportarFactura_790MY.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnExportarFactura_790MY.Enabled = false;
+            this.btnExportarFactura_790MY.FlatAppearance.BorderSize = 0;
+            this.btnExportarFactura_790MY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExportarFactura_790MY.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
+            this.btnExportarFactura_790MY.ForeColor = System.Drawing.Color.White;
+            this.btnExportarFactura_790MY.IconChar = FontAwesome.Sharp.IconChar.FilePdf;
+            this.btnExportarFactura_790MY.IconColor = System.Drawing.Color.White;
+            this.btnExportarFactura_790MY.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.btnExportarFactura_790MY.IconSize = 22;
+            this.btnExportarFactura_790MY.Margin = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.btnExportarFactura_790MY.Name = "btnExportarFactura_790MY";
+            this.btnExportarFactura_790MY.Size = new System.Drawing.Size(230, 56);
+            this.btnExportarFactura_790MY.TabIndex = 6;
+            this.btnExportarFactura_790MY.Tag = "AC_btn_exportar_factura";
+            this.btnExportarFactura_790MY.Text = " Exportar factura PDF";
+            this.btnExportarFactura_790MY.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnExportarFactura_790MY.UseVisualStyleBackColor = false;
+            this.btnExportarFactura_790MY.Click += new System.EventHandler(this.btnExportarFactura_790MY_Click);
+            //
             // tlpKpis_790MY  (las tarjetas KPI se arman en código)
             //
             this.tlpKpis_790MY.ColumnCount = 5;
@@ -202,6 +231,7 @@ namespace GUI_08YS.Reportes
             //
             this.dgvCobros_790MY.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colHora_790MY,
+            this.colFactura_790MY,
             this.colMesa_790MY,
             this.colMedio_790MY,
             this.colDescuento_790MY,
@@ -214,12 +244,19 @@ namespace GUI_08YS.Reportes
             this.dgvCobros_790MY.TabIndex = 3;
             this.dgvCobros_790MY.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgvCobros_790MY_CellPainting);
             this.dgvCobros_790MY.Resize += new System.EventHandler(this.dgvCobros_790MY_Resize);
+            this.dgvCobros_790MY.SelectionChanged += new System.EventHandler(this.dgvCobros_790MY_SelectionChanged);
             //
             // colHora_790MY
             //
             this.colHora_790MY.FillWeight = 10F;
             this.colHora_790MY.HeaderText = "Hora";
             this.colHora_790MY.Name = "colHora_790MY";
+            //
+            // colFactura_790MY
+            //
+            this.colFactura_790MY.FillWeight = 16F;
+            this.colFactura_790MY.HeaderText = "Factura";
+            this.colFactura_790MY.Name = "colFactura_790MY";
             //
             // colMesa_790MY
             //
@@ -304,10 +341,12 @@ namespace GUI_08YS.Reportes
         private FontAwesome.Sharp.IconButton btnSiguiente_790MY;
         private System.Windows.Forms.Label lblResumen_790MY;
         private FontAwesome.Sharp.IconButton btnCerrarCaja_790MY;
+        private FontAwesome.Sharp.IconButton btnExportarFactura_790MY;
         private System.Windows.Forms.TableLayoutPanel tlpKpis_790MY;
         private System.Windows.Forms.Label lblNota_790MY;
         private System.Windows.Forms.DataGridView dgvCobros_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHora_790MY;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colFactura_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMesa_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMedio_790MY;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDescuento_790MY;

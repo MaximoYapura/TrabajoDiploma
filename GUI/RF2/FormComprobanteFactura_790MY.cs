@@ -512,37 +512,24 @@ namespace GUI_08YS.RF2
             t.Espacio(Math.Max(tamano, y - t.Y) + 14);
         }
 
-        /// <summary>Patrón tipo QR derivado del hash (simulación visual, no decodificable). Devuelve su lado.</summary>
+        /// <summary>
+        /// QR simulado (patrón de FacturaBLL_790MY.PatronQrSimulado, el mismo del PDF). Devuelve su lado.
+        /// </summary>
         private static float DibujarQrSimulado(TicketFactura_790MY t, string hash, float x0, float y0, float lado)
         {
-            const int modulos = 25;
+            bool[,] patron = FacturaBLL_790MY.PatronQrSimulado(hash);
+            int modulos = FacturaBLL_790MY.ModulosQrSimulado;
             float tamano = modulos * lado;
 
-            var semilla = new Random(Convert.ToInt32(hash.Substring(0, 7), 16));
             using (var pincel = new SolidBrush(Tinta))
             {
                 for (int f = 0; f < modulos; f++)
                     for (int c = 0; c < modulos; c++)
-                    {
-                        bool enPatron = (f < 8 && c < 8) || (f < 8 && c >= modulos - 8) || (f >= modulos - 8 && c < 8);
-                        bool lleno = enPatron ? ModuloPatron(f, c, modulos) : semilla.Next(100) < 48;
-                        if (lleno) t.G.FillRectangle(pincel, x0 + c * lado, y0 + f * lado, lado, lado);
-                    }
+                        if (patron[f, c]) t.G.FillRectangle(pincel, x0 + c * lado, y0 + f * lado, lado, lado);
             }
             using (var lapiz = new Pen(Color.FromArgb(200, 195, 190)))
                 t.G.DrawRectangle(lapiz, x0 - 6, y0 - 6, tamano + 12, tamano + 12);
             return tamano;
-        }
-
-        /// <summary>Patrones de posición (esquinas) de un QR: anillo 7x7 con centro 3x3.</summary>
-        private static bool ModuloPatron(int fila, int col, int modulos)
-        {
-            int f = fila >= modulos - 8 ? fila - (modulos - 7) : fila;
-            int c = col >= modulos - 8 ? col - (modulos - 7) : col;
-            if (f < 0 || c < 0 || f > 6 || c > 6) return false;
-            bool borde = f == 0 || f == 6 || c == 0 || c == 6;
-            bool centro = f >= 2 && f <= 4 && c >= 2 && c <= 4;
-            return borde || centro;
         }
 
         /// <summary>

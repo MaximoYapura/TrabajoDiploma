@@ -276,6 +276,24 @@ namespace BLL_08YS
             return reporte;
         }
 
+        /// <summary>
+        /// Factura B de un cobro del arqueo como PDF A4 (mismo contenido fiscal que el ticket).
+        /// Solo facturas Pagadas; no registra eventos en la bitácora.
+        /// </summary>
+        public byte[] ExportarFacturaPDF(int nroFactura)
+        {
+            SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
+
+            Factura_790MY factura = _facturaBll.ObtenerPorNumero(nroFactura);
+            Pago_790MY pago = factura != null && factura.Estado == EstadoFactura_790MY.Pagada
+                ? _pagoRepository.GetPorFactura(nroFactura)
+                : null;
+            if (pago == null)
+                throw MensajesBLL_790MY.Regla("msg_ac_factura_no_pagada", FacturaBLL_790MY.FormatearComprobante(nroFactura));
+
+            return _facturaBll.GenerarFacturaPDF(factura, pago);
+        }
+
         /// <summary>True si la caja de <paramref name="fecha"/> ya se cerró (tabla CierresCaja).</summary>
         public bool EstaCajaCerrada(DateTime fecha)
         {
