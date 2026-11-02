@@ -21,7 +21,7 @@ namespace BLL_08YS
     /// Si la mesa ya tenía una factura Abierta con otros importes (nuevos consumos u otro
     /// descuento), la anterior queda Anulada y se emite una nueva.
     /// </summary>
-    public class FacturaBLL_790MY
+    public partial class FacturaBLL_790MY
     {
         private readonly IFacturaRepository_790MY _facturaRepository;
         private readonly ReservaBLL_790MY _reservaBll;

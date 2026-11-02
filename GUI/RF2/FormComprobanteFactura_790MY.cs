@@ -193,15 +193,19 @@ namespace GUI_08YS.RF2
 
             if (EsFactura)
             {
-                t.Centrado("El Fogón del Sur S.R.L.", t.FNegrita);
-                t.Centrado("CUIT: 30-12345678-9", t.FChica);
-                t.Centrado("Av. del Fogón 1234 · Buenos Aires", t.FChica);
-                t.Centrado(E.T("CJ_tk_iva_ri"), t.FChica);
+                // Datos del emisor (Factura B, modelo de ARCA): constantes de FacturaBLL_790MY.
+                t.Centrado(E.T("CJ_tk_slogan"), t.FChica);
+                t.Espacio(4);
+                t.Centrado(FacturaBLL_790MY.EmisorRazonSocial, t.FNegrita);
+                t.Centrado(E.T("CJ_tk_cuit_iibb", FacturaBLL_790MY.EmisorCuit, FacturaBLL_790MY.EmisorIngresosBrutos), t.FChica);
+                t.Centrado(FacturaBLL_790MY.EmisorDomicilio, t.FChica);
+                t.Centrado(E.T("CJ_tk_inicio_actividades", FacturaBLL_790MY.EmisorInicioActividades), t.FChica);
+                t.Centrado(E.T("CJ_tk_iva_ri"), t.FNegritaChica);
             }
             else
             {
                 t.Centrado(E.T("CJ_tk_slogan"), t.FChica);
-                t.Centrado("Av. del Fogón 1234 · Buenos Aires", t.FChica);
+                t.Centrado(FacturaBLL_790MY.EmisorDomicilio, t.FChica);
             }
             t.Espacio(8);
             t.Separador(grueso: true);
@@ -228,7 +232,7 @@ namespace GUI_08YS.RF2
             // "FACTURA" + recuadro con la letra del comprobante.
             float altoCaja = 44f;
             t.G.DrawString(E.T("CJ_tk_factura"), t.FTitulo, t.Pincel, t.X, t.Y + 12);
-            var caja = new RectangleF(t.X + t.Ancho - 46, t.Y, 46, altoCaja);
+            var caja = new RectangleF(t.X + t.Ancho - 56, t.Y, 56, altoCaja);   // entra "COD. 06" completo
             using (var lapiz = new Pen(Tinta, 1.5f))
                 t.G.DrawRectangle(lapiz, caja.X, caja.Y, caja.Width, caja.Height);
             using (var centro = new StringFormat { Alignment = StringAlignment.Center })
@@ -238,13 +242,21 @@ namespace GUI_08YS.RF2
             }
             t.Espacio(altoCaja + 10);
 
-            DateTime momento = _pago?.FechaHoraPago ?? _factura.FechaEmision;
-            t.Fila(E.T("CJ_tk_nro"), _factura.NumeroComprobante, negritaDer: true);
-            t.Fila(E.T("CJ_tk_fecha"), momento.ToString("dd/MM/yyyy"));
-            t.Fila(E.T("CJ_tk_hora"), momento.ToString("HH:mm:ss"));
-            t.Fila(E.T("CJ_tk_cliente"), E.T("CJ_tk_consumidor_final"));
+            // Punto de venta y número por separado, como el modelo oficial (el número
+            // completo de Factura_790MY.NumeroComprobante sigue en el hash).
+            DateTime emision = FacturaBLL_790MY.FechaEmisionComprobante(_factura, _pago);
+            t.Fila(E.T("CJ_tk_punto_venta"), FacturaBLL_790MY.FormatearPuntoVenta(), negritaDer: true);
+            t.Fila(E.T("CJ_tk_comp_nro"), FacturaBLL_790MY.FormatearNumeroComprobante(_factura), negritaDer: true);
+            t.Fila(E.T("CJ_tk_fecha_emision"), emision.ToString("dd/MM/yyyy HH:mm"));
+            t.Espacio(8);
+            t.Recuadro(E.T("CJ_tk_consumidor_final_leyenda"), t.FNegrita, 1f);
+            t.Espacio(6);
+            bool efectivo = _pago.MetodoPago == MetodoPago_790MY.Efectivo;
+            t.Fila(E.T("CJ_tk_condicion_venta"), E.T(efectivo ? "CJ_tk_condicion_efectivo" : "CJ_tk_condicion_tarjeta"));
+            t.Espacio(4);
             t.Fila(E.T("CJ_tk_mesa"), E.T("CJ_tk_mesa_reserva", _factura.MesaNumero, _factura.NroReserva));
             t.Fila(E.T("CJ_tk_camarero"), _factura.CamareroNombre ?? "-");
+            t.Fila(E.T("CJ_tk_comensales"), _factura.CantidadComensales.ToString());
             t.Espacio(8);
         }
 
@@ -259,7 +271,12 @@ namespace GUI_08YS.RF2
             foreach (var item in _factura.Items.OrderBy(i => i.NroItem))
                 t.Columnas(item.Cantidad.ToString(), item.Descripcion, Numero(item.PrecioUnitario), Numero(item.Subtotal), t.FCuerpo);
 
-            if (EsFactura)
+            if (IvaContenido)
+            {
+                t.Espacio(4);
+                t.Izquierda(E.T("CJ_tk_precios_finales"), t.FMini, suave: true);
+            }
+            else if (EsFactura)
             {
                 t.Espacio(4);
                 t.Izquierda(E.T("CJ_tk_importes_congelados"), t.FMini, suave: true);
@@ -269,20 +286,61 @@ namespace GUI_08YS.RF2
             t.Espacio(8);
         }
 
+        /// <summary>
+        /// Factura B con IVA contenido. Las facturas emitidas antes del cambio sumaban el
+        /// IVA: se reimprimen con sus importes y filas originales.
+        /// </summary>
+        private bool IvaContenido => FacturaBLL_790MY.TieneIvaContenido(_factura);
+
         private void DibujarTotales(TicketFactura_790MY t)
         {
             t.Fila(E.T("CJ_tk_subtotal"), "$ " + Numero(_factura.Subtotal));
             t.Fila(E.T("CJ_tk_descuento", _factura.PorcentajeDescuento.ToString("0.##", CulturaMoneda)),
                    _factura.MontoDescuento == 0 ? "$ 0" : "- $ " + Numero(_factura.MontoDescuento));
-            t.Fila(EsFactura ? E.T("CJ_tk_subtotal_neto") : E.T("CJ_tk_subtotal_desc"), "$ " + Numero(_factura.SubtotalNeto));
-            t.Fila(EsFactura ? E.T("CJ_tk_iva") : E.T("CJ_tk_iva_informativo"), "$ " + Numero(_factura.IVA));
+            if (!IvaContenido)
+            {
+                t.Fila(EsFactura ? E.T("CJ_tk_subtotal_neto") : E.T("CJ_tk_subtotal_desc"), "$ " + Numero(_factura.SubtotalNeto));
+                t.Fila(EsFactura ? E.T("CJ_tk_iva") : E.T("CJ_tk_iva_informativo"), "$ " + Numero(_factura.IVA));
+            }
             t.Espacio(6);
             t.Linea(Tinta, 1f); t.Espacio(3); t.Linea(Tinta, 1f);
             t.Espacio(8);
-            t.FilaGrande(EsFactura ? E.T("CJ_tk_total_general") : E.T("CJ_tk_total_pagar"), "$ " + Numero(_factura.MontoTotal));
+            string rotuloTotal = !EsFactura ? E.T("CJ_tk_total_pagar") : IvaContenido ? E.T("CJ_tk_total") : E.T("CJ_tk_total_general");
+            t.FilaGrande(rotuloTotal, "$ " + Numero(_factura.MontoTotal));
             t.Espacio(6);
             t.Linea(Tinta, 1f); t.Espacio(3); t.Linea(Tinta, 1f);
             t.Espacio(12);
+
+            if (!IvaContenido) return;
+            if (EsFactura)
+            {
+                DibujarTransparenciaFiscal(t);
+            }
+            else
+            {
+                t.Fila(E.T("CJ_tk_iva_contenido_informativo"), "$ " + Numero(_factura.IVA));
+                t.Espacio(10);
+            }
+        }
+
+        /// <summary>
+        /// Régimen de Transparencia Fiscal al Consumidor (Ley 27.743, RG 5614/2024):
+        /// IVA contenido y otros impuestos nacionales indirectos, alineado a la izquierda.
+        /// </summary>
+        private void DibujarTransparenciaFiscal(TicketFactura_790MY t)
+        {
+            float inicio = t.Y;
+            t.Margen(10);
+            t.Espacio(8);
+            t.Izquierda(E.T("CJ_tk_transparencia_titulo"), t.FNegritaChica);
+            t.Espacio(2);
+            t.Fila(E.T("CJ_tk_iva_contenido"), "$ " + Numero(_factura.IVA));
+            t.Fila(E.T("CJ_tk_otros_impuestos"), "$ " + Numero(0m));
+            t.Espacio(6);
+            t.Margen(-10);
+            using (var lapiz = new Pen(Tinta, 1f))
+                t.G.DrawRectangle(lapiz, t.X, inicio, t.Ancho, t.Y - inicio);
+            t.Espacio(14);
         }
 
         private void DibujarPiePreTicket(TicketFactura_790MY t)
@@ -324,7 +382,9 @@ namespace GUI_08YS.RF2
             t.Separador(grueso: false);
             t.Espacio(6);
             t.Fila(E.T("CJ_tk_total_abonado"), "$ " + Numero(_pago.MontoAbonado), negritaIzq: true, negritaDer: true);
-            t.Espacio(10);
+            t.Espacio(2);
+            t.Izquierda(E.T("CJ_tk_propina_nota"), t.FMini, suave: true);
+            t.Espacio(8);
             t.Margen(-14);
             using (var lapiz = new Pen(Tinta, 2f))
                 t.G.DrawRectangle(lapiz, t.X, inicio, t.Ancho, t.Y - inicio);
@@ -336,9 +396,9 @@ namespace GUI_08YS.RF2
             t.Separador(grueso: false);
             t.Espacio(12);
 
-            // ─── QR simulado + integridad ───
+            // ─── QR simulado + CAE simulado + integridad ───
             string hash = FacturaBLL_790MY.CalcularHashComprobante(_factura, _pago);
-            DibujarQrSimulado(t, hash);
+            DibujarAutorizacion(t, hash);
             t.Centrado(E.T("CJ_tk_qr"), t.FMini, suave: true);
             t.Espacio(8);
             t.Linea(Tinta, 1f);
@@ -426,13 +486,37 @@ namespace GUI_08YS.RF2
             }
         }
 
-        /// <summary>Patrón tipo QR derivado del hash (simulación visual, no decodificable).</summary>
-        private static void DibujarQrSimulado(TicketFactura_790MY t, string hash)
+        /// <summary>
+        /// Pie de comprobante electrónico: QR a la izquierda y, a su derecha, «Comprobante
+        /// autorizado (simulado)», CAE de 14 dígitos y su vencimiento (derivados del hash).
+        /// </summary>
+        private void DibujarAutorizacion(TicketFactura_790MY t, string hash)
+        {
+            const float lado = 4f;
+            float tamano = DibujarQrSimulado(t, hash, t.X + 6, t.Y, lado);
+
+            float x = t.X + tamano + 24, y = t.Y + 6, ancho = t.X + t.Ancho - x;
+            DateTime vto = FacturaBLL_790MY.VencimientoCae(FacturaBLL_790MY.FechaEmisionComprobante(_factura, _pago));
+            var lineas = new[]
+            {
+                (E.T("CJ_tk_autorizado"), t.FNegritaChica),
+                (E.T("CJ_tk_cae", FacturaBLL_790MY.CaeSimulado(hash)), t.FChica),
+                (E.T("CJ_tk_vto_cae", vto.ToString("dd/MM/yyyy")), t.FChica)
+            };
+            foreach (var (texto, fuente) in lineas)
+            {
+                SizeF med = t.G.MeasureString(texto, fuente, (int)ancho);
+                t.G.DrawString(texto, fuente, t.Pincel, new RectangleF(x, y, ancho, med.Height + 2));
+                y += med.Height + 3;
+            }
+            t.Espacio(Math.Max(tamano, y - t.Y) + 14);
+        }
+
+        /// <summary>Patrón tipo QR derivado del hash (simulación visual, no decodificable). Devuelve su lado.</summary>
+        private static float DibujarQrSimulado(TicketFactura_790MY t, string hash, float x0, float y0, float lado)
         {
             const int modulos = 25;
-            const float lado = 5f;
             float tamano = modulos * lado;
-            float x0 = t.X + (t.Ancho - tamano) / 2f, y0 = t.Y;
 
             var semilla = new Random(Convert.ToInt32(hash.Substring(0, 7), 16));
             using (var pincel = new SolidBrush(Tinta))
@@ -447,7 +531,7 @@ namespace GUI_08YS.RF2
             }
             using (var lapiz = new Pen(Color.FromArgb(200, 195, 190)))
                 t.G.DrawRectangle(lapiz, x0 - 6, y0 - 6, tamano + 12, tamano + 12);
-            t.Espacio(tamano + 14);
+            return tamano;
         }
 
         /// <summary>Patrones de posición (esquinas) de un QR: anillo 7x7 con centro 3x3.</summary>

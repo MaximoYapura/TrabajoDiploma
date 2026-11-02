@@ -73,6 +73,9 @@
     <Compile Include="ProductoCBLL_790MY.cs" />
     <Compile Include="DiferenciaVersion_790MY.cs" />
     <Compile Include="FacturaBLL_790MY.cs" />
+    <Compile Include="FacturaBLL_790MY.Comprobante.cs">
+      <DependentUpon>FacturaBLL_790MY.cs</DependentUpon>
+    </Compile>
     <Compile Include="PagoBLL_790MY.cs" />
     <Compile Include="MesaCobroDTO_790MY.cs" />
     <Compile Include="ImportesCuenta_790MY.cs" />
