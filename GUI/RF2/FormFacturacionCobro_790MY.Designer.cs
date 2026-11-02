@@ -594,7 +594,7 @@ namespace GUI_08YS.RF2
             this.lblIvaTxt_790MY.Size = new System.Drawing.Size(73, 20);
             this.lblIvaTxt_790MY.TabIndex = 4;
             this.lblIvaTxt_790MY.Tag = "CJ_iva";
-            this.lblIvaTxt_790MY.Text = "IVA (21%)";
+            this.lblIvaTxt_790MY.Text = "IVA contenido (21 %)";
             // 
             // lblIva_790MY
             // 
@@ -658,7 +658,7 @@ namespace GUI_08YS.RF2
             this.lblNotaIva_790MY.Size = new System.Drawing.Size(294, 30);
             this.lblNotaIva_790MY.TabIndex = 9;
             this.lblNotaIva_790MY.Tag = "CJ_nota_iva";
-            this.lblNotaIva_790MY.Text = "Precios de carta netos de IVA; el IVA se calcula sobre el importe con descuento.";
+            this.lblNotaIva_790MY.Text = "Precios de carta finales, IVA incluido.";
             // 
             // tlpCobro_790MY
             // 
