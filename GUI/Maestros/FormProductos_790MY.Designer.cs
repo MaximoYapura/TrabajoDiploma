@@ -577,10 +577,25 @@ namespace GUI_08YS.Maestros
             this.pnlDetalle_790MY.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProductos_790MY)).EndInit();
             this.ResumeLayout(false);
+            this.AplicarEstiloVisual();
 
         }
 
         #endregion
+
+        /// <summary>
+        /// Estilo de maestros (EstiloMaestros_790MY) sobre grilla y botones (solo apariencia).
+        /// Invocado desde InitializeComponent().
+        /// </summary>
+        private void AplicarEstiloVisual()
+        {
+            GUI_08YS.Maestros.EstiloMaestros_790MY.EstilizarGrilla(this.dgvProductos_790MY);
+            GUI_08YS.Maestros.EstiloMaestros_790MY.EstilizarBoton(this.btnAnadir_790MY, true);
+            GUI_08YS.Maestros.EstiloMaestros_790MY.EstilizarBoton(this.btnModificar_790MY, false);
+            GUI_08YS.Maestros.EstiloMaestros_790MY.EstilizarBoton(this.btnBaja_790MY, false);
+            GUI_08YS.Maestros.EstiloMaestros_790MY.EstilizarBoton(this.btnGuardar_790MY, true);
+            GUI_08YS.Maestros.EstiloMaestros_790MY.EstilizarBoton(this.btnCancelar_790MY, false);
+        }
 
         private System.Windows.Forms.Panel pnlBarra_790MY;
         private System.Windows.Forms.TextBox txtBuscar_790MY;

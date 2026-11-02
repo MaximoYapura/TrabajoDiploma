@@ -41,13 +41,6 @@ namespace GUI_08YS.Maestros
             InitializeComponent();
             _empleadoBll = BLLFactory_790MY.CreateEmpleadoBLL();
 
-            EstiloMaestros_790MY.EstilizarGrilla(dgvEmpleados_790MY);
-            EstiloMaestros_790MY.EstilizarBoton(btnAnadir_790MY, true);
-            EstiloMaestros_790MY.EstilizarBoton(btnModificar_790MY, false);
-            EstiloMaestros_790MY.EstilizarBoton(btnBaja_790MY, false);
-            EstiloMaestros_790MY.EstilizarBoton(btnGuardar_790MY, true);
-            EstiloMaestros_790MY.EstilizarBoton(btnCancelar_790MY, false);
-
             TraductorManager_08YS.Instance.Suscribir(this);
             this.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(this);
         }
