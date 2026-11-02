@@ -131,20 +131,33 @@ namespace DAL_08YS.SQL
             }
         }
 
-        public void Update(Producto_790MY producto)
+        public bool Update(Producto_790MY producto, int stockLeido)
         {
             const string sql =
                 "UPDATE Productos SET Nombre = @Nombre, Precio = @Precio, StockPorciones = @Stock, " +
                 "Activo = @Activo, Categoria = @Categoria, ControlaStock = @ControlaStock " +
-                "WHERE ProductoID = @ProductoID";
+                "WHERE ProductoID = @ProductoID AND StockPorciones = @StockLeido";
 
             using (var con = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand(sql, con))
             {
                 CargarParametros(cmd, producto);
                 cmd.Parameters.Add("@ProductoID", SqlDbType.Int).Value = producto.ProductoID;
+                cmd.Parameters.Add("@StockLeido", SqlDbType.Int).Value = stockLeido;
                 con.Open();
-                cmd.ExecuteNonQuery();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public bool DarDeBaja(int productoId)
+        {
+            using (var con = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(
+                "UPDATE Productos SET Activo = 0 WHERE ProductoID = @ID AND Activo = 1", con))
+            {
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = productoId;
+                con.Open();
+                return cmd.ExecuteNonQuery() > 0;
             }
         }
 

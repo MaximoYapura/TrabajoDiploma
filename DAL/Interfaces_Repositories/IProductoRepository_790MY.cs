@@ -21,6 +21,13 @@ namespace DAL_08YS.Interfaces_Repositories
         /// <summary>Asigna producto.ProductoID con el valor generado.</summary>
         void Add(Producto_790MY producto);
 
-        void Update(Producto_790MY producto);
+        /// <summary>
+        /// Actualiza el producto solo si su stock físico sigue siendo <paramref name="stockLeido"/>
+        /// (el que vio la pantalla). False si cocina lo cambió en el medio: no se pisa.
+        /// </summary>
+        bool Update(Producto_790MY producto, int stockLeido);
+
+        /// <summary>Baja lógica (Activo = 0) sin tocar el stock. False si ya estaba inactivo.</summary>
+        bool DarDeBaja(int productoId);
     }
 }

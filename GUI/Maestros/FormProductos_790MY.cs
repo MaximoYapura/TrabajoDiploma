@@ -34,6 +34,10 @@ namespace GUI_08YS.Maestros
         private List<Producto_790MY> _productos = new List<Producto_790MY>();
         private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
 
+        // Stock físico del producto al entrar en modificación: la BLL no guarda si cocina
+        // lo cambió mientras tanto.
+        private int _stockLeido;
+
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
         private const int EM_SETCUEBANNER = 0x1501;
@@ -303,6 +307,7 @@ namespace GUI_08YS.Maestros
         private void btnModificar_790MY_Click(object sender, EventArgs e)
         {
             if (Seleccionado == null) return;
+            _stockLeido = Seleccionado.StockPorciones;
             EstablecerModo(ModoEdicion_790MY.Modificacion);
             txtNombre_790MY.Focus();
         }
@@ -333,7 +338,7 @@ namespace GUI_08YS.Maestros
                 if (_modo == ModoEdicion_790MY.Alta)
                     _productoBll.RegistrarProducto(producto);
                 else
-                    _productoBll.ModificarProducto(producto);
+                    _productoBll.ModificarProducto(producto, _stockLeido);
             }
             catch (Exception ex)
             {

@@ -44,7 +44,8 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ProductoRegistrado, $"Prod {producto.ProductoID} {producto.Nombre}");
         }
 
-        public void ModificarProducto(Producto_790MY producto)
+        /// <param name="stockLeido">Stock físico que la pantalla leyó al cargar el producto.</param>
+        public void ModificarProducto(Producto_790MY producto, int stockLeido)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionProductos);
 
@@ -56,7 +57,11 @@ namespace BLL_08YS
             if (producto.ControlaStock && producto.StockPorciones < actual.PorcionesComprometidas)
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_stock_bajo_comprometido", actual.PorcionesComprometidas);
 
-            _productoRepository.Update(producto);
+            // Cocina descuenta stock al despachar: si cambió mientras se editaba, no se pisa.
+            if (!_productoRepository.Update(producto, stockLeido))
+                throw MensajesBLL_790MY.Regla("msg_rf2_producto_stock_cambio", producto.Nombre,
+                    ObtenerExistente(producto.ProductoID).StockPorciones);
+
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ProductoModificado, $"Prod {producto.ProductoID} {producto.Nombre}");
         }
@@ -70,8 +75,9 @@ namespace BLL_08YS
             if (!producto.Activo)
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_ya_inactivo", producto.Nombre);
 
-            producto.Activo = false;
-            _productoRepository.Update(producto);
+            // Solo Activo: la baja no reescribe el stock que pudo descontar cocina.
+            if (!_productoRepository.DarDeBaja(productoId))
+                throw MensajesBLL_790MY.Regla("msg_rf2_producto_ya_inactivo", producto.Nombre);
             DVManager_08YS.Recalcular();
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ProductoDadoDeBaja, $"Prod {producto.ProductoID} {producto.Nombre}");
         }
