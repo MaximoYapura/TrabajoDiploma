@@ -133,9 +133,18 @@ namespace BLL_08YS
             if (factura == null || factura.Estado != EstadoFactura_790MY.Abierta)
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_no_abierta", solicitud.NroFactura);
 
+            // Precondiciones de la mesa ANTES de pedir la autorización bancaria (no se autoriza
+            // una tarjeta para un cobro que después se rechazaría). Son avisos tempranos: la
+            // transacción de SqlPagoRepository_790MY.RegistrarCobro las vuelve a verificar.
             // La cuenta cambió desde que se emitió (p. ej. se despachó otro pedido).
             if (!_facturaBll.FacturaVigente(factura))
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_desactualizada", factura.MesaNumero);
+
+            if (_cierreCajaRepository.Existe(DateTime.Today))
+                throw MensajesBLL_790MY.Regla("msg_fc_caja_cerrada", DateTime.Today.ToString("dd/MM/yyyy"));
+
+            if (_facturaBll.ContarPedidosNoDespachados(factura.NroReserva) > 0)
+                throw MensajesBLL_790MY.Regla("msg_fc_pedidos_sin_despachar", factura.MesaNumero);
 
             if (solicitud.MontoPropina < 0)
                 throw MensajesBLL_790MY.Regla("msg_fc_propina_invalida");

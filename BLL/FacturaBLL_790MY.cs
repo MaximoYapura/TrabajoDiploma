@@ -242,6 +242,10 @@ namespace BLL_08YS
         internal int ContarMesasAbiertas()
             => _reservaBll.ObtenerAsistidas().Count;
 
+        /// <summary>Pedidos Pendiente/EnPreparacion de la reserva (PagoBLL_790MY no conoce a PedidoBLL_790MY).</summary>
+        internal int ContarPedidosNoDespachados(int reservaId)
+            => _pedidoBll.ContarNoDespachados(reservaId);
+
         // ═══════════════════════════════════════════════════════════════════
         //  Integridad del comprobante
         // ═══════════════════════════════════════════════════════════════════
