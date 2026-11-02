@@ -216,6 +216,28 @@ namespace BLL_08YS
             return _facturaRepository.GetById(nroFactura);
         }
 
+        // ─── Consultas para otras BLL ────────────────────────────────────────
+        // Sin ValidatePermission: las usa PagoBLL_790MY, que ya validó su propia patente.
+
+        /// <summary>
+        /// True si la factura sigue reflejando los consumos Listo de su reserva (mismo
+        /// detalle e importes que se emitirían hoy). Aviso temprano: la garantía es la
+        /// verificación dentro de la transacción de SqlPagoRepository_790MY.RegistrarCobro.
+        /// </summary>
+        internal bool FacturaVigente(Factura_790MY factura)
+        {
+            List<ItemFactura_790MY> items = _facturaRepository.ObtenerConsumosFacturables(factura.NroReserva);
+            if (items.Count == 0)
+                return false;
+
+            decimal subtotal = items.Sum(i => i.Subtotal);
+            if (factura.MontoDescuento > subtotal)
+                return false;
+
+            ImportesCuenta_790MY importes = CalcularImportes(subtotal, factura.MontoDescuento, TipoDescuento_790MY.MontoFijo);
+            return MismoContenido(factura, items, importes);
+        }
+
         // ═══════════════════════════════════════════════════════════════════
         //  Integridad del comprobante
         // ═══════════════════════════════════════════════════════════════════

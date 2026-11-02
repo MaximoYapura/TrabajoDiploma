@@ -67,6 +67,36 @@ namespace DAL_08YS.SQL
                             }
                         }
 
+                        // 1c) Factura vigente: mismos consumos que ObtenerConsumosFacturables
+                        // (pedidos Listo de la reserva), sumados.
+                        using (var cmd = new SqlCommand(@"
+                                SELECT f.Subtotal,
+                                       ISNULL((SELECT SUM(i.Cantidad * i.PrecioUnitario)
+                                               FROM Pedidos pe
+                                               INNER JOIN ItemsPedido i ON i.NroPedido = pe.NroPedido
+                                               INNER JOIN Productos pr ON pr.ProductoID = i.ProductoID
+                                               WHERE pe.ReservaID = @ReservaID AND pe.Estado = @Listo), 0)
+                                FROM Facturas f
+                                WHERE f.NroFactura = @NroFactura", connection, tx))
+                        {
+                            cmd.Parameters.Add("@ReservaID", SqlDbType.Int).Value = reservaId;
+                            cmd.Parameters.Add("@Listo", SqlDbType.NVarChar, 20).Value = EstadoPedido_790MY.Listo.ToString();
+                            cmd.Parameters.Add("@NroFactura", SqlDbType.Int).Value = pago.NroFactura;
+                            decimal subtotalFactura, subtotalConsumos;
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                reader.Read();
+                                subtotalFactura = reader.GetDecimal(0);
+                                subtotalConsumos = reader.GetDecimal(1);
+                            }
+
+                            if (subtotalFactura != subtotalConsumos)
+                            {
+                                tx.Rollback();
+                                return ResultadoRegistroCobro_790MY.FacturaDesactualizada;
+                            }
+                        }
+
                         // 2) Sin pedidos sin despachar (dejarían porciones comprometidas).
                         using (var cmd = new SqlCommand { Connection = connection, Transaction = tx })
                         {

@@ -12,14 +12,16 @@ namespace DAL_08YS.Interfaces_Repositories
         /// <summary>La reserva de la factura ya no está Asistida.</summary>
         ReservaNoAsistida,
         /// <summary>Quedan pedidos Pendiente/EnPreparacion: se comprometería stock para siempre.</summary>
-        PedidosSinDespachar
+        PedidosSinDespachar,
+        /// <summary>Los consumos Listo de la reserva ya no suman el subtotal de la factura (hay que reemitirla).</summary>
+        FacturaDesactualizada
     }
 
     public interface IPagoRepository_790MY
     {
         /// <summary>
         /// CUN-007. En una única transacción SERIALIZABLE:
-        ///  1) bloquea la factura y verifica que siga Abierta;
+        ///  1) bloquea la factura y verifica que siga Abierta y que el subtotal coincida con los consumos Listo actuales;
         ///  2) verifica que la reserva siga Asistida y sin pedidos sin despachar;
         ///  3) inserta el Pago;
         ///  4) Factura -> Pagada, Reserva -> Finalizada, Mesa -> Libre.

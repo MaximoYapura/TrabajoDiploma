@@ -133,6 +133,10 @@ namespace BLL_08YS
             if (factura == null || factura.Estado != EstadoFactura_790MY.Abierta)
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_no_abierta", solicitud.NroFactura);
 
+            // La cuenta cambió desde que se emitió (p. ej. se despachó otro pedido).
+            if (!_facturaBll.FacturaVigente(factura))
+                throw MensajesBLL_790MY.Regla("msg_fc_factura_desactualizada", factura.MesaNumero);
+
             if (solicitud.MontoPropina < 0)
                 throw MensajesBLL_790MY.Regla("msg_fc_propina_invalida");
 
@@ -190,6 +194,8 @@ namespace BLL_08YS
                     throw MensajesBLL_790MY.Regla("msg_rf2_reserva_no_asistida", factura.NroReserva);
                 case ResultadoRegistroCobro_790MY.PedidosSinDespachar:
                     throw MensajesBLL_790MY.Regla("msg_fc_pedidos_sin_despachar", factura.MesaNumero);
+                case ResultadoRegistroCobro_790MY.FacturaDesactualizada:
+                    throw MensajesBLL_790MY.Regla("msg_fc_factura_desactualizada", factura.MesaNumero);
                 default:
                     throw new InvalidOperationException(resultado.ToString());
             }
