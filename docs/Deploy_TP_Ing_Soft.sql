@@ -293,7 +293,7 @@ IF OBJECT_ID(N'dbo.CK_Facturas_Estado') IS NOT NULL
 ALTER TABLE [dbo].[Facturas] CHECK CONSTRAINT [CK_Facturas_Estado]
 GO
 IF OBJECT_ID(N'dbo.CK_Facturas_Importes', N'C') IS NULL
-ALTER TABLE [dbo].[Facturas]  WITH CHECK ADD  CONSTRAINT [CK_Facturas_Importes] CHECK  (([Subtotal]>(0) AND [IVA]>=(0) AND [SubtotalNeto]=([Subtotal]-[MontoDescuento]) AND [MontoTotal]=([SubtotalNeto]+[IVA])))
+ALTER TABLE [dbo].[Facturas]  WITH CHECK ADD  CONSTRAINT [CK_Facturas_Importes] CHECK  (([Subtotal]>(0) AND [IVA]>=(0) AND [MontoTotal]=([Subtotal]-[MontoDescuento]) AND [MontoTotal]=([SubtotalNeto]+[IVA])))
 GO
 IF OBJECT_ID(N'dbo.CK_Facturas_Importes') IS NOT NULL
 ALTER TABLE [dbo].[Facturas] CHECK CONSTRAINT [CK_Facturas_Importes]
@@ -1307,7 +1307,25 @@ GO
        DV. Equivale a Migraciones_790MY/AgregarCierresCaja_790MY.sql.
      - A5 producto_actualizado: se actualiza con CREATE OR ALTER (sección
        Triggers); equivale a Migraciones_790MY/VersionarSoloCambiosNegocio_790MY.sql.
+   Cambios incluidos (correcciones Entrega 2, fase 5):
+     - CK_Facturas_Importes, Factura B con IVA contenido: el total es
+       Subtotal - MontoDescuento y el IVA está contenido en él. Si la restricción
+       tiene la definición anterior (SubtotalNeto = Subtotal - MontoDescuento) se
+       reemplaza WITH NOCHECK: las facturas ya emitidas conservan su cálculo y no se
+       revalidan (SQL Server solo vuelve a evaluar la restricción si un UPDATE toca
+       sus columnas; cobrar o anular cambia solo Estado).
    No hay columnas nuevas en tablas existentes. */
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = N'CK_Facturas_Importes'
+             AND parent_object_id = OBJECT_ID(N'dbo.Facturas')
+             AND definition = N'([Subtotal]>(0) AND [IVA]>=(0) AND [SubtotalNeto]=([Subtotal]-[MontoDescuento]) AND [MontoTotal]=([SubtotalNeto]+[IVA]))')
+BEGIN
+    ALTER TABLE [dbo].[Facturas] DROP CONSTRAINT [CK_Facturas_Importes];
+    ALTER TABLE [dbo].[Facturas] WITH NOCHECK ADD CONSTRAINT [CK_Facturas_Importes]
+        CHECK (([Subtotal]>(0) AND [IVA]>=(0) AND [MontoTotal]=([Subtotal]-[MontoDescuento]) AND [MontoTotal]=([SubtotalNeto]+[IVA])));
+    PRINT N'CK_Facturas_Importes actualizada a IVA contenido (facturas anteriores sin revalidar).';
+END
+
 ;WITH Cierres AS (
     SELECT TRY_CONVERT(date, SUBSTRING(b.TargetUsername, 6, 10), 103) AS Fecha,
            LTRIM(SUBSTRING(b.TargetUsername, 19, 50))               AS Importe,

@@ -110,7 +110,9 @@ namespace BLL_08YS
         /// <summary>
         /// CUN-007 paso 3 (y escenario 3.1). Función pura: la GUI la usa para recalcular en
         /// tiempo real mientras se edita el descuento, y GenerarFactura la vuelve a aplicar.
-        /// El IVA (21 %) se calcula sobre el subtotal con descuento; importes a 2 decimales.
+        /// Factura B: el precio de carta es precio final. El total es el subtotal con
+        /// descuento y el IVA (21 %) está contenido en él (Ley 27.743, informativo):
+        /// IVA = total × 21 / 121 y SubtotalNeto = total − IVA (neto gravado). Importes a 2 decimales.
         /// </summary>
         public static ImportesCuenta_790MY CalcularImportes(decimal subtotal, decimal valorDescuento, TipoDescuento_790MY tipoDescuento)
         {
@@ -133,17 +135,17 @@ namespace BLL_08YS
                 porcentaje = Redondear(montoDescuento * 100m / subtotal);
             }
 
-            decimal neto = subtotal - montoDescuento;
-            decimal iva = Redondear(neto * Factura_790MY.AlicuotaIVA);
+            decimal total = subtotal - montoDescuento;
+            decimal iva = Redondear(total * Factura_790MY.AlicuotaIVA / (1m + Factura_790MY.AlicuotaIVA));
 
             return new ImportesCuenta_790MY
             {
                 Subtotal = subtotal,
                 PorcentajeDescuento = porcentaje,
                 MontoDescuento = montoDescuento,
-                SubtotalNeto = neto,
+                SubtotalNeto = total - iva,
                 IVA = iva,
-                MontoTotal = neto + iva
+                MontoTotal = total
             };
         }
 

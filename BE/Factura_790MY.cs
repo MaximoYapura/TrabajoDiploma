@@ -26,7 +26,9 @@ namespace BE_08YS
 
     public class Factura_790MY
     {
-        /// <summary>Alícuota de IVA aplicada sobre el subtotal con descuento.</summary>
+        /// <summary>
+        /// Alícuota de IVA contenida en el precio final (Factura B): IVA = total × 0,21 / 1,21.
+        /// </summary>
         public const decimal AlicuotaIVA = 0.21m;
 
         /// <summary>Punto de venta fijo del comprobante simulado (Factura B).</summary>
