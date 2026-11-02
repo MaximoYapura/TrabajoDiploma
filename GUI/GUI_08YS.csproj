@@ -409,6 +409,9 @@
     <EmbeddedResource Include="RF2\FormAbrirMesa_790MY.resx">
       <DependentUpon>FormAbrirMesa_790MY.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="RF2\FormFacturacionCobro_790MY.resx">
+      <DependentUpon>FormFacturacionCobro_790MY.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="RF2\FormRegistrarPedido_790MY.resx">
       <DependentUpon>FormRegistrarPedido_790MY.cs</DependentUpon>
     </EmbeddedResource>
