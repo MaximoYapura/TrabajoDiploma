@@ -213,16 +213,16 @@ namespace BLL_08YS
             var todasLasMesas = _mesaRepository.GetAll();
 
             if (todasLasMesas.Count >= 12)
-                throw new ArgumentException(TraductorManager_08YS.Instance.GetTexto("msg_limite_mesas_alcanzado") ?? "Se ha alcanzado el límite máximo de 12 mesas para el salón.");
+                throw MensajesBLL_790MY.Regla("msg_limite_mesas_alcanzado");
 
             if (_mesaRepository.Exists(numero))
-                throw new ArgumentException($"Ya existe una mesa con el número {numero}.");
+                throw MensajesBLL_790MY.Regla("msg_fm_mesa_duplicada", numero);
 
             var mesa = new Mesa_790MY(numero, capacidad, EstadoMesa_790MY.Libre);
 
             _mesaRepository.Add(mesa);
             DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEvento(Evento.MesaRegistrada, targetUsername: numero.ToString());
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaRegistrada, numero.ToString());
         }
 
         public void ModificarMesa(Mesa_790MY mesa)
@@ -233,7 +233,7 @@ namespace BLL_08YS
 
             Mesa_790MY actual = ObtenerPorNumero(mesa.NroMesa);
             if (actual == null)
-                throw new ArgumentException("La mesa que intenta modificar no existe.");
+                throw MensajesBLL_790MY.Regla("msg_fm_mesa_inexistente_modificar", mesa.NroMesa);
 
             // El maestro solo pasa la mesa a FueraDeServicio o la devuelve a Libre desde ahí;
             // Ocupada y Reservada son estados operativos de Reservas y Atención en mesa.
@@ -264,7 +264,7 @@ namespace BLL_08YS
 
             _mesaRepository.Update(mesa);
             DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEvento(Evento.MesaModificada, targetUsername: mesa.NroMesa.ToString());
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaModificada, mesa.NroMesa.ToString());
         }
 
         public void EliminarMesa(int numero)
@@ -272,7 +272,7 @@ namespace BLL_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
 
             if (!_mesaRepository.Exists(numero))
-                throw new ArgumentException("La mesa que intenta eliminar no existe.");
+                throw MensajesBLL_790MY.Regla("msg_fm_mesa_inexistente_baja", numero);
 
             // ── Integridad referencial: historial completo (activas + pasadas) ──────────
             // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
@@ -286,9 +286,7 @@ namespace BLL_08YS
                                    todasLasReservas.Any(r => r.MesaNumero == numero);
 
             if (tieneHistorial)
-                throw new ArgumentException(
-                    TraductorManager_08YS.Instance.GetTexto("msg_error_eliminar_mesa_con_reservas")
-                    ?? "No se puede eliminar la mesa porque posee reservas asociadas en el historial.");
+                throw MensajesBLL_790MY.Regla("msg_error_eliminar_mesa_con_reservas");
 
             // ── Baja por estado: FueraDeServicio (no DELETE físico) ──────────────────────
             // La mesa no tiene reservas en absoluto: se marca como FueraDeServicio
@@ -297,16 +295,16 @@ namespace BLL_08YS
             if (!_mesaRepository.UpdateEstado(numero, actual.Estado, EstadoMesa_790MY.FueraDeServicio))
                 throw MensajesBLL_790MY.Regla("msg_fm_mesa_cambio_estado", numero);
             DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEvento(Evento.MesaEliminada, targetUsername: numero.ToString());
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaEliminada, numero.ToString());
         }
 
         private static void ValidarDatos(int numero, int capacidad)
         {
             if (numero <= 0)
-                throw new ArgumentException("El número de mesa debe ser mayor a cero.");
+                throw MensajesBLL_790MY.Regla("msg_fm_numero_invalido");
 
             if (capacidad < 1 || capacidad > 8)
-                throw new ArgumentException("La capacidad de la mesa debe estar entre 1 y 8 personas.");
+                throw MensajesBLL_790MY.Regla("msg_fm_capacidad_invalida", 1, 8);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace BLL_08YS
           
             DVManager_08YS.Recalcular();
 
-            _bitacoraBll.RegistrarEvento(Evento.ClienteRegistrado, targetUsername: dni.ToString());
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.ClienteRegistrado, dni.ToString());
         }
 
         public void ActualizarCliente(Cliente_790MY cliente)
@@ -62,11 +62,11 @@ namespace BLL_08YS
 
             // GetByDni filtra Activo = 1: un cliente dado de baja no se modifica.
             if (_clienteRepository.GetByDni(cliente.DNI) == null)
-                throw new ArgumentException("El cliente que intenta modificar no existe o fue dado de baja.");
+                throw MensajesBLL_790MY.Regla("msg_fc_cliente_inexistente_modificar");
 
             _clienteRepository.Update(cliente);
             DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEvento(Evento.ClienteModificado, targetUsername: cliente.DNI.ToString());
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.ClienteModificado, cliente.DNI.ToString());
         }
 
         public void EliminarCliente(int dni)
@@ -74,7 +74,7 @@ namespace BLL_08YS
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
 
             if (_clienteRepository.GetByDni(dni) == null)
-                throw new ArgumentException("El cliente que intenta eliminar no existe o ya fue dado de baja.");
+                throw MensajesBLL_790MY.Regla("msg_fc_cliente_inexistente_baja");
 
             // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
             // ReservaBLL_790MY formaría un ciclo ReservaBLL -> ClienteBLL -> ReservaBLL y
@@ -86,7 +86,7 @@ namespace BLL_08YS
 
             _clienteRepository.DeleteLogico(dni);
             DVManager_08YS.Recalcular();
-            _bitacoraBll.RegistrarEvento(Evento.ClienteEliminado, targetUsername: dni.ToString());
+            _bitacoraBll.RegistrarEventoPostCommit(Evento.ClienteEliminado, dni.ToString());
         }
 
         public List<Cliente_790MY> GetAll()
@@ -134,7 +134,7 @@ namespace BLL_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             if (clientes == null) throw new ArgumentNullException(nameof(clientes));
-            if (clientes.Count == 0) throw new ArgumentException("Debe indicar al menos un cliente para serializar.");
+            if (clientes.Count == 0) throw MensajesBLL_790MY.Regla("msg_fc_xml_lista_vacia");
 
             using (var writer = new Utf8StringWriter())
             {
@@ -152,7 +152,7 @@ namespace BLL_08YS
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             if (string.IsNullOrWhiteSpace(contenidoXml))
-                throw new ArgumentException("El contenido XML a deserializar está vacío.");
+                throw MensajesBLL_790MY.Regla("msg_fc_xml_vacio");
 
             string texto = contenidoXml.Trim();
             try
@@ -172,17 +172,17 @@ namespace BLL_08YS
             catch (Exception ex) when (ex is XmlException || ex is InvalidOperationException)
             {
                 // XML mal formado o con tipos de datos incorrectos.
-                throw new ArgumentException($"El contenido no es un XML válido de clientes: {ex.Message}", ex);
+                throw new ArgumentException(MensajesBLL_790MY.Texto("msg_fc_xml_invalido", ex.Message), ex);
             }
 
-            throw new ArgumentException("El XML no contiene clientes con el formato esperado.");
+            throw MensajesBLL_790MY.Regla("msg_fc_xml_sin_clientes");
         }
 
         /// <summary>Serializa la lista de clientes y la guarda en el archivo XML indicado.</summary>
         public void SerializarArchivoXML(List<Cliente_790MY> clientes, string rutaArchivo)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
-            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
+            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw MensajesBLL_790MY.Regla("msg_fc_ruta_vacia");
             string xml = SerializarClientesXML(clientes);
             File.WriteAllText(rutaArchivo, xml, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
@@ -191,8 +191,8 @@ namespace BLL_08YS
         public List<Cliente_790MY> DeserializarArchivoXML(string rutaArchivo)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
-            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("La ruta del archivo no puede estar vacía.");
-            if (!File.Exists(rutaArchivo)) throw new ArgumentException($"El archivo '{rutaArchivo}' no existe.");
+            if (string.IsNullOrWhiteSpace(rutaArchivo)) throw MensajesBLL_790MY.Regla("msg_fc_ruta_vacia");
+            if (!File.Exists(rutaArchivo)) throw MensajesBLL_790MY.Regla("msg_fc_archivo_inexistente", rutaArchivo);
             return DeserializarClientesXML(File.ReadAllText(rutaArchivo, Encoding.UTF8));
         }
 
@@ -211,16 +211,16 @@ namespace BLL_08YS
                 throw MensajesBLL_790MY.Regla("FC_val_dni_formato");
 
             if (string.IsNullOrWhiteSpace(nombre))
-                throw new ArgumentException("El nombre es obligatorio.");
+                throw MensajesBLL_790MY.Regla("FC_val_nombre");
 
             if (string.IsNullOrWhiteSpace(apellido))
-                throw new ArgumentException("El apellido es obligatorio.");
+                throw MensajesBLL_790MY.Regla("FC_val_apellido");
 
             if (string.IsNullOrWhiteSpace(telefono))
-                throw new ArgumentException("El teléfono es obligatorio.");
+                throw MensajesBLL_790MY.Regla("msg_fc_celular_requerido");
 
             if (string.IsNullOrWhiteSpace(email) || !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ArgumentException("El email ingresado no es válido.");
+                throw MensajesBLL_790MY.Regla("FC_val_email_formato");
         }
     }
 }
