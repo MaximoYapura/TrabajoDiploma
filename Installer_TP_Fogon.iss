@@ -63,8 +63,10 @@
 
 #define MyAppName        "El Fogón del Sur"
 ; 1.2.0: Maître digital, logo transparente, numeración CUN-004..008 y backups en ProgramData.
-; Sin cambios en el esquema de la base.
-#define MyAppVersion     "1.2.0"
+; 1.3.0: correcciones de la Entrega 2 (Factura B con IVA contenido, exportación de la factura
+; en PDF, integridad de cobro y caja), un usuario de prueba por rol y README. Cambia la base:
+; CK_Facturas_Importes (WITH NOCHECK al actualizar) y la patente GestionCaja del Gerente.
+#define MyAppVersion     "1.3.0"
 #define MyAppPublisher   "Maximo Yapura"
 #define MyAppExeName     "GUI_08YS.exe"
 #define ReleaseDir       "GUI\bin\Release"
@@ -134,8 +136,11 @@ Source: "GUI\Config\App.secrets.config.template"; DestDir: "{app}"; DestName: "A
 ; instalación limpia y en la reinstalación (ver [Run]).
 Source: "docs\Deploy_TP_Ing_Soft.sql"; DestDir: "{app}\Database"; Flags: ignoreversion
 
-; Documentación
+; Documentación. README.md: usuarios de prueba, base de datos y cadena de conexión.
 Source: "docs\*.pdf"; DestDir: "{app}\docs"; Flags: ignoreversion
+; También como LEAME.txt: un .md puede no tener programa asociado; el .txt abre con el Bloc de notas.
+Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "README.md"; DestDir: "{app}"; DestName: "LEAME.txt"; Flags: ignoreversion
 
 ; Manual de Recetas (Etapa 5, Fase 8a): un PDF por receta; la Ayuda del Chef los abre
 ; desde {app}\Manual. Arriba se excluyen de la copia de bin para no duplicarlos.
@@ -154,6 +159,7 @@ Name: "{#LogDir}"; Flags: uninsneveruninstall
 [Icons]
 Name: "{autoprograms}\{#MyAppName}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
 Name: "{autoprograms}\{#MyAppName}\Documentación"; Filename: "{app}\docs"
+Name: "{autoprograms}\{#MyAppName}\Léame (usuarios y configuración)"; Filename: "{app}\LEAME.txt"
 Name: "{autoprograms}\{#MyAppName}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
 
