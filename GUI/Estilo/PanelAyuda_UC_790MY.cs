@@ -81,6 +81,18 @@ namespace GUI_08YS.Estilo
             }
         }
 
+        /// <summary>
+        /// Disponibilidad real de cada pantalla en el menú lateral (la asigna FormMDI_08YS):
+        /// el Menú Degustación solo ofrece «Ir» a lo que el menú muestra.
+        /// </summary>
+        [System.ComponentModel.Browsable(false)]
+        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+        public Func<DestinoAyuda_790MY, bool> PantallaDisponible
+        {
+            get => ucDegustacion_790MY.PantallaDisponible;
+            set => ucDegustacion_790MY.PantallaDisponible = value;
+        }
+
         /// <summary>Al abrir el panel: datos en vivo y foco en la primera opción.</summary>
         public void AlMostrar()
         {

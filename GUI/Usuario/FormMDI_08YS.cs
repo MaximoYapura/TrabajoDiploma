@@ -92,6 +92,7 @@ namespace GUI_08YS
             ConfigurarCombo();
             AplicarPermisos();
             panelAyuda.Preparar();
+            panelAyuda.PantallaDisponible = PantallaDisponible;
             TraductorManager_08YS.Instance.CambiarIdioma(SessionManager_08YS.Instance.Current.Idioma);
             TraductorManager_08YS.Instance.Suscribir(this);
             SessionManager_08YS.Instance.SesionInvalidada += OnSesionInvalidada;
@@ -1038,22 +1039,36 @@ namespace GUI_08YS
         /// </summary>
         public bool IrAPantalla(DestinoAyuda_790MY destino)
         {
-            if (_navegacionBloqueada) return false;
-            ToolStripMenuItem item;
-            switch (destino)
-            {
-                case DestinoAyuda_790MY.Clientes:         item = clientesToolStripMenuItem; break;
-                case DestinoAyuda_790MY.RegistrarReserva: item = registrarReservaToolStripMenuItem; break;
-                case DestinoAyuda_790MY.AbrirMesa:        item = abrirMesaToolStripMenuItem_790MY; break;
-                case DestinoAyuda_790MY.RegistrarPedido:  item = registrarPedidoToolStripMenuItem_790MY; break;
-                case DestinoAyuda_790MY.Cocina:           item = despacharPedidoToolStripMenuItem_790MY; break;
-                case DestinoAyuda_790MY.CajaCobro:        item = cajaCobroToolStripMenuItem_790MY; break;
-                default: return false;
-            }
-            // Available refleja la visibilidad que dejó PermissionFilter (el menú no está desplegado).
-            if (!item.Available || !item.Enabled) return false;
+            if (_navegacionBloqueada || !PantallaDisponible(destino)) return false;
+            ItemDelMenu(destino, out ToolStripMenuItem item, out _);
             item.PerformClick();
             return true;
+        }
+
+        /// <summary>
+        /// Una pantalla está disponible si el rol ve su ítem Y el botón lateral que lo despliega.
+        /// Recepción tiene VerClientes (alta de clientes en reservas y Walk-in) pero no el módulo
+        /// Maestros: el Menú Degustación no debe abrirle el maestro de Clientes.
+        /// </summary>
+        public bool PantallaDisponible(DestinoAyuda_790MY destino)
+        {
+            if (!ItemDelMenu(destino, out ToolStripMenuItem item, out Control boton)) return false;
+            // Available refleja la visibilidad que dejó PermissionFilter (el menú no está desplegado).
+            return boton.Visible && item.Available && item.Enabled;
+        }
+
+        private bool ItemDelMenu(DestinoAyuda_790MY destino, out ToolStripMenuItem item, out Control boton)
+        {
+            switch (destino)
+            {
+                case DestinoAyuda_790MY.Clientes:         item = clientesToolStripMenuItem;              boton = btnMaestros;       return true;
+                case DestinoAyuda_790MY.RegistrarReserva: item = registrarReservaToolStripMenuItem;      boton = btnReservar;       return true;
+                case DestinoAyuda_790MY.AbrirMesa:        item = abrirMesaToolStripMenuItem_790MY;       boton = btnAtencion_790MY; return true;
+                case DestinoAyuda_790MY.RegistrarPedido:  item = registrarPedidoToolStripMenuItem_790MY; boton = btnAtencion_790MY; return true;
+                case DestinoAyuda_790MY.Cocina:           item = despacharPedidoToolStripMenuItem_790MY; boton = btnAtencion_790MY; return true;
+                case DestinoAyuda_790MY.CajaCobro:        item = cajaCobroToolStripMenuItem_790MY;       boton = btnAtencion_790MY; return true;
+                default: item = null; boton = null; return false;
+            }
         }
         #endregion
 

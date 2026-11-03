@@ -31,6 +31,18 @@ namespace GUI_08YS.Estilo
 
         private readonly Paso[] _pasos;
 
+        /// <summary>
+        /// Pantalla accesible desde el menú lateral (FormMDI_08YS.PantallaDisponible). Además de
+        /// la patente del paso: p. ej. Recepción tiene VerClientes pero no el módulo Maestros.
+        /// </summary>
+        [System.ComponentModel.Browsable(false)]
+        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+        public Func<DestinoAyuda_790MY, bool> PantallaDisponible { get; set; }
+
+        private bool Permitido(Paso paso)
+            => paso.Permisos.Any(SessionManager_08YS.Instance.HasPermission)
+               && (PantallaDisponible?.Invoke(paso.Destino) ?? true);
+
         public MenuDegustacion_UC_790MY()
         {
             InitializeComponent();
@@ -91,13 +103,9 @@ namespace GUI_08YS.Estilo
         {
             lblIntro_790MY.Text = T("AY_deg_intro");
             string ir = T("AY_btn_ir"), hecho = T("AY_chk_hecho"), motivo = T("AY_paso_sin_permiso"), receta = T("AY_btn_receta");
-            var sesion = SessionManager_08YS.Instance;
             foreach (var p in _pasos)
-            {
-                bool permitido = p.Permisos.Any(sesion.HasPermission);
                 p.Control.Configurar(T(p.ClaveTitulo), p.Ruta() + Environment.NewLine + p.Pista(),
-                                     permitido, motivo, ir, hecho, receta);
-            }
+                                     Permitido(p), motivo, ir, hecho, receta);
         }
 
         public void EnfocarPrimero()
@@ -122,7 +130,7 @@ namespace GUI_08YS.Estilo
         private void Paso_IrSolicitado(object sender, EventArgs e)
         {
             var paso = _pasos.FirstOrDefault(p => p.Control == sender);
-            if (paso != null)
+            if (paso != null && Permitido(paso))
                 NavegacionSolicitada?.Invoke(this, new DestinoAyudaEventArgs_790MY(paso.Destino));
         }
     }
