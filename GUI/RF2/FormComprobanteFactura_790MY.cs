@@ -20,7 +20,7 @@ namespace GUI_08YS.RF2
     ///  - Sin pago: cuenta / pre-ticket de la factura Abierta (CUN-007), con la leyenda
     ///    "NO VÁLIDO COMO FACTURA".
     ///  - Con pago: Factura B definitiva en estado PAGADA (CUN-007), con detalle del
-    ///    pago, QR simulado, código de verificación y hash SHA-256 calculados por la BLL.
+    ///    pago, QR y CAE simulados (derivados del hash SHA-256 que calcula la BLL).
     /// El ticket se dibuja con GDI+ una sola vez y se reutiliza para pantalla e impresora.
     /// </summary>
     public partial class FormComprobanteFactura_790MY : Form, IIdiomaObserver_08YS
@@ -396,17 +396,12 @@ namespace GUI_08YS.RF2
             t.Separador(grueso: false);
             t.Espacio(12);
 
-            // ─── QR simulado + CAE simulado + integridad ───
+            // ─── QR simulado + CAE simulado (derivados del hash, que no se imprime) ───
             string hash = FacturaBLL_790MY.CalcularHashComprobante(_factura, _pago);
             DibujarAutorizacion(t, hash);
             t.Centrado(E.T("CJ_tk_qr"), t.FMini, suave: true);
             t.Espacio(8);
             t.Linea(Tinta, 1f);
-            t.Espacio(8);
-            t.Centrado(E.T("CJ_tk_dv", FacturaBLL_790MY.CodigoVerificacion(hash)), t.FChica);
-            t.Centrado(E.T("CJ_tk_hash"), t.FNegritaChica);
-            t.Centrado(hash.Substring(0, 8) + " " + hash.Substring(8, 8), t.FChica);
-            t.Centrado(hash.Substring(16, 8) + " " + hash.Substring(24, 8), t.FChica);
             t.Espacio(12);
             t.Centrado(E.T("CJ_tk_gracias"), t.FChica);
             t.Espacio(8);

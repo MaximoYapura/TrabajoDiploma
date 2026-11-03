@@ -137,7 +137,6 @@ namespace BLL_08YS
             var fEncabezado = new Font(Font.FontFamily.HELVETICA, 8.5f, Font.BOLD, BaseColor.WHITE);
             var fTotal     = new Font(Font.FontFamily.HELVETICA, 13f,  Font.BOLD, ReservaBLL_790MY.PdfBordo);
             var fNota      = new Font(Font.FontFamily.HELVETICA, 7.5f, Font.ITALIC, ReservaBLL_790MY.PdfGris);
-            var fHash      = new Font(Font.FontFamily.COURIER,   7.5f, Font.NORMAL, ReservaBLL_790MY.PdfGris);
             var fPie       = new Font(Font.FontFamily.HELVETICA, 7.5f, Font.NORMAL, ReservaBLL_790MY.PdfGris);
             var fGracias   = new Font(Font.FontFamily.HELVETICA, 9f,   Font.BOLDITALIC, ReservaBLL_790MY.PdfBordo);
 
@@ -289,8 +288,6 @@ namespace BLL_08YS
                 autorizacion.AddElement(new Paragraph(t.GetTexto("CJ_tk_autorizado"), fNegrita));
                 autorizacion.AddElement(new Paragraph(string.Format(t.GetTexto("CJ_tk_cae"), CaeSimulado(hash)), fCuerpo));
                 autorizacion.AddElement(new Paragraph(string.Format(t.GetTexto("CJ_tk_vto_cae"), VencimientoCae(emision).ToString("dd/MM/yyyy")), fCuerpo));
-                autorizacion.AddElement(new Paragraph(string.Format(t.GetTexto("CJ_tk_dv"), CodigoVerificacion(hash)), fChica) { SpacingBefore = 6f });
-                autorizacion.AddElement(new Paragraph(t.GetTexto("CJ_tk_hash") + ": " + hash, fHash));
                 pie.AddCell(autorizacion);
                 doc.Add(pie);
 

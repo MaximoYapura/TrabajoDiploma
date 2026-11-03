@@ -329,7 +329,7 @@ BE: Pedido_790MY, ItemPedido_790MY, Producto_790MY, Empleado_790MY
 - **Objetivo:** el cajero elige una mesa con consumos, ve la cuenta, aplica descuento, genera la factura, registra el cobro (efectivo o tarjeta) y el sistema libera la mesa.
 - **Formulario:** `FormFacturacionCobro_790MY` (3 paneles: mesas por cobrar / cuenta / cobro) y `FormComprobanteFactura_790MY` (vista previa e impresión).
 - **UI:** `SlidingTab_UC_790MY sldMetodo_790MY` (Efectivo | Tarjeta); `BotonCobro_790MY` con *spinner* GDI+ mientras procesa; campos con formato moneda `es-AR`; recálculo en vivo de importes mientras se edita el descuento; banner de rechazo.
-- **Comprobante:** `FormComprobanteFactura_790MY` dibuja con **GDI+** sobre `PrintDocument`/`PrintPreviewDialog` (no usa PDF), incluye un **QR simulado** (`DibujarQrSimulado`) y el **hash SHA-256** del comprobante (`FacturaBLL_790MY.CalcularHashComprobante` + `CodigoVerificacion`); el cursor de dibujo es `TicketFactura_790MY` (`internal`, archivo propio en `GUI/RF2`).
+- **Comprobante:** `FormComprobanteFactura_790MY` dibuja con **GDI+** sobre `PrintDocument`/`PrintPreviewDialog` (no usa PDF), incluye un **QR simulado** (`DibujarQrSimulado`) y un **CAE simulado** (`FacturaBLL_790MY.CaeSimulado`), ambos derivados del **hash SHA-256** del comprobante (`FacturaBLL_790MY.CalcularHashComprobante`), que no se imprime (el DV es integridad de la base, no va en el comprobante); el cursor de dibujo es `TicketFactura_790MY` (`internal`, archivo propio en `GUI/RF2`).
 
 #### B. Lógica y Reglas de Negocio
 

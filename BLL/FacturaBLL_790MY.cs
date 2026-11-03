@@ -261,8 +261,9 @@ namespace BLL_08YS
 
         /// <summary>
         /// SHA-256 de los datos que identifican el comprobante (número, reserva, fecha,
-        /// importes y, si existe, el pago). Se imprime en el ticket para verificar que
-        /// no fue alterado. Formato invariante: no depende del idioma del usuario.
+        /// importes y, si existe, el pago). No se imprime: de él se derivan el QR y el CAE
+        /// simulados, distintos para cada comprobante. Formato invariante: no depende del
+        /// idioma del usuario.
         /// </summary>
         public static string CalcularHashComprobante(Factura_790MY factura, Pago_790MY pago = null)
         {
@@ -292,14 +293,6 @@ namespace BLL_08YS
                 byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
                 return string.Concat(hash.Select(b => b.ToString("x2")));
             }
-        }
-
-        /// <summary>Código corto de verificación (primeros 8 hex del hash): "7F3A-92C1".</summary>
-        public static string CodigoVerificacion(string hash)
-        {
-            if (string.IsNullOrEmpty(hash) || hash.Length < 8) return string.Empty;
-            string h = hash.Substring(0, 8).ToUpperInvariant();
-            return h.Substring(0, 4) + "-" + h.Substring(4, 4);
         }
 
         // ─── Helpers ─────────────────────────────────────────────────────────

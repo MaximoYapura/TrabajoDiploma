@@ -35,8 +35,8 @@ SuperAdmin recibe las cuatro familias nuevas desde `Migraciones_790MY/CompletarR
 - **Visibilidad**: un camarero ve y cobra solo sus mesas; un usuario sin puesto de camarero
   (encargado / caja) ve todas las mesas Asistidas.
 - **Comprobantes** (`FormComprobanteFactura_790MY`): pre-ticket "NO VÁLIDO COMO FACTURA" y
-  Factura B PAGADA con detalle del pago, QR simulado, código de verificación y hash SHA-256
-  (`FacturaBLL_790MY.CalcularHashComprobante`). Botón Imprimir con vista previa.
+  Factura B PAGADA con detalle del pago, QR y CAE simulados, derivados del hash SHA-256 del
+  comprobante (`FacturaBLL_790MY.CalcularHashComprobante`, no se imprime). Botón Imprimir con vista previa.
 - **Bitácora** (módulo `Facturacion`): `FacturaGenerada`, `FacturaAnulada`, `PagoRegistrado`,
   `PagoRechazado`, `CierreCajaRealizado`, más `ReservaFinalizada` y `MesaEstadoActualizado`.
 - **KDS**: semáforo por tiempo desde la solicitud: < 10 min verde, 10–20 min amarillo,
