@@ -844,7 +844,7 @@ INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Productos', N'huaTDGf8l4IfxM
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Reservas', N'UZnK9nko0Rk5Hm4urEiuGw==', N'gC4Lra1Y1YFf4XoAfkCKyA==')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Roles', N'cougKoLpSK6LuvvoaHF+6jC+rAkkNWqKSU+b9oQY4X2g7H4BLfSoPdfZRqMCh3Wc7flHUIx4J0huXnXieOwenhtuzbR/zzBPUqEH475Qz8M=', N'Y1dFEhqr5LRbxa81Mh7Zv9hf8fWSwxJXDhwnWVEwXlQToEHqzzuGdqRXtHhAFMrfa0zGZrmb/GAI2wq0mD1wtGvM5z+MzS+bkQwJ87gpwkA=')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolFamilia', N'O/TplqOE+7KQugh/DwAcc2tW2CeMAufDo2O9gY+rSTE3tiy4OzaChO8Ev44waz6reQoh8aSxNYayzDgqm0cb+A==', N'pBIJXLVaPTAmpkXr6fjrUNBnO4IJ3K/5XSh6Li8qpy+K6G0DSyrEs37nu4dnmxipwARYRmnRFAA05Trhds/n2A==')
-INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolPermiso', N'1ZHbaibjUMIvq/i9x7uEdxHYXfwep/Tkw2313z4yOQPufXZWqaeH0itb2pfW+Bb8', N'idoJuuYcLt7tPVf0Zvce2kyGY649urSUB0cru/wmG+FIzkIBRCKN/8GfYacFIR2b')
+INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolPermiso', N'1ZHbaibjUMIvq/i9x7uEdxHYXfwep/Tkw2313z4yOQP074U8aLij56ZkJ4sqv3t5', N'K4+GsmdoUQsmT9TT9zJ0/6JGgBYijCO14G6tcVsSvTCd4GkwUB6It2GQgCpVArgm')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Users', N'wSQ6L6QDrv14dS8KCBE8KPeg7vFHZ8SuIy/vcqwvMM7BegE8beOAmBT0A+DOMNDx5dBTSgqrzFn76/58o28tGTxc8CktpgWVtQMhyQKzoJWasnnE1xd0dyHcML/fHpcVL9KZGDXsRyz0gXKppj8F4j+rYIAb97fKdJVTC7WGow0=', N'xioQuckAuprBSBozkpWWjMbHO0S0sb8mvPhZgo8b/+UqGRCfJHJJ2t9dFP8ZD14TSts/ui66udUY/87CkIfna92zwsgaz6e5zcelEPeEosD4SfLBGwonzxaHmq4duk/yNScguGASVjpPz8ap6+wQ/Syph+Z8NR/OlKe3q4MrHwg=')
 END
 GO
@@ -1063,6 +1063,7 @@ INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (4, 24)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (4, 26)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (5, 24)
 INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (5, 27)
+INSERT [dbo].[RolPermiso] ([RolID], [PermisoID]) VALUES (5, 37)
 END
 GO
 -- Users
