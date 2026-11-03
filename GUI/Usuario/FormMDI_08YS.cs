@@ -558,6 +558,10 @@ namespace GUI_08YS
 
             childForm.Load += (s, e) => TraductorManager_08YS.Instance.Suscribir(childForm as IIdiomaObserver_08YS);
             childForm.FormClosed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(childForm as IIdiomaObserver_08YS);
+            // Al cerrar sesión la pantalla abierta se desecha junto con este formulario sin pasar por
+            // FormClosed: si quedaba suscripta, el CambiarIdioma del próximo login la actualizaba
+            // ya desechada (ObjectDisposedException) y la sesión quedaba tomada.
+            childForm.Disposed += (s, e) => TraductorManager_08YS.Instance.Desuscribir(childForm as IIdiomaObserver_08YS);
 
             childForm.Show();
             childForm.Refresh();
