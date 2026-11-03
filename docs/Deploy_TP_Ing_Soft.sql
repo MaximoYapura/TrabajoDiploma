@@ -11,7 +11,10 @@
         procedimientos almacenados con su estructura final.
      3. Inserta los datos semilla limpios:
           - Seguridad: Roles, Permisos, Familias y sus relaciones.
-          - Usuario Maximo (SuperAdmin).
+          - Un usuario por rol, contraseña 1234 (ver README.md): Maximo
+            (SuperAdmin), Pedro (Recepcionista), Lucas (Camarero), Martina (Chef),
+            Laura (Gerente), Diego (Supervisor) y Ana (Gestor de accesos).
+            Pedro, Lucas y Martina quedan vinculados a su empleado.
           - 1 cliente de prueba, 4 empleados (uno de cada puesto), Mesas y el
             catálogo de Productos.
         Sin reservas, pedidos, facturas, pagos ni bitácora.
@@ -829,7 +832,7 @@ GO
 IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
 BEGIN
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Clientes', N'FfueLzU+cesSdj5UiBiircXdpdTj5j0N4ypXO03dN6D01sJ6oGRcA5kouJIdVb34qiBNSTuVjHSG8cUVhLzbs5Zw3bF02hndW7rE4FJwfvM=', N'AT9IHFWLP85lcxCiz0Ib+4eeyZLDC1MCt7l0y2pUSi7qgJ+ZZCCFgYxpTmAlQxEviD+FBA5A/bw+6eXyABkYFOM9+DnlldEm8a0FX20PB+U=')
-INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Empleados', N'76bUYYAUD637R5lRsWcnFR/IoksAyVChXoFUOuFQsFyN0e7IO/W13losSeAu12HBRjgsGG9UNoZcdwh/YgCy++hA3LPWhl8lO7UgA6Enme/CwVCIVdtIFW09cCwBHK7CvF/LbUUiIR1ncWipPNRkrrt9OZ9cbuSE8NscGRlG5jU=', N'oo2A994cFMBK6lLG23rJduaUtwrCxx2dZ69BmzrzRtOA4GwOBhDZRz224fB6ZPdrpNChgJunx3RU6gzrRIl9k+0LOXfYkQrBuKxpxS7pnGwvqTM+51IAvFDAkFEvRj+/+i89JdJ+dS8LmLOSby/i969HwKD7dgBKuNCQH3OYYFo=')
+INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Empleados', N'76bUYYAUD637R5lRsWcnFR/IoksAyVChXoFUOuFQsFyN0e7IO/W13losSeAu12HBRjgsGG9UNoZcdwh/YgCy+5s4HoOIv3z1T1ckb8H7mV2mvoPkGuiAZxHvcr61aRIvkIe2U/Y1Ky5kyo7kPagD4waJWfZJVsXEI9bSyWR+iEANpF8yJDJk4YGv+uBQXrILiJ0VyLC0gbMPy449mliKYA==', N'oo2A994cFMBK6lLG23rJduaUtwrCxx2dZ69BmzrzRtOA4GwOBhDZRz224fB6ZPdrpNChgJunx3RU6gzrRIl9k+0LOXfYkQrBuKxpxS7pnGwvqTM+51IAvFDAkFEvRj+/+i89JdJ+dS8LmLOSby/i98Sk9ClCwAMUxQVJOtwMwknDeBi01JLyxYl042kmRGeyeNJFQMF3tVr9zto9RdwkAQ==')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Facturas', N'ptmmpmry2Awc6TsYuuKCHA==', N'ZUfQd7PynYmY/krYVmYsKg==')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'FamiliaIntegrada', N'5IosYTXNpmSR1HPORAmeNQ==', N'1iPTQXhgIkDeNjdii7cfOQ==')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'FamiliaPermiso', N'SS5amWewvtVrB+MWBQq1noI5AuM+NBqZ4sdK5bopfQdwVoAq8CSQgRzPvFEjJYy4gTt6wn4IHFabfH0TF/q1eqSNIDMMjdopUWpWLfW0pwo7Op6TYVUr8trhId+ycYJBuLGb5rQQcQ+4bYc4rjeldfz+xBxXIT/LQSVOLgLiObg=', N'XM45C3pJvHb1T7S2eKv4ytYAjKn9VSkDvCIM6HahORpgqg8iu97OQb7Dh/XPrxM1LYE5t0Z+U0b7CBBFGaDWQFrhYfgt6PDf2MVUCGGaoRy/DFCCuM7Hm6CZqcOSEZBAPZIA/7I+EcJNKvc1yA6ESY8dl3ObvOhJzORpg4XYQT4=')
@@ -845,16 +848,16 @@ INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Reservas', N'UZnK9nko0Rk5Hm4
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Roles', N'cougKoLpSK6LuvvoaHF+6jC+rAkkNWqKSU+b9oQY4X2g7H4BLfSoPdfZRqMCh3Wc7flHUIx4J0huXnXieOwenhtuzbR/zzBPUqEH475Qz8M=', N'Y1dFEhqr5LRbxa81Mh7Zv9hf8fWSwxJXDhwnWVEwXlQToEHqzzuGdqRXtHhAFMrfa0zGZrmb/GAI2wq0mD1wtGvM5z+MzS+bkQwJ87gpwkA=')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolFamilia', N'O/TplqOE+7KQugh/DwAcc2tW2CeMAufDo2O9gY+rSTE3tiy4OzaChO8Ev44waz6reQoh8aSxNYayzDgqm0cb+A==', N'pBIJXLVaPTAmpkXr6fjrUNBnO4IJ3K/5XSh6Li8qpy+K6G0DSyrEs37nu4dnmxipwARYRmnRFAA05Trhds/n2A==')
 INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'RolPermiso', N'1ZHbaibjUMIvq/i9x7uEdxHYXfwep/Tkw2313z4yOQP074U8aLij56ZkJ4sqv3t5', N'K4+GsmdoUQsmT9TT9zJ0/6JGgBYijCO14G6tcVsSvTCd4GkwUB6It2GQgCpVArgm')
-INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Users', N'wSQ6L6QDrv14dS8KCBE8KPeg7vFHZ8SuIy/vcqwvMM7BegE8beOAmBT0A+DOMNDx5dBTSgqrzFn76/58o28tGTxc8CktpgWVtQMhyQKzoJWasnnE1xd0dyHcML/fHpcVL9KZGDXsRyz0gXKppj8F4j+rYIAb97fKdJVTC7WGow0=', N'xioQuckAuprBSBozkpWWjMbHO0S0sb8mvPhZgo8b/+UqGRCfJHJJ2t9dFP8ZD14TSts/ui66udUY/87CkIfna92zwsgaz6e5zcelEPeEosD4SfLBGwonzxaHmq4duk/yNScguGASVjpPz8ap6+wQ/Syph+Z8NR/OlKe3q4MrHwg=')
+INSERT [dbo].[DV] ([Tabla], [DVH], [DVV]) VALUES (N'Users', N'wSQ6L6QDrv14dS8KCBE8KPeg7vFHZ8SuIy/vcqwvMM7Lv/gtrTErSiOvQRzr17kGZNQxIlWpczM0RUcV6+mbItDHvR8fekc4bdSQglKG1OKC9PzMcMpVgZQubypz9EHQGKS+2/s1dEzcr0epK1bmmzEs5ZDdUymiBRPxwDtVb+UEijdqhRtcJYNCB3CCJwQlmhYgRFdzKEOoBn738F112wipQ/ZN4xk/TTpPCTn2FawisN0oYUo/lINAS365AGgtes4VRgeQ1AgUv2O5j5Sek027e/4LEIjr30Asjupvsco+3xtdZX1hWUaJzU7PYUrplGI1nwHevdx3XYJP/oOi9XEi5chETpKUDzgJWIWSYUdoHjL/d94gxoRccrK24cf5P6D62y44yy0elngmfIT81v5cgtY6k0Xl93Pz6BYt1paL7nTfA5YEuCw7Wapi5KWrPMO16regF6E09B3HPMhXhggE+rh62sAEItdT0/lqV8IifLPv+mXejNXBKrpyJIuYH7TrioMVoQKmL87K3F6SYqMZmfvvks2+Xt2L2b92eCb541lfYmkixzJ3SEBj3rgRA+egzmbCiX7ZYup3yJdgD67FcBbul19cOyg/+mJNjNDxl3QxWPcV1Gd4mpTE0DFe59T39Rm/Jlyik1uTq0UxhSXggRN7Yr3+vkEtW5CYtSMFVpWb7tzab/CEzr6vTGaSPmDm7tdulbcEEBNnbZvBFdlBVpxKULZnrn7SMF8nVYIaFx+JeEeZQ96qX+Xepb9ZVz37O+5SdV6ltSu7KOpJAIbo65limL6GQitI3PGTrvUaCt8negIXeIlA9QQtJs6+6mBzjaoT9qK0SNR7l76G+2tO8dlZLtNaJLa/ZPim/N3TWccwl4nHpZYVWWH1xneOifeZ82xUjS0+N0iYQNfVT0nL/eORW7Kq8bAS9Saz1rCwaFvLBSZnjEZjSuRyrLm0H9Wi4GU2y5ltUjTQicqW4kA2afFCrSPDb8u8CvWFtWFDhBuI73ymBoP8xiWMiBB3+SwY7GmmUpbgpeeUTcGmxaJ3vECtkLj61YaJNvqX2t0=', N'/KG2YnuJTk+8Q6ZiiyT3RvQP4CFCqEvUlDKKnCq8Uvu/8nVS585u8dQ2zC4Xr46ZCl15Hq5WWvaaiI0uSRoS4zheCRBk+evA3SsY+A3/wQCzWFEqQmNdZSHwKUGNfpSuA9Pi41av2dZJbaf4Evtk8MWguGO0rKI/N00q14aRBpK36hsoqmCSfV+YreiJtbzHvCOxQZBI2qIfafQJQntimfb+nhzD05tOfYUkqt3TlV3DatX2UmeD5NuQ9DeuyMe02z1Rzgv7DDHvx3r8t0XQNZ4T966pKCAKxuobK6wR2a2sulA3iU/5UxQ/W4lAbCZRRG9BAI3AM1AFXdU/5bjRLQH9Np2AOru7chJnS7FvF/Qcm4ze+v7lmMF4ZyIFgab5UrYfuLZCyd5SulOAPcCFpdvKbrebE/hUs+4EiduJZMJXCspZ4Bpu3ZGVQSD/sDKkdwAwbbwG30flCzyG1wQvq8ryUrNAMu68mvPfXvITEe59FBvToDj1tfZ+VbswOVdJawUJakyYblavclbIl211DxVyPm6JLNQ0pcKz4u+cx0B8Q88qzpe/XckgxI4kMTcxFNHINP/n0EVnbuT1aj6ToXbg0hxqsAkA2/Kl/PDYqVQQFmB2jqiIZtjMqXCN3BXUuUy3Fddc+Yywv73nd6uTenNhoqnKYMAtUQe1LgYk+HPqkcH503q/WEvRWXgwNVHUZwveg97mcsS6VF/QfZyM8ernms6743pdL+F90jea+vLQPPVz32wauHmGgdhAbrL9KaM7SFSvUT9d/XAq4jqe/Y3xEw+D/Xzl29kszWyg10zse8aIiB3lnIuXf4w6IjARJ53NAyDtD88tFVutagwpX8P6HRN+/NB9h3DofouMiGEijQd5as/iQhzjX5WarljhfXdMmjQ864k761xzC+yqhVhtc5Yc1iapivZmdSR/Gepa5AU+NGkupRgAIX7TAhgw687Ig4Dq+Hv7Vh4o2VgHLgUTrz9UskK+X0j95/S4IjWbgB2Q4zyg5OKDuyf1j5YAfY1lQxuU7AEkDG9bRive4sXsNMqmpzJGut4PZCJh4KQ=')
 END
 GO
 -- Empleados
 IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
 BEGIN
 INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (12345678, N'Maximo', N'Yapura', N'Camarero', 12345678, 1)
-INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (22222222, N'Pedro', N'Pascal', N'Recepcionista', NULL, 1)
-INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (30000001, N'Lucas', N'Gomez', N'Camarero', NULL, 1)
-INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (30000002, N'Martina', N'Ruiz', N'Chef', NULL, 1)
+INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (22222222, N'Pedro', N'Pascal', N'Recepcionista', 22222222, 1)
+INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (30000001, N'Lucas', N'Gomez', N'Camarero', 30000001, 1)
+INSERT [dbo].[Empleados] ([DNI], [Nombre], [Apellido], [Puesto], [UsuarioDNI], [Activo]) VALUES (30000002, N'Martina', N'Ruiz', N'Chef', 30000002, 1)
 END
 GO
 -- FamiliaPermiso
@@ -1069,7 +1072,13 @@ GO
 -- Users
 IF CAST(SESSION_CONTEXT(N'DeployNuevo') AS int) = 1
 BEGIN
-INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (12345678, N'Maximo', 1, N'Maximo', N'Yapura', N'Maximo@gmail.com', N'N4Rf9Gw3hwxmXiqY4tp1IFxaOezlZdSiuYkDZqKOGFQ=', N'CWu49+d6I6N7m98eZq7sUw==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (12345678, N'Maximo', 1, N'Maximo', N'Yapura', N'Maximo@gmail.com', N'7mtHU0jNpI+bTZBcAiwTU3pbylHTcJa7aVYPphkCRs8=', N'OfzS84EmpyVyy0/yZlsAiA==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (30000005, N'Diego', 2, N'Diego', N'Ramos', N'diego@fogon.com', N'oRyxsOqT1j3Zbo084yeMTsRzWv8273XlIpNzoyrVdtI=', N'L6kxkhmEIrQYvKNOQSGNWA==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (30000006, N'Ana', 3, N'Ana', N'Ferreyra', N'ana@fogon.com', N'Lmdi5CtjtRkK9V3fLzhuwxcxdzVk+VastGkyaazOTuQ=', N'CkAxe7WcGXXEM4WgfQ/mWA==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (22222222, N'Pedro', 4, N'Pedro', N'Pascal', N'pedro@fogon.com', N'BBLd/5+IGlLo09RSATeDjzR7O8f8FMIpXCalDV4oC14=', N'aHe5mpxAMm984w1Bam+otQ==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (30000004, N'Laura', 5, N'Laura', N'Benitez', N'laura@fogon.com', N'plmv38GBoG/yoS70zyUO1HYn4L6p5ogcSAJCqwec6tI=', N'WgJionZd0oUtEqbl0bo4pg==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (30000001, N'Lucas', 6, N'Lucas', N'Gomez', N'lucas@fogon.com', N'YOTS0Ro6Kle85fY22ZMcvSVcgcobJsYHs635NxrTD1k=', N'612kUKm4oxBunNaHP5x+Rw==', 0, 1, N'es')
+INSERT [dbo].[Users] ([DNI], [Username], [RolID], [Nombre], [Apellido], [Email], [Hash], [Salt], [Bloqueado], [Activo], [Idioma]) VALUES (30000002, N'Martina', 7, N'Martina', N'Ruiz', N'martina@fogon.com', N'TnTgYHP48FUW7VVpXYLWjA5h3B4b8fSnl+2AtyATjfs=', N'bnhxqecHNnx97XwEGFH9Xw==', 0, 1, N'es')
 END
 GO
 
