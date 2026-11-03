@@ -112,7 +112,10 @@ namespace GUI_08YS.RF2
 
         private void FormRegistrarPedido_790MY_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.WindowsShutDown) return;
+            // Application.Exit recorre Application.OpenForms: abrir un modal acá modifica esa
+            // colección y, si se cancela, deja la salida a medias (con la sesión ya cerrada).
+            // Para salir de la app pregunta FormMDI_08YS antes de llamar a Application.Exit.
+            if (e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.ApplicationExitCall) return;
             if (!ConfirmarSalida())
                 e.Cancel = true;
         }

@@ -1064,7 +1064,8 @@ namespace GUI_08YS
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
         private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
 
-        private void button1_Click_1(object sender, EventArgs e) { Application.Exit(); }
+        // M8: se pregunta antes de Application.Exit; durante la salida los formularios ya no preguntan.
+        private void button1_Click_1(object sender, EventArgs e) { if (PantallaActualPermiteSalir()) Application.Exit(); }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
