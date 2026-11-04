@@ -24,7 +24,7 @@
 ;   * Instalación limpia (no existe HKLM\Software\ElFogonDelSur):
 ;       - el usuario elige la carpeta de destino y la instancia de SQL Server
 ;         (desplegable con las instancias detectadas en el Registro);
-;       - se copian los binarios de GUI\bin\Release y el PDF de docs\;
+;       - se copian los binarios de GUI\bin\Release;
 ;       - se ejecuta docs\Deploy_TP_Ing_Soft.sql con sqlcmd sobre esa instancia:
 ;         crea TP_Ing_Soft completa (esquema + datos iniciales + DV) si no existe;
 ;       - se crea App.secrets.config a partir de la plantilla (si no existe);
@@ -48,7 +48,8 @@
 ;     {commonappdata}\El Fogon del Sur quedan intactos.
 ;
 ;  MODO DEMOSTRACIÓN (A8)
-;   * Tarea opcional "Instalar en modo demostración", DESMARCADA por defecto.
+;   * Tarea opcional "Instalar en modo demostración", MARCADA por defecto: la versión
+;     entregada se evalúa en cualquier horario. Para una instalación real, desmarcarla.
 ;   * Al terminar de copiar (también en reinstalación, porque el .exe.config se
 ;     reemplaza) se escribe appSettings/ModoDemostracion en GUI_08YS.exe.config:
 ;     "false" (producción) salvo que se marque la casilla ("true"). En una
@@ -111,10 +112,11 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-; Modo demostración (A8): desmarcado por defecto = producción. En una reinstalación
-; Inno Setup vuelve a proponer la elección anterior (UsePreviousTasks).
+; Modo demostración (A8): marcado por defecto, porque la versión entregada se evalúa en
+; cualquier horario; para una instalación real (producción) se desmarca. En una
+; reinstalación Inno Setup vuelve a proponer la elección anterior (UsePreviousTasks).
 Name: "mododemo"; Description: "Instalar en modo demostración (turno de prueba, Ficha de Ingredientes y demora simulada del cobro)"; \
-    GroupDescription: "Opciones de la aplicación:"; Flags: unchecked
+    GroupDescription: "Opciones de la aplicación:"
 
 [Files]
 ; Ejecutable, DLLs, idiomas.json, GUI_08YS.exe.config y Resources\.
@@ -137,7 +139,6 @@ Source: "GUI\Config\App.secrets.config.template"; DestDir: "{app}"; DestName: "A
 Source: "docs\Deploy_TP_Ing_Soft.sql"; DestDir: "{app}\Database"; Flags: ignoreversion
 
 ; Documentación. README.md: usuarios de prueba, base de datos y cadena de conexión.
-Source: "docs\*.pdf"; DestDir: "{app}\docs"; Flags: ignoreversion
 ; También como LEAME.txt: un .md puede no tener programa asociado; el .txt abre con el Bloc de notas.
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; DestName: "LEAME.txt"; Flags: ignoreversion

@@ -44,7 +44,7 @@ Hay dos formas de probar el sistema:
    - `(localdb)\MSSQLLocalDB`.
 
    El botón «Probar conexión» comprueba que la instancia responda.
-4. **Recomendado:** marcar «Instalar en modo demostración» (ver 1.3). Sin esa opción solo se pueden abrir mesas en los horarios de atención.
+4. La opción «Instalar en modo demostración» viene **marcada** (ver 1.3). Desmarcala solo para un uso real: sin ella, las mesas se abren únicamente en los horarios de atención.
 5. Terminar. El instalador:
    - crea la base `TP_Ing_Soft` completa (esquema, datos de prueba, los usuarios de la sección 2 y dígitos verificadores);
    - escribe la instancia elegida en la cadena de conexión;
@@ -68,6 +68,15 @@ Si la aplicación ya estaba instalada, el mismo setup la **actualiza**: hace un 
 - **Conexión a internet** la primera vez, para descargar los paquetes NuGet.
 
 **Pasos:**
+
+**0. Desbloquear el zip (si se descargó de internet).** Windows marca los archivos descargados. Si el zip se descomprime con esa marca, Visual Studio se niega a compilar los formularios y muestra errores «no se pudo procesar el archivo ….resx porque se encuentra en Internet o en la zona restringida».
+
+- **Antes de descomprimir:** clic derecho sobre el zip › **Propiedades** › tildar **Desbloquear** › **Aceptar**. Después, descomprimir.
+- **Si ya se descomprimió:** abrir PowerShell en la carpeta extraída, ejecutar el comando de abajo y volver a abrir la solución.
+
+```powershell
+Get-ChildItem -Recurse | Unblock-File
+```
 
 **1. Abrir la solución.** Abrir `TrabajoDiploma.slnx` con Visual Studio.
 
@@ -111,10 +120,10 @@ Con el modo demostración activo:
 - se habilita la Ficha de Ingredientes de la Ayuda;
 - el cobro con tarjeta simula la demora del banco.
 
-El modo se configura en el archivo de configuración de la aplicación:
+Viene **activo** tanto con el instalador (la casilla está marcada) como desde el código. Para cambiarlo, editá el archivo de configuración de la aplicación:
 
 - instalada: `GUI_08YS.exe.config`, en la carpeta de instalación;
-- desde el código: `GUI\Config\App.config`, que viene con el modo activo.
+- desde el código: `GUI\Config\App.config`.
 
 ```xml
 <add key="ModoDemostracion" value="true" />
@@ -358,6 +367,8 @@ Ese archivo nunca se sube al repositorio.
 
 | Síntoma | Qué hacer |
 |---|---|
+| Errores «no se pudo procesar el archivo ….resx porque se encuentra en Internet o en la zona restringida» | El zip se descomprimió sin desbloquear. Ver el paso 0 de la sección 1.2. |
+| Advertencia «No se pudo agregar el archivo 'Config\App.secrets.config' al proyecto» | Es normal: ese archivo tiene credenciales SMTP y no se distribuye. No impide compilar. Solo hace falta para enviar el comprobante por email (sección 7). |
 | Errores de compilación con `FontAwesome.Sharp`, `IconChar`, `iTextSharp` o `Newtonsoft.Json` | Faltan los paquetes NuGet. Recargarlos como indica el paso 2 de la sección 1.2. Hace falta conexión a internet. |
 | «No se pudo preparar la base de datos» al iniciar | La instancia del `Data Source` no existe o no responde. Revisar la sección 5 y que el servicio de SQL Server esté iniciado. |
 | No se conecta a `(localdb)\MSSQLLocalDB` | Crear e iniciar la instancia con `sqllocaldb create MSSQLLocalDB -s`. Si no existe el comando, agregar «SQL Server Express LocalDB» desde el Visual Studio Installer. |
