@@ -9,12 +9,9 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Maître digital: personaje con un globo de consejos que FormMDI_08YS muestra sobre el
-    /// área de trabajo mientras no hay pantalla abierta. Los consejos salen de idiomas.json
-    /// (MT_consejo_N_tipo / _titulo / _mensaje) y el tipo elige la pose. Sin rotación
-    /// automática, sin sonido ni animaciones.
-    /// </summary>
+    // Maître digital: un personaje con un globo de consejos que se ve en el área de trabajo
+    // cuando no hay ninguna pantalla abierta. Los consejos salen de idiomas.json
+    // (MT_consejo_N_...) y el tipo de consejo elige la pose del personaje.
     public partial class AsistenteMaitre_UC_790MY : UserControl
     {
         private const int Cola = 12;              // ancho de la cola del globo, hacia el personaje
@@ -44,7 +41,7 @@ namespace GUI_08YS.Estilo
             InitializeComponent();
         }
 
-        /// <summary>Lo llama FormMDI_08YS.UpdateIdioma: recarga los consejos y conserva la posición.</summary>
+        // Lo llama FormMDI_08YS.UpdateIdioma: recarga los consejos y conserva la posición.
         public void UpdateIdioma()
         {
             var tr = TraductorManager_08YS.Instance;
@@ -54,11 +51,9 @@ namespace GUI_08YS.Estilo
             MostrarConsejo();
         }
 
-        /// <summary>
-        /// Elige el modo según la marca de agua (<paramref name="logo"/>, en coordenadas del
-        /// contenedor). Si el personaje completo la pisaría pasa a compacto; devuelve false si
-        /// ni el compacto evita taparla, y entonces el asistente no debe mostrarse.
-        /// </summary>
+        // Elige el modo según la marca de agua (logo, en coordenadas del
+        // contenedor). Si el personaje completo la pisaría pasa a compacto; devuelve false si
+        // ni el compacto evita taparla, y entonces el asistente no debe mostrarse.
         public bool AjustarModo(Rectangle logo)
         {
             bool compacto = Pisa(picPersonaje_790MY, logo);
@@ -144,7 +139,7 @@ namespace GUI_08YS.Estilo
             return pose;
         }
 
-        /// <summary>Corta el mensaje por palabras y agrega «…» si no entra en el máximo de líneas.</summary>
+        // Corta el mensaje por palabras y agrega «…» si no entra en el máximo de líneas.
         private string RecortarALineas(string texto, int lineas)
         {
             var fuente = lblMensaje_790MY.Font;
@@ -172,10 +167,8 @@ namespace GUI_08YS.Estilo
 
         #region Dibujo
 
-        /// <summary>
-        /// Escala Zoom apoyada en el borde inferior: las poses vienen recortadas al ras con el
-        /// torso cortado abajo, y el Zoom nativo las centra (la pose 01 quedaría flotando).
-        /// </summary>
+        // Escala Zoom apoyada en el borde inferior: las poses vienen recortadas al ras con el
+        // torso cortado abajo, y el Zoom nativo las centra (la pose 01 quedaría flotando).
         private void Personaje_Paint(object sender, PaintEventArgs e)
         {
             if (_pose == null) return;
@@ -188,7 +181,7 @@ namespace GUI_08YS.Estilo
             e.Graphics.DrawImage(_pose, new Rectangle(caja.X + (caja.Width - ancho) / 2, caja.Bottom - alto, ancho, alto));
         }
 
-        /// <summary>Globo y aviso compacto: cuerpo redondeado + cola a la derecha, sin sombra.</summary>
+        // Globo y aviso compacto: cuerpo redondeado + cola a la derecha, sin sombra.
         private void Globo_Paint(object sender, PaintEventArgs e)
         {
             var panel = (Control)sender;
@@ -202,8 +195,8 @@ namespace GUI_08YS.Estilo
             }
         }
 
-        /// <param name="caja">Rectángulo del panel (cuerpo + cola).</param>
-        /// <param name="margen">0.5 para dibujar el borde de 1 px nítido; 0 para la Region.</param>
+        // caja: Rectángulo del panel (cuerpo + cola).
+        // margen: 0.5 para dibujar el borde de 1 px nítido; 0 para la Region.
         private static GraphicsPath CrearGlobo(RectangleF caja, float margen)
         {
             float izq = caja.Left + margen, arriba = caja.Top + margen;
@@ -224,10 +217,8 @@ namespace GUI_08YS.Estilo
             return forma;
         }
 
-        /// <summary>
-        /// El fondo crema es opaco: la Region deja visible solo personaje ∪ globo (forma «en L»)
-        /// para que el resto del rectángulo no tape la marca de agua de panel2.
-        /// </summary>
+        // El fondo crema es opaco: la Region deja visible solo personaje ∪ globo (forma «en L»)
+        // para que el resto del rectángulo no tape la marca de agua de panel2.
         private void ActualizarRegion()
         {
             var personaje = _compacto ? picPersonajeCompacto_790MY : picPersonaje_790MY;

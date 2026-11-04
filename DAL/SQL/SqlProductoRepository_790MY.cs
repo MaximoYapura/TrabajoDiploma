@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 
 namespace DAL_08YS.SQL
 {
+    // Productos en SQL Server. Los métodos están explicados en IProductoRepository_790MY.
     public class SqlProductoRepository_790MY : IProductoRepository_790MY
     {
         private readonly string _connectionString;
@@ -21,10 +22,8 @@ namespace DAL_08YS.SQL
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        /// <summary>
-        /// Arma el SELECT de productos con la subconsulta de porciones comprometidas.
-        /// Se reutiliza desde SqlPedidoRepository_790MY dentro de su transaccion.
-        /// </summary>
+        // SELECT de productos con la subconsulta de porciones comprometidas.
+        // También lo usa SqlPedidoRepository_790MY dentro de su transacción.
         internal static string SelectConComprometidas(SqlCommand cmd, string hintsProductos)
         {
             string comprometido = FiltroOcupacionMesa_790MY.CondicionPedidoComprometido(cmd, "pe");

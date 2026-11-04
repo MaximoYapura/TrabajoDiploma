@@ -8,44 +8,31 @@ using System.Linq;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// Reporte inteligente: Análisis Predictivo de Canasta (Market Basket Analysis).
-    ///
-    /// Toma las facturas Pagadas de los últimos 90 días; cada factura es una "canasta"
-    /// con los productos distintos que se pidieron en la misma cuenta. Para cada par de
-    /// productos calcula:
-    ///   Soporte %   = (cuentas con A y B) / (total de cuentas)
-    ///   Confianza % = (cuentas con A y B) / (cuentas con A)
-    /// y conserva la dirección (A -> B o B -> A) de mayor confianza. Implementación
-    /// propia, sin librerías externas: con la carta de un restaurante (decenas de
-    /// productos) el conteo de pares por canasta es inmediato.
-    ///
-    /// Patente: GestionReportePredictivo.
-    /// </summary>
+    // Reporte predictivo (análisis de canasta): busca qué productos se piden juntos.
+    // Toma las facturas pagadas de los últimos 90 días; cada factura es una canasta con
+    // los productos distintos que tuvo. Para cada par calcula:
+    //   soporte = cuentas con A y B / total de cuentas
+    //   confianza = cuentas con A y B / cuentas con A
+    // y se queda con la dirección (A->B o B->A) de mayor confianza.
+    // Está hecho a mano, sin librerías: con una carta de decenas de productos es rápido.
+    // Permiso: GestionReportePredictivo.
     public class ReportePredictivoBLL_790MY
     {
         public const int DiasAnalisis = 90;
 
-        /// <summary>
-        /// Cuentas cobradas mínimas para calcular reglas. Por debajo de este umbral el
-        /// soporte de cualquier par sería anecdótico. Siempre se analizan datos reales
-        /// (Facturas pagadas + ItemsFactura), con o sin ModoDemostracion.
-        /// </summary>
+        // Con menos cuentas que esto no se calculan reglas porque no serían confiables.
         public const int MinimoCuentasReales = 10;
 
-        /// <summary>Soporte mínimo (%) para considerar frecuente una combinación.</summary>
+        // Soporte mínimo (%) para considerar frecuente una combinación.
         public const decimal SoporteMinimo = 3m;
 
-        /// <summary>Una combinación debe aparecer al menos en esta cantidad de cuentas.</summary>
+        // Una combinación debe aparecer al menos en esta cantidad de cuentas.
         private const int MinimoCuentasPar = 2;
 
-        /// <summary>
-        /// Lift mínimo: descarta pares que coinciden solo porque B es muy pedido
-        /// (lift ≈ 1 = independencia), aunque su confianza sea alta.
-        /// </summary>
+        // Lift mínimo. Descarta pares que aparecen juntos solo porque B se pide mucho.
         public const decimal LiftMinimo = 1.2m;
 
-        /// <summary>Confianza mínima (%) de las reglas que pueden originar una sugerencia.</summary>
+        // Confianza mínima (%) de las reglas que pueden originar una sugerencia.
         public const decimal ConfianzaMinimaSugerencias = 40m;
 
         private readonly IFacturaRepository_790MY _facturaRepository;
@@ -60,10 +47,10 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  API del reporte
+        //  Consultas del reporte
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>Vuelve a leer las facturas de la BD en la próxima consulta.</summary>
+        // Descarta lo calculado para que la próxima consulta vuelva a leer la base.
         public void Actualizar()
         {
             _canastas = null;
@@ -71,6 +58,7 @@ namespace BLL_08YS
             _resumen = null;
         }
 
+        // Cuántas cuentas se analizaron y desde qué fecha.
         public ResumenCanasta_790MY ObtenerResumen()
         {
             ValidarAcceso();
@@ -78,10 +66,7 @@ namespace BLL_08YS
             return _resumen;
         }
 
-        /// <summary>
-        /// Reglas con confianza mayor o igual a la indicada (en %), ordenadas por confianza
-        /// o por soporte y numeradas según ese orden.
-        /// </summary>
+        // Reglas con confianza mayor o igual a la indicada (en %), ordenadas y numeradas.
         public List<ReglaAsociacion_790MY> ObtenerReglasAsociacion(decimal confianzaMinima,
                                                                    OrdenReglas_790MY orden = OrdenReglas_790MY.PorConfianza)
         {
@@ -99,13 +84,10 @@ namespace BLL_08YS
             return filtradas.Select(r => Copiar(r, numero++)).ToList();
         }
 
-        /// <summary>
-        /// Hasta tres recomendaciones concretas a partir de las reglas más fuertes:
-        ///  1. Combo con la regla de mayor confianza.
-        ///  2. Promoción el día de menor demanda con la siguiente regla fuerte que no
-        ///     comparta productos con el combo.
-        ///  3. Aviso de venta cruzada al camarero con la regla de mayor soporte restante.
-        /// </summary>
+        // Hasta tres sugerencias con las reglas más fuertes:
+        // 1. un combo con la regla de mayor confianza;
+        // 2. una promoción el día con menos cuentas, con otra regla que no repita productos;
+        // 3. un aviso de venta cruzada para el camarero con la regla de más soporte que queda.
         public List<SugerenciaInteligente_790MY> ObtenerSugerenciasInteligentes()
         {
             var sugerencias = new List<SugerenciaInteligente_790MY>();
@@ -139,6 +121,7 @@ namespace BLL_08YS
         //  Motor de reglas de asociación
         // ═══════════════════════════════════════════════════════════════════
 
+        // Lee las canastas y calcula las reglas una sola vez por instancia.
         private void Analizar()
         {
             if (_reglas != null) return;
@@ -161,10 +144,8 @@ namespace BLL_08YS
             };
         }
 
-        /// <summary>
-        /// Cuenta, en una sola pasada, en cuántas canastas aparece cada producto y cada par
-        /// de productos; luego arma las reglas de los pares frecuentes.
-        /// </summary>
+        // Cuenta en cuántas canastas aparece cada producto y cada par de productos, y arma
+        // las reglas de los pares que pasan los mínimos.
         internal static List<ReglaAsociacion_790MY> CalcularReglas(IList<CanastaFactura_790MY> canastas)
         {
             var reglas = new List<ReglaAsociacion_790MY>();
@@ -227,10 +208,8 @@ namespace BLL_08YS
             return reglas;
         }
 
-        /// <summary>
-        /// Día de la semana con menos cuentas cobradas en el período (promedio por
-        /// ocurrencia de ese día, para no penalizar días que aparecen una vez menos).
-        /// </summary>
+        // Día de la semana con menos cuentas. Se promedia por cuántas veces aparece ese día
+        // en el período, para no perjudicar a un día que aparece una vez menos.
         private DayOfWeek DiaDeMenorDemanda()
         {
             Analizar();
@@ -268,7 +247,7 @@ namespace BLL_08YS
             Lift = r.Lift
         };
 
-        /// <summary>Patente dedicada del reporte predictivo.</summary>
+        // Todas las consultas del reporte piden el mismo permiso.
         private static void ValidarAcceso()
             => SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionReportePredictivo);
     }

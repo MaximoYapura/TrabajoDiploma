@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 using BE_08YS;
 namespace DAL_08YS.Interfaces_Repositories
 {
+    // Acceso a la tabla Clientes y a sus emails y teléfonos adicionales.
     public interface IClienteRepository_790MY
     {
-        // No filtra por Activo: verifica existencia fisica de la fila para prevenir
-        // una violacion de clave primaria al registrar un DNI que ya existe (aunque
-        // este dado de baja logicamente). Para saber si un cliente existe Y esta
-        // activo (por ejemplo, para permitirle hacer una reserva), usar GetByDni
-        // (que si filtra por Activo = 1) y chequear que no devuelva null.
+        // True si el DNI está en la tabla, aunque el cliente esté dado de baja.
+        // Para saber si está activo hay que usar GetByDni.
         bool Exists(int dni);
+
+        // Alta y modificación. Graban también los emails y teléfonos adicionales.
         void Create(Cliente_790MY cliente);
         void Update(Cliente_790MY cliente);
+
+        // Baja lógica (Activo = 0).
         void DeleteLogico(int dni);
+
+        // Solo clientes activos.
         List<Cliente_790MY> GetAll();
         Cliente_790MY GetByDni(int dni);
     }

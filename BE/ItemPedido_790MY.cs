@@ -1,5 +1,6 @@
 ﻿namespace BE_08YS
 {
+    // Renglón de un pedido: producto, cantidad y observaciones para cocina.
     public class ItemPedido_790MY
     {
         public int NroPedido { get; set; }
@@ -8,10 +9,10 @@
         public int Cantidad { get; set; }
         public string Observaciones { get; set; }
 
-        /// <summary>Precio vigente al momento de registrar el pedido (snapshot).</summary>
+        // Precio del producto en el momento del pedido. No cambia si después cambia la carta.
         public decimal PrecioUnitario { get; set; }
 
-        // Solo lectura (JOIN con Productos).
+        // Se lee con JOIN a Productos, no se guarda.
         public string ProductoNombre { get; set; }
 
         public decimal Subtotal => PrecioUnitario * Cantidad;

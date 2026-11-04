@@ -7,7 +7,7 @@ using Service_08YS;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>Un paso de la Visita Guiada: el elemento real que se resalta y su explicación.</summary>
+    // Un paso de la Visita Guiada: el elemento real que se resalta y su explicación.
     public sealed class PasoVisita_790MY
     {
         public PasoVisita_790MY(Control objetivo, string titulo, string texto)
@@ -22,12 +22,10 @@ namespace GUI_08YS.Estilo
         public string Texto { get; }
     }
 
-    /// <summary>
-    /// Visita Guiada de primer ingreso (Etapa 5, Fase 7). Los pasos los arma el formulario
-    /// principal a partir de lo que el usuario realmente ve (botones visibles según sus
-    /// permisos); esta clase captura la ventana, la muestra atenuada con un hueco sobre cada
-    /// elemento y ubica el globo. Completar o saltar la visita dispara <see cref="Terminada"/>.
-    /// </summary>
+    // Visita guiada del primer ingreso. Los pasos los arma la ventana principal con los
+    // botones que el usuario ve según sus permisos. Esta clase saca una captura de la
+    // ventana, la oscurece dejando un hueco sobre cada botón y pone el globo al lado.
+    // Al completarla o saltearla se dispara Terminada.
     public sealed class VisitaGuiada_790MY
     {
         private const int Separacion = 4;
@@ -39,10 +37,10 @@ namespace GUI_08YS.Estilo
         private List<PasoVisita_790MY> _pasos = new List<PasoVisita_790MY>();
         private int _indice;
 
-        /// <summary>El usuario completó o saltó la visita (no se dispara si se cortó por otra causa).</summary>
+        // El usuario completó o saltó la visita (no se dispara si se cortó por otra causa).
         public event EventHandler Terminada;
 
-        /// <summary>La visita se cerró por cualquier motivo (incluida <see cref="Terminada"/>).</summary>
+        // La visita se cerró por cualquier motivo (incluida Terminada).
         public event EventHandler Cerrada;
 
         public VisitaGuiada_790MY(Control host, VisitaOverlay_790MY capa, GloboAyuda_790MY globo)
@@ -57,7 +55,7 @@ namespace GUI_08YS.Estilo
 
         public bool Activa { get; private set; }
 
-        /// <param name="partes">Contenedores visibles de la ventana, para componer la captura.</param>
+        // partes: Contenedores visibles de la ventana, para componer la captura.
         public bool Iniciar(IEnumerable<PasoVisita_790MY> pasos, IEnumerable<Control> partes)
         {
             Cortar();
@@ -73,7 +71,7 @@ namespace GUI_08YS.Estilo
             return true;
         }
 
-        /// <summary>Cierra la visita sin marcarla como vista (navegación, cambio de tamaño, cobro).</summary>
+        // Cierra la visita sin marcarla como vista (navegación, cambio de tamaño, cobro).
         public void Cortar()
         {
             if (!Activa && !_capa.Visible) return;
@@ -114,12 +112,10 @@ namespace GUI_08YS.Estilo
             _globo.EnfocarSiguiente();
         }
 
-        /// <summary>
-        /// Zona en la que puede quedar el hueco: el contenedor de primer nivel que contiene al
-        /// elemento (barra lateral, barra superior), achicado por el borde que dibuja la capa.
-        /// Así el marco de un elemento que ocupa todo el ancho de la barra (el encabezado con
-        /// nombre y rol) no invade el área de contenido.
-        /// </summary>
+        // Zona en la que puede quedar el hueco: el contenedor de primer nivel que contiene al
+        // elemento (barra lateral, barra superior), achicado por el borde que dibuja la capa.
+        // Así el marco de un elemento que ocupa todo el ancho de la barra (el encabezado con
+        // nombre y rol) no invade el área de contenido.
         private Rectangle LimiteDe(Control objetivo)
         {
             Control contenedor = objetivo;
@@ -129,7 +125,7 @@ namespace GUI_08YS.Estilo
             return Rectangle.Inflate(zona, -margen, -margen);
         }
 
-        /// <summary>A la derecha del elemento si entra (la barra está a la izquierda); si no, abajo o arriba.</summary>
+        // A la derecha del elemento si entra (la barra está a la izquierda); si no, abajo o arriba.
         private static Point UbicacionGlobo(Rectangle hueco, Rectangle zona, Size globo)
         {
             int y = Math.Max(zona.Top + Distancia, Math.Min(hueco.Top, zona.Bottom - globo.Height - Distancia));
@@ -141,11 +137,8 @@ namespace GUI_08YS.Estilo
             return new Point(x, Math.Max(zona.Top + Distancia, hueco.Top - Distancia - globo.Height));
         }
 
-        /// <summary>
-        /// Captura por partes con DrawToBitmap: sobre el formulario MDI completo dibuja el
-        /// MdiClient gris en lugar del contenido (spike B2), y CopyFromScreen depende de que
-        /// ninguna otra ventana tape la aplicación.
-        /// </summary>
+        // Captura la ventana por partes con DrawToBitmap. Capturarla entera sale gris, y una
+        // captura de pantalla fallaría si otra ventana la tapa.
         private Bitmap Capturar(IEnumerable<Control> partes)
         {
             var bmp = new Bitmap(Math.Max(1, _host.ClientSize.Width), Math.Max(1, _host.ClientSize.Height));

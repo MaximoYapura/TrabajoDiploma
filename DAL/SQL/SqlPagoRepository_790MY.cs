@@ -8,6 +8,7 @@ using static DAL_08YS.SQL.SqlFacturaRepository_790MY;
 
 namespace DAL_08YS.SQL
 {
+    // Pagos en SQL Server. Los métodos están explicados en IPagoRepository_790MY.
     public class SqlPagoRepository_790MY : IPagoRepository_790MY
     {
         private readonly string _connectionString;
@@ -67,8 +68,8 @@ namespace DAL_08YS.SQL
                             }
                         }
 
-                        // 1b) Caja del día abierta. HOLDLOCK sobre el rango: un cierre de otra
-                        // terminal espera a que termine este cobro.
+                        // 1b) La caja del día no puede estar cerrada. Con el bloqueo, un cierre
+                        // desde otra terminal espera a que termine este cobro.
                         using (var cmd = new SqlCommand(
                                 "SELECT COUNT(1) FROM CierresCaja WITH (UPDLOCK, HOLDLOCK) WHERE Fecha = @Fecha", connection, tx))
                         {
@@ -80,8 +81,7 @@ namespace DAL_08YS.SQL
                             }
                         }
 
-                        // 1c) Factura vigente: mismos consumos que ObtenerConsumosFacturables
-                        // (pedidos Listo de la reserva), sumados.
+                        // 1c) El subtotal de la factura tiene que seguir siendo la suma de los pedidos Listo.
                         using (var cmd = new SqlCommand(@"
                                 SELECT f.Subtotal,
                                        ISNULL((SELECT SUM(i.Cantidad * i.PrecioUnitario)
@@ -110,7 +110,7 @@ namespace DAL_08YS.SQL
                             }
                         }
 
-                        // 2) Sin pedidos sin despachar (dejarían porciones comprometidas).
+                        // 2) No pueden quedar pedidos sin despachar.
                         using (var cmd = new SqlCommand { Connection = connection, Transaction = tx })
                         {
                             string comprometido = FiltroOcupacionMesa_790MY.CondicionPedidoComprometido(cmd, null);

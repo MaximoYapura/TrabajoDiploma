@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BLL_08YS
 {
-    /// <summary>Arqueo de caja de una jornada.</summary>
+    // Arqueo de caja de un día. Todos los totales se calculan a partir de la lista de cobros.
     public class ReporteArqueoCaja_790MY
     {
         public DateTime Fecha { get; set; }
@@ -16,7 +16,7 @@ namespace BLL_08YS
         public decimal TotalPropinas => Cobros.Sum(c => c.MontoPropina);
         public decimal TotalDescuentos => Cobros.Sum(c => c.MontoDescuento);
 
-        /// <summary>Efectivo + Tarjetas (descuentos deducidos, IVA incluido). Las propinas se informan aparte.</summary>
+        // Efectivo más tarjetas, con el descuento aplicado y el IVA incluido. Las propinas van aparte.
         public decimal RecaudacionNeta => TotalEfectivo + TotalTarjetas;
 
         public int CantidadCuentas => Cobros.Count;

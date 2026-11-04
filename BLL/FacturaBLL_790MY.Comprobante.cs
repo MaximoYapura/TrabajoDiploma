@@ -9,11 +9,9 @@ using System.Linq;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// Representación de la Factura B (ticket de FormComprobanteFactura_790MY y PDF del
-    /// Arqueo de Caja): datos del emisor y formatos compartidos, para no duplicarlos entre
-    /// la GUI y el PDF. Datos fiscales ficticios: el sistema no se conecta con ARCA.
-    /// </summary>
+    // Parte de FacturaBLL_790MY que arma la Factura B: los datos del emisor y los formatos
+    // que usan el ticket de la pantalla y el PDF del arqueo. Los datos fiscales son
+    // ficticios (no hay conexión con ARCA).
     public partial class FacturaBLL_790MY
     {
         #region Emisor y formato compartido (ticket y PDF)
@@ -24,42 +22,37 @@ namespace BLL_08YS
         public const string EmisorInicioActividades = "01/03/2024";
         public const string EmisorDomicilio = "Av. del Fogón 1234 · Buenos Aires";
 
-        /// <summary>Días de vigencia del CAE simulado desde la emisión.</summary>
+        // Días de vigencia del CAE simulado desde la emisión.
         public const int DiasVigenciaCae = 10;
 
-        /// <summary>Módulos por lado del QR simulado.</summary>
+        // Módulos por lado del QR simulado.
         public const int ModulosQrSimulado = 25;
 
-        /// <summary>Punto de venta con 5 dígitos, como el modelo oficial ("00001").</summary>
+        // Punto de venta con 5 dígitos, como el modelo oficial ("00001").
         public static string FormatearPuntoVenta()
             => Factura_790MY.PuntoVenta.ToString("00000", CultureInfo.InvariantCulture);
 
-        /// <summary>
-        /// Número del comprobante con 8 dígitos ("00000234"). Factura_790MY.NumeroComprobante
-        /// no cambia: entra en el hash de las facturas ya emitidas.
-        /// </summary>
+        // Número del comprobante con 8 dígitos ("00000234"). No se usa
+        // Factura_790MY.NumeroComprobante porque ese formato entra en el hash.
         public static string FormatearNumeroComprobante(Factura_790MY factura)
             => FormatearNumeroComprobante(factura.NroFactura);
 
         public static string FormatearNumeroComprobante(int nroFactura)
             => nroFactura.ToString("00000000", CultureInfo.InvariantCulture);
 
-        /// <summary>Punto de venta y número: "00001-00000234" (grilla del arqueo).</summary>
+        // Punto de venta y número: "00001-00000234" (grilla del arqueo).
         public static string FormatearComprobante(int nroFactura)
             => FormatearPuntoVenta() + "-" + FormatearNumeroComprobante(nroFactura);
 
-        /// <summary>Nombre sugerido para el PDF: "Factura_B_00001-00000234.pdf".</summary>
+        // Nombre sugerido para el PDF: "Factura_B_00001-00000234.pdf".
         public static string NombreArchivoFacturaPdf(int nroFactura)
             => "Factura_B_" + FormatearComprobante(nroFactura) + ".pdf";
 
-        /// <summary>Fecha de emisión que se imprime: la del cobro si existe, si no la de la cuenta.</summary>
+        // Fecha de emisión que se imprime: la del cobro si existe, si no la de la cuenta.
         public static DateTime FechaEmisionComprobante(Factura_790MY factura, Pago_790MY pago)
             => pago?.FechaHoraPago ?? factura.FechaEmision;
 
-        /// <summary>
-        /// CAE simulado de 14 dígitos derivado del hash del comprobante: no se persiste y
-        /// sale igual en cada reimpresión.
-        /// </summary>
+        // CAE simulado de 14 dígitos, sacado del hash. No se guarda y sale igual en cada reimpresión.
         public static string CaeSimulado(string hash)
         {
             if (string.IsNullOrEmpty(hash) || hash.Length < 23) return new string('0', 14);
@@ -67,20 +60,16 @@ namespace BLL_08YS
             return "7" + valor.ToString("D13", CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Vencimiento del CAE simulado: fecha de emisión + <see cref="DiasVigenciaCae"/> días.</summary>
+        // Vencimiento del CAE simulado: fecha de emisión + DiasVigenciaCae días.
         public static DateTime VencimientoCae(DateTime emision) => emision.Date.AddDays(DiasVigenciaCae);
 
-        /// <summary>
-        /// True si la factura se emitió con IVA contenido (total = subtotal − descuento).
-        /// Las emitidas antes del cambio sumaban el IVA y se muestran con su cálculo original.
-        /// </summary>
+        // True si la factura tiene el IVA incluido en el total. Las facturas viejas sumaban
+        // el IVA aparte y se siguen mostrando así.
         public static bool TieneIvaContenido(Factura_790MY factura)
             => factura.MontoTotal == factura.Subtotal - factura.MontoDescuento;
 
-        /// <summary>
-        /// Patrón tipo QR derivado del hash (simulación visual, no decodificable), igual en el
-        /// ticket y en el PDF: [fila, columna] = módulo lleno.
-        /// </summary>
+        // Dibujo parecido a un QR, sacado del hash (no se puede escanear). Es el mismo en
+        // el ticket y en el PDF. Cada true es un cuadradito pintado.
         public static bool[,] PatronQrSimulado(string hash)
         {
             const int modulos = ModulosQrSimulado;
@@ -95,7 +84,7 @@ namespace BLL_08YS
             return patron;
         }
 
-        /// <summary>Patrones de posición (esquinas) de un QR: anillo 7x7 con centro 3x3.</summary>
+        // Los tres cuadrados de las esquinas que tiene todo QR.
         private static bool ModuloPatron(int fila, int col, int modulos)
         {
             int f = fila >= modulos - 8 ? fila - (modulos - 7) : fila;
@@ -112,11 +101,9 @@ namespace BLL_08YS
 
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
-        /// <summary>
-        /// Representación gráfica de la Factura B en A4, con el mismo contenido fiscal que el
-        /// ticket. Diagramación tomada del ejemplo de comprobante de ARCA: encabezado en dos
-        /// columnas con la letra al centro. Se genera en memoria; la GUI decide dónde guardarlo.
-        /// </summary>
+        // Arma la Factura B en PDF A4 con iTextSharp, con el mismo contenido que el ticket.
+        // El diseño copia el modelo de ARCA (emisor y datos a los costados, la letra al
+        // centro). Devuelve los bytes; la pantalla decide dónde guardarlo.
         internal byte[] GenerarFacturaPDF(Factura_790MY factura, Pago_790MY pago)
         {
             if (factura == null) throw new ArgumentNullException(nameof(factura));
@@ -279,7 +266,7 @@ namespace BLL_08YS
                 bloques.AddCell(new PdfPCell(detalle) { Padding = 9f, BorderWidth = 1.5f });
                 doc.Add(bloques);
 
-                // ── Pie: QR simulado, CAE simulado e integridad ─────────────────────
+                // ── Pie: QR y CAE simulados ────────────────────────────────────────
                 var pie = new PdfPTable(2) { WidthPercentage = 100f, SpacingBefore = 18f };
                 pie.SetWidths(new[] { 0.55f, 3f });
                 pie.AddCell(new PdfPCell(QrSimulado(writer.DirectContent, hash, 3.2f)) { Border = Rectangle.NO_BORDER, PaddingTop = 2f });
@@ -300,6 +287,7 @@ namespace BLL_08YS
             }
         }
 
+        // Helpers de formato para las celdas del PDF.
         private static Paragraph Dato(string etiqueta, string valor, Font fEtiqueta, Font fValor)
         {
             var p = new Paragraph { Leading = 13f };
@@ -341,7 +329,7 @@ namespace BLL_08YS
             tabla.AddCell(new PdfPCell(new Phrase(valor, fuente)) { Border = Rectangle.NO_BORDER, PaddingTop = 2f, PaddingBottom = 3f, HorizontalAlignment = Element.ALIGN_RIGHT });
         }
 
-        /// <summary>QR simulado (mismo patrón que el ticket) como imagen vectorial.</summary>
+        // QR simulado (mismo patrón que el ticket) como imagen vectorial.
         private static Image QrSimulado(PdfContentByte cb, string hash, float lado)
         {
             bool[,] patron = PatronQrSimulado(hash);

@@ -8,11 +8,8 @@ namespace GUI_08YS.Estilo
 {
     public enum TipoBanner_790MY { Error, Aviso, Info }
 
-    /// <summary>
-    /// Banner del formulario (Etapa 2, E2-D4): errores y avisos que permanecen en pantalla
-    /// hasta que se corrigen o el usuario los cierra. Se acopla arriba (Dock = Top) y
-    /// empuja el contenido hacia abajo, sin tapar controles.
-    /// </summary>
+    // Banner de avisos de los formularios: errores y avisos que quedan arriba hasta que se
+    // corrigen o el usuario los cierra. Empuja el contenido hacia abajo, no lo tapa.
     public partial class Banner_UC_790MY : UserControl
     {
         private Color _borde = T.Linea;
@@ -22,7 +19,7 @@ namespace GUI_08YS.Estilo
             InitializeComponent();
         }
 
-        /// <summary>Muestra <paramref name="mensaje"/>. Sin <paramref name="cerrable"/>, solo lo quita el código (al corregirse).</summary>
+        // Muestra el mensaje. Si no es cerrable, solo lo saca el código (cuando se corrige).
         public void Mostrar(string mensaje, TipoBanner_790MY tipo = TipoBanner_790MY.Error, bool cerrable = true)
         {
             Color fondo, texto;

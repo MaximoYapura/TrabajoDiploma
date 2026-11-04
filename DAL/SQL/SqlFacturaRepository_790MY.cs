@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace DAL_08YS.SQL
 {
+    // Facturas en SQL Server. Los métodos están explicados en IFacturaRepository_790MY.
     public class SqlFacturaRepository_790MY : IFacturaRepository_790MY
     {
         private const string SelectFacturas = @"
@@ -86,7 +87,7 @@ namespace DAL_08YS.SQL
                 {
                     try
                     {
-                        // 1) La reserva debe seguir Asistida (bloqueo para que no se cobre en paralelo).
+                        // 1) La mesa tiene que seguir abierta. Se bloquea la reserva para que no se cobre en paralelo.
                         using (var cmd = new SqlCommand(@"
                                 SELECT COUNT(1) FROM Reservas WITH (UPDLOCK, HOLDLOCK)
                                 WHERE ReservaID = @ReservaID AND Estado = @Asistida", connection, tx))
@@ -128,7 +129,7 @@ namespace DAL_08YS.SQL
                                 nroFacturaAnulada = Convert.ToInt32(anulada);
                         }
 
-                        // 4) Alta de la factura con importes congelados.
+                        // 4) Alta de la factura y su detalle.
                         using (var cmd = new SqlCommand(@"
                                 INSERT INTO Facturas (NroReserva, FechaEmision, Subtotal, PorcentajeDescuento, MontoDescuento,
                                                       SubtotalNeto, IVA, MontoTotal, Estado)
@@ -211,6 +212,7 @@ namespace DAL_08YS.SQL
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
+        // Agrega un parámetro decimal con dos decimales. También lo usa SqlPagoRepository_790MY.
         internal static void AgregarImporte(SqlCommand cmd, string nombre, decimal valor, byte precision = 12)
         {
             var p = cmd.Parameters.Add(nombre, SqlDbType.Decimal);

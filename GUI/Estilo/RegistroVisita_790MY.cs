@@ -6,12 +6,10 @@ using Newtonsoft.Json;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// «Visita ya vista» (Etapa 5, A7 / C6 / G4): archivo local, sin tocar la base, en
-    /// %LocalAppData%\El Fogon del Sur\ayuda.json (Program Files no es escribible sin
-    /// privilegios). La clave es el usuario de la aplicación, no el rol: dos camareros
-    /// comparten rol. Toda E/S va protegida: si falla, se asume «no vista» y el ingreso sigue.
-    /// </summary>
+    // Recuerda qué usuarios ya vieron la visita guiada, en el archivo
+    // %LocalAppData%\El Fogon del Sur\ayuda.json (no en la base; Program Files no se puede
+    // escribir sin permisos). Se guarda por usuario, no por rol. Si el archivo falla, se
+    // toma como "no vista" y el ingreso sigue normal.
     internal static class RegistroVisita_790MY
     {
         private sealed class Datos
@@ -24,6 +22,7 @@ namespace GUI_08YS.Estilo
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                          "El Fogon del Sur", "ayuda.json");
 
+        // True si el usuario ya vio la visita en esta PC.
         public static bool FueVista(string usuario)
         {
             if (string.IsNullOrWhiteSpace(usuario)) return false;
@@ -37,6 +36,7 @@ namespace GUI_08YS.Estilo
             }
         }
 
+        // Anota que el usuario ya vio la visita.
         public static void MarcarVista(string usuario)
         {
             if (string.IsNullOrWhiteSpace(usuario)) return;

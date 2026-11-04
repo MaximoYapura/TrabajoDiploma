@@ -9,13 +9,9 @@ namespace GUI_08YS.Estilo
 {
     public enum EstadoBotonCobro_790MY { Disponible, Deshabilitado, Procesando }
 
-    /// <summary>
-    /// Botón de la acción principal de cobro (Etapa 4, E4-D2): bordó sólido con un ícono de
-    /// confirmación. En «Procesando» muestra un indicador circular que gira (GDI+, timer de
-    /// ~40 ms que corre solo en ese estado), cambia el texto y no acepta clics ni teclas.
-    /// Con las animaciones de Windows desactivadas el indicador queda estático.
-    /// Deriva de Button: conserva foco, Enter/Espacio, Tag de idioma y el filtro de permisos.
-    /// </summary>
+    // Botón de cobrar de Caja y cobro. En "Procesando" muestra un círculo que gira, cambia
+    // el texto y no acepta clics, así no se puede cobrar dos veces. Hereda de Button para
+    // conservar el foco, el teclado, la traducción y el filtro de permisos.
     public partial class BotonCobro_790MY : Button
     {
         private const int PasoGiroGrados = 30;
@@ -33,7 +29,7 @@ namespace GUI_08YS.Estilo
                      ControlStyles.ResizeRedraw | ControlStyles.UserPaint, true);
         }
 
-        /// <summary>Disponible (acepta clic), Deshabilitado (datos incompletos) o Procesando (cobro en curso).</summary>
+        // Disponible (acepta clic), Deshabilitado (datos incompletos) o Procesando (cobro en curso).
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public EstadoBotonCobro_790MY Estado
         {
@@ -59,7 +55,7 @@ namespace GUI_08YS.Estilo
             }
         }
 
-        /// <summary>Texto mientras el cobro está en curso (lo asigna el formulario desde idiomas.json).</summary>
+        // Texto mientras el cobro está en curso (lo asigna el formulario desde idiomas.json).
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string TextoProcesando
         {
@@ -136,7 +132,7 @@ namespace GUI_08YS.Estilo
                 TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis |
                 TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix);
 
-            // Foco visible (P10): anillo dorado interior, solo cuando el botón acepta la acción.
+            // Borde dorado cuando tiene el foco.
             if (Focused && ShowFocusCues && activo)
             {
                 Rectangle foco = r;

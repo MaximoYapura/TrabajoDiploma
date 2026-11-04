@@ -18,12 +18,9 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Reportes
 {
-    /// <summary>
-    /// Reporte gerencial de Arqueo y Cierre de Caja: totales de la jornada (efectivo,
-    /// tarjetas, propinas, descuentos y recaudación neta) y detalle de las cuentas
-    /// cobradas. "Cerrar caja del día" deja constancia del cierre en la bitácora
-    /// (PagoBLL_790MY.CerrarCaja). Patente: GestionCaja.
-    /// </summary>
+    // Reporte de arqueo y cierre de caja: los totales del día (efectivo, tarjetas, propinas,
+    // descuentos y recaudación neta) y el detalle de cada cobro. Permite cerrar la caja del
+    // día y exportar la factura de un cobro en PDF. Permiso: GestionCaja.
     public partial class FormArqueoCaja_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
@@ -38,7 +35,7 @@ namespace GUI_08YS.Reportes
                 { nameof(btnExportarFactura_790MY), Permisos.GestionCaja },
             };
 
-        /// <summary>Tarjeta KPI: clave del título, ícono y si es la destacada (recaudación neta).</summary>
+        // Tarjeta KPI: clave del título, ícono y si es la destacada (recaudación neta).
         private sealed class Kpi
         {
             public string ClaveTitulo;
@@ -107,6 +104,7 @@ namespace GUI_08YS.Reportes
 
         #region Datos
 
+        // Carga el arqueo del día elegido y si la caja ya está cerrada.
         private void Cargar()
         {
             bnrAvisos_790MY.Ocultar();
@@ -128,7 +126,7 @@ namespace GUI_08YS.Reportes
         // La caja de cada día se cierra una sola vez (la BLL también lo controla).
         private bool _cajaCerrada;
 
-        /// <summary>Explica por qué «Cerrar caja» está deshabilitado.</summary>
+        // Explica por qué «Cerrar caja» está deshabilitado.
         private void AvisarSiCajaCerrada()
         {
             if (_cajaCerrada)
@@ -185,11 +183,12 @@ namespace GUI_08YS.Reportes
                 dtpFecha_790MY.Value = dtpFecha_790MY.Value.Date.AddDays(1);
         }
 
+        // Cierra la caja del día con PagoBLL_790MY.CerrarCaja, después de confirmar.
         private void btnCerrarCaja_790MY_Click(object sender, EventArgs e)
         {
             DateTime fecha = dtpFecha_790MY.Value.Date;
 
-            // Validación defensiva: otra terminal pudo cerrar la caja después de cargar la pantalla.
+            // Se vuelve a preguntar porque otra terminal pudo cerrar la caja mientras tanto.
             try
             {
                 _cajaCerrada = _pagoBll.EstaCajaCerrada(fecha);
@@ -231,14 +230,14 @@ namespace GUI_08YS.Reportes
             }
         }
 
-        /// <summary>El cobro elegido en la grilla (la fila guarda el CobroArqueo_790MY con su NroFactura).</summary>
+        // El cobro elegido en la grilla (la fila guarda el CobroArqueo_790MY con su NroFactura).
         private CobroArqueo_790MY CobroSeleccionado
             => dgvCobros_790MY.SelectedRows.Count > 0 ? dgvCobros_790MY.SelectedRows[0].Tag as CobroArqueo_790MY : null;
 
         private void dgvCobros_790MY_SelectionChanged(object sender, EventArgs e)
             => btnExportarFactura_790MY.Enabled = CobroSeleccionado != null;
 
-        /// <summary>Exporta la Factura B del cobro elegido en PDF A4 (PagoBLL_790MY.ExportarFacturaPDF).</summary>
+        // Exporta la Factura B del cobro elegido en PDF A4 (PagoBLL_790MY.ExportarFacturaPDF).
         private void btnExportarFactura_790MY_Click(object sender, EventArgs e)
         {
             CobroArqueo_790MY cobro = CobroSeleccionado;
@@ -288,6 +287,7 @@ namespace GUI_08YS.Reportes
 
         #region Presentación
 
+        // Crea las cinco tarjetas de totales de arriba.
         private void CrearTarjetasKpi()
         {
             tlpKpis_790MY.SuspendLayout();
@@ -378,7 +378,7 @@ namespace GUI_08YS.Reportes
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(dtpFecha_790MY), "AY_sug_ac1_t", "AY_sug_ac1_x"),

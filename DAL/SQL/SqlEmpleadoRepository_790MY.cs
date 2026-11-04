@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 
 namespace DAL_08YS.SQL
 {
+    // Empleados en SQL Server. Los métodos están explicados en IEmpleadoRepository_790MY.
     public class SqlEmpleadoRepository_790MY : IEmpleadoRepository_790MY
     {
         private const string Columnas = "SELECT DNI, Nombre, Apellido, Puesto, UsuarioDNI, Activo FROM Empleados ";
@@ -107,11 +108,8 @@ namespace DAL_08YS.SQL
             }
         }
 
-        /// <summary>
-        /// Actualiza los datos del empleado. UsuarioDNI no se modifica: el vínculo con un
-        /// usuario del sistema no se gestiona desde el Maestro de Empleados (se conserva el
-        /// existente, p. ej. el del administrador).
-        /// </summary>
+        // No modifica UsuarioDNI: el vínculo con el usuario no se edita desde el maestro,
+        // así se conserva el que ya tenía.
         public void Update(Empleado_790MY empleado)
         {
             const string sql =

@@ -2,7 +2,7 @@
 
 namespace BE_08YS
 {
-    /// <summary>Una cuenta cobrada, para el detalle del arqueo de caja.</summary>
+    // Una cuenta cobrada, para el detalle del arqueo de caja.
     public class CobroArqueo_790MY
     {
         public int IdPago { get; set; }
@@ -13,7 +13,7 @@ namespace BE_08YS
         public decimal MontoDescuento { get; set; }
         public decimal MontoPropina { get; set; }
 
-        /// <summary>Total de la factura (descuento deducido, IVA incluido, sin propina).</summary>
+        // Total de la factura (descuento deducido, IVA incluido, sin propina).
         public decimal ImporteCobrado { get; set; }
     }
 }

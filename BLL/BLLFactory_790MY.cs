@@ -4,6 +4,8 @@ using DAL_08YS.SQL;
 
 namespace BLL_08YS
 {
+    // Arma cada BLL con sus repositorios SQL y con las otras BLL que necesita.
+    // Las pantallas piden la BLL acá y nunca crean repositorios.
     public static class BLLFactory_790MY
     {
         public static ClienteBLL_790MY CreateClienteBLL()

@@ -1,5 +1,6 @@
 namespace BE_08YS
 {
+    // Estado físico de la mesa. FueraDeServicio es la baja desde el maestro.
     public enum EstadoMesa_790MY
     {
         Libre,
@@ -8,6 +9,7 @@ namespace BE_08YS
         FueraDeServicio
     }
 
+    // Mesa del salón (capacidad de 1 a 8 personas).
     public class Mesa_790MY
     {
         private int _nroMesa;

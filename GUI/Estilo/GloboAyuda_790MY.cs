@@ -5,11 +5,8 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Globo de las Sugerencias del Chef (Etapa 5, Fase 6, C8): control opaco (sin
-    /// transparencia ni ventana propia) que AyudaSugerencias_790MY ubica junto al control
-    /// resaltado. ← / → recorren las pistas y Esc cierra.
-    /// </summary>
+    // Globo de texto de la ayuda (F1 y visita guiada). Se ubica al lado del control
+    // marcado. Las flechas recorren las pistas y Esc cierra.
     public partial class GloboAyuda_790MY : UserControl
     {
         public event EventHandler AnteriorSolicitado;

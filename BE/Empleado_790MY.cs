@@ -2,7 +2,7 @@
 
 namespace BE_08YS
 {
-    /// <summary>Puesto operativo del empleado dentro del restaurante.</summary>
+    // Puesto del empleado en el restaurante.
     public enum PuestoEmpleado_790MY
     {
         Camarero,
@@ -10,15 +10,9 @@ namespace BE_08YS
         Recepcionista
     }
 
-    /// <summary>
-    /// Empleado del restaurante (entidad de dominio).
-    ///
-    /// Esta deliberadamente desacoplada de la seguridad: NO referencia a User_08YS,
-    /// Rol_08YS ni al Composite de permisos. La unica relacion con la identidad de
-    /// acceso es UsuarioDNI (FK a Users.DNI), que puede ser null cuando el empleado
-    /// no opera el sistema (p. ej. un camarero que solo es asignado por recepcion).
-    /// Los permisos se siguen resolviendo exclusivamente via SessionManager_08YS.
-    /// </summary>
+    // Empleado del restaurante. No depende de la seguridad: lo único que lo une a un
+    // usuario del sistema es UsuarioDNI, que puede quedar vacío si el empleado no usa
+    // el sistema. Los permisos los resuelve siempre SessionManager_08YS.
     public class Empleado_790MY
     {
         private int _dni;
@@ -64,7 +58,7 @@ namespace BE_08YS
             set { _puesto = value; }
         }
 
-        /// <summary>DNI del usuario del sistema asociado; null si no tiene usuario.</summary>
+        // DNI del usuario del sistema asociado; null si no tiene usuario.
         public int? UsuarioDNI
         {
             get { return _usuarioDni; }

@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 
 namespace DAL_08YS.SQL
 {
+    // Mesas en SQL Server. Los métodos están explicados en IMesaRepository_790MY.
     public class SqlMesaRepository_790MY : IMesaRepository_790MY
     {
         private readonly string _connectionString;

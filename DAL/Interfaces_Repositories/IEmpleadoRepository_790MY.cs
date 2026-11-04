@@ -3,21 +3,23 @@ using System.Collections.Generic;
 
 namespace DAL_08YS.Interfaces_Repositories
 {
+    // Acceso a la tabla Empleados.
     public interface IEmpleadoRepository_790MY
     {
         bool Exists(int dni);
 
-        /// <summary>Devuelve el empleado (activo o no) o null si no existe.</summary>
+        // Devuelve el empleado (activo o no) o null si no existe.
         Empleado_790MY GetByDni(int dni);
 
-        /// <summary>Empleado vinculado al usuario del sistema indicado, o null.</summary>
+        // Empleado vinculado al usuario del sistema indicado, o null.
         Empleado_790MY GetByUsuarioDni(int usuarioDni);
 
         List<Empleado_790MY> GetAll();
 
+        // Empleados activos de un puesto (por ejemplo, los camareros para Abrir mesa).
         List<Empleado_790MY> GetActivosPorPuesto(PuestoEmpleado_790MY puesto);
 
-        /// <summary>True si el usuario ya esta vinculado a un empleado distinto de exceptoDni.</summary>
+        // True si el usuario ya está vinculado a otro empleado (distinto de exceptoDni).
         bool UsuarioVinculadoAOtroEmpleado(int usuarioDni, int exceptoDni);
 
         void Add(Empleado_790MY empleado);

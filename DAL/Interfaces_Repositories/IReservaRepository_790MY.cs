@@ -4,33 +4,26 @@ using System.Collections.Generic;
 
 namespace DAL_08YS.Interfaces_Repositories
 {
+    // Acceso a la tabla Reservas.
     public interface IReservaRepository_790MY
     {
-        /// <summary>
-        /// Alta atomica: dentro de una transaccion verifica que la mesa exista, este
-        /// en servicio, tenga capacidad y no tenga otra reserva que la ocupe en el
-        /// mismo (Fecha, Hora); recien entonces inserta. Bloquea el rango con
-        /// UPDLOCK/HOLDLOCK para que dos puestos no confirmen la misma mesa/turno.
-        /// Si ocuparMesaFisica = true (Walk-in) ademas exige que la mesa no este
-        /// fisicamente Ocupada y la marca como Ocupada en la misma transaccion.
-        /// Devuelve false (sin cambios) si la mesa ya no esta disponible.
-        /// Asigna reserva.ReservaID cuando inserta.
-        /// </summary>
+        // Inserta la reserva solo si la mesa sigue libre en ese turno, todo en una
+        // transacción con bloqueo, para que dos puestos no tomen la misma mesa.
+        // Con ocuparMesaFisica (walk-in) además exige que la mesa no esté ocupada y la
+        // deja Ocupada. Devuelve false si la mesa ya no estaba disponible.
         bool AddSiMesaDisponible(Reserva_790MY reserva, bool ocuparMesaFisica);
 
         Reserva_790MY GetById(int reservaId);
 
-        // Todos los filtros son opcionales (null = sin filtrar por ese campo).
+        // Todos los filtros son opcionales: null no filtra.
         List<Reserva_790MY> Buscar(DateTime? desde, DateTime? hasta, int? clienteDni, EstadoReserva_790MY? estado);
 
-        /// <summary>Reservas Asistidas (mesas abiertas) a cargo del camarero.</summary>
+        // Mesas abiertas a cargo del camarero.
         List<Reserva_790MY> GetAsistidasPorCamarero(int camareroDni);
 
-        /// <summary>
-        /// CUN-004. En una transaccion: Confirmada -> Asistida + CamareroDNI y
-        /// Mesa -> Ocupada. False (sin cambios) si la reserva ya no esta Confirmada
-        /// o la mesa esta fisicamente ocupada / fuera de servicio.
-        /// </summary>
+        // Abre la mesa de una reserva: la pasa a Asistida con el camarero y deja la mesa
+        // Ocupada. Devuelve false si la reserva ya no estaba Confirmada o la mesa no
+        // estaba disponible (por ejemplo, la abrió otro puesto).
         bool AbrirReserva(int reservaId, int camareroDni);
     }
 }

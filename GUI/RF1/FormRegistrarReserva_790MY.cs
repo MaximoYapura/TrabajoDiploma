@@ -13,6 +13,9 @@ using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
+    // RF1: registrar una reserva. Se busca el cliente por DNI, se eligen fecha, turno y
+    // comensales, se elige la mesa en el plano y se confirma. A la derecha hay un resumen
+    // que se actualiza en vivo. Las reglas las controla ReservaBLL_790MY.
     public partial class FormRegistrarReserva_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly ClienteBLL_790MY _clienteBll;
@@ -22,7 +25,7 @@ namespace GUI_08YS.RF1
         private Cliente_790MY _clienteActual;
         private Mesa_790MY _mesaSeleccionada;
 
-        // DNI de cliente: solo números, de 7 u 8 dígitos (regla del propietario).
+        // DNI de cliente: solo números, de 7 u 8 dígitos.
         private static readonly Regex _regexDni = new Regex(@"^\d{7,8}$");
 
         // El resumen de faltantes aparece al intentar confirmar y se va solo al completarse.
@@ -148,6 +151,7 @@ namespace GUI_08YS.RF1
 
         #region Resumen en vivo
 
+        // Actualiza el resumen de la derecha con lo cargado hasta ahora.
         private void ActualizarResumen()
         {
             var t = TraductorManager_08YS.Instance;
@@ -251,6 +255,7 @@ namespace GUI_08YS.RF1
             btnBuscarCliente_790MY.PerformClick();
         }
 
+        // Busca el cliente por DNI. Si no existe, ofrece darlo de alta.
         private void btnBuscarCliente_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
@@ -270,14 +275,13 @@ namespace GUI_08YS.RF1
 
             try
             {
-                // Escenario 1: cliente activo — GetByDni filtra por Activo = 1.
+                // Cliente activo: se carga.
                 _clienteActual = _clienteBll.GetByDni(dni);
 
                 if (_clienteActual != null)
                     return;
 
-                // Escenario 2: DNI existe en BD pero inactivo (baja lógica).
-                // Exists no filtra por Activo, por lo que devuelve true en ese caso.
+                // El DNI existe pero el cliente está dado de baja (Exists no filtra por activo).
                 if (_clienteBll.Exists(dni))
                 {
                     bnrAvisos_790MY.Mostrar(string.Format(t.GetTexto("RR_aviso_cliente_inactivo"), dni),
@@ -285,7 +289,7 @@ namespace GUI_08YS.RF1
                     return;
                 }
 
-                // Escenario 3: DNI no existe en absoluto — ofrecer registro rápido.
+                // El DNI no existe: se ofrece el alta rápida.
                 bool registrar = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
                     string.Format(t.GetTexto("RR_confirmar_registro_titulo"), dni),
                     t.GetTexto("RR_confirmar_registro_msg"),
@@ -309,6 +313,7 @@ namespace GUI_08YS.RF1
             }
         }
 
+        // Abre el plano del salón para elegir la mesa.
         private void btnSeleccionarMesa_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
@@ -327,10 +332,8 @@ namespace GUI_08YS.RF1
             int      comensales = (int)nudComensales_790MY.Value;
             DateTime fecha      = dtpFecha_790MY.Value.Date;
 
-            // ── Verificar disponibilidad antes de abrir el plano ──────────────
-            // Se consulta el mapa para el mismo contexto que usará FormSeleccionarMesa.
-            // Si ninguna mesa resulta seleccionable, se informa al usuario y se
-            // cancela la apertura del modal preservando todos los campos del formulario.
+            // ── Antes de abrir el plano se controla que haya alguna mesa ──────
+            // Si ninguna se puede elegir, se avisa y no se abre, sin perder lo cargado.
             try
             {
                 var mesas = _mesaBll.ObtenerMesasMapa(fecha, hora, comensales);
@@ -357,11 +360,12 @@ namespace GUI_08YS.RF1
             }
         }
 
+        // Registra la reserva y muestra el comprobante.
         private void btnConfirmar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
 
-            // Etapa 2 (E2-D4): todo lo que falta se marca a la vez y se resume en el banner.
+            // Si falta algo, se marca todo junto y se resume en el banner.
             if (Faltantes().Count > 0)
             {
                 _resumenVisible = true;
@@ -389,8 +393,7 @@ namespace GUI_08YS.RF1
                 return;
             }
 
-            // La reserva ya quedó persistida: el comprobante (vista previa, PDF y
-            // email) no puede deshacerla, solo informarla.
+            // La reserva ya está grabada; el comprobante (PDF y mail) solo la informa.
             Cliente_790MY cliente = _clienteActual;
             LimpiarFormulario();
 
@@ -403,7 +406,7 @@ namespace GUI_08YS.RF1
 
         #region Validación y avisos (Etapa 2)
 
-        /// <summary>Datos que faltan para confirmar, en el orden de la pantalla.</summary>
+        // Datos que faltan para confirmar, en el orden de la pantalla.
         private Dictionary<Control, string> Faltantes()
         {
             var t = TraductorManager_08YS.Instance;
@@ -440,13 +443,13 @@ namespace GUI_08YS.RF1
                 TipoBanner_790MY.Error, cerrable: false);
         }
 
-        /// <summary>Quita un aviso puntual (cliente inactivo, sin disponibilidad, regla de la BLL); el resumen sigue.</summary>
+        // Quita un aviso puntual (cliente inactivo, sin disponibilidad, regla de la BLL); el resumen sigue.
         private void OcultarAvisoPuntual()
         {
             if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
         }
 
-        /// <summary>Error inesperado (base de datos, excepción no prevista): se conserva el MessageBox nativo (E2-D1).</summary>
+        // Error inesperado (por ejemplo, de la base): se muestra en un MessageBox.
         private void MostrarErrorFatal(string mensaje)
         {
             MessageBox.Show(VentanaPropietaria, mensaje, TraductorManager_08YS.Instance.GetTexto("error"),
@@ -455,6 +458,7 @@ namespace GUI_08YS.RF1
 
         #endregion
 
+        // Deja la pantalla lista para otra reserva.
         private void LimpiarFormulario()
         {
             _clienteActual = null;
@@ -497,7 +501,7 @@ namespace GUI_08YS.RF1
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(txtDniCliente_790MY), "AY_sug_rr1_t", "FC_val_dni_formato", "AY_sug_rr1_p"),

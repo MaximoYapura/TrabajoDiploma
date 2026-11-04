@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace DAL_08YS.SQL
 {
+    // Pedidos en SQL Server. Los métodos están explicados en IPedidoRepository_790MY.
     public class SqlPedidoRepository_790MY : IPedidoRepository_790MY
     {
         private const string SelectPedidos = @"
@@ -34,8 +35,9 @@ namespace DAL_08YS.SQL
         {
             if (pedido == null) throw new ArgumentNullException(nameof(pedido));
 
-            // Cantidades totales por producto (un producto puede repetirse en varios items
-            // con distintas observaciones). Orden por ID => orden de bloqueo estable, sin deadlocks.
+            // Cantidad total por producto (un producto puede venir en varios ítems con distintas
+            // observaciones). Se recorren en orden de ID para bloquear siempre en el mismo orden
+            // y que dos pedidos a la vez no se traben entre sí.
             var solicitadoPorProducto = pedido.Items
                 .GroupBy(i => i.ProductoID)
                 .ToDictionary(g => g.Key, g => g.Sum(i => i.Cantidad));
@@ -88,7 +90,7 @@ namespace DAL_08YS.SQL
                             precios[productoId] = producto.Precio;
                         }
 
-                        // Insercion del pedido condicionada a que la reserva siga Asistida.
+                        // El pedido se inserta solo si la mesa sigue abierta.
                         using (var cmd = new SqlCommand(@"
                                 INSERT INTO Pedidos (ReservaID, Fecha, Hora, Estado, FechaFin, HoraFin, StockDescontado)
                                 OUTPUT inserted.NroPedido
@@ -248,9 +250,8 @@ namespace DAL_08YS.SQL
                 {
                     try
                     {
-                        // 0) Bloqueo de las filas de Productos ANTES de tocar Pedidos, en el mismo
-                        //    orden que usa RegistrarSiHayStock (Productos -> Pedidos), para no
-                        //    generar interbloqueos entre el registro de pedidos y el despacho.
+                        // 0) Primero se bloquean los productos y después el pedido, en el mismo orden
+                        //    que RegistrarSiHayStock, para que pedir y despachar no se traben entre sí.
                         using (var cmd = new SqlCommand(@"
                                 SELECT COUNT(1) FROM Productos WITH (UPDLOCK, HOLDLOCK)
                                 WHERE ProductoID IN (SELECT ProductoID FROM ItemsPedido WHERE NroPedido = @NroPedido)",
@@ -260,9 +261,8 @@ namespace DAL_08YS.SQL
                             cmd.ExecuteScalar();
                         }
 
-                        // 1) Transicion idempotente: solo una ejecucion puede pasar de
-                        //    StockDescontado = 0 a 1. Un reproceso (doble clic, reintento,
-                        //    segundo puesto de cocina) afecta 0 filas y no descuenta nada.
+                        // 1) Solo se actualiza si StockDescontado sigue en 0. Si el pedido ya se
+                        //    procesó (doble clic, otra pantalla de cocina) no cambia nada.
                         int filas;
                         using (var cmd = new SqlCommand { Connection = connection, Transaction = tx })
                         {
@@ -290,9 +290,8 @@ namespace DAL_08YS.SQL
                             return existe ? ResultadoDespacho_790MY.YaProcesado : ResultadoDespacho_790MY.NoEncontrado;
                         }
 
-                        // 2) Descuento. El WHERE StockPorciones >= Total impide stock negativo:
-                        //    si algun producto no alcanza, se actualizan menos filas que productos
-                        //    del pedido y se revierte TODO (estado del pedido incluido).
+                        // 2) Descuento. El WHERE no deja el stock en negativo: si a algún producto no
+                        //    le alcanza, se actualizan menos filas de las esperadas y se revierte todo.
                         int productosDelPedido, productosDescontados, totalPorciones;
                         using (var cmd = new SqlCommand(@"
                                 SELECT COUNT(DISTINCT i.ProductoID), ISNULL(SUM(i.Cantidad), 0)

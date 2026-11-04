@@ -13,6 +13,8 @@ using GUI_08YS.Estilo;
 
 namespace GUI_08YS.Reportes
 {
+    // Reporte de reservas: busca por fechas, DNI y estado, y genera el listado en PDF.
+    // La búsqueda la hace ReservaBLL_790MY.Buscar; el PDF se arma acá con iTextSharp.
     public partial class FormReporteReservas_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly ReservaBLL_790MY _reservaBll;
@@ -44,10 +46,8 @@ namespace GUI_08YS.Reportes
             InicializarPanelResumen();
         }
 
-        /// <summary>
-        /// Aplica los textos traducidos de los prefijos del panel de resumen de
-        /// filtros. El panel y sus controles se crean en InitializeComponent().
-        /// </summary>
+        // Aplica los textos traducidos de los prefijos del panel de resumen de
+        // filtros. El panel y sus controles se crean en InitializeComponent().
         private void InicializarPanelResumen()
         {
             var t = TraductorManager_08YS.Instance;
@@ -55,9 +55,7 @@ namespace GUI_08YS.Reportes
             _lblPrefCliente.Text = t.GetTexto("REP_lbl_filtro_cliente") ?? "Filtro Cliente:";
         }
 
-        /// <summary>
-        /// Actualiza las etiquetas del resumen con los filtros que se acaban de aplicar.
-        /// </summary>
+        // Actualiza las etiquetas del resumen con los filtros que se acaban de aplicar.
         private void ActualizarResumenFiltros(DateTime? desde, DateTime? hasta, int? dni)
         {
             var t = TraductorManager_08YS.Instance;
@@ -102,8 +100,7 @@ namespace GUI_08YS.Reportes
             cboEstado_790MY.SelectedIndex = (idx >= 0 && idx < cboEstado_790MY.Items.Count) ? idx : 0;
         }
 
-        // Clave de traducción por estado: REP_cmbConfirmada, REP_cmbCancelada,
-        // REP_cmbAsistida, REP_cmbFinalizada (antes solo se distinguían dos estados).
+        // Clave de traducción de cada estado (REP_cmbConfirmada, REP_cmbAsistida, etc.).
         private static string TextoEstado(EstadoReserva_790MY estado)
             => TraductorManager_08YS.Instance.GetTexto("REP_cmb" + estado);
 
@@ -114,6 +111,7 @@ namespace GUI_08YS.Reportes
             BuscarReservas();
         }
 
+        // Valida los filtros y busca las reservas.
         private void BuscarReservas()
         {
             var t = TraductorManager_08YS.Instance;
@@ -164,7 +162,7 @@ namespace GUI_08YS.Reportes
             }
             catch (Exception ex)
             {
-                // Error inesperado (base de datos, excepción no prevista): MessageBox nativo (E2-D1).
+                // Error inesperado (por ejemplo, de la base): se muestra en un MessageBox.
                 MessageBox.Show(this, string.Format(t.GetTexto("msg_rep_error_buscar"), ex.Message),
                                 t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -222,7 +220,7 @@ namespace GUI_08YS.Reportes
                 }
                 catch (Exception ex)
                 {
-                    // Error inesperado al generar el PDF: MessageBox nativo (E2-D1).
+                    // Error inesperado al generar el PDF: se muestra en un MessageBox.
                     MessageBox.Show(this, string.Format(t.GetTexto("REP_fatal_pdf"), ex.Message),
                                     t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -236,6 +234,8 @@ namespace GUI_08YS.Reportes
             }
         }
 
+        // Arma el PDF (A4 horizontal): encabezado con logo, quién lo generó, los filtros,
+        // la tabla de reservas y el total.
         private void GenerarPDF(string rutaArchivo)
         {
             var t       = TraductorManager_08YS.Instance;
@@ -507,7 +507,7 @@ namespace GUI_08YS.Reportes
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(dtpDesde_790MY), "AY_sug_rs1_t", "AY_sug_rs1_x"),

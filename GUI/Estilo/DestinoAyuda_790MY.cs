@@ -2,7 +2,7 @@ using System;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>Pantallas a las que lleva el Menú Degustación (flujo real de FormMDI_08YS).</summary>
+    // Pantallas a las que lleva el botón "Ir" del Menú Degustación.
     public enum DestinoAyuda_790MY
     {
         Clientes,

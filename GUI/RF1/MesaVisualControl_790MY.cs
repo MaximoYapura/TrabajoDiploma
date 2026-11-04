@@ -8,9 +8,11 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.RF1
 {
+    // Una mesa en el plano del salón: se dibuja con su forma, sus sillas, el número, la
+    // capacidad y el color de su estado. Avisa con MesaClick cuando se la elige.
     public class MesaVisualControl_790MY : Control
     {
-        // ── Colors ────────────────────────────────────────────────────────
+        // ── Colores ───────────────────────────────────────────────────────
         private static readonly Color ClrRecomendada  = Color.FromArgb(39, 174, 96);
         private static readonly Color ClrDisponible   = Color.FromArgb(80, 140, 70);
         private static readonly Color ClrOcupada      = Color.FromArgb(120, 25, 25);
@@ -20,22 +22,22 @@ namespace GUI_08YS.RF1
         private static readonly Color ClrTextoBlanco  = Color.FromArgb(255, 255, 255);
         private static readonly Color ClrTextoOscuro  = Color.FromArgb(45, 42, 40);
 
-        // Sillas: tono madera oscura / caoba, en armonía con el piso del salón
+        // Sillas color madera oscura, como el piso del salón.
         private static readonly Color ClrSillaFondo = Color.FromArgb(92, 44, 22);   // #5C2C16 caoba cálido
         private static readonly Color ClrSillaBorde = Color.FromArgb(50, 24, 10);   // borde sutil más oscuro
 
-        // ── Constants ─────────────────────────────────────────────────────
+        // ── Constantes ────────────────────────────────────────────────────
         private const int Radio   = 10;
         private const int SillaW  = 14;
         private const int SillaH  = 9;
         private const int SillaGap = 5;
         public  const int MargenCtrl = 20;
 
-        // ── Fields ────────────────────────────────────────────────────────
+        // ── Campos ────────────────────────────────────────────────────────
         private bool _hover;
         private bool _seleccionada;
 
-        // ── Properties ────────────────────────────────────────────────────
+        // ── Propiedades ───────────────────────────────────────────────────
         public MesaMapaDTO_790MY Datos { get; }
 
         public bool Seleccionada
@@ -44,14 +46,12 @@ namespace GUI_08YS.RF1
             set { _seleccionada = value; Invalidate(); }
         }
 
-        // ── Event ─────────────────────────────────────────────────────────
+        // ── Evento ────────────────────────────────────────────────────────
         public event EventHandler<MesaMapaDTO_790MY> MesaClick;
 
-        // ── Dimensions helper ─────────────────────────────────────────────
-        /// <summary>
-        /// Devuelve (ancho, alto) en píxeles según la capacidad de la mesa.
-        /// ≤2p → 70×70 (circular), 3-4p → 85×65, 5-8p → 120×65.
-        /// </summary>
+        // ── Tamaño ────────────────────────────────────────────────────────
+        // Ancho y alto en píxeles según la capacidad: hasta 2 personas 70x70 (redonda),
+        // de 3 a 4 personas 85x65 y de 5 a 8 personas 120x65.
         public static (int ancho, int alto) GetDimensiones(int capacidad)
         {
             if (capacidad <= 2) return (70, 70);
@@ -67,9 +67,8 @@ namespace GUI_08YS.RF1
             Size   = new Size(ancho + MargenCtrl * 2, alto + MargenCtrl * 2);
             Cursor = datos.EsSeleccionable ? Cursors.Hand : Cursors.Default;
 
-            // IMPORTANTE: habilitar SupportsTransparentBackColor y deshabilitar
-            // Opaque ANTES de asignar BackColor = Transparent, o WinForms lanza
-            // "El control no admite colores de fondo transparentes".
+            // Estos estilos tienen que ir antes de poner BackColor = Transparent;
+            // si no, WinForms tira un error.
             SetStyle(
                 ControlStyles.AllPaintingInWmPaint        |
                 ControlStyles.UserPaint                   |
@@ -84,6 +83,7 @@ namespace GUI_08YS.RF1
         }
 
         // ── Mouse ─────────────────────────────────────────────────────────
+        // Al pasar el mouse cambia el color; el clic avisa que se eligió la mesa.
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
@@ -104,12 +104,9 @@ namespace GUI_08YS.RF1
                 MesaClick?.Invoke(this, Datos);
         }
 
-        // ── Transparent background ─────────────────────────────────────────
-        /// <summary>
-        /// Simula la transparencia dibujando la región correspondiente del
-        /// BackgroundImage del panel padre antes de pintar el contenido propio.
-        /// Esto garantiza que las sombras de las mesas proyecten sobre la madera.
-        /// </summary>
+        // ── Fondo "transparente" ──────────────────────────────────────────
+        // WinForms no tiene transparencia real: se dibuja el pedazo de la foto del salón
+        // que queda detrás del control, y encima la mesa con su sombra.
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             if (Parent != null && Parent.BackgroundImage != null)
@@ -117,8 +114,7 @@ namespace GUI_08YS.RF1
                 var g   = e.Graphics;
                 var img = Parent.BackgroundImage;
 
-                // Calcular la región del BackgroundImage (Stretch) que corresponde
-                // a la posición de este control dentro del panel padre.
+                // Qué parte de la foto queda detrás de este control.
                 float scaleX = (float)img.Width  / Math.Max(1, Parent.ClientSize.Width);
                 float scaleY = (float)img.Height / Math.Max(1, Parent.ClientSize.Height);
 
@@ -136,13 +132,13 @@ namespace GUI_08YS.RF1
             }
         }
 
-        // ── Painting ──────────────────────────────────────────────────────
+        // ── Dibujo ────────────────────────────────────────────────────────
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
             g.SmoothingMode     = SmoothingMode.AntiAlias;
             g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            // No g.Clear() — el fondo ya fue pintado en OnPaintBackground
+            // No se limpia: el fondo ya se dibujó en OnPaintBackground.
 
             var (ancho, alto) = GetDimensiones(Datos.Mesa.Capacidad);
             var tablero = new Rectangle(MargenCtrl, MargenCtrl, ancho, alto);
@@ -324,7 +320,7 @@ namespace GUI_08YS.RF1
             }
         }
 
-        // ── Decorations ───────────────────────────────────────────────────
+        // ── Estrella (recomendada) y candado (ocupada) ────────────────────
         private static void DibujarEstrella(Graphics g, float cx, float cy, float r, Color color)
         {
             const int puntas = 5;
@@ -375,7 +371,7 @@ namespace GUI_08YS.RF1
             }
         }
 
-        // ── Helpers ───────────────────────────────────────────────────────
+        // ── Auxiliares ────────────────────────────────────────────────────
         private Color ObtenerColorPrincipal()
         {
             if (_seleccionada) return ClrSeleccionada;

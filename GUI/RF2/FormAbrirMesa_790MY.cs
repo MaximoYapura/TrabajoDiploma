@@ -16,12 +16,9 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// CUN-004 Abrir Mesa y su extensión CUN-005 Registrar Walk-In. Recepción da ingreso al salón a un cliente con reserva
-    /// Confirmada del turno en curso, o a un Walk-in (sin reserva) eligiendo la mesa
-    /// en el plano de FormSeleccionarMesa_790MY, y asigna el camarero responsable.
-    /// Autorización, validaciones, DV y bitácora los resuelve ReservaBLL_790MY.
-    /// </summary>
+    // RF2: Abrir mesa (CUN-004) y walk-in (CUN-005). Recepción abre la mesa de una reserva
+    // del turno en curso, o la de un cliente sin reserva eligiendo la mesa en el plano, y
+    // asigna el camarero. Las reglas, el DV y la bitácora los maneja ReservaBLL_790MY.
     public partial class FormAbrirMesa_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly ReservaBLL_790MY  _reservaBll;
@@ -88,6 +85,7 @@ namespace GUI_08YS.RF2
 
         #region Carga de datos
 
+        // Carga las reservas del turno y los camareros con sus mesas a cargo.
         private void CargarDatos()
         {
             _turno = MesaBLL_790MY.ObtenerTurnoVigente(DateTime.Now);
@@ -136,11 +134,8 @@ namespace GUI_08YS.RF2
                 : E.T("AM_fuera_de_turno");
         }
 
-        /// <summary>
-        /// Contadores del salón para el turno en curso. Usa el mismo cálculo de ocupación
-        /// que el plano (ReservaBLL_790MY.ObtenerMesasMapa, patente AbrirMesa); si no hay turno
-        /// o la consulta falla, los contadores se ocultan sin afectar la apertura.
-        /// </summary>
+        // Contadores de mesas libres y ocupadas del turno, con el mismo cálculo que el plano.
+        // Si no hay turno o falla la consulta, se ocultan.
         private void ActualizarContadores()
         {
             int reservadas = _reservas.Count;
@@ -345,6 +340,7 @@ namespace GUI_08YS.RF2
         private void sldModo_790MY_SeleccionCambiada(object sender, EventArgs e)
             => AplicarModo(sldModo_790MY.IndiceSeleccionado == OpcionWalkIn);
 
+        // Muestra los campos del modo elegido: con reserva o walk-in.
         private void AplicarModo(bool walkIn)
         {
             _modoWalkIn = walkIn;
@@ -377,6 +373,7 @@ namespace GUI_08YS.RF2
             btnBuscarCliente_790MY.PerformClick();
         }
 
+        // Walk-in: busca el cliente por DNI y, si no existe, ofrece darlo de alta.
         private void btnBuscarCliente_790MY_Click(object sender, EventArgs e)
         {
             OcultarAvisoPuntual();
@@ -404,7 +401,7 @@ namespace GUI_08YS.RF2
                     return;
                 }
 
-                // La reserva Walk-in necesita un cliente registrado (FK): se ofrece el alta rápida.
+                // El walk-in necesita un cliente registrado: se ofrece el alta rápida.
                 bool registrar = ConfirmModal_790MY.Confirmar(VentanaPropietaria,
                     E.T("RR_confirmar_registro_titulo", dni),
                     E.T("RR_confirmar_registro_msg"),
@@ -435,10 +432,7 @@ namespace GUI_08YS.RF2
             ActualizarResumen();
         }
 
-        /// <summary>
-        /// Reutiliza el plano de RF1 (FormSeleccionarMesa_790MY) para el turno en curso:
-        /// muestra la ocupación por turno + estado físico y la capacidad de cada mesa.
-        /// </summary>
+        // Abre el mismo plano de RF1 para hoy y el turno en curso.
         private void btnSeleccionarMesa_790MY_Click(object sender, EventArgs e)
         {
             int comensales = (int)nudComensales_790MY.Value;
@@ -524,8 +518,8 @@ namespace GUI_08YS.RF2
             lblResEstado_790MY.BackColor = listo ? E.ListoFondo : E.PendFondo;
             lblResEstado_790MY.ForeColor = listo ? E.ListoTexto : E.PendTexto;
 
-            // Etapa 2 (E2-D4): Confirmar queda habilitado durante el turno; si falta algo,
-            // al tocarlo se marca cada dato con el ErrorProvider y se resume en el banner.
+            // Confirmar queda habilitado durante el turno; si falta algo, al tocarlo se marca
+            // cada dato y se resume en el banner.
             btnConfirmar_790MY.Enabled = _turno.HasValue;
             btnConfirmar_790MY.BackColor = btnConfirmar_790MY.Enabled ? E.Bordo : E.Deshabilitado;
             btnConfirmar_790MY.ForeColor = btnConfirmar_790MY.Enabled ? Color.White : E.Gris;
@@ -535,13 +529,13 @@ namespace GUI_08YS.RF2
 
         #region Validación y avisos (Etapa 2)
 
-        // DNI de cliente: solo números, de 7 u 8 dígitos (regla del propietario).
+        // DNI de cliente: solo números, de 7 u 8 dígitos.
         private static readonly Regex _regexDni = new Regex(@"^\d{7,8}$");
 
         // El resumen de faltantes aparece al intentar confirmar y se va solo al completarse.
         private bool _resumenVisible;
 
-        /// <summary>Datos que faltan para abrir la mesa, en el orden de la pantalla.</summary>
+        // Datos que faltan para abrir la mesa, en el orden de la pantalla.
         private Dictionary<Control, string> Faltantes()
         {
             var faltantes = new Dictionary<Control, string>();
@@ -578,7 +572,7 @@ namespace GUI_08YS.RF2
                                     TipoBanner_790MY.Error, cerrable: false);
         }
 
-        /// <summary>Quita un aviso puntual (cliente inactivo, sin disponibilidad, regla de la BLL); el resumen sigue.</summary>
+        // Quita un aviso puntual (cliente inactivo, sin disponibilidad, regla de la BLL); el resumen sigue.
         private void OcultarAvisoPuntual()
         {
             if (!_resumenVisible) bnrAvisos_790MY.Ocultar();
@@ -597,6 +591,7 @@ namespace GUI_08YS.RF2
 
         #region Confirmar / Limpiar
 
+        // Abre la mesa (con reserva o walk-in) con ReservaBLL_790MY.
         private void btnConfirmar_790MY_Click(object sender, EventArgs e)
         {
             if (Faltantes().Count > 0)
@@ -615,8 +610,8 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                // Una apertura concurrente o una mesa recién ocupada se refleja al recargar;
-                // el aviso se muestra después para que la recarga no lo oculte.
+                // Si otro puesto abrió la mesa, se ve al recargar. El aviso va después de
+                // recargar para que no se borre.
                 CargarDatos();
                 E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 return;
@@ -671,6 +666,7 @@ namespace GUI_08YS.RF2
             }
         }
 
+        // Cada 30 segundos actualiza el reloj y el turno.
         private void timerReloj_790MY_Tick(object sender, EventArgs e)
         {
             // Si cambió el turno (p. ej. 19:59 -> 20:00), la nómina debe recalcularse.
@@ -702,7 +698,7 @@ namespace GUI_08YS.RF2
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(sldModo_790MY), "AY_sug_am1_t", "AY_sug_am1_x"),

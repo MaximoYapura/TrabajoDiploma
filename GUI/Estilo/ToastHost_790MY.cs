@@ -6,10 +6,8 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Aviso de éxito no bloqueante (Etapa 2, E2-D1 / E2-D4): aparece en la esquina inferior
-    /// derecha de un control, no toma el foco y se cierra solo a los 4 s (o con un clic).
-    /// </summary>
+    // Aviso de éxito abajo a la derecha. No toma el foco y se cierra solo a los 4 segundos
+    // (o con un clic).
     public partial class ToastHost_790MY : UserControl
     {
         private const int Margen = T.Espacio4;
@@ -19,10 +17,7 @@ namespace GUI_08YS.Estilo
             InitializeComponent();
         }
 
-        /// <summary>
-        /// Muestra <paramref name="mensaje"/> sobre la esquina inferior derecha de
-        /// <paramref name="ancla"/>. Un toast anterior sobre la misma ancla se reemplaza.
-        /// </summary>
+        // Muestra el mensaje en la esquina inferior derecha de ancla. Si ya había uno, lo reemplaza.
         public static void Mostrar(Control ancla, string mensaje)
         {
             if (ancla == null || ancla.IsDisposed) return;

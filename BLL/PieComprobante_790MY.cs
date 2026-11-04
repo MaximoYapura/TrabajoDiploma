@@ -3,7 +3,8 @@ using iTextSharp.text.pdf;
 
 namespace BLL_08YS
 {
-    /// <summary>Pie del comprobante de reserva (ReservaBLL_790MY.Comprobante): línea punteada, datos de emisión y agradecimiento.</summary>
+    // Pie de página de los PDF (comprobante de reserva y factura): línea punteada, quién lo
+    // emitió y el agradecimiento. iTextSharp lo dibuja al terminar cada página.
     internal sealed class PieComprobante_790MY : PdfPageEventHelper
     {
         private readonly string _emitido;

@@ -13,11 +13,9 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Maestros
 {
-    /// <summary>
-    /// ABM de la carta (RF2). Precio vigente, categoría y stock físico de cada producto;
-    /// la carta de Registrar Pedido solo muestra los activos. Validaciones, DV y
-    /// bitácora los resuelve ProductoBLL_790MY (patente GestionProductos).
-    /// </summary>
+    // Maestro de productos (la carta): precio, categoría y stock de cada producto. Registrar
+    // pedido solo muestra los activos. Las reglas, el DV y la bitácora los maneja
+    // ProductoBLL_790MY (permiso GestionProductos).
     public partial class FormProductos_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private const int UmbralBajoStock = 5;
@@ -34,8 +32,8 @@ namespace GUI_08YS.Maestros
         private List<Producto_790MY> _productos = new List<Producto_790MY>();
         private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
 
-        // Stock físico del producto al entrar en modificación: la BLL no guarda si cocina
-        // lo cambió mientras tanto.
+        // Stock que tenía el producto al empezar a editarlo. Si cocina lo cambia mientras
+        // tanto, la BLL no guarda.
         private int _stockLeido;
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
@@ -155,7 +153,7 @@ namespace GUI_08YS.Maestros
             }
         }
 
-        /// <summary>Stock disponible (físico - comprometido) con alerta "Bajo" / "Agotado".</summary>
+        // Porciones disponibles, con aviso de "Bajo" o "Agotado".
         private void PintarStock(DataGridViewCellPaintingEventArgs e, Producto_790MY p)
         {
             if (!p.ControlaStock)
@@ -310,6 +308,7 @@ namespace GUI_08YS.Maestros
             EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
+        // Guarda el alta o la modificación con ProductoBLL_790MY.
         private void btnGuardar_790MY_Click(object sender, EventArgs e)
         {
             var categoria = (cmbCategoria_790MY.SelectedItem as OpcionCombo_790MY<CategoriaProducto_790MY>)?.Valor
@@ -342,7 +341,7 @@ namespace GUI_08YS.Maestros
             string exito = E.T(_modo == ModoEdicion_790MY.Alta ? "FP_msg_alta_ok" : "FP_msg_modificacion_ok", producto.Nombre);
             if (_modo == ModoEdicion_790MY.Alta)
             {
-                // Alta (E2-D4): la ficha queda limpia y con foco en el nombre para cargar otro producto.
+                // Después de un alta la ficha queda limpia para cargar otro producto.
                 _modo = ModoEdicion_790MY.Reposo;
                 Cargar();
                 dgvProductos_790MY.ClearSelection();
@@ -352,7 +351,7 @@ namespace GUI_08YS.Maestros
             }
             else
             {
-                // Modificación (E2-D4): queda elegido el producto con los datos guardados.
+                // Después de modificar queda elegido el producto guardado.
                 _modo = ModoEdicion_790MY.Reposo;
                 Cargar(producto.ProductoID);
                 EstablecerModo(ModoEdicion_790MY.Reposo);
@@ -413,7 +412,7 @@ namespace GUI_08YS.Maestros
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(txtBuscar_790MY), "AY_sug_pr1_t", "AY_sug_pr1_x"),

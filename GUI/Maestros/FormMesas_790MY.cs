@@ -12,6 +12,8 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Maestros
 {
+    // Maestro de mesas: las mesas se ven como tarjetas y a la derecha está la ficha para
+    // alta, modificación y baja. Las reglas las controla MesaBLL_790MY.
     public partial class FormMesas_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
@@ -25,14 +27,12 @@ namespace GUI_08YS.Maestros
         private readonly MesaBLL_790MY _mesaBll;
         private ModoEdicion_790MY _modo = ModoEdicion_790MY.Reposo;
 
-        // Estado original de la mesa que se esta editando. El maestro solo ofrece
-        // «Disponible» / «Fuera de servicio»; Ocupada y Reservada son estados operativos
-        // que manejan Reservas y Atención en mesa, y se preservan al modificar para no
-        // pisarlos (ver EstadoAGuardar).
+        // Estado que tenía la mesa al empezar a editarla. El maestro solo ofrece Disponible y
+        // Fuera de servicio; Ocupada y Reservada las manejan otros módulos y no se pisan.
         private EstadoMesa_790MY _estadoEdicion = EstadoMesa_790MY.Libre;
         private bool _activoEdicion = true;
 
-        // Mesa elegida en el tablero (reemplaza a la fila actual de la grilla anterior).
+        // Mesa elegida en el tablero.
         private Mesa_790MY _seleccionada;
         private readonly List<MesaCard_790MY> _tarjetas = new List<MesaCard_790MY>();
 
@@ -57,7 +57,7 @@ namespace GUI_08YS.Maestros
         {
             int? nroAnterior = _seleccionada?.NroMesa;
 
-            // Orden automático por número (P11): el modelo de Mesa no guarda posición.
+            // Se ordenan por número: la mesa no guarda una posición.
             List<Mesa_790MY> mesas = _mesaBll.GetAll().OrderBy(m => m.NroMesa).ToList();
 
             flpTablero_790MY.SuspendLayout();
@@ -150,7 +150,7 @@ namespace GUI_08YS.Maestros
             MostrarEstado(mesa.Estado);
         }
 
-        /// <summary>El maestro trabaja con dos estados: «Fuera de servicio» o «Disponible» (todo lo demás).</summary>
+        // El maestro trabaja con dos estados: «Fuera de servicio» o «Disponible» (todo lo demás).
         private static bool EstaFueraDeServicio(EstadoMesa_790MY estado)
             => estado == EstadoMesa_790MY.FueraDeServicio;
 
@@ -161,11 +161,8 @@ namespace GUI_08YS.Maestros
             rdoDisponible_790MY.Checked = estado.HasValue && !fuera;
         }
 
-        /// <summary>
-        /// Estado que se envía a la BLL al modificar. Elegir «Disponible» solo restaura a
-        /// Libre una mesa que estaba fuera de servicio; si estaba Ocupada o Reservada se
-        /// conserva ese estado operativo, que pertenece a otros módulos.
-        /// </summary>
+        // Estado que se manda a la BLL al modificar. "Disponible" solo devuelve a Libre una
+        // mesa que estaba fuera de servicio; si estaba Ocupada o Reservada, se deja así.
         private EstadoMesa_790MY EstadoAGuardar()
         {
             if (rdoFueraServicio_790MY.Checked)
@@ -192,8 +189,7 @@ namespace GUI_08YS.Maestros
             _modo = modo;
             bool editando = modo != ModoEdicion_790MY.Reposo;
 
-            // NroMesa siempre es de solo lectura (ReadOnly = true en el Designer):
-            // se auto-asigna en Alta y no se permite cambiar la PK en Modificación.
+            // El número es siempre de solo lectura: lo pone el sistema en el alta y no se cambia.
             txtNumero_790MY.Enabled  = editando;
 
             nudCapacidad_790MY.Enabled = editando;
@@ -251,12 +247,12 @@ namespace GUI_08YS.Maestros
             PrepararAlta();
         }
 
-        /// <summary>Ficha limpia con el próximo número y foco en la capacidad (también tras un alta, E2-D4).</summary>
+        // Ficha limpia con el próximo número y el foco en la capacidad (también después de un alta).
         private void PrepararAlta()
         {
             LimpiarCampos();
 
-            // Auto-asignar el próximo número disponible (Max + 1)
+            // El número es el más alto más uno.
             try
             {
                 int siguiente = _mesaBll.GetProximoNumero();
@@ -317,6 +313,7 @@ namespace GUI_08YS.Maestros
             }
         }
 
+        // Guarda el alta o la modificación con MesaBLL_790MY.
         private void btnAplicar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
@@ -340,7 +337,7 @@ namespace GUI_08YS.Maestros
                 {
                     _mesaBll.RegistrarMesa(numero, capacidad);
 
-                    // Alta (E2-D4): el tablero muestra la mesa nueva y la ficha queda lista para otra.
+                    // Después de un alta se ve la mesa nueva y la ficha queda lista para otra.
                     _seleccionada = null;
                     _modo = ModoEdicion_790MY.Reposo;
                     CargarTablero();
@@ -350,7 +347,7 @@ namespace GUI_08YS.Maestros
                     return;
                 }
 
-                // Modificación (E2-D4): queda elegida la mesa con los datos guardados.
+                // Después de modificar queda elegida la mesa guardada.
                 var mesa = new Mesa_790MY(numero, capacidad, estado, _activoEdicion);
                 _mesaBll.ModificarMesa(mesa);
 
@@ -373,7 +370,7 @@ namespace GUI_08YS.Maestros
             }
         }
 
-        /// <summary>Error inesperado (base de datos, excepción no prevista): se conserva el MessageBox nativo (E2-D1).</summary>
+        // Error inesperado (por ejemplo, de la base): se muestra en un MessageBox.
         private void MostrarErrorFatal(string mensaje)
         {
             MessageBox.Show(this, mensaje, TraductorManager_08YS.Instance.GetTexto("error"),
@@ -419,7 +416,7 @@ namespace GUI_08YS.Maestros
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(flpTablero_790MY), "AY_sug_me1_t", "FM_detalle_vacio"),

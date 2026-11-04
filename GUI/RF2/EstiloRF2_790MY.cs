@@ -8,10 +8,8 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// Paleta y utilidades comunes de las pantallas de Atención en Mesa (RF2).
-    /// Mismos tonos que FormRegistrarReserva_790MY para que el módulo se lea igual.
-    /// </summary>
+    // Colores y funciones comunes de las pantallas de Atención en mesa (RF2). Las pantallas
+    // lo usan con el alias E (E.T para traducir, E.MostrarErrorEnBanner, etc.).
     internal static class EstiloRF2_790MY
     {
         // Salón / Comandas (tema claro)
@@ -46,7 +44,7 @@ namespace GUI_08YS.RF2
 
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
-        /// <summary>Formato de precio de la carta: $14.500 (sin decimales si son cero).</summary>
+        // Formato de precio de la carta: $14.500 (sin decimales si son cero).
         public static string Moneda(decimal valor)
             => "$" + valor.ToString(valor == decimal.Truncate(valor) ? "N0" : "N2", CulturaMoneda);
 
@@ -57,7 +55,7 @@ namespace GUI_08YS.RF2
             return (a + b).ToUpperInvariant();
         }
 
-        /// <summary>"Martín Quiroga" -> "Martín Q."</summary>
+        // "Martín Quiroga" -> "Martín Q."
         public static string NombreCorto(Empleado_790MY empleado)
         {
             if (empleado == null) return string.Empty;
@@ -67,7 +65,7 @@ namespace GUI_08YS.RF2
 
         public static string Hora(TimeSpan hora) => $"{(int)hora.TotalHours:00}:{hora.Minutes:00}";
 
-        /// <summary>Traduce recursivamente todo control cuyo Tag sea una clave de idiomas.json.</summary>
+        // Traduce recursivamente todo control cuyo Tag sea una clave de idiomas.json.
         public static void TraducirTags(Control contenedor)
         {
             foreach (Control c in contenedor.Controls)
@@ -88,11 +86,8 @@ namespace GUI_08YS.RF2
             catch (FormatException) { return plantilla; }
         }
 
-        /// <summary>
-        /// Etapa 2 (E2-D1/E2-D4): las reglas de negocio (ArgumentException) y los permisos
-        /// (UnauthorizedAccessException) van al banner del formulario. Solo las fallas
-        /// inesperadas conservan el MessageBox nativo (error fatal).
-        /// </summary>
+        // Las reglas de negocio (ArgumentException) y la falta de permisos van al banner.
+        // Cualquier otro error se muestra en un MessageBox.
         public static void MostrarErrorEnBanner(Banner_UC_790MY banner, Exception ex)
         {
             if (ex is UnauthorizedAccessException || ex is ArgumentException)
@@ -102,7 +97,7 @@ namespace GUI_08YS.RF2
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        /// <summary>Etapa 2: éxito no bloqueante (toast de 4 s) sobre la esquina inferior derecha de <paramref name="ancla"/>.</summary>
+        // Aviso de éxito que se va solo a los 4 segundos, abajo a la derecha.
         public static void MostrarExitoToast(Control ancla, string mensaje)
             => ToastHost_790MY.Mostrar(ancla, mensaje);
 
@@ -131,10 +126,8 @@ namespace GUI_08YS.RF2
             };
         }
 
-        /// <summary>
-        /// Hace que el clic sobre cualquier hijo de la tarjeta dispare la acción de la tarjeta
-        /// (las tarjetas se arman con labels encima del panel).
-        /// </summary>
+        // Hace que el clic sobre cualquier hijo de la tarjeta dispare la acción de la tarjeta
+        // (las tarjetas se arman con labels encima del panel).
         public static void PropagarClick(Control raiz, EventHandler manejador)
         {
             raiz.Click += manejador;

@@ -1,5 +1,6 @@
 ﻿namespace BE_08YS
 {
+    // Renglón de la factura. La descripción y el precio se copian al emitir.
     public class ItemFactura_790MY
     {
         public int NroFactura { get; set; }

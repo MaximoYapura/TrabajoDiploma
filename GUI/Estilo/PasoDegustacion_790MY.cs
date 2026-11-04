@@ -5,16 +5,14 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Un paso del Menú Degustación (Etapa 5, Fase 4): título, pista, casilla «Hecho» (solo
-    /// en memoria) y botón «Ir». Sin permiso, «Ir» queda deshabilitado con el motivo visible.
-    /// </summary>
+    // Un paso del Menú Degustación: título, pista, casilla "Hecho" (no se guarda) y los
+    // botones "Ir" y "Receta". Sin permiso, "Ir" queda deshabilitado y se muestra el motivo.
     public partial class PasoDegustacion_790MY : UserControl
     {
-        /// <summary>El usuario pulsó «Ir».</summary>
+        // El usuario pulsó «Ir».
         public event EventHandler IrSolicitado;
 
-        /// <summary>El usuario pulsó «Receta» (PDF del Manual de Recetas).</summary>
+        // El usuario pulsó «Receta» (PDF del Manual de Recetas).
         public event EventHandler RecetaSolicitada;
 
         public PasoDegustacion_790MY()
@@ -54,7 +52,7 @@ namespace GUI_08YS.Estilo
 
         private void btnReceta_790MY_Click(object sender, EventArgs e) => RecetaSolicitada?.Invoke(this, EventArgs.Empty);
 
-        // Un botón Flat deshabilitado conserva el bordó y parece activo (TemaFogon P04).
+        // Un botón Flat deshabilitado sigue bordó y parece activo; acá se pinta gris.
         private void btnIr_790MY_EnabledChanged(object sender, EventArgs e)
         {
             bool activo = btnIr_790MY.Enabled;

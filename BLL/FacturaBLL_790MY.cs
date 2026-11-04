@@ -12,15 +12,11 @@ using System.Text;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// CUN-007 Cobrar Venta: emisión de la cuenta / factura (primera mitad del flujo de cobro).
-    ///
-    /// La cuenta se arma con los ítems de los pedidos Listo (entregados) de la reserva,
-    /// con el precio que quedó congelado en cada pedido. Al generar la factura se copia
-    /// ese detalle a ItemsFactura, así el comprobante no cambia aunque cambie la carta.
-    /// Si la mesa ya tenía una factura Abierta con otros importes (nuevos consumos u otro
-    /// descuento), la anterior queda Anulada y se emite una nueva.
-    /// </summary>
+    // Caja y cobro, primera parte (CUN-007): la cuenta de la mesa y la emisión de la factura.
+    // La cuenta son los ítems de los pedidos Listo, con el precio que quedó en cada pedido.
+    // Al emitir, ese detalle se copia a ItemsFactura, así la factura no cambia aunque
+    // cambie la carta. Si la mesa ya tenía una factura Abierta con otros importes, esa
+    // queda Anulada y se emite una nueva. El cobro está en PagoBLL_790MY.
     public partial class FacturaBLL_790MY
     {
         private readonly IFacturaRepository_790MY _facturaRepository;
@@ -44,11 +40,8 @@ namespace BLL_08YS
         //  Consulta de mesas y consumos
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Mesas ocupadas (reservas Asistidas) que el usuario puede cobrar. Un camarero ve
-        /// solo las que tiene asignadas; un usuario sin puesto de camarero (encargado / caja)
-        /// ve todas. Lista vacía => la GUI informa el escenario alternativo 1.1.
-        /// </summary>
+        // Mesas abiertas que el usuario puede cobrar. Un camarero ve solo las suyas; un
+        // usuario que no es camarero (encargado, caja) ve todas.
         public List<MesaCobroDTO_790MY> ObtenerMesasParaCobrar()
         {
             ValidarAccesoCaja();
@@ -76,11 +69,8 @@ namespace BLL_08YS
                 .ToList();
         }
 
-        /// <summary>
-        /// CUN-007 pasos 2 y 3: consumos entregados de la reserva con subtotal, descuento,
-        /// IVA (21 %) y total. Si ya existe una factura Abierta se informa para reutilizar
-        /// su descuento. Lanza el escenario 1.1 si no hay consumos facturables.
-        /// </summary>
+        // La cuenta de la mesa con sus importes. Si ya hay una factura Abierta la incluye,
+        // para reutilizar su descuento. Si no hay consumos, lanza el aviso.
         public DetalleCuentaDTO_790MY ObtenerDetalleConsumoMesa(int nroReserva,
             decimal valorDescuento = 0m, TipoDescuento_790MY tipoDescuento = TipoDescuento_790MY.Porcentaje)
         {
@@ -107,13 +97,13 @@ namespace BLL_08YS
             };
         }
 
-        /// <summary>
-        /// CUN-007 paso 3 (y escenario 3.1). Función pura: la GUI la usa para recalcular en
-        /// tiempo real mientras se edita el descuento, y GenerarFactura la vuelve a aplicar.
-        /// Factura B: el precio de carta es precio final. El total es el subtotal con
-        /// descuento y el IVA (21 %) está contenido en él (Ley 27.743, informativo):
-        /// IVA = total × 21 / 121 y SubtotalNeto = total − IVA (neto gravado). Importes a 2 decimales.
-        /// </summary>
+        // Calcula los importes sin tocar la base. La pantalla la usa para recalcular mientras
+        // se edita el descuento y GenerarFactura la vuelve a usar al emitir.
+        // En la Factura B el precio de carta ya incluye el IVA:
+        //   total = subtotal - descuento
+        //   IVA = total x 21 / 121
+        //   neto = total - IVA
+        // Todo redondeado a 2 decimales.
         public static ImportesCuenta_790MY CalcularImportes(decimal subtotal, decimal valorDescuento, TipoDescuento_790MY tipoDescuento)
         {
             if (subtotal <= 0)
@@ -150,19 +140,16 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-007 Cobrar Venta — emisión de la factura
+        //  Emisión de la factura
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>Descuento expresado como porcentaje (atajo de la firma general).</summary>
+        // Atajo con el descuento en porcentaje.
         public Factura_790MY GenerarFactura(int nroReserva, decimal porcentajeDescuento)
             => GenerarFactura(nroReserva, porcentajeDescuento, TipoDescuento_790MY.Porcentaje);
 
-        /// <summary>
-        /// CUN-007 paso 8: registra la factura Abierta con importes congelados y la
-        /// devuelve completa (con mesa, cliente y camarero) para mostrar la cuenta.
-        /// Si ya hay una factura Abierta con el mismo detalle e importes, se reutiliza
-        /// (imprimir dos veces el pre-ticket no consume números de factura).
-        /// </summary>
+        // Emite la factura Abierta y la devuelve completa para el comprobante. Si ya había
+        // una Abierta con el mismo detalle e importes se reutiliza, así imprimir dos veces
+        // el pre-ticket no gasta números de factura.
         public Factura_790MY GenerarFactura(int nroReserva, decimal valorDescuento, TipoDescuento_790MY tipoDescuento)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GenerarFactura);
@@ -212,6 +199,7 @@ namespace BLL_08YS
             return _facturaRepository.GetById(factura.NroFactura) ?? factura;
         }
 
+        // Factura con su detalle.
         public Factura_790MY ObtenerFactura(int nroFactura)
         {
             ValidarAccesoCaja();
@@ -219,13 +207,10 @@ namespace BLL_08YS
         }
 
         // ─── Consultas para otras BLL ────────────────────────────────────────
-        // Sin ValidatePermission: las usa PagoBLL_790MY, que ya validó su propia patente.
+        // No validan permiso: las usa PagoBLL_790MY, que ya validó el suyo.
 
-        /// <summary>
-        /// True si la factura sigue reflejando los consumos Listo de su reserva (mismo
-        /// detalle e importes que se emitirían hoy). Aviso temprano: la garantía es la
-        /// verificación dentro de la transacción de SqlPagoRepository_790MY.RegistrarCobro.
-        /// </summary>
+        // True si la factura sigue coincidiendo con lo que consumió la mesa. Es un aviso
+        // previo; el control definitivo lo hace la transacción del cobro.
         internal bool FacturaVigente(Factura_790MY factura)
         {
             List<ItemFactura_790MY> items = _facturaRepository.ObtenerConsumosFacturables(factura.NroReserva);
@@ -240,31 +225,25 @@ namespace BLL_08YS
             return MismoContenido(factura, items, importes);
         }
 
-        /// <summary>
-        /// Factura completa (ítems, mesa y camarero) sin exigir RegistrarCobro ni GenerarFactura:
-        /// la usa la exportación del Arqueo de Caja, que ya validó GestionCaja.
-        /// </summary>
+        // Factura completa para exportarla desde el arqueo, que ya validó GestionCaja.
         internal Factura_790MY ObtenerPorNumero(int nroFactura)
             => _facturaRepository.GetById(nroFactura);
 
-        /// <summary>Mesas abiertas (reservas Asistidas) de cualquier camarero.</summary>
+        // Cantidad de mesas abiertas, de cualquier camarero.
         internal int ContarMesasAbiertas()
             => _reservaBll.ObtenerAsistidas().Count;
 
-        /// <summary>Pedidos Pendiente/EnPreparacion de la reserva (PagoBLL_790MY no conoce a PedidoBLL_790MY).</summary>
+        // Pedidos de la reserva que siguen en cocina (PagoBLL_790MY no conoce a PedidoBLL_790MY).
         internal int ContarPedidosNoDespachados(int reservaId)
             => _pedidoBll.ContarNoDespachados(reservaId);
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Integridad del comprobante
+        //  Hash del comprobante
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// SHA-256 de los datos que identifican el comprobante (número, reserva, fecha,
-        /// importes y, si existe, el pago). No se imprime: de él se derivan el QR y el CAE
-        /// simulados, distintos para cada comprobante. Formato invariante: no depende del
-        /// idioma del usuario.
-        /// </summary>
+        // SHA-256 de los datos del comprobante (número, reserva, fecha, importes y pago).
+        // No se imprime: de acá salen el QR y el CAE simulados, distintos en cada factura.
+        // Se arma con cultura invariante para que no dependa del idioma.
         public static string CalcularHashComprobante(Factura_790MY factura, Pago_790MY pago = null)
         {
             if (factura == null) throw new ArgumentNullException(nameof(factura));
@@ -297,11 +276,13 @@ namespace BLL_08YS
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
+        // Redondeo a 2 decimales (el 0,5 sube).
         internal static decimal Redondear(decimal valor) => Math.Round(valor, 2, MidpointRounding.AwayFromZero);
 
         private static DateTime Truncar(DateTime momento)
             => new DateTime(momento.Year, momento.Month, momento.Day, momento.Hour, momento.Minute, momento.Second);
 
+        // True si la factura tiene los mismos ítems e importes que la cuenta actual.
         private static bool MismoContenido(Factura_790MY abierta, List<ItemFactura_790MY> items, ImportesCuenta_790MY importes)
         {
             if (abierta.Subtotal != importes.Subtotal || abierta.MontoDescuento != importes.MontoDescuento
@@ -313,17 +294,14 @@ namespace BLL_08YS
             return actuales.SequenceEqual(facturados);
         }
 
-        /// <summary>Acceso al módulo Caja y cobro: alcanza con cualquiera de las dos patentes.</summary>
+        // Para entrar a Caja y cobro alcanza con cualquiera de los dos permisos.
         private static void ValidarAccesoCaja()
         {
             if (!SessionManager_08YS.Instance.HasPermission(Permisos.RegistrarCobro))
                 SessionManager_08YS.Instance.ValidatePermission(Permisos.GenerarFactura);
         }
 
-        /// <summary>
-        /// Precondición CUN-007: reserva Asistida (mesa ocupada) y, si el usuario es
-        /// camarero, asignada a él.
-        /// </summary>
+        // La mesa tiene que estar abierta y, si el usuario es camarero, ser suya.
         private Reserva_790MY ValidarReservaCobrable(int nroReserva)
         {
             Reserva_790MY reserva = _reservaBll.ObtenerPorId(nroReserva)
@@ -339,10 +317,8 @@ namespace BLL_08YS
             return reserva;
         }
 
-        /// <summary>
-        /// Empleado camarero vinculado al usuario logueado, o null si el usuario no es
-        /// camarero (encargado / caja): en ese caso puede cobrar cualquier mesa.
-        /// </summary>
+        // Camarero vinculado al usuario logueado, o null si no es camarero. En ese caso
+        // (encargado, caja) puede cobrar cualquier mesa.
         private Empleado_790MY ObtenerCamareroDeSesion()
         {
             Empleado_790MY empleado = _empleadoBll.ObtenerEmpleadoDeSesion();

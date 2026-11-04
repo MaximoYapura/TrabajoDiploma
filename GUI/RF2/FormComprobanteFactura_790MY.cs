@@ -15,14 +15,10 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// Vista previa e impresión de los comprobantes de Caja y cobro:
-    ///  - Sin pago: cuenta / pre-ticket de la factura Abierta (CUN-007), con la leyenda
-    ///    "NO VÁLIDO COMO FACTURA".
-    ///  - Con pago: Factura B definitiva en estado PAGADA (CUN-007), con detalle del
-    ///    pago, QR y CAE simulados (derivados del hash SHA-256 que calcula la BLL).
-    /// El ticket se dibuja con GDI+ una sola vez y se reutiliza para pantalla e impresora.
-    /// </summary>
+    // Vista previa e impresión de los comprobantes de Caja y cobro:
+    // - sin pago es el pre-ticket, con la leyenda "NO VÁLIDO COMO FACTURA";
+    // - con pago es la Factura B PAGADA, con el detalle del pago y el QR y el CAE simulados.
+    // El ticket se dibuja con GDI+ y el mismo dibujo sirve para la pantalla y la impresora.
     public partial class FormComprobanteFactura_790MY : Form, IIdiomaObserver_08YS
     {
         private const int AnchoTicket = 400;
@@ -38,12 +34,8 @@ namespace GUI_08YS.RF2
         private readonly Image _logo;
         private Bitmap _render;
 
-        /// <summary>
-        /// Isotipo monocromático (horno con fuego) preparado una sola vez por ejecución:
-        /// recortado al horno (sin el logotipo de texto ni bloque de color de fondo) y
-        /// binarizado a trazo negro sólido sobre papel blanco, como lo imprime una
-        /// comandera térmica de 80 mm. Null si el recurso no está disponible.
-        /// </summary>
+        // El dibujo del horno del logo, en blanco y negro como lo imprime una impresora
+        // térmica. Se prepara una sola vez. Null si no está la imagen.
         private static readonly Lazy<Bitmap> IsotipoTermico = new Lazy<Bitmap>(PrepararIsotipo);
 
         public FormComprobanteFactura_790MY(Factura_790MY factura, Pago_790MY pago)
@@ -111,6 +103,7 @@ namespace GUI_08YS.RF2
 
         #region Impresión
 
+        // Imprime el ticket con la vista previa de Windows.
         private void btnImprimir_790MY_Click(object sender, EventArgs e)
         {
             bnrAvisos_790MY.Ocultar();
@@ -139,9 +132,8 @@ namespace GUI_08YS.RF2
             }
             catch (Exception ex)
             {
-                // Etapa 4: la falla de impresión (sin impresora, cola detenida) no es un error
-                // fatal: el comprobante ya está registrado. Se informa en el banner y se puede
-                // reintentar sin cerrar la vista previa.
+                // Si falla la impresión (sin impresora, por ejemplo) se avisa en el banner y se
+                // puede reintentar. El comprobante ya está grabado.
                 bnrAvisos_790MY.Mostrar(E.T("CJ_msg_error_impresion", ex.Message), TipoBanner_790MY.Error, cerrable: true);
             }
         }
@@ -150,7 +142,7 @@ namespace GUI_08YS.RF2
 
         #region Dibujo del ticket
 
-        /// <summary>Dibuja el comprobante completo y devuelve su alto en píxeles.</summary>
+        // Dibuja el comprobante completo y devuelve su alto en píxeles.
         private int Dibujar(Graphics g, int origenX, int origenY)
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -242,8 +234,7 @@ namespace GUI_08YS.RF2
             }
             t.Espacio(altoCaja + 10);
 
-            // Punto de venta y número por separado, como el modelo oficial (el número
-            // completo de Factura_790MY.NumeroComprobante sigue en el hash).
+            // Punto de venta y número por separado, como el modelo oficial.
             DateTime emision = FacturaBLL_790MY.FechaEmisionComprobante(_factura, _pago);
             t.Fila(E.T("CJ_tk_punto_venta"), FacturaBLL_790MY.FormatearPuntoVenta(), negritaDer: true);
             t.Fila(E.T("CJ_tk_comp_nro"), FacturaBLL_790MY.FormatearNumeroComprobante(_factura), negritaDer: true);
@@ -286,10 +277,8 @@ namespace GUI_08YS.RF2
             t.Espacio(8);
         }
 
-        /// <summary>
-        /// Factura B con IVA contenido. Las facturas emitidas antes del cambio sumaban el
-        /// IVA: se reimprimen con sus importes y filas originales.
-        /// </summary>
+        // Factura B con el IVA incluido. Las facturas viejas sumaban el IVA aparte y se
+        // reimprimen como eran.
         private bool IvaContenido => FacturaBLL_790MY.TieneIvaContenido(_factura);
 
         private void DibujarTotales(TicketFactura_790MY t)
@@ -323,10 +312,7 @@ namespace GUI_08YS.RF2
             }
         }
 
-        /// <summary>
-        /// Régimen de Transparencia Fiscal al Consumidor (Ley 27.743, RG 5614/2024):
-        /// IVA contenido y otros impuestos nacionales indirectos, alineado a la izquierda.
-        /// </summary>
+        // Bloque de transparencia fiscal (Ley 27.743): cuánto IVA incluye el total.
         private void DibujarTransparenciaFiscal(TicketFactura_790MY t)
         {
             float inicio = t.Y;
@@ -431,12 +417,8 @@ namespace GUI_08YS.RF2
             t.Espacio(84);
         }
 
-        /// <summary>
-        /// Dibuja el texto letra por letra, centrado en el área y con el mismo espacio entre
-        /// cada par de letras. Cada glifo se mide con StringFormat tipográfico (sin el relleno
-        /// que GDI+ agrega por defecto), así "P A G A D A" y "P A I D" no quedan pegadas ni
-        /// desparejas. Si el texto no entra, se reduce primero el espaciado y luego la fuente.
-        /// </summary>
+        // Dibuja el texto letra por letra, centrado y con el mismo espacio entre letras (para
+        // el sello "P A G A D A"). Si no entra, primero achica el espacio y después la letra.
         private static void DibujarTextoEspaciado(Graphics g, string texto, Font fuente, Brush pincel, RectangleF area)
         {
             string letras = new string((texto ?? string.Empty).Where(c => !char.IsWhiteSpace(c)).ToArray())
@@ -481,10 +463,8 @@ namespace GUI_08YS.RF2
             }
         }
 
-        /// <summary>
-        /// Pie de comprobante electrónico: QR a la izquierda y, a su derecha, «Comprobante
-        /// autorizado (simulado)», CAE de 14 dígitos y su vencimiento (derivados del hash).
-        /// </summary>
+        // Pie de la factura: el QR a la izquierda y a la derecha "Comprobante autorizado",
+        // el CAE y su vencimiento. Todo simulado a partir del hash.
         private void DibujarAutorizacion(TicketFactura_790MY t, string hash)
         {
             const float lado = 4f;
@@ -507,9 +487,7 @@ namespace GUI_08YS.RF2
             t.Espacio(Math.Max(tamano, y - t.Y) + 14);
         }
 
-        /// <summary>
-        /// QR simulado (patrón de FacturaBLL_790MY.PatronQrSimulado, el mismo del PDF). Devuelve su lado.
-        /// </summary>
+        // QR simulado (patrón de FacturaBLL_790MY.PatronQrSimulado, el mismo del PDF). Devuelve su lado.
         private static float DibujarQrSimulado(TicketFactura_790MY t, string hash, float x0, float y0, float lado)
         {
             bool[,] patron = FacturaBLL_790MY.PatronQrSimulado(hash);
@@ -527,10 +505,7 @@ namespace GUI_08YS.RF2
             return tamano;
         }
 
-        /// <summary>
-        /// Recorta el isotipo B/N a la caja de sus trazos (con un margen) y lo binariza:
-        /// trazo negro sólido y fondo transparente, sin grises de la compresión JPEG.
-        /// </summary>
+        // Recorta el dibujo del horno y lo pasa a negro puro sobre fondo transparente.
         private static Bitmap PrepararIsotipo()
         {
             Bitmap original;
@@ -571,9 +546,8 @@ namespace GUI_08YS.RF2
                         }
                 if (maxX < 0) return null;
 
-                // El recurso trae el isotipo (horno con fuego) y debajo el logotipo de texto.
-                // En el ticket va solo el isotipo: se corta en la primera franja horizontal
-                // vacía suficientemente alta que aparece después del dibujo.
+                // La imagen trae el horno y abajo el texto del logo. Se corta en el primer
+                // espacio en blanco debajo del horno para quedarse solo con el dibujo.
                 int franjaMinima = Math.Max(6, alto / 40);
                 int vacias = 0;
                 for (int y = minY; y <= maxY; y++)

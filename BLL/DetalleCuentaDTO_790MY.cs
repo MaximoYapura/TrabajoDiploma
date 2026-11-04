@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BLL_08YS
 {
-    /// <summary>Detalle de consumo de una mesa listo para revisar / facturar.</summary>
+    // La cuenta de una mesa tal como la muestra Caja y cobro.
     public class DetalleCuentaDTO_790MY
     {
         public int ReservaID { get; set; }
@@ -14,10 +14,10 @@ namespace BLL_08YS
         public List<ItemFactura_790MY> Items { get; set; } = new List<ItemFactura_790MY>();
         public ImportesCuenta_790MY Importes { get; set; }
 
-        /// <summary>Factura Abierta vigente (null si todavía no se generó la cuenta).</summary>
+        // Factura Abierta de la mesa, o null si todavía no se emitió.
         public Factura_790MY FacturaAbierta { get; set; }
 
-        /// <summary>Pedidos Pendiente/EnPreparacion: impiden el cobro hasta que cocina los despache.</summary>
+        // Pedidos que todavía están en cocina. Mientras haya, no se puede cobrar.
         public int PedidosSinDespachar { get; set; }
     }
 }

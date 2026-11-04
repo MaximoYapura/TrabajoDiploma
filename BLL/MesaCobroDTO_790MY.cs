@@ -2,7 +2,7 @@
 
 namespace BLL_08YS
 {
-    /// <summary>Mesa ocupada (reserva Asistida) en la lista "Mesas para cobrar".</summary>
+    // Una mesa abierta en la lista de mesas por cobrar.
     public class MesaCobroDTO_790MY
     {
         public int ReservaID { get; set; }
@@ -11,10 +11,10 @@ namespace BLL_08YS
         public string CamareroNombre { get; set; }
         public string ClienteNombre { get; set; }
 
-        /// <summary>Hora de inicio del turno / apertura de la mesa.</summary>
+        // Hora de inicio del turno.
         public TimeSpan Desde { get; set; }
 
-        /// <summary>Subtotal de consumos entregados (sin descuento ni IVA).</summary>
+        // Suma de lo consumido, sin descuento.
         public decimal SubtotalConsumido { get; set; }
 
         public bool TieneFacturaAbierta { get; set; }

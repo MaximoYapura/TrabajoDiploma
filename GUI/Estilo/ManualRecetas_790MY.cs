@@ -7,19 +7,14 @@ using Service_08YS;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Manual de Recetas (Etapa 5, Fase 8a, A8): un PDF por receta en la carpeta Manual junto
-    /// al ejecutable (el instalador copia docs\Manual\*.pdf a {app}\Manual; en desarrollo los
-    /// copia el proyecto a bin). Lo abre el visor de PDF predeterminado del equipo.
-    /// </summary>
+    // Manual de recetas: un PDF por caso de uso en la carpeta Manual, al lado del ejecutable
+    // (el instalador copia ahí docs\Manual). Se abre con el visor de PDF del equipo.
     internal static class ManualRecetas_790MY
     {
         public static string Carpeta => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Manual");
 
-        /// <summary>
-        /// Abre <paramref name="receta"/> (p. ej. «Receta_AbrirMesa.pdf»); sin receta abre la
-        /// carpeta del manual. Devuelve null si se abrió, o el mensaje para el banner si no.
-        /// </summary>
+        // Abre la receta (por ejemplo "Receta_AbrirMesa.pdf"); sin receta abre la carpeta.
+        // Devuelve null si se abrió, o el mensaje de error para el banner.
         public static string AbrirManual(string receta)
         {
             string ruta = string.IsNullOrEmpty(receta) ? Carpeta : Path.Combine(Carpeta, receta);

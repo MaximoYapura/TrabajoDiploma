@@ -1,13 +1,14 @@
 ﻿namespace DAL_08YS.Interfaces_Repositories
 {
+    // Cómo terminó el intento de grabar un pedido.
     public enum EstadoRegistroPedido_790MY
     {
         Ok,
-        /// <summary>Algun producto no alcanza (stock fisico - porciones comprometidas).</summary>
+        // A algún producto no le alcanzan las porciones disponibles.
         StockInsuficiente,
-        /// <summary>Algun producto no existe, esta inactivo o no tiene precio vigente.</summary>
+        // Algún producto no existe, está dado de baja o no tiene precio.
         ProductoNoVigente,
-        /// <summary>La reserva dejo de estar Asistida antes del commit.</summary>
+        // La mesa se cerró mientras se grababa el pedido.
         ReservaNoAsistida
     }
 }

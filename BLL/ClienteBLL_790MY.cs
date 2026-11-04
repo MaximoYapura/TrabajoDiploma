@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 namespace BLL_08YS
 {
+    // Reglas del maestro de clientes, más la exportación e importación en XML.
     public class ClienteBLL_790MY
     {
         private readonly IClienteRepository_790MY _clienteRepository;
@@ -30,6 +31,7 @@ namespace BLL_08YS
             _bitacoraBll = bitacoraBll;
         }
 
+        // Alta de cliente. El DNI no se puede repetir, ni siquiera con un cliente dado de baja.
         public void RegistrarCliente(int dni, string nombre, string apellido, string email, string telefono,
             string direccion = null, List<string> emailsAdicionales = null, List<string> telefonosAdicionales = null)
         {
@@ -54,13 +56,14 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ClienteRegistrado, dni.ToString());
         }
 
+        // Modificación de un cliente activo.
         public void ActualizarCliente(Cliente_790MY cliente)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
 
             ValidarDatos(cliente.DNI, cliente.Nombre, cliente.Apellido, cliente.Email, cliente.Telefono);
 
-            // GetByDni filtra Activo = 1: un cliente dado de baja no se modifica.
+            // GetByDni solo trae activos: un cliente dado de baja no se modifica.
             if (_clienteRepository.GetByDni(cliente.DNI) == null)
                 throw MensajesBLL_790MY.Regla("msg_fc_cliente_inexistente_modificar");
 
@@ -69,6 +72,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ClienteModificado, cliente.DNI.ToString());
         }
 
+        // Baja lógica. No se puede si el cliente tiene reservas confirmadas de hoy en adelante.
         public void EliminarCliente(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearCliente);
@@ -76,9 +80,8 @@ namespace BLL_08YS
             if (_clienteRepository.GetByDni(dni) == null)
                 throw MensajesBLL_790MY.Regla("msg_fc_cliente_inexistente_baja");
 
-            // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
-            // ReservaBLL_790MY formaría un ciclo ReservaBLL -> ClienteBLL -> ReservaBLL y
-            // BLLFactory_790MY entraría en recursión infinita.
+            // Lee IReservaRepository_790MY directo: pasar por ReservaBLL_790MY armaría un
+            // ciclo, porque ReservaBLL ya depende de ClienteBLL.
             int reservasPendientes = _reservaRepository
                 .Buscar(DateTime.Today, null, dni, EstadoReserva_790MY.Confirmada).Count;
             if (reservasPendientes > 0)
@@ -89,55 +92,49 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ClienteEliminado, dni.ToString());
         }
 
+        // Clientes activos.
         public List<Cliente_790MY> GetAll()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             return _clienteRepository.GetAll();
         }
 
+        // True si el DNI existe, aunque el cliente esté dado de baja.
         public bool Exists(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             return _clienteRepository.Exists(dni);
         }
 
+        // Cliente activo con ese DNI, o null.
         public Cliente_790MY GetByDni(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
             return _clienteRepository.GetByDni(dni);
         }
 
-        /// <summary>
-        /// True si existe un cliente activo con ese DNI (GetByDni filtra Activo = 1).
-        /// Sin ValidatePermission: lo usa ReservaBLL_790MY, que ya validó RegistrarReserva
-        /// o AbrirMesa; exigir VerClientes le negaría el alta de reservas a Recepción.
-        /// </summary>
+        // True si hay un cliente activo con ese DNI. No valida permiso porque lo usa
+        // ReservaBLL_790MY, que ya validó el suyo (Recepción no tiene VerClientes).
         internal bool ExisteActivo(int dni)
             => _clienteRepository.GetByDni(dni) != null;
 
-        /// <summary>Cliente activo con ese DNI, o null. Sin ValidatePermission (Walk-in, ver ExisteActivo).</summary>
+        // Cliente activo con ese DNI, o null. Para el walk-in; no valida permiso.
         internal Cliente_790MY ObtenerActivo(int dni)
             => _clienteRepository.GetByDni(dni);
 
-        /// <summary>True si el DNI está registrado pero dado de baja. Sin ValidatePermission (Walk-in).</summary>
+        // True si el DNI existe pero el cliente está dado de baja. Para el walk-in.
         internal bool ExisteInactivo(int dni)
             => _clienteRepository.Exists(dni) && _clienteRepository.GetByDni(dni) == null;
 
-        // ── Serialización / Deserialización XML de colecciones ──────────────
-        //
-        // Formato único: XML nativo de .NET (System.Xml.Serialization.XmlSerializer).
-        // Todas las operaciones trabajan SIEMPRE sobre List<Cliente_790MY>: exportar
-        // 1 cliente o N clientes produce el mismo documento (<ArrayOfCliente_790MY>),
-        // y al importar se acepta tanto esa colección como un único <Cliente_790MY>
-        // suelto, que se devuelve como lista de 1 elemento. Exigen VerClientes, igual
-        // que el listado del que salen los clientes exportados.
+        // ── Exportar e importar XML ──────────────────────────────────────────
+        // Se usa XmlSerializer de .NET y siempre se trabaja con una lista de clientes,
+        // sea uno o varios. Al importar se acepta una lista o un cliente suelto.
+        // Piden VerClientes, igual que el listado.
 
         private static readonly XmlSerializer _serializerLista   = new XmlSerializer(typeof(List<Cliente_790MY>));
         private static readonly XmlSerializer _serializerCliente = new XmlSerializer(typeof(Cliente_790MY));
 
-        /// <summary>Serializa la lista de clientes a una cadena XML bien formada (UTF-8).</summary>
-        /// <exception cref="ArgumentNullException">La lista es null.</exception>
-        /// <exception cref="ArgumentException">La lista está vacía.</exception>
+        // Pasa la lista de clientes a un texto XML (UTF-8). La lista no puede estar vacía.
         public string SerializarClientesXML(List<Cliente_790MY> clientes)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
@@ -151,11 +148,7 @@ namespace BLL_08YS
             }
         }
 
-        /// <summary>
-        /// Deserializa el contenido XML a una lista de clientes. Admite una colección
-        /// (&lt;ArrayOfCliente_790MY&gt;) o un único cliente (&lt;Cliente_790MY&gt;).
-        /// </summary>
-        /// <exception cref="ArgumentException">El contenido está vacío o no es un XML válido de clientes.</exception>
+        // Lee un texto XML y devuelve los clientes. Si el XML no es válido lanza ArgumentException.
         public List<Cliente_790MY> DeserializarClientesXML(string contenidoXml)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
@@ -186,7 +179,7 @@ namespace BLL_08YS
             throw MensajesBLL_790MY.Regla("msg_fc_xml_sin_clientes");
         }
 
-        /// <summary>Serializa la lista de clientes y la guarda en el archivo XML indicado.</summary>
+        // Exporta la lista de clientes a un archivo XML.
         public void SerializarArchivoXML(List<Cliente_790MY> clientes, string rutaArchivo)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
@@ -195,7 +188,7 @@ namespace BLL_08YS
             File.WriteAllText(rutaArchivo, xml, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
 
-        /// <summary>Lee el archivo XML indicado y devuelve la lista de clientes que contiene.</summary>
+        // Lee un archivo XML y devuelve los clientes que tiene. No los graba en la base.
         public List<Cliente_790MY> DeserializarArchivoXML(string rutaArchivo)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerClientes);
@@ -204,17 +197,16 @@ namespace BLL_08YS
             return DeserializarClientesXML(File.ReadAllText(rutaArchivo, Encoding.UTF8));
         }
 
-        // StringWriter declara "utf-16" en el encabezado XML; este declara "utf-8",
-        // que es la codificación con la que efectivamente se guarda el archivo.
+        // StringWriter pone "utf-16" en el encabezado del XML; este pone "utf-8", que es como se guarda.
         private sealed class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding => new UTF8Encoding(false);
         }
 
+        // Validaciones de los datos del cliente.
         private static void ValidarDatos(int dni, string nombre, string apellido, string email, string telefono)
         {
-            // Misma regla que la GUI (FormClientes_790MY._regexDni): 7 u 8 dígitos.
-            // Cubre también dni <= 0 (un negativo o el 0 no cumplen el patrón).
+            // DNI de 7 u 8 dígitos, igual que en la pantalla. Un 0 o un negativo no pasan.
             if (!Regex.IsMatch(dni.ToString(), @"^\d{7,8}$"))
                 throw MensajesBLL_790MY.Regla("FC_val_dni_formato");
 

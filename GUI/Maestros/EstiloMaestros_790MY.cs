@@ -6,11 +6,8 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Maestros
 {
-    /// <summary>
-    /// Estilo común de las grillas de los ABM de RF2 (Empleados, Productos):
-    /// encabezado bordó, filas altas con separador suave y celdas de estado
-    /// dibujadas como "píldoras".
-    /// </summary>
+    // Estilo común de las grillas de Empleados y Productos: encabezado bordó, filas altas
+    // y las celdas de estado dibujadas como "píldoras".
     internal static class EstiloMaestros_790MY
     {
         public static readonly Color Encabezado = Color.FromArgb(110, 26, 46);
@@ -50,7 +47,7 @@ namespace GUI_08YS.Maestros
             dgv.DefaultCellStyle.Padding = new Padding(8, 0, 0, 0);
         }
 
-        /// <summary>Dibuja el texto de la celda como una píldora de color (estado, cargo, categoría).</summary>
+        // Dibuja el texto de la celda como una píldora de color (estado, cargo, categoría).
         public static void PintarPildora(DataGridViewCellPaintingEventArgs e, string texto, Color fondo, Color colorTexto)
         {
             e.PaintBackground(e.CellBounds, (e.State & DataGridViewElementStates.Selected) != 0);
@@ -81,7 +78,7 @@ namespace GUI_08YS.Maestros
                 PintarPildora(e, "✕ " + textoInactivo, Color.FromArgb(252, 228, 228), Color.FromArgb(170, 30, 30));
         }
 
-        /// <summary>Estilo de botón primario (bordó) o secundario (contorno).</summary>
+        // Estilo de botón primario (bordó) o secundario (contorno).
         public static void EstilizarBoton(Button boton, bool primario)
         {
             boton.FlatStyle = FlatStyle.Flat;

@@ -1,12 +1,10 @@
 ﻿namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Pantalla con trabajo sin guardar (Entrega 2, M8). FormMDI_08YS la consulta antes de
-    /// cerrar sesión o salir; la navegación del menú lo resuelve con el FormClosing del hijo.
-    /// </summary>
+    // La implementan las pantallas que pueden tener algo sin guardar. FormMDI_08YS pregunta
+    // antes de cerrar sesión o salir de la aplicación.
     public interface IConfirmarSalida_790MY
     {
-        /// <summary>True si se puede salir (no hay nada pendiente o el usuario lo descartó).</summary>
+        // True si se puede salir (no hay nada pendiente o el usuario lo descartó).
         bool ConfirmarSalida();
     }
 }

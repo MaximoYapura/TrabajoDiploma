@@ -9,11 +9,8 @@ using System.Collections.Generic;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// Reglas de negocio de Empleado. El empleado es independiente de la seguridad:
-    /// la única relación con Users es UsuarioDNI (opcional), validada aquí contra
-    /// IUserRepository_08YS.Exists sin cargar roles ni permisos del usuario.
-    /// </summary>
+    // Reglas del maestro de empleados. El empleado no depende de la seguridad: lo único que
+    // lo une a un usuario es UsuarioDNI (opcional), que acá solo se controla que exista.
     public class EmpleadoBLL_790MY
     {
         private const int LargoMaximoNombre = 100;
@@ -32,16 +29,15 @@ namespace BLL_08YS
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
+        // Todos los empleados (maestro).
         public List<Empleado_790MY> GetAll()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
             return _empleadoRepository.GetAll();
         }
 
-        /// <summary>
-        /// Camareros activos para el combo de "Camarero responsable" de CUN-004.
-        /// Exige AbrirMesa (no el permiso de ABM) porque lo usa la Recepción.
-        /// </summary>
+        // Camareros activos para elegir el responsable al abrir una mesa. Pide AbrirMesa
+        // (no el permiso del maestro) porque lo usa Recepción.
         public List<Empleado_790MY> GetCamarerosActivos()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
@@ -49,14 +45,11 @@ namespace BLL_08YS
         }
 
         // ─── Consultas para otras BLL ────────────────────────────────────────
-        // Sin ValidatePermission: las usan ReservaBLL, PedidoBLL y FacturaBLL, que ya
-        // validaron su propia patente (AbrirMesa, RegistrarPedido, DespacharPedido,
-        // Caja). Exigir CrearEmpleado acá le negaría el acceso a Recepción, Camarero y Chef.
+        // No validan permiso: las usan ReservaBLL, PedidoBLL y FacturaBLL, que ya validaron el
+        // suyo. Si pidieran CrearEmpleado, Recepción, el camarero y el chef no podrían usarlas.
 
-        /// <summary>
-        /// Empleado vinculado al usuario logueado (Users.DNI -> Empleados.UsuarioDNI), o
-        /// null si no tiene. Cada llamador aplica su regla (activo, puesto Camarero).
-        /// </summary>
+        // Empleado vinculado al usuario logueado, o null. Cada BLL controla después si está
+        // activo y si es camarero.
         internal Empleado_790MY ObtenerEmpleadoDeSesion()
         {
             User_08YS usuario = SessionManager_08YS.Instance.Current
@@ -71,6 +64,7 @@ namespace BLL_08YS
         internal Empleado_790MY ObtenerPorDni(int dni)
             => _empleadoRepository.GetByDni(dni);
 
+        // Alta de empleado. El DNI no se puede repetir.
         public void RegistrarEmpleado(Empleado_790MY empleado)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
@@ -87,6 +81,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.EmpleadoRegistrado, $"Empleado {empleado.DNI} ({empleado.Puesto})");
         }
 
+        // Modificación de un empleado.
         public void ModificarEmpleado(Empleado_790MY empleado)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
@@ -110,7 +105,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.EmpleadoModificado, $"Empleado {empleado.DNI} ({empleado.Puesto})");
         }
 
-        /// <summary>Baja lógica (Activo = 0). Se conserva el registro por las reservas históricas.</summary>
+        // Baja lógica. No se puede si tiene mesas abiertas.
         public void DarDeBaja(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
@@ -128,10 +123,8 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.EmpleadoDadoDeBaja, $"Empleado {dni}");
         }
 
-        // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
-        // ReservaBLL_790MY formaría un ciclo ReservaBLL -> EmpleadoBLL -> ReservaBLL y
-        // BLLFactory_790MY entraría en recursión infinita.
-        /// <summary>Mesas abiertas (reservas Asistidas) a cargo del empleado.</summary>
+        // Mesas abiertas a cargo del empleado. Lee IReservaRepository_790MY directo porque
+        // pasar por ReservaBLL_790MY armaría un ciclo (ReservaBLL ya depende de EmpleadoBLL).
         public int ContarMesasAbiertas(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearEmpleado);
@@ -140,8 +133,7 @@ namespace BLL_08YS
 
         // ─── Validaciones ────────────────────────────────────────────────────
 
-        // Excepción: chequeo de integridad de solo lectura antes de la baja; usa
-        // IReservaRepository_790MY directo por el mismo motivo que ContarMesasAbiertas.
+        // Lanza el aviso si el empleado tiene mesas abiertas.
         private void ValidarSinMesasAbiertas(int dni)
         {
             int abiertas = _reservaRepository.GetAsistidasPorCamarero(dni).Count;
@@ -149,6 +141,7 @@ namespace BLL_08YS
                 throw MensajesBLL_790MY.Regla("msg_rf2_empleado_con_mesas_abiertas", abiertas);
         }
 
+        // DNI mayor a cero, nombre y apellido de hasta 100 caracteres y puesto válido.
         private static void ValidarDatos(Empleado_790MY empleado)
         {
             if (empleado == null)
@@ -168,10 +161,7 @@ namespace BLL_08YS
             empleado.Apellido = empleado.Apellido.Trim();
         }
 
-        /// <summary>
-        /// Empleado sin usuario (UsuarioDNI = null): válido.
-        /// Empleado con usuario: el usuario debe existir y no estar vinculado a otro empleado.
-        /// </summary>
+        // Si el empleado tiene usuario, ese usuario tiene que existir y no estar en otro empleado.
         private void ValidarUsuarioAsociado(Empleado_790MY empleado)
         {
             if (!empleado.UsuarioDNI.HasValue)

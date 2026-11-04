@@ -2,7 +2,7 @@
 
 namespace BLL_08YS
 {
-    /// <summary>Resultado de un cobro confirmado: datos para el comprobante definitivo.</summary>
+    // La factura y el pago de un cobro hecho, para mostrar el comprobante.
     public class ResultadoCobroDTO_790MY
     {
         public Factura_790MY Factura { get; set; }

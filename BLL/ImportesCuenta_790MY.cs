@@ -1,6 +1,6 @@
 ﻿namespace BLL_08YS
 {
-    /// <summary>Importes calculados de una cuenta (CUN-007, pasos 2-3).</summary>
+    // Importes de una cuenta: subtotal, descuento, IVA y total. Los calcula FacturaBLL_790MY.CalcularImportes.
     public class ImportesCuenta_790MY
     {
         public decimal Subtotal { get; set; }

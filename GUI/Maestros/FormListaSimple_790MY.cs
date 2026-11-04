@@ -6,11 +6,8 @@ using Service_08YS;
 
 namespace GUI_08YS.Maestros
 {
-    /// <summary>
-    /// Dialogo generico para agregar/quitar valores de texto sueltos (emails o
-    /// telefonos adicionales de un Cliente, por ahora). No conoce nada de Cliente
-    /// ni de negocio: solo edita una lista de strings y la devuelve.
-    /// </summary>
+    // Ventana para agregar y quitar valores de una lista de textos (los emails o teléfonos
+    // adicionales del alta rápida de cliente). No sabe nada del negocio: edita la lista y la devuelve.
     public partial class FormListaSimple_790MY : Form, IIdiomaObserver_08YS
     {
         private readonly string _tituloKey;
@@ -41,8 +38,7 @@ namespace GUI_08YS.Maestros
             if (string.IsNullOrWhiteSpace(valor))
                 return;
 
-            // Etapa 2 (E2-D4): los errores de campo se marcan con el ErrorProvider y se
-            // borran solos al corregirse (al escribir o al elegir un valor de la lista).
+            // El error se marca en el campo y se borra solo al escribir o elegir otro valor.
             if (lstValores_790MY.Items.Contains(valor))
             {
                 errValidacion_790MY.SetError(txtNuevoValor_790MY,

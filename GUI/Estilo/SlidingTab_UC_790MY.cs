@@ -10,13 +10,9 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Selector deslizante (Etapa 4, E4-D7): una pista con N opciones y un indicador bordó
-    /// que se desliza hasta la opción elegida (~200 ms; sin movimiento si Windows tiene las
-    /// animaciones desactivadas). Se maneja con clic/toque o, con foco, con las flechas,
-    /// Inicio y Fin. Los textos salen de idiomas.json a partir de <see cref="ClavesIdioma"/>.
-    /// Todas las medidas se derivan de la fuente y del DPI del control.
-    /// </summary>
+    // Selector de opciones con un indicador bordó que se desliza hasta la elegida (por
+    // ejemplo Con reserva / Walk-in o Efectivo / Tarjeta). Se usa con clic o con las
+    // flechas. Los textos salen de idiomas.json con las claves de ClavesIdioma.
     public partial class SlidingTab_UC_790MY : UserControl
     {
         private const int DuracionAnimacionMs = 200;
@@ -38,10 +34,10 @@ namespace GUI_08YS.Estilo
                      ControlStyles.ResizeRedraw | ControlStyles.UserPaint | ControlStyles.Selectable, true);
         }
 
-        /// <summary>Se dispara cuando el usuario (o el código) cambia la opción elegida.</summary>
+        // Se dispara cuando el usuario (o el código) cambia la opción elegida.
         public event EventHandler SeleccionCambiada;
 
-        /// <summary>Claves de idiomas.json de cada opción, en orden.</summary>
+        // Claves de idiomas.json de cada opción, en orden.
         [Category("Fogon"), Description("Claves de idiomas.json de cada opción, en orden.")]
         public string[] ClavesIdioma
         {
@@ -72,7 +68,7 @@ namespace GUI_08YS.Estilo
             }
         }
 
-        /// <summary>Posición inicial (al cargar el formulario): sin deslizamiento y sin disparar <see cref="SeleccionCambiada"/>.</summary>
+        // Posición inicial (al cargar el formulario): sin deslizamiento y sin disparar SeleccionCambiada.
         public void SeleccionarSinAnimacion(int indice)
         {
             if (_claves.Length == 0) return;
@@ -83,7 +79,7 @@ namespace GUI_08YS.Estilo
             Invalidate();
         }
 
-        /// <summary>Vuelve a leer los textos de idiomas.json (llamar desde UpdateIdioma del formulario).</summary>
+        // Vuelve a leer los textos de idiomas.json (llamar desde UpdateIdioma del formulario).
         public void ActualizarTextos()
         {
             _textos = _claves.Select(Traducir).ToArray();
@@ -273,7 +269,7 @@ namespace GUI_08YS.Estilo
                     TextFormatFlags.EndEllipsis | TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix);
             }
 
-            // Foco visible (P10): anillo dorado sobre la opción elegida.
+            // Borde dorado sobre la opción elegida cuando tiene el foco.
             if (Focused && ShowFocusCues && Enabled)
             {
                 Rectangle foco = Rectangle.Round(RectOpcion(pista, anchoOpcion, _indice, interior));
@@ -305,7 +301,7 @@ namespace GUI_08YS.Estilo
 
         protected override AccessibleObject CreateAccessibilityInstance() => new SlidingTabAccesible(this);
 
-        /// <summary>Expone el selector como lista de pestañas, con la opción elegida como valor.</summary>
+        // Expone el selector como lista de pestañas, con la opción elegida como valor.
         private sealed class SlidingTabAccesible : ControlAccessibleObject
         {
             private readonly SlidingTab_UC_790MY _dueno;

@@ -8,18 +8,14 @@ using Service_08YS;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Ficha de Ingredientes (Etapa 5, Fase 3): datos de prueba para el jurado leídos en vivo
-    /// de la BLL (A5, C4), solo lectura y sin contraseñas. Solo existe con Modo Demostración
-    /// y rol SuperAdmin (lo decide PanelAyuda_UC_790MY). Lo único constante son las reglas
-    /// del cobro simulado: Luhn, terminación de rechazo y cuotas (PagoBLL_790MY, Pago_790MY).
-    /// </summary>
+    // Ficha de ingredientes: datos reales para probar el sistema (clientes, empleados, mesas,
+    // turno y tarjetas de prueba), solo lectura. Aparece únicamente en modo demostración y
+    // con rol SuperAdmin (eso lo decide PanelAyuda_UC_790MY).
     public partial class FichaIngredientes_UC_790MY : UserControl, IIdiomaObserver_08YS
     {
         private const int Maximo = 5;
 
-        // Ejemplos de tarjeta (reglas, no datos): VISA válida por Luhn y otra válida que
-        // termina en la terminación de rechazo simulado. Se verifican al mostrarlas.
+        // Tarjetas de prueba: una que se aprueba y otra que el banco simulado rechaza.
         private const string TarjetaAprobada = "4111 1111 1111 1111";
         private const string TarjetaRechazada = "4000 0000 0000 0002";
 
@@ -46,7 +42,7 @@ namespace GUI_08YS.Estilo
             catch (FormatException) { return plantilla; }
         }
 
-        /// <summary>Lee los datos en vivo (se llama cada vez que se abre el panel).</summary>
+        // Lee los datos en vivo (se llama cada vez que se abre el panel).
         public void Cargar()
         {
             _seccionesConError.Clear();
@@ -86,10 +82,8 @@ namespace GUI_08YS.Estilo
                    e => e.NombreCompleto, e => T("FE_puesto_" + e.Puesto), e => e.DNI.ToString());
         }
 
-        /// <summary>
-        /// «Mesas libres» no existe como dato único (depende de fecha y turno): se muestran
-        /// las primeras mesas en servicio con número y capacidad, sin llamarlas libres (C4).
-        /// </summary>
+        // No se puede decir qué mesas están libres sin fecha y turno, así que se muestran las
+        // primeras mesas en servicio con número y capacidad.
         private void CargarMesas()
         {
             List<Mesa_790MY> lista = Leer("AY_ficha_sec_mesas",
@@ -136,6 +130,7 @@ namespace GUI_08YS.Estilo
             lblCuotas_790MY.Text = T("AY_ficha_cuotas", string.Join(", ", Pago_790MY.CuotasPermitidas));
         }
 
+        // Lee una sección. Si falla, esa sección muestra "no disponible" y el resto sigue.
         private List<TItem> Leer<TItem>(string claveSeccion, Func<List<TItem>> lectura)
         {
             try
@@ -150,7 +145,7 @@ namespace GUI_08YS.Estilo
             }
         }
 
-        /// <summary>Completa las casillas fijas del Designer; sin datos, muestra el estado vacío.</summary>
+        // Completa las casillas fijas del Designer; sin datos, muestra el estado vacío.
         private static void Llenar<TItem>(ValorCopiable_790MY[] casillas, Label vacio, List<TItem> datos,
                                           Func<TItem, string> titulo, Func<TItem, string> detalle, Func<TItem, string> valor)
         {

@@ -4,10 +4,8 @@ using Service_08YS;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Diálogo modal de confirmación con TemaFogon_790MY (Etapa 2, E2-D1): reemplaza al
-    /// MessageBox nativo en bajas, eliminaciones y demás preguntas antes de una acción.
-    /// </summary>
+    // Ventana de confirmación con los colores de la casa. Se usa en lugar del MessageBox
+    // antes de bajas y otras acciones que no se pueden deshacer.
     public partial class ConfirmModal_790MY : Form
     {
         public ConfirmModal_790MY()
@@ -15,11 +13,9 @@ namespace GUI_08YS.Estilo
             InitializeComponent();
         }
 
-        /// <summary>
-        /// Pregunta antes de ejecutar <paramref name="textoAccion"/>. Devuelve true solo si el
-        /// usuario eligió la acción; Esc, cerrar la ventana o Cancelar devuelven false.
-        /// El foco arranca en Cancelar para que un Enter accidental no confirme una baja.
-        /// </summary>
+        // Pregunta antes de ejecutar textoAccion. Devuelve true solo si el
+        // usuario eligió la acción; Esc, cerrar la ventana o Cancelar devuelven false.
+        // El foco arranca en Cancelar para que un Enter accidental no confirme una baja.
         public static bool Confirmar(IWin32Window owner, string titulo, string mensaje,
                                      string textoAccion, string textoCancelar = null)
         {

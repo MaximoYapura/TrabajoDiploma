@@ -11,9 +11,10 @@ using System.Linq;
 
 namespace BLL_08YS
 {
+    // Reglas de las mesas: el maestro de mesas, los turnos y el plano del salón.
     public class MesaBLL_790MY
     {
-        // Turnos fijos de 2 horas entre las 18:00 y las 24:00 (horas de inicio válidas).
+        // Turnos de 2 horas entre las 18:00 y las 24:00 (horas de inicio).
         private static readonly TimeSpan[] TurnosValidos =
         {
             new TimeSpan(18, 0, 0),
@@ -23,26 +24,22 @@ namespace BLL_08YS
 
         public static readonly TimeSpan DuracionTurno = TimeSpan.FromHours(2);
 
-        /// <summary>Horas de inicio de los turnos de atención.</summary>
+        // Horas de inicio de los turnos de atención.
         public static IReadOnlyList<TimeSpan> Turnos => TurnosValidos;
 
-        /// <summary>
-        /// Turno en curso para el momento indicado (inicio &lt;= hora &lt; inicio + 2h),
-        /// o null si el restaurante está fuera del horario de atención.
-        /// Lo usan la apertura de mesas (CUN-004) y el Walk-in (CUN-005).
-        /// Fuera de horario, si el modo prueba está activo (App.config), devuelve el
-        /// turno de prueba configurado para poder testear sin depender de la hora.
-        /// </summary>
+        // Turno en curso en ese momento, o null si está fuera de horario.
+        // En modo demostración, fuera de horario devuelve el turno de prueba.
         public static TimeSpan? ObtenerTurnoVigente(DateTime momento)
         {
             TimeSpan? real = ObtenerTurnoReal(momento);
             return real ?? TurnoDePrueba;
         }
 
-        /// <summary>True si el turno vigente del momento indicado proviene del modo prueba.</summary>
+        // True si el turno vigente sale del modo demostración.
         public static bool EsTurnoDePrueba(DateTime momento)
             => !ObtenerTurnoReal(momento).HasValue && TurnoDePrueba.HasValue;
 
+        // Turno real según la hora, sin tener en cuenta el modo demostración.
         private static TimeSpan? ObtenerTurnoReal(DateTime momento)
         {
             TimeSpan hora = momento.TimeOfDay;
@@ -53,10 +50,10 @@ namespace BLL_08YS
         }
 
         // ─── Modo demostración ───────────────────────────────────────────────
-        // App.config de la GUI, <appSettings>:
+        // Se configura en el App.config:
         //   <add key="ModoDemostracion"  value="true" />
         //   <add key="TurnoPrueba_790MY" value="22:00" />   (18:00, 20:00 o 22:00)
-        // Con ModoDemostracion en false o ausente se aplica el control de turnos estricto.
+        // Con ModoDemostracion en false (o sin la clave) solo valen los turnos reales.
         private static readonly Lazy<TimeSpan?> _turnoDePrueba = new Lazy<TimeSpan?>(LeerTurnoDePrueba);
 
         private static TimeSpan? TurnoDePrueba => _turnoDePrueba.Value;
@@ -68,8 +65,7 @@ namespace BLL_08YS
                 if (!bool.TryParse(ConfigurationManager.AppSettings["ModoDemostracion"], out bool activo) || !activo)
                     return null;
 
-                // Un valor ausente o que no es un inicio de turno válido cae en el último
-                // turno del día, que es el que admite registrar reservas "para hoy" más tarde.
+                // Si el valor falta o no es un turno, se usa el último del día.
                 return TimeSpan.TryParse(ConfigurationManager.AppSettings["TurnoPrueba_790MY"], out TimeSpan turno)
                        && TurnosValidos.Contains(turno)
                     ? turno
@@ -81,12 +77,8 @@ namespace BLL_08YS
             }
         }
 
-        /// <summary>
-        /// Igual que ObtenerTurnoVigente(DateTime.Now) pero lanza una regla de negocio
-        /// traducida si no hay turno en curso. La GUI lo usa para abrir
-        /// FormSeleccionarMesa_790MY en modo Walk-in: new FormSeleccionarMesa_790MY(
-        /// DateTime.Today, mesaBll.ObtenerTurnoVigenteObligatorio(), comensales).
-        /// </summary>
+        // Igual que ObtenerTurnoVigente(DateTime.Now), pero si no hay turno lanza el mensaje
+        // de fuera de turno. Lo usa el walk-in para abrir el plano.
         public TimeSpan ObtenerTurnoVigenteObligatorio()
         {
             TimeSpan? turno = ObtenerTurnoVigente(DateTime.Now);
@@ -108,22 +100,19 @@ namespace BLL_08YS
             _bitacoraBll       = bitacoraBll       ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
+        // Todas las mesas (maestro de mesas).
         public List<Mesa_790MY> GetAll()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
             return _mesaRepository.GetAll();
         }
 
-        /// <summary>
-        /// Mesa con ese número, o null. Sin ValidatePermission: lo usa ReservaBLL_790MY
-        /// en CUN-004, que ya validó AbrirMesa (Recepción no tiene VerMesas).
-        /// </summary>
+        // Mesa con ese número, o null. No valida permiso porque lo usa ReservaBLL_790MY al
+        // abrir la mesa, que ya validó AbrirMesa (Recepción no tiene VerMesas).
         internal Mesa_790MY ObtenerPorNumero(int nroMesa)
             => _mesaRepository.GetAll().FirstOrDefault(m => m.NroMesa == nroMesa);
 
-        /// <summary>
-        /// Devuelve el próximo número de mesa disponible: Max(NroMesa) + 1, o 1 si no hay mesas.
-        /// </summary>
+        // Número para la próxima mesa: el más alto más uno, o 1 si no hay mesas.
         public int GetProximoNumero()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
@@ -132,20 +121,15 @@ namespace BLL_08YS
             return max + 1;
         }
 
-         /// <summary>
-        /// Devuelve todas las mesas clasificadas para el mapa del salón según
-        /// el turno y la cantidad de comensales solicitados.
-        /// </summary>
+        // Las mesas con su estado para el plano del salón, según el turno y los comensales.
         public List<MesaMapaDTO_790MY> ObtenerMesasMapa(DateTime fecha, TimeSpan hora, int comensales)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerMesas);
             return ObtenerMapa(fecha, hora, comensales);
         }
 
-        /// <summary>
-        /// Cuerpo de ObtenerMesasMapa sin ValidatePermission: lo usa ReservaBLL_790MY en el
-        /// Walk-in, que ya validó AbrirMesa (Recepción no tiene VerMesas).
-        /// </summary>
+        // Lo mismo que ObtenerMesasMapa pero sin validar permiso. Lo usa el walk-in de
+        // ReservaBLL_790MY, que ya validó AbrirMesa.
         internal List<MesaMapaDTO_790MY> ObtenerMapa(DateTime fecha, TimeSpan hora, int comensales)
         {
             if (fecha.Date < DateTime.Today)
@@ -157,26 +141,22 @@ namespace BLL_08YS
             if (!TurnosValidos.Contains(hora))
                 throw MensajesBLL_790MY.Regla("msg_rf2_turno_invalido");
 
-            // Las mesas dadas de baja (FueraDeServicio / Activo = 0) no se dibujan en el
-            // plano: no pueden asignarse ni en reservas ni en Walk-in.
+            // Las mesas fuera de servicio no aparecen en el plano.
             var todasLasMesas = _mesaRepository.GetAll()
                 .Where(m => m.Activo && m.Estado != EstadoMesa_790MY.FueraDeServicio)
                 .ToList();
 
-            // Ocupación por turno: reservas Confirmadas y Asistidas del mismo (fecha, hora).
-            // Canceladas y Finalizadas no bloquean (Reserva_790MY.EstadosQueOcupanMesa).
+            // Mesas con una reserva Confirmada o Asistida en esa fecha y hora.
             var numerosOcupados = new HashSet<int>(_mesaRepository.GetNumerosOcupadosEnTurno(fecha.Date, hora));
 
-            // Si se consulta el turno EN CURSO, además se respeta el estado físico de la
-            // mesa: un grupo de un turno anterior que todavía no se retiró (mesa Ocupada,
-            // reserva aún Asistida) no puede recibir a otro grupo. Para turnos futuros
-            // el estado físico actual no aplica.
+            // Si es el turno en curso, también cuenta la mesa ocupada ahora: puede seguir
+            // ahí un grupo del turno anterior. Para turnos futuros esto no importa.
             bool esTurnoEnCurso = fecha.Date == DateTime.Today && ObtenerTurnoVigente(DateTime.Now) == hora;
             if (esTurnoEnCurso)
                 foreach (var mesa in todasLasMesas.Where(m => m.Estado == EstadoMesa_790MY.Ocupada))
                     numerosOcupados.Add(mesa.NroMesa);
 
-            // Mejor ajuste: mínima capacidad entre las mesas libres que pueden alojar a los comensales.
+            // La recomendada es la mesa libre de menor capacidad que alcanza.
             int minCapacidadLibre = todasLasMesas
                 .Where(m => m.Capacidad >= comensales && !numerosOcupados.Contains(m.NroMesa))
                 .Select(m => m.Capacidad)
@@ -212,6 +192,7 @@ namespace BLL_08YS
             return resultado.OrderBy(dto => dto.Mesa.NroMesa).ToList();
         }
 
+        // Alta de mesa. Hay un máximo de 12 mesas y el número no se puede repetir.
         public void RegistrarMesa(int numero, int capacidad)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
@@ -233,6 +214,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaRegistrada, numero.ToString());
         }
 
+        // Modifica la capacidad y, si corresponde, la pasa a Fuera de servicio o la devuelve a Libre.
         public void ModificarMesa(Mesa_790MY mesa)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
@@ -243,15 +225,15 @@ namespace BLL_08YS
             if (actual == null)
                 throw MensajesBLL_790MY.Regla("msg_fm_mesa_inexistente_modificar", mesa.NroMesa);
 
-            // El maestro solo pasa la mesa a FueraDeServicio o la devuelve a Libre desde ahí;
-            // Ocupada y Reservada son estados operativos de Reservas y Atención en mesa.
+            // Desde el maestro solo se pasa a FueraDeServicio o se vuelve a Libre. Ocupada y
+            // Reservada las manejan Reservas y Atención en mesa.
             EstadoMesa_790MY? nuevoEstado = null;
             if (mesa.Estado == EstadoMesa_790MY.FueraDeServicio && actual.Estado != EstadoMesa_790MY.FueraDeServicio)
                 nuevoEstado = EstadoMesa_790MY.FueraDeServicio;
             else if (mesa.Estado != EstadoMesa_790MY.FueraDeServicio && actual.Estado == EstadoMesa_790MY.FueraDeServicio)
                 nuevoEstado = EstadoMesa_790MY.Libre;
 
-            // Excepción: se lee IReservaRepository_790MY directo (ver EliminarMesa).
+            // Lee IReservaRepository_790MY directo, por lo mismo que EliminarMesa.
             if (nuevoEstado == EstadoMesa_790MY.FueraDeServicio
                 && (actual.Estado == EstadoMesa_790MY.Ocupada
                     || _reservaRepository.Buscar(null, null, null, EstadoReserva_790MY.Asistida)
@@ -275,6 +257,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaModificada, mesa.NroMesa.ToString());
         }
 
+        // Baja de mesa. Si alguna vez tuvo reservas no se puede; si no, queda Fuera de servicio.
         public void EliminarMesa(int numero)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.CrearMesa);
@@ -282,13 +265,9 @@ namespace BLL_08YS
             if (!_mesaRepository.Exists(numero))
                 throw MensajesBLL_790MY.Regla("msg_fm_mesa_inexistente_baja", numero);
 
-            // ── Integridad referencial: historial completo (activas + pasadas) ──────────
-            // Excepción: se lee IReservaRepository_790MY directo (solo lectura). Pasar por
-            // ReservaBLL_790MY formaría un ciclo ReservaBLL -> MesaBLL -> ReservaBLL y
-            // BLLFactory_790MY entraría en recursión infinita.
-            // Se consulta el repositorio de reservas para verificar si existen reservas
-            // asociadas a esta mesa, sin importar su estado ni fecha.
-            // Si las hay, se prohíbe la eliminación y se informa al usuario.
+            // Se buscan reservas de esta mesa de cualquier fecha y estado. Se lee
+            // IReservaRepository_790MY directo porque pasar por ReservaBLL_790MY armaría un
+            // ciclo (ReservaBLL ya depende de MesaBLL) y la fábrica no terminaría nunca.
             var todasLasReservas = _reservaRepository.Buscar(null, null, null, null);
             bool tieneHistorial  = todasLasReservas != null &&
                                    todasLasReservas.Any(r => r.MesaNumero == numero);
@@ -296,9 +275,7 @@ namespace BLL_08YS
             if (tieneHistorial)
                 throw MensajesBLL_790MY.Regla("msg_error_eliminar_mesa_con_reservas");
 
-            // ── Baja por estado: FueraDeServicio (no DELETE físico) ──────────────────────
-            // La mesa no tiene reservas en absoluto: se marca como FueraDeServicio
-            // en lugar de eliminarse físicamente, para preservar la integridad del modelo.
+            // No se borra la fila: la mesa queda Fuera de servicio.
             Mesa_790MY actual = ObtenerPorNumero(numero);
             if (!_mesaRepository.UpdateEstado(numero, actual.Estado, EstadoMesa_790MY.FueraDeServicio))
                 throw MensajesBLL_790MY.Regla("msg_fm_mesa_cambio_estado", numero);
@@ -306,6 +283,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.MesaEliminada, numero.ToString());
         }
 
+        // Número mayor a cero y capacidad de 1 a 8.
         private static void ValidarDatos(int numero, int capacidad)
         {
             if (numero <= 0)

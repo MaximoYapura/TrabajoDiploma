@@ -2,7 +2,7 @@
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>Renglón de la comanda todavía no enviada (FormRegistrarPedido_790MY).</summary>
+    // Renglón de la comanda todavía no enviada (FormRegistrarPedido_790MY).
     internal sealed class ItemComanda_790MY
     {
         public Producto_790MY Producto { get; set; }

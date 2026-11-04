@@ -1,6 +1,6 @@
 ﻿namespace BE_08YS
 {
-    /// <summary>Datos que el camarero ingresa para cobrar (entrada de PagoBLL.RegistrarCobro).</summary>
+    // Lo que se carga en la caja para cobrar. Es la entrada de PagoBLL_790MY.RegistrarCobro.
     public class SolicitudCobro_790MY
     {
         public int NroFactura { get; set; }

@@ -2,16 +2,14 @@
 
 namespace BLL_08YS
 {
+    // Datos generales del reporte predictivo (cuentas analizadas y período).
     public class ResumenCanasta_790MY
     {
         public int CuentasAnalizadas { get; set; }
         public int DiasAnalizados { get; set; }
         public DateTime Desde { get; set; }
 
-        /// <summary>
-        /// false si la BD todavía no tiene suficientes cuentas cobradas para calcular
-        /// asociaciones: no se generan reglas ni sugerencias y la GUI lo informa.
-        /// </summary>
+        // False si todavía no hay suficientes cuentas cobradas; en ese caso no hay reglas.
         public bool DatosSuficientes { get; set; }
     }
 }

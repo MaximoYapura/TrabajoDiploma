@@ -5,11 +5,9 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// Panel con esquinas redondeadas y borde configurable (sólido o punteado).
-    /// Lo usan las tarjetas de RF2: reservas, camareros, productos, mesas y comandas.
-    /// El relleno es BackColor; fuera de las esquinas se pinta el fondo del contenedor.
-    /// </summary>
+    // Panel con esquinas redondeadas y borde configurable (sólido o punteado).
+    // Lo usan las tarjetas de RF2: reservas, camareros, productos, mesas y comandas.
+    // El relleno es BackColor; fuera de las esquinas se pinta el fondo del contenedor.
     public class PanelRedondeado_790MY : Panel
     {
         private int _radio = 10;
@@ -82,10 +80,8 @@ namespace GUI_08YS.RF2
         }
     }
 
-    /// <summary>
-    /// Etiqueta tipo "píldora" (fondo redondeado) para estados y contadores:
-    /// "Disp. 9", "# 229 · Listo", "3 pendientes", etc.
-    /// </summary>
+    // Etiqueta tipo "píldora" (fondo redondeado) para estados y contadores:
+    // "Disp. 9", "# 229 · Listo", "3 pendientes", etc.
     public class EtiquetaChip_790MY : Label
     {
         private Color _colorBorde = Color.Transparent;

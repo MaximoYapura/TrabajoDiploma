@@ -4,13 +4,10 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Un dato de prueba de la Ficha de Ingredientes (Etapa 5, Fase 3): título, detalle,
-    /// valor de solo lectura y botón «Copiar». El aviso (toast o banner) lo muestra la Ficha.
-    /// </summary>
+    // Un dato de la Ficha de ingredientes: título, detalle, el valor y el botón "Copiar".
     public partial class ValorCopiable_790MY : UserControl
     {
-        /// <summary>Resultado de pulsar «Copiar»: true si el portapapeles aceptó el valor.</summary>
+        // Resultado de pulsar «Copiar»: true si el portapapeles aceptó el valor.
         public event EventHandler<bool> CopiaIntentada;
 
         private string _textoCopiar = "Copiar";
@@ -42,7 +39,7 @@ namespace GUI_08YS.Estilo
         private void ActualizarAccesible()
             => btnCopiar_790MY.AccessibleName = $"{_textoCopiar}: {lblTitulo_790MY.Text} ({txtValor_790MY.Text})";
 
-        /// <summary>Si el portapapeles falla, el valor queda seleccionado para Ctrl+C.</summary>
+        // Si el portapapeles falla, el valor queda seleccionado para Ctrl+C.
         public void SeleccionarValor()
         {
             txtValor_790MY.Focus();

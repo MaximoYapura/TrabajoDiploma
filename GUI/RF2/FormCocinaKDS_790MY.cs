@@ -13,12 +13,10 @@ using NivelSemaforo = GUI_08YS.RF2.TicketKds_790MY.NivelSemaforo;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// CUN-008 Despachar Pedido (Chef). Pantalla KDS en columnas: Pendientes,
-    /// En preparación y Listas para retirar. "Marcar como listo" invoca
-    /// PedidoBLL_790MY.MarcarPedidoListo, que en una misma transacción cambia el estado
-    /// y descuenta el stock (con DV y bitácora). El camarero lo ve en Registrar Pedido.
-    /// </summary>
+    // RF2: Cocina (CUN-008). Pantalla del chef en tres columnas: pendientes, en preparación
+    // y listas. "Listo" llama a PedidoBLL_790MY.MarcarPedidoListo, que cambia el estado y
+    // descuenta el stock en una transacción. El camarero ve el aviso en Registrar pedido.
+    // Se refresca sola cada 15 segundos.
     public partial class FormCocinaKDS_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private readonly PedidoBLL_790MY _pedidoBll;
@@ -33,14 +31,11 @@ namespace GUI_08YS.RF2
         private List<Pedido_790MY> _listos = new List<Pedido_790MY>();
         private Dictionary<int, Empleado_790MY> _camareros = new Dictionary<int, Empleado_790MY>();
 
-        /// <summary>
-        /// Etapa 3 (Opción C): cada pedido en pantalla tiene un único ticket, que se
-        /// actualiza en el lugar y se mueve de columna; solo se crean los pedidos nuevos
-        /// y solo se destruyen los que ya no vienen en la consulta.
-        /// </summary>
+        // Un ticket por pedido. Al refrescar se actualiza y se mueve de columna en vez de
+        // recrearlo: solo se crean los nuevos y se borran los que ya no vienen.
         private readonly Dictionary<int, TicketKds_790MY> _tickets = new Dictionary<int, TicketKds_790MY>();
 
-        /// <summary>Aviso «sin comandas» de cada columna; se muestra u oculta, no se recrea.</summary>
+        // Aviso «sin comandas» de cada columna; se muestra u oculta, no se recrea.
         private readonly Dictionary<FlowLayoutPanel, Label> _avisosVacio = new Dictionary<FlowLayoutPanel, Label>();
 
         private readonly FuentesKds_790MY _fuentes = new FuentesKds_790MY();
@@ -81,10 +76,10 @@ namespace GUI_08YS.RF2
 
         #region Datos
 
+        // Vuelve a consultar los pedidos y redibuja. En el refresco automático no muestra errores.
         private void Recargar(bool mostrarErrores)
         {
-            // Tiempos de consulta y redibujado (criterio E3-D5: redibujado < 50 ms),
-            // para poder medir en el equipo real de la cocina.
+            // Se mide cuánto tarda la consulta y el redibujado (se ve en la salida de Trace).
             var reloj = System.Diagnostics.Stopwatch.StartNew();
             try
             {
@@ -119,6 +114,7 @@ namespace GUI_08YS.RF2
 
         #region Render
 
+        // Reparte los tickets en las tres columnas.
         private void Renderizar()
         {
             var pendientes = _comandas.Where(p => p.Estado == EstadoPedido_790MY.Pendiente).ToList();
@@ -155,6 +151,7 @@ namespace GUI_08YS.RF2
             foreach (var flp in columnas) flp.ResumeLayout();
         }
 
+        // Deja en la columna los tickets de esos pedidos, reutilizando los que ya existen.
         private void SincronizarColumna(FlowLayoutPanel flp, List<Pedido_790MY> pedidos, string claveVacio, HashSet<int> vigentes)
         {
             int ancho = Math.Max(220, flp.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 4);
@@ -233,7 +230,7 @@ namespace GUI_08YS.RF2
             bnrAvisos_790MY.Ocultar();
             try
             {
-                // Cambio de estado + descuento efectivo del inventario en una transacción.
+                // Cambia el estado y descuenta el stock en una transacción.
                 Pedido_790MY despachado = _pedidoBll.MarcarPedidoListo(pedido.NroPedido);
                 E.MostrarExitoToast(this, E.T("msg_rf2_pedido_listo_ok", despachado?.NroPedido ?? pedido.NroPedido));
             }
@@ -260,7 +257,7 @@ namespace GUI_08YS.RF2
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(flpPendientes_790MY), "AY_sug_kds1_t", "AY_sug_kds1_x"),

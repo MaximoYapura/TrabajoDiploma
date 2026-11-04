@@ -2,20 +2,18 @@ using System;
 
 namespace BE_08YS
 {
-    /// <summary>Se persiste como texto (nvarchar(20)).</summary>
+    // Medio de pago. Se guarda como texto.
     public enum MetodoPago_790MY
     {
         Efectivo,
         Tarjeta
     }
 
-    /// <summary>
-    /// Pago confirmado de una factura (CUN-007). Solo se persisten pagos aprobados:
-    /// un rechazo de la entidad bancaria queda únicamente en la bitácora.
-    /// </summary>
+    // Pago de una factura. Solo se guardan pagos aprobados; un rechazo del banco
+    // queda únicamente en la bitácora.
     public class Pago_790MY
     {
-        /// <summary>Planes de cuotas habilitados para tarjeta (simulación sin recargo).</summary>
+        // Cuotas que se aceptan con tarjeta (sin recargo).
         public static readonly int[] CuotasPermitidas = { 1, 3, 6, 12 };
 
         public int IdPago { get; set; }
@@ -23,27 +21,27 @@ namespace BE_08YS
         public DateTime FechaHoraPago { get; set; }
         public MetodoPago_790MY MetodoPago { get; set; }
 
-        /// <summary>Total de la factura + propina: lo que efectivamente se cobra.</summary>
+        // Total de la factura + propina: lo que efectivamente se cobra.
         public decimal MontoAbonado { get; set; }
 
-        /// <summary>Efectivo entregado por el cliente (null para tarjeta).</summary>
+        // Efectivo entregado por el cliente (null para tarjeta).
         public decimal? MontoRecibido { get; set; }
 
-        /// <summary>Vuelto entregado (null para tarjeta).</summary>
+        // Vuelto entregado (null para tarjeta).
         public decimal? Cambio { get; set; }
 
         public decimal MontoPropina { get; set; }
 
-        /// <summary>Número enmascarado ("**** **** **** 1111"); nunca el número completo.</summary>
+        // Número enmascarado ("**** **** **** 1111"); nunca el número completo.
         public string NroTarjeta { get; set; }
 
-        /// <summary>VISA / MASTERCARD / AMEX / OTRA, deducida del prefijo del número.</summary>
+        // VISA / MASTERCARD / AMEX / OTRA, deducida del prefijo del número.
         public string MarcaTarjeta { get; set; }
 
         public int? CantidadCuotas { get; set; }
         public string NroAutorizacion { get; set; }
 
-        /// <summary>Importe de cada cuota (solo visualización).</summary>
+        // Importe de cada cuota (solo visualización).
         public decimal? ImporteCuota => CantidadCuotas.HasValue && CantidadCuotas.Value > 0
             ? Math.Round(MontoAbonado / CantidadCuotas.Value, 2, MidpointRounding.AwayFromZero)
             : (decimal?)null;

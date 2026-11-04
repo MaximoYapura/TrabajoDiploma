@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BE_08YS
 {
+    // Cliente del restaurante. El DNI es la clave y la baja es lógica (Activo = false).
     public class Cliente_790MY
     {
         private int _dni;
@@ -47,7 +48,7 @@ namespace BE_08YS
             set { _apellido = value; }
         }
 
-        // Email/Telefono "principales": obligatorios, son los del formulario ppal.
+        // Email y teléfono principales (obligatorios).
         public string Email
         {
             get { return _email; }
@@ -72,7 +73,7 @@ namespace BE_08YS
             set { _activo = value; }
         }
 
-        // Emails/telefonos adicionales (relacion 1:n). No incluyen al principal.
+        // Emails y teléfonos extra, sin contar los principales. Van en tablas aparte.
         public List<string> EmailsAdicionales { get; set; } = new List<string>();
         public List<string> TelefonosAdicionales { get; set; } = new List<string>();
 

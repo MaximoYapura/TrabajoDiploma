@@ -10,12 +10,9 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Fila «Ayuda [F1]» de la barra lateral (Etapa 5, G1): sombrero del chef, texto y tecla
-    /// dibujada. Se ve y se comporta como los IconButton de la barra: hover, presionado,
-    /// foco con Tab + Enter/Espacio y estado deshabilitado (cuando el cobro bloquea la barra).
-    /// Un clic en cualquier parte (imagen, texto o tecla) dispara <see cref="Control.Click"/>.
-    /// </summary>
+    // Botón "Ayuda [F1]" de la barra lateral: sombrero del chef, texto y la tecla dibujada.
+    // Se comporta como los demás botones de la barra (hover, presionado, foco y
+    // deshabilitado). Un clic en cualquier parte dispara Click.
     public partial class FilaAyuda_790MY : UserControl, IIdiomaObserver_08YS
     {
         private bool _hover;
@@ -24,7 +21,7 @@ namespace GUI_08YS.Estilo
         private Image _imagenAtenuada;
         private Image _imagenVisible;
 
-        // Animación (Fase 8b): inclinación al hover, latido y un brillo único.
+        // Animación al pasar el mouse: el sombrero se inclina, late y brilla una vez.
         private const float AnguloHover = 10f;
         private const int DuracionGiro = 150;      // ms
         private const int DuracionBrillo = 300;    // ms
@@ -41,7 +38,7 @@ namespace GUI_08YS.Estilo
             AplicarEstado();
         }
 
-        /// <summary>Recurso nativo para la escala (32/40/48/64 px): reducir el maestro de 512 px pixela.</summary>
+        // Hay una imagen por tamaño (32, 40, 48 y 64 px); achicar la de 512 px se ve mal.
         private static Image ElegirSombrero(int dpi)
         {
             if (dpi <= 96) return Resources.SombreroAyuda32;
@@ -88,7 +85,7 @@ namespace GUI_08YS.Estilo
             }
         }
 
-        /// <summary>El sombrero recoloreado con TextoDeshabilitado (se conserva la transparencia).</summary>
+        // El sombrero recoloreado con TextoDeshabilitado (se conserva la transparencia).
         private Image ImagenAtenuada()
         {
             if (_imagenAtenuada != null) return _imagenAtenuada;
@@ -153,10 +150,8 @@ namespace GUI_08YS.Estilo
 
         #region Animación del sombrero (Fase 8b, spike B4)
 
-        /// <summary>
-        /// Inclinación hasta 10° en 150 ms (y de vuelta al salir); al entrar, además, un latido
-        /// y un brillo diagonal de 300 ms. Sin efectos de animación en Windows, no se mueve.
-        /// </summary>
+        // Inclinación hasta 10° en 150 ms (y de vuelta al salir); al entrar, además, un latido
+        // y un brillo diagonal de 300 ms. Sin efectos de animación en Windows, no se mueve.
         private void Animar(bool haciaHover)
         {
             if (!SystemInformation.UIEffectsEnabled || !Enabled)
@@ -202,7 +197,7 @@ namespace GUI_08YS.Estilo
             picSombrero_790MY.Invalidate();     // solo el área del ícono
         }
 
-        /// <summary>Dibuja el sombrero (normal o atenuado) con la inclinación, el latido y el brillo vigentes.</summary>
+        // Dibuja el sombrero (normal o atenuado) con la inclinación, el latido y el brillo vigentes.
         private void picSombrero_790MY_Paint(object sender, PaintEventArgs e)
         {
             Image img = _imagenVisible;

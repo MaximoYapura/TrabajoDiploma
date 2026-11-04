@@ -10,16 +10,15 @@ using System.Linq;
 
 namespace BLL_08YS
 {
-    // Clase parcial: la generación del comprobante (PDF + email) vive en
-    // ReservaBLL_790MY.Comprobante.cs para no mezclarla con las reglas de dominio.
+    // Reglas de las reservas (RF1) y de la apertura de mesas (RF2: con reserva y walk-in).
+    // El comprobante en PDF y el mail están en ReservaBLL_790MY.Comprobante.cs.
     //
-    // Patrón de cada operación que modifica datos (igual al resto del proyecto):
-    //   1) SessionManager_08YS.ValidatePermission  -> autorización (Composite) en la BLL,
-    //      de modo que invocar la BLL directamente sin permiso también falla.
-    //   2) Validaciones de negocio con mensajes traducidos (MensajesBLL_790MY).
-    //   3) Persistencia atómica en el repositorio (una transacción SQL por operación).
-    //   4) DVManager_08YS.Recalcular()                -> DVH/DVV de todas las tablas monitoreadas.
-    //   5) BitacoraBLL_08YS.RegistrarEventoPostCommit -> auditoría del hecho ya confirmado.
+    // Cada operación que modifica datos sigue el mismo orden que el resto de las BLL:
+    //   1) valida el permiso (aunque la pantalla esconda el botón);
+    //   2) valida las reglas, con mensajes traducidos (MensajesBLL_790MY);
+    //   3) graba en el repositorio, en una sola transacción;
+    //   4) recalcula los dígitos verificadores;
+    //   5) registra el evento en la bitácora, ya con los datos guardados.
     public partial class ReservaBLL_790MY
     {
         private readonly IReservaRepository_790MY _reservaRepository;
@@ -40,13 +39,10 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  RF1 — Registrar reserva
+        //  RF1: registrar reserva
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Registra la reserva y la devuelve con su ReservaID ya asignado por el
-        /// repositorio, para que la capa de presentación pueda emitir el comprobante.
-        /// </summary>
+        // Registra la reserva y la devuelve con su número, para que la pantalla muestre el comprobante.
         public Reserva_790MY RegistrarReserva(int clienteDni, Mesa_790MY mesa, DateTime fecha, TimeSpan hora, int comensales)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
@@ -54,8 +50,7 @@ namespace BLL_08YS
             if (mesa == null)
                 throw MensajesBLL_790MY.Regla("msg_rf2_falta_mesa");
 
-            // ExisteActivo filtra por Activo = 1: un cliente dado de baja logicamente
-            // no deberia poder hacer reservas.
+            // Un cliente dado de baja no puede reservar.
             if (!_clienteBll.ExisteActivo(clienteDni))
                 throw MensajesBLL_790MY.Regla("msg_rf2_cliente_inexistente");
 
@@ -71,10 +66,8 @@ namespace BLL_08YS
 
             var reserva = new Reserva_790MY(clienteDni, mesa.NroMesa, fecha.Date, hora, comensales, EstadoReserva_790MY.Confirmada);
 
-            // Alta atómica: la re-validación de disponibilidad y el INSERT ocurren en la
-            // misma transacción con bloqueo de rango, por lo que dos puestos de recepción
-            // no pueden confirmar la misma mesa para el mismo turno (antes la verificación
-            // y el alta eran dos pasos separados y existía una ventana de carrera).
+            // El repositorio vuelve a controlar que la mesa esté libre y graba en la misma
+            // transacción, así dos recepciones no pueden reservar la misma mesa y turno.
             if (!_reservaRepository.AddSiMesaDisponible(reserva, ocuparMesaFisica: false))
             {
                 _bitacoraBll.RegistrarEventoPostCommit(Evento.ReservaRechazadaDisponibilidad,
@@ -90,6 +83,7 @@ namespace BLL_08YS
             return reserva;
         }
 
+        // Búsqueda del reporte de reservas. Todos los filtros son opcionales.
         public List<Reserva_790MY> Buscar(DateTime? desde, DateTime? hasta, int? clienteDni, EstadoReserva_790MY? estado)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.VerReservas);
@@ -101,14 +95,11 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  RF2 — CUN-004 Abrir Mesa
+        //  RF2: abrir mesa (CUN-004) y walk-in (CUN-005)
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Nómina de reservas Confirmadas de HOY para el turno en curso, filtrable por
-        /// número de reserva o DNI del cliente (pasos 2-4 del CUN-004).
-        /// Devuelve lista vacía fuera del horario de atención.
-        /// </summary>
+        // Reservas Confirmadas de hoy para el turno en curso, filtrables por número o DNI.
+        // Fuera de horario devuelve la lista vacía.
         public List<Reserva_790MY> ObtenerReservasParaApertura(int? nroReserva = null, int? clienteDni = null)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
@@ -125,10 +116,7 @@ namespace BLL_08YS
                 .ToList();
         }
 
-        /// <summary>
-        /// Cantidad de mesas abiertas (reservas Asistidas) que tiene a cargo cada
-        /// camarero, para orientar a Recepción al elegir el responsable (CUN-004).
-        /// </summary>
+        // Cuántas mesas abiertas tiene cada camarero, para mostrarlo al elegir el responsable.
         public Dictionary<int, int> ContarMesasACargo(IEnumerable<int> camarerosDni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
@@ -139,11 +127,8 @@ namespace BLL_08YS
             return resultado;
         }
 
-        /// <summary>
-        /// CUN-004 escenario principal: el cliente llega con reserva previa.
-        /// Confirmada -> Asistida, asigna el camarero y marca la mesa Ocupada
-        /// (todo en una transacción).
-        /// </summary>
+        // El cliente llega con reserva: la reserva pasa a Asistida con el camarero y la
+        // mesa queda Ocupada, todo en una transacción.
         public Reserva_790MY AbrirMesa(int reservaId, int camareroDni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
@@ -174,8 +159,7 @@ namespace BLL_08YS
             if (mesa.Estado == EstadoMesa_790MY.Ocupada)
                 throw MensajesBLL_790MY.Regla("msg_rf2_mesa_fisicamente_ocupada", reserva.MesaNumero);
 
-            // La transición es condicional en la base: si entre la validación y este punto
-            // otro puesto abrió la reserva u ocupó la mesa, no se modifica nada.
+            // Si otro puesto abrió la reserva u ocupó la mesa mientras tanto, la base no cambia nada.
             if (!_reservaRepository.AbrirReserva(reservaId, camarero.DNI))
                 throw MensajesBLL_790MY.Regla("msg_rf2_apertura_concurrente", reserva.MesaNumero);
 
@@ -190,47 +174,41 @@ namespace BLL_08YS
             return reserva;
         }
 
-        // ─── Consultas del Walk-in (patente AbrirMesa) ───────────────────────
-        // Recepción abre mesas sin VerClientes ni VerMesas: estas consultas validan
-        // AbrirMesa y delegan en métodos internal de ClienteBLL y MesaBLL.
+        // ─── Consultas del walk-in ───────────────────────────────────────────
+        // Recepción no tiene VerClientes ni VerMesas: estas consultas piden AbrirMesa y
+        // usan los métodos internal de ClienteBLL y MesaBLL.
 
-        /// <summary>Cliente activo con ese DNI, o null.</summary>
+        // Cliente activo con ese DNI, o null.
         public Cliente_790MY ObtenerClienteWalkIn(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
             return _clienteBll.ObtenerActivo(dni);
         }
 
-        /// <summary>True si el DNI está registrado pero dado de baja (no se puede reservar).</summary>
+        // True si el DNI está registrado pero dado de baja (no se puede reservar).
         public bool ExisteClienteInactivo(int dni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
             return _clienteBll.ExisteInactivo(dni);
         }
 
-        /// <summary>Turno en curso; lanza la regla de negocio si no hay turno.</summary>
+        // Turno en curso. Si no hay, lanza el mensaje de fuera de turno.
         public TimeSpan ObtenerTurnoVigenteObligatorio()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
             return _mesaBll.ObtenerTurnoVigenteObligatorio();
         }
 
-        /// <summary>Plano del salón para el turno (mismo cálculo que MesaBLL_790MY.ObtenerMesasMapa).</summary>
+        // Plano del salón para el turno, igual que MesaBLL_790MY.ObtenerMesasMapa.
         public List<MesaMapaDTO_790MY> ObtenerMesasMapa(DateTime fecha, TimeSpan hora, int comensales)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
             return _mesaBll.ObtenerMapa(fecha, hora, comensales);
         }
 
-        /// <summary>
-        /// CUN-005 Registrar Walk-In (extiende el paso 3 de CUN-004). La mesa se elige con el mismo
-        /// FormSeleccionarMesa_790MY usado en RF1, abierto con DateTime.Today y el turno
-        /// en curso (MesaBLL_790MY.ObtenerTurnoVigenteObligatorio). Se crea la reserva en
-        /// tiempo real directamente en estado Asistida, con camarero, y la mesa queda
-        /// Ocupada, todo en una transacción.
-        /// La reserva se guarda con Hora = inicio del turno en curso (no la hora exacta de
-        /// llegada) para que la regla de ocupación por turno la contemple igual que al resto.
-        /// </summary>
+        // Cliente sin reserva (walk-in). Crea una reserva que ya nace Asistida, con el
+        // camarero, y deja la mesa Ocupada, todo en una transacción. La hora que se guarda
+        // es la del inicio del turno (no la de llegada) para que cuente como las demás reservas.
         public Reserva_790MY AbrirMesaWalkIn(int clienteDni, Mesa_790MY mesa, int comensales, int camareroDni)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.AbrirMesa);
@@ -242,8 +220,7 @@ namespace BLL_08YS
             if (mesa == null)
                 throw MensajesBLL_790MY.Regla("msg_rf2_falta_mesa");
 
-            // La FK Reservas -> Clientes exige un cliente registrado y activo; si no existe,
-            // la GUI debe ofrecer el alta (FormRegistrarCliente_790MY) antes de reintentar.
+            // El cliente tiene que existir; si no, la pantalla ofrece darlo de alta antes.
             if (!_clienteBll.ExisteActivo(clienteDni))
                 throw MensajesBLL_790MY.Regla("msg_rf2_cliente_inexistente");
 
@@ -271,8 +248,8 @@ namespace BLL_08YS
         }
 
         // ─── Consultas para otras BLL ────────────────────────────────────────
-        // Sin ValidatePermission: las usan PedidoBLL y FacturaBLL, que ya validaron su
-        // propia patente. Exigir VerReservas o AbrirMesa le negaría el acceso al Camarero.
+        // No validan permiso: las usan PedidoBLL y FacturaBLL, que ya validaron el suyo.
+        // Si pidieran VerReservas, el camarero no podría usarlas.
 
         internal Reserva_790MY ObtenerPorId(int reservaId)
             => _reservaRepository.GetById(reservaId);
@@ -280,12 +257,13 @@ namespace BLL_08YS
         internal List<Reserva_790MY> ObtenerAsistidasPorCamarero(int camareroDni)
             => _reservaRepository.GetAsistidasPorCamarero(camareroDni);
 
-        /// <summary>Todas las reservas Asistidas (mesas ocupadas), de cualquier camarero.</summary>
+        // Todas las mesas abiertas, de cualquier camarero.
         internal List<Reserva_790MY> ObtenerAsistidas()
             => _reservaRepository.Buscar(null, null, null, EstadoReserva_790MY.Asistida);
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
+        // Más de cero comensales y que entren en la mesa.
         private static void ValidarComensales(Mesa_790MY mesa, int comensales)
         {
             if (comensales <= 0)
@@ -295,11 +273,8 @@ namespace BLL_08YS
                 throw MensajesBLL_790MY.Regla("msg_rf2_capacidad_insuficiente", mesa.NroMesa, mesa.Capacidad, comensales);
         }
 
-        /// <summary>
-        /// El camarero responsable debe existir, estar activo y tener puesto Camarero.
-        /// Se usa la consulta interna de EmpleadoBLL (sin ValidatePermission) para no
-        /// exigir el permiso de ABM de empleados a quien solo tiene AbrirMesa.
-        /// </summary>
+        // El camarero tiene que existir, estar activo y tener puesto Camarero. Usa la consulta
+        // internal de EmpleadoBLL para no pedirle a Recepción el permiso del maestro de empleados.
         private Empleado_790MY ValidarCamarero(int camareroDni)
         {
             Empleado_790MY empleado = _empleadoBll.ObtenerPorDni(camareroDni);

@@ -6,11 +6,8 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.Reportes
 {
-    /// <summary>
-    /// Slider plano con la paleta de la casa (pista crema, tramo recorrido y perilla en
-    /// bordó). Reemplaza al TrackBar del sistema, que no admite colores. Se maneja con
-    /// el mouse (clic o arrastre) y con el teclado (flechas, RePág/AvPág, Inicio/Fin).
-    /// </summary>
+    // Control deslizante con los colores de la casa. Reemplaza al TrackBar, que no deja
+    // cambiar los colores. Se usa con el mouse (clic o arrastre) o con el teclado.
     public class SliderBordo_790MY : Control
     {
         private int _minimo;
@@ -47,7 +44,7 @@ namespace GUI_08YS.Reportes
             set { _maximo = Math.Max(_minimo, value); Value = _valor; Invalidate(); }
         }
 
-        /// <summary>Incremento al que se ajusta el valor (mouse y teclado).</summary>
+        // Incremento al que se ajusta el valor (mouse y teclado).
         [DefaultValue(5)]
         public int Step
         {

@@ -6,18 +6,12 @@ using System.Linq;
 
 namespace DAL_08YS.SQL
 {
-    /// <summary>
-    /// Arma la condicion SQL "la reserva ocupa la mesa" a partir de
-    /// Reserva_790MY.EstadosQueOcupanMesa, para que todas las consultas de
-    /// disponibilidad (mapa, re-validacion, alta atomica) usen la misma regla
-    /// sin repetir literales de estado.
-    /// </summary>
+    // Arma los pedazos de SQL de "la reserva ocupa la mesa" y "el pedido tiene stock
+    // comprometido" a partir de las listas de estados de BE. Así todas las consultas usan
+    // la misma regla sin escribir los estados a mano.
     internal static class FiltroOcupacionMesa_790MY
     {
-        /// <summary>
-        /// Devuelve "alias.Estado IN (@EstOcupa0, @EstOcupa1, ...)" y agrega los
-        /// parametros correspondientes al comando.
-        /// </summary>
+        // Devuelve "alias.Estado IN (@EstOcupa0, ...)" y agrega los parámetros al comando.
         public static string CondicionEstado(SqlCommand cmd, string alias)
         {
             var nombres = new List<string>();
@@ -34,10 +28,7 @@ namespace DAL_08YS.SQL
             return columna + " IN (" + string.Join(", ", nombres) + ")";
         }
 
-        /// <summary>
-        /// Igual que CondicionEstado pero para los estados de pedido cuyo stock
-        /// esta comprometido y aun no descontado.
-        /// </summary>
+        // Lo mismo para los pedidos que todavía no descontaron stock.
         public static string CondicionPedidoComprometido(SqlCommand cmd, string alias)
         {
             var nombres = Pedido_790MY.EstadosConStockComprometido

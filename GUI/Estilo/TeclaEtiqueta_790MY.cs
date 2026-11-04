@@ -4,10 +4,7 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Etiqueta con aspecto de tecla física (Etapa 5): borde redondeado de 1 px en el color
-    /// del texto. Se usa para el atajo «F1» de la fila de Ayuda.
-    /// </summary>
+    // Etiqueta con forma de tecla (borde redondeado). Se usa para el "F1" del botón de Ayuda.
     public class TeclaEtiqueta_790MY : Label
     {
         private const int Radio = 3;

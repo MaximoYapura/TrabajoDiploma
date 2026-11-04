@@ -13,14 +13,10 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Reportes
 {
-    /// <summary>
-    /// Reporte inteligente: Análisis Predictivo de Canasta. Muestra las reglas de
-    /// asociación entre productos (soporte y confianza, calculados por
-    /// ReportePredictivoBLL_790MY sobre las cuentas cobradas reales de los últimos 90 días),
-    /// filtradas por confianza mínima, y tarjetas de sugerencias de negocio con
-    /// acciones simuladas. Si la BD todavía no tiene suficientes cobros, lo informa en
-    /// lugar de mostrar reglas. Patente: GestionReportePredictivo.
-    /// </summary>
+    // Reporte predictivo (análisis de canasta). Muestra qué productos se piden juntos, con
+    // su soporte y confianza (los calcula ReportePredictivoBLL_790MY con las cuentas de los
+    // últimos 90 días), filtrados por una confianza mínima, y tres sugerencias con acciones
+    // simuladas. Si todavía no hay suficientes cobros, lo avisa. Permiso: GestionReportePredictivo.
     public partial class FormReportePredictivo_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         // Paleta oficial de la casa.
@@ -63,7 +59,7 @@ namespace GUI_08YS.Reportes
 
         private IWin32Window VentanaPropietaria => (this.TopLevelControl as Form) ?? (IWin32Window)this;
 
-        /// <summary>La BD todavía no tiene suficientes cuentas cobradas para calcular asociaciones.</summary>
+        // Todavía no hay suficientes cuentas cobradas para calcular reglas.
         private bool DatosInsuficientes => _resumen != null && !_resumen.DatosSuficientes;
 
         private static CultureInfo Cultura => TraductorManager_08YS.Instance.CulturaActual ?? CultureInfo.CurrentCulture;
@@ -87,6 +83,7 @@ namespace GUI_08YS.Reportes
 
         #region Datos
 
+        // Carga el resumen, las reglas y las sugerencias.
         private void Cargar()
         {
             try
@@ -106,7 +103,7 @@ namespace GUI_08YS.Reportes
             MostrarSugerencias();
         }
 
-        /// <summary>Solo recalcula la grilla (filtro u orden): las sugerencias no dependen de ellos.</summary>
+        // Solo recalcula la grilla (filtro u orden): las sugerencias no dependen de ellos.
         private void RecargarReglas()
         {
             try
@@ -337,7 +334,7 @@ namespace GUI_08YS.Reportes
             public string Encabezado, Titulo, Descripcion, Boton, Confirmacion;
         }
 
-        /// <summary>Arma los textos de la tarjeta en el idioma activo a partir de los datos de la BLL.</summary>
+        // Arma los textos de la tarjeta en el idioma activo a partir de los datos de la BLL.
         private TextoSugerencia Redactar(SugerenciaInteligente_790MY s)
         {
             ReglaAsociacion_790MY r = s.Regla;
@@ -381,7 +378,7 @@ namespace GUI_08YS.Reportes
             }
         }
 
-        /// <summary>Acción simulada: no modifica la carta ni las comandas, solo confirma el pedido.</summary>
+        // Acción simulada: no modifica la carta ni las comandas, solo confirma el pedido.
         private void BotonSugerencia_Click(object sender, EventArgs e)
         {
             if (!((sender as Control)?.Tag is SugerenciaInteligente_790MY sugerencia)) return;
@@ -403,7 +400,7 @@ namespace GUI_08YS.Reportes
 
         private static bool EsIngles => Cultura.TwoLetterISOLanguageName == "en";
 
-        /// <summary>"martes" / "sábados" / "Tuesdays".</summary>
+        // "martes" / "sábados" / "Tuesdays".
         private static string DiaEnPlural(DayOfWeek dia)
         {
             string nombre = Cultura.DateTimeFormat.GetDayName(dia);
@@ -438,7 +435,7 @@ namespace GUI_08YS.Reportes
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(sldConfianza_790MY), "AY_sug_pc1_t", "AY_sug_pc1_x"),

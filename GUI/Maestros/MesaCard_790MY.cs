@@ -8,13 +8,9 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Maestros
 {
-    /// <summary>
-    /// Tarjeta de una mesa en el tablero del Maestro de Mesas (P11, P12, P14).
-    /// Muestra solo datos estructurales (H12): número, capacidad y estado (Disponible o
-    /// Fuera de servicio). El estado se lee por superficie suave, ícono y texto, nunca
-    /// solo por color (P04).
-    /// Control nuevo: no reemplaza ni modifica MesaVisualControl_790MY.
-    /// </summary>
+    // Tarjeta de una mesa en el maestro de mesas: número, capacidad y estado (Disponible o
+    // Fuera de servicio). El estado se muestra con color, ícono y texto. No es la misma mesa
+    // del plano de reservas (esa es MesaVisualControl_790MY).
     public class MesaCard_790MY : Control
     {
         private Mesa_790MY _mesa;
@@ -48,7 +44,7 @@ namespace GUI_08YS.Maestros
             set { if (_seleccionada == value) return; _seleccionada = value; Invalidate(); }
         }
 
-        /// <summary>Textos ya traducidos (los arma el formulario con idiomas.json).</summary>
+        // Textos ya traducidos (los arma el formulario con idiomas.json).
         public void EstablecerTextos(string textoMesa, string textoEstado, string textoCapacidad)
         {
             _textoMesa = textoMesa ?? string.Empty;
@@ -86,9 +82,8 @@ namespace GUI_08YS.Maestros
         #endregion
 
         #region Dibujo
-        // El maestro distingue solo dos estados (decisión de Etapa 1): Fuera de servicio
-        // o Disponible. Ocupada/Reservada son estados operativos de otros módulos y aquí
-        // se muestran como Disponible.
+        // El maestro distingue solo dos estados: Fuera de servicio o Disponible. Ocupada y
+        // Reservada son de otros módulos y acá se muestran como Disponible.
         private bool FueraDeServicio => _mesa?.Estado == EstadoMesa_790MY.FueraDeServicio;
 
         private void ColoresEstado(out Color superficie, out Color borde, out Color tinta)

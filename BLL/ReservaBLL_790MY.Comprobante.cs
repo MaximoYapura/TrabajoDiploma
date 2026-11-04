@@ -16,26 +16,23 @@ using System.Text;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// Comprobante de Reserva: generación del PDF en memoria y envío por email.
-    /// Todos los textos salen de TraductorManager_08YS (idiomas.json), por lo que el
-    /// documento y el correo se emiten en el idioma activo de la sesión.
-    /// </summary>
+    // Parte de ReservaBLL_790MY que arma el comprobante de la reserva en PDF y lo manda por
+    // mail. Los textos salen de idiomas.json, así que salen en el idioma activo.
     public partial class ReservaBLL_790MY
     {
         #region Constantes y formato compartido (PDF, email y vista previa)
 
-        /// <summary>Devuelve el turno como "20:00 - 22:00" (el fin de 22:00 se muestra como 24:00).</summary>
+        // Devuelve el turno como "20:00 - 22:00" (el fin de 22:00 se muestra como 24:00).
         public static string FormatearTurno(TimeSpan inicio)
         {
             TimeSpan fin = inicio + MesaBLL_790MY.DuracionTurno;
             return $"{(int)inicio.TotalHours:00}:{inicio.Minutes:00} - {(int)fin.TotalHours:00}:{fin.Minutes:00}";
         }
 
-        /// <summary>Número de reserva con ceros a la izquierda (ej. 000123).</summary>
+        // Número de reserva con ceros a la izquierda (ej. 000123).
         public static string FormatearNumeroReserva(int reservaId) => reservaId.ToString("D6");
 
-        /// <summary>Nombre sugerido para el archivo PDF del comprobante.</summary>
+        // Nombre sugerido para el archivo PDF del comprobante.
         public static string NombreArchivoComprobante(Reserva_790MY reserva)
             => $"Comprobante_Reserva_{FormatearNumeroReserva(reserva.ReservaID)}_{reserva.Fecha:yyyyMMdd}.pdf";
 
@@ -58,11 +55,8 @@ namespace BLL_08YS
 
         #region Generación del PDF
 
-        /// <summary>
-        /// Genera el comprobante de la reserva como PDF (A5 vertical) completamente en
-        /// memoria. No escribe en disco: la GUI decide si lo guarda (SaveFileDialog) y
-        /// EnviarComprobanteEmail lo adjunta al correo.
-        /// </summary>
+        // Arma el comprobante en PDF (A5 vertical) y devuelve los bytes. No escribe en disco:
+        // la pantalla lo guarda donde elija el usuario y EnviarComprobanteEmail lo adjunta.
         public byte[] GenerarComprobantePDF(Reserva_790MY reserva, Cliente_790MY cliente)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
@@ -89,15 +83,12 @@ namespace BLL_08YS
 
             using (var ms = new MemoryStream())
             {
-                // A5 vertical: formato de ticket/comprobante. El margen superior deja
-                // lugar a la banda de marca y el inferior al pie absoluto.
+                // Los márgenes dejan lugar para la banda de arriba y el pie.
                 var doc    = new Document(PageSize.A5, 30f, 30f, 108f, 70f);
                 var writer = PdfWriter.GetInstance(doc, ms);
                 writer.CloseStream = false;
 
-                // El pie se dibuja en OnEndPage: queda anclado al borde inferior de
-                // cada página aunque un dato largo (p. ej. un email extenso) haga
-                // crecer el contenido.
+                // El pie se dibuja al final de cada página, así queda abajo aunque el contenido crezca.
                 writer.PageEvent = new PieComprobante_790MY(
                     string.Format(t.GetTexto("CR_doc_emitido"), DateTime.Now.ToString("dd/MM/yyyy HH:mm"), UsuarioEmisor()),
                     t.GetTexto("CR_doc_gracias"), fPie, fGracias);
@@ -296,14 +287,15 @@ namespace BLL_08YS
         private static string Capitalizar(string texto, CultureInfo cultura)
             => string.IsNullOrEmpty(texto) ? texto : char.ToUpper(texto[0], cultura) + texto.Substring(1);
 
+        // "Nombre Apellido" del usuario logueado, para el pie de los PDF.
         internal static string UsuarioEmisor()
         {
             var actual = SessionManager_08YS.Instance.Current;
             return actual != null ? $"{actual.Nombre} {actual.Apellido}".Trim() : "-";
         }
 
-        // El logo original pesa ~1 MB; se reescala una sola vez a 256 px para que el
-        // PDF adjunto al email quede liviano.
+        // El logo original pesa cerca de 1 MB. Se achica una sola vez a 256 px para que el
+        // PDF que va por mail sea liviano.
         private static byte[] _logoCache;
         private static readonly object _logoLock = new object();
 
@@ -352,11 +344,8 @@ namespace BLL_08YS
 
         #region Envío por email
 
-        /// <summary>
-        /// Indica si el envío de emails está configurado: la sección
-        /// &lt;system.net&gt;&lt;mailSettings&gt; del App.config existe (no está comentada)
-        /// y define un host SMTP y un remitente. Nunca lanza excepciones.
-        /// </summary>
+        // True si el App.config tiene la sección de mail (<mailSettings>) con servidor y
+        // remitente. Nunca lanza excepciones.
         public static bool EmailConfigurado()
         {
             try
@@ -373,31 +362,20 @@ namespace BLL_08YS
             }
         }
 
-        // Lee <system.net><mailSettings><smtp> del App.config (null si está comentada).
+        // Sección <smtp> del App.config, o null si no está.
         private static SmtpSection LeerSeccionSmtp()
             => ConfigurationManager.GetSection("system.net/mailSettings/smtp") as SmtpSection;
 
-        /// <summary>
-        /// Envía el comprobante en PDF adjunto al email principal del cliente usando
-        /// System.Net.Mail. La configuración SMTP (host, puerto, SSL, credenciales y
-        /// remitente) se toma de la sección &lt;system.net&gt;&lt;mailSettings&gt; del App.config.
-        /// <para>
-        /// Tolerante a fallos: NUNCA lanza excepciones. Si falta el email del cliente,
-        /// si la configuración SMTP no existe o está incompleta, o si el servidor
-        /// rechaza la conexión o las credenciales, devuelve <c>false</c> y describe el
-        /// motivo en <paramref name="mensaje"/> (ya traducido cuando es un motivo conocido).
-        /// </para>
-        /// Es sincrónico a propósito: la GUI lo invoca en segundo plano con Task.Run.
-        /// </summary>
-        /// <returns><c>true</c> si el correo se entregó al servidor SMTP.</returns>
+        // Manda el comprobante en PDF al email principal del cliente, con la configuración
+        // SMTP del App.config. Nunca lanza excepciones: si algo falla (sin email, sin
+        // configuración, servidor caído) devuelve false y explica el motivo en mensaje.
+        // Es sincrónico; la pantalla lo llama en segundo plano con Task.Run.
         public bool EnviarComprobanteEmail(Cliente_790MY cliente, Reserva_790MY reserva, out string mensaje)
         {
             mensaje = null;
             var t = TraductorManager_08YS.Instance;
 
-            // Corre dentro de Task.Run: SessionManager_08YS es un singleton y la sesión es
-            // la misma en cualquier hilo. Sin permiso se informa como el resto de los
-            // motivos, sin lanzar.
+            // Si no tiene permiso se informa como cualquier otro motivo, sin lanzar.
             try
             {
                 SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarReserva);
@@ -474,6 +452,7 @@ namespace BLL_08YS
             $"<td style=\"padding:9px 18px;font-size:15px;font-weight:bold;color:#2D2A28;\">{H(valor)}</td>" +
             "</tr>";
 
+        // Cuerpo del mail en HTML.
         private static string ConstruirCuerpoHtml(Cliente_790MY cliente, Reserva_790MY reserva)
         {
             var t       = TraductorManager_08YS.Instance;

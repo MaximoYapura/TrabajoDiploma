@@ -3,15 +3,11 @@ using System.Collections.Generic;
 
 namespace BE_08YS
 {
-    /// <summary>
-    /// Ciclo de vida de una reserva.
-    /// Confirmada  -> registrada, pendiente de la llegada del cliente.
-    /// Asistida    -> el cliente llego y la mesa fue abierta (CUN-004; Walk-in: CUN-005).
-    /// Finalizada  -> la atencion concluyo (pago registrado) y la mesa se libero.
-    /// Cancelada   -> anulada antes de la llegada del cliente.
-    /// Los valores se persisten como texto (nvarchar(20)), por lo que el orden
-    /// del enum no afecta a los datos existentes.
-    /// </summary>
+    // Estados de la reserva (se guardan como texto):
+    // Confirmada: registrada, falta que llegue el cliente.
+    // Asistida: el cliente llegó y la mesa está abierta (también los walk-in).
+    // Finalizada: se cobró y la mesa quedó libre.
+    // Cancelada: se anuló antes de que llegara el cliente.
     public enum EstadoReserva_790MY
     {
         Confirmada,
@@ -20,14 +16,11 @@ namespace BE_08YS
         Finalizada
     }
 
+    // Reserva de una mesa para un turno. Los walk-in también se guardan como reserva.
     public class Reserva_790MY
     {
-        /// <summary>
-        /// Estados que mantienen la mesa ocupada en el turno de la reserva.
-        /// Unica fuente de verdad de la regla de ocupacion: la usan la BLL y los
-        /// repositorios para no repetir literales de estado en cada consulta.
-        /// Cancelada y Finalizada NO bloquean la mesa.
-        /// </summary>
+        // Estados que ocupan la mesa en su turno. La BLL y los repositorios usan esta
+        // lista para no repetir la regla. Cancelada y Finalizada no ocupan.
         public static readonly IReadOnlyList<EstadoReserva_790MY> EstadosQueOcupanMesa =
             new[] { EstadoReserva_790MY.Confirmada, EstadoReserva_790MY.Asistida };
 
@@ -76,7 +69,7 @@ namespace BE_08YS
             set { _fecha = value; }
         }
 
-        /// <summary>Hora de inicio del turno (18:00, 20:00 o 22:00).</summary>
+        // Hora de inicio del turno (18:00, 20:00 o 22:00).
         public TimeSpan Hora
         {
             get { return _hora; }
@@ -95,19 +88,14 @@ namespace BE_08YS
             set { _estado = value; }
         }
 
-        /// <summary>
-        /// DNI del Empleado (puesto Camarero) responsable de la atencion.
-        /// Null mientras la reserva no fue abierta (estado Confirmada/Cancelada).
-        /// </summary>
+        // Camarero a cargo de la mesa. Queda vacío hasta que se abre la mesa.
         public int? CamareroDNI
         {
             get { return _camareroDni; }
             set { _camareroDni = value; }
         }
 
-        // Solo para lectura/visualizacion (no se persiste, no participa de Add):
-        // lo completan las consultas de busqueda que hacen JOIN con Clientes,
-        // para no tener que ir a buscar el cliente aparte solo para mostrar su nombre.
+        // Nombre del cliente para mostrar. Lo completan las consultas con JOIN; no se guarda.
         public string ClienteNombreCompleto { get; set; }
     }
 }

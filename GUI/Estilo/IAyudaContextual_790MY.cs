@@ -2,17 +2,14 @@ using System.Collections.Generic;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Pantalla con Sugerencias del Chef (Etapa 5, Fase 6, C7). Solo devuelve datos: el
-    /// componente compartido AyudaSugerencias_790MY resuelve los controles y dibuja el marco
-    /// y el globo, así ningún formulario crea controles visuales para la ayuda.
-    /// </summary>
+    // La implementan las pantallas que tienen ayuda con F1. Solo devuelven la lista de
+    // pistas; el marco y el globo los dibuja AyudaSugerencias_790MY.
     public interface IAyudaContextual_790MY
     {
         IReadOnlyList<PistaAyuda_790MY> ObtenerPistas();
     }
 
-    /// <summary>Una sugerencia: control a resaltar (por Name) y claves de idiomas.json.</summary>
+    // Una pista: el nombre del control a marcar y las claves de idiomas.json del texto.
     public sealed class PistaAyuda_790MY
     {
         public PistaAyuda_790MY(string nombreControl, string claveTitulo, string claveTexto, string claveProbaCon = null)
@@ -27,7 +24,7 @@ namespace GUI_08YS.Estilo
         public string ClaveTitulo { get; }
         public string ClaveTexto { get; }
 
-        /// <summary>Opcional: un dato de prueba sugerido.</summary>
+        // Opcional: un dato de prueba sugerido.
         public string ClaveProbaCon { get; }
     }
 }

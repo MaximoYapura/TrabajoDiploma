@@ -10,25 +10,18 @@ using System.Linq;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// CUN-006 Registrar Pedido y CUN-008 Despachar Pedido.
-    ///
-    /// Stock en dos momentos:
-    ///  - CUN-006 valida (sin descontar) contra las porciones DISPONIBLES =
-    ///    StockPorciones - porciones comprometidas por pedidos Pendiente/EnPreparacion.
-    ///    Contar lo comprometido evita la sobreventa entre pedidos que todavía no se
-    ///    despacharon, sin adelantar el descuento definitivo.
-    ///  - CUN-008 descuenta efectivamente al marcar Listo, en la misma transacción que
-    ///    el cambio de estado, con una marca de idempotencia (StockDescontado).
-    /// </summary>
+    // Reglas de Registrar pedido (CUN-006, el camarero) y de Cocina (CUN-008, el chef).
+    // El stock se maneja en dos momentos:
+    // - al pedir solo se controla que alcancen las porciones disponibles (el stock menos
+    //   lo que ya pidieron otros pedidos que siguen en cocina), sin descontar nada;
+    // - al marcar Listo se descuenta de verdad, en la misma transacción que el cambio de
+    //   estado. StockDescontado evita descontar dos veces el mismo pedido.
     public class PedidoBLL_790MY
     {
         private const int LargoMaximoObservaciones = 200;
 
-        /// <summary>
-        /// Tope de unidades de un mismo producto por pedido cuando el producto no controla
-        /// stock (los que lo controlan quedan limitados por sus porciones disponibles).
-        /// </summary>
+        // Máximo de unidades por pedido de un producto que no controla stock (los que lo
+        // controlan ya están limitados por sus porciones).
         public const int MaximoPorItemSinControl = 99;
 
         private readonly IPedidoRepository_790MY _pedidoRepository;
@@ -49,13 +42,10 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-006 — Camarero
+        //  Registrar pedido (camarero)
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Mesas abiertas (reservas Asistidas) a cargo del camarero logueado.
-        /// Lista vacía => la GUI muestra msg_rf2_sin_mesas_asignadas (escenario alt. 1.1).
-        /// </summary>
+        // Mesas abiertas a cargo del camarero logueado. Si está vacía, la pantalla lo avisa.
         public List<Reserva_790MY> ObtenerMesasAsignadas()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
@@ -63,20 +53,20 @@ namespace BLL_08YS
             return _reservaBll.ObtenerAsistidasPorCamarero(camarero.DNI);
         }
 
-        /// <summary>Catálogo con porciones disponibles (stock - comprometido).</summary>
+        // Productos activos con sus porciones disponibles.
         public List<Producto_790MY> ObtenerCatalogo()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
             return _productoBll.ObtenerActivos();
         }
 
+        // Graba el pedido de una mesa si hay stock. El precio lo pone el repositorio.
         public Pedido_790MY RegistrarPedido(int reservaId, IList<ItemPedido_790MY> items)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
             Empleado_790MY camarero = ObtenerCamareroDeSesion();
 
-            // Paso 6: cantidades > 0 y datos válidos. El precio vigente lo toma el
-            // repositorio desde Productos dentro de la transacción (no la GUI).
+            // Al menos un ítem, cantidades mayores a cero y observaciones cortas.
             if (items == null || items.Count == 0)
                 throw MensajesBLL_790MY.Regla("msg_rf2_pedido_sin_items");
 
@@ -88,7 +78,7 @@ namespace BLL_08YS
                     throw MensajesBLL_790MY.Regla("msg_rf2_pedido_observaciones_largas", LargoMaximoObservaciones);
             }
 
-            // Precondición: mesa ocupada con reserva Asistida asignada a este camarero.
+            // La mesa tiene que estar abierta y a cargo de este camarero.
             Reserva_790MY reserva = _reservaBll.ObtenerPorId(reservaId)
                 ?? throw MensajesBLL_790MY.Regla("msg_rf2_reserva_inexistente", reservaId);
 
@@ -121,7 +111,7 @@ namespace BLL_08YS
                     break;
 
                 case EstadoRegistroPedido_790MY.StockInsuficiente:
-                    // Escenario alternativo 4.1: no se genera ningún pedido (rollback completo).
+                    // Falta stock: no se grabó nada.
                     _bitacoraBll.RegistrarEventoPostCommit(Evento.PedidoRechazadoStock,
                         $"Reserva {reservaId} - Prod {resultado.ProductoID}");
                     throw new StockInsuficienteException_790MY(
@@ -149,11 +139,8 @@ namespace BLL_08YS
             return pedido;
         }
 
-        /// <summary>
-        /// Todos los pedidos (cualquier estado) de las mesas abiertas del camarero
-        /// logueado. FormRegistrarPedido_790MY los usa para las etiquetas de estado
-        /// de cada mesa ("# 229 · Listo").
-        /// </summary>
+        // Pedidos de las mesas abiertas del camarero, en cualquier estado. La pantalla los
+        // usa para mostrar el estado de cada mesa y avisar cuando uno está Listo.
         public List<Pedido_790MY> ObtenerPedidosDeMisMesas()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarPedido);
@@ -167,20 +154,17 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-008 — Chef
+        //  Cocina (chef)
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>Comandas Pendiente / EnPreparacion por hora de solicitud (KDS).</summary>
+        // Pedidos pendientes y en preparación, del más viejo al más nuevo.
         public List<Pedido_790MY> ObtenerComandasCocina()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
             return _pedidoRepository.Buscar(Pedido_790MY.EstadosConStockComprometido, null, null);
         }
 
-        /// <summary>
-        /// Últimos pedidos finalizados hoy, para la columna "Listas para retirar" del KDS.
-        /// Ordenados del más reciente al más antiguo.
-        /// </summary>
+        // Últimos pedidos listos de hoy, del más nuevo al más viejo (columna "Listas").
         public List<Pedido_790MY> ObtenerListosDelDia(int maximo = 10)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
@@ -192,11 +176,8 @@ namespace BLL_08YS
                 .ToList();
         }
 
-        /// <summary>
-        /// Nombre de los camareros activos por DNI, para mostrar en cada comanda quién
-        /// la pidió. Se usa la consulta interna de EmpleadoBLL (sin ValidatePermission)
-        /// para no exigir al Chef el permiso de ABM de empleados.
-        /// </summary>
+        // Camareros activos por DNI, para mostrar en cada comanda quién la pidió. Usa la
+        // consulta internal de EmpleadoBLL para no pedirle al chef el permiso de empleados.
         public Dictionary<int, Empleado_790MY> ObtenerCamarerosPorDni()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
@@ -205,6 +186,7 @@ namespace BLL_08YS
                 .ToDictionary(e => e.DNI);
         }
 
+        // Pasa el pedido de Pendiente a EnPreparacion.
         public void IniciarPreparacion(int nroPedido)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
@@ -222,11 +204,8 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.PedidoEnPreparacion, $"Pedido {nroPedido}");
         }
 
-        /// <summary>
-        /// Marca el pedido como Listo y descuenta el stock en la misma transacción.
-        /// Reprocesar el mismo pedido no vuelve a descontar (StockDescontado).
-        /// Devuelve el pedido actualizado (incluye MesaNumero y CamareroDNI para notificar).
-        /// </summary>
+        // Marca el pedido Listo y descuenta el stock en la misma transacción. Si se marca dos
+        // veces no descuenta de nuevo. Devuelve el pedido actualizado.
         public Pedido_790MY MarcarPedidoListo(int nroPedido)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.DespacharPedido);
@@ -246,8 +225,8 @@ namespace BLL_08YS
                     throw MensajesBLL_790MY.Regla("msg_rf2_pedido_ya_despachado", nroPedido);
 
                 case ResultadoDespacho_790MY.StockFisicoInsuficiente:
-                    // No debería ocurrir (CUN-006 reserva las porciones), salvo un ajuste
-                    // manual de inventario. Se revirtió todo: el pedido sigue sin despachar.
+                    // No debería pasar porque las porciones se reservan al pedir, salvo que se
+                    // haya cambiado el stock a mano. Se revirtió todo y el pedido sigue en cocina.
                     _bitacoraBll.RegistrarEventoPostCommit(Evento.StockDescuentoFallido, $"Pedido {nroPedido}");
                     throw MensajesBLL_790MY.Regla("msg_rf2_stock_fisico_insuficiente", nroPedido);
 
@@ -264,20 +243,15 @@ namespace BLL_08YS
 
         // ─── Consultas para otras BLL ────────────────────────────────────────
 
-        /// <summary>
-        /// Pedidos Pendiente / EnPreparacion de la reserva. Sin ValidatePermission: lo usa
-        /// FacturaBLL_790MY, que ya validó el acceso a Caja (el cajero no tiene RegistrarPedido).
-        /// </summary>
+        // Pedidos de la reserva que siguen en cocina. No valida permiso porque lo usa
+        // FacturaBLL_790MY, que ya validó el de caja.
         internal int ContarNoDespachados(int reservaId)
             => _pedidoRepository.ContarNoDespachados(reservaId);
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Resuelve el Empleado camarero vinculado al usuario logueado (Users.DNI ->
-        /// Empleados.UsuarioDNI). La autorización ya la resolvió el Composite; esto
-        /// solo identifica a qué camarero corresponden las mesas.
-        /// </summary>
+        // Camarero vinculado al usuario logueado (Empleados.UsuarioDNI). El permiso ya se
+        // validó; esto es para saber de qué camarero son las mesas.
         private Empleado_790MY ObtenerCamareroDeSesion()
         {
             Empleado_790MY empleado = _empleadoBll.ObtenerEmpleadoDeSesion();

@@ -13,11 +13,9 @@ using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
-    /// <summary>
-    /// Alta rápida de cliente (extend de Registrar Reserva). Diálogo modal compacto:
-    /// se abre cuando el DNI buscado no existe, llega con el DNI precargado y, al
-    /// aplicar, devuelve el cliente creado en <see cref="ClienteRegistrado"/>.
-    /// </summary>
+    // Alta rápida de cliente desde Registrar reserva o Abrir mesa. Se abre cuando el DNI
+    // buscado no existe, viene con el DNI cargado y, al aceptar, deja el cliente creado
+    // en ClienteRegistrado.
     public partial class FormRegistrarCliente_790MY : Form, IIdiomaObserver_08YS
     {
         private static readonly Color ColorBordo      = Color.FromArgb(120, 25, 25);
@@ -96,8 +94,8 @@ namespace GUI_08YS.RF1
 
         #region Validación en línea (Etapa 2, mismas reglas que el Maestro de Clientes)
 
-        // DNI de 7 u 8 dígitos; email y celular obligatorios (los exige ClienteBLL_790MY);
-        // dirección opcional. La BLL sigue siendo la autoridad al guardar (E2-H3).
+        // DNI de 7 u 8 dígitos, email y celular obligatorios y dirección opcional. Son las
+        // mismas reglas de ClienteBLL_790MY, que las vuelve a controlar al guardar.
         private static readonly Regex _regexDni     = new Regex(@"^\d{7,8}$");
         private static readonly Regex _regexEmail   = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         private static readonly Regex _regexCelular = new Regex(@"^\d+$");
@@ -118,6 +116,7 @@ namespace GUI_08YS.RF1
             yield return txtDireccion_790MY;
         }
 
+        // Errores de cada campo (vacío si está todo bien).
         private Dictionary<TextBox, string> ValidarFicha()
         {
             var t = TraductorManager_08YS.Instance;
@@ -210,6 +209,7 @@ namespace GUI_08YS.RF1
 
         #endregion
 
+        // Valida y da de alta el cliente con ClienteBLL_790MY.
         private void btnAplicar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
@@ -258,7 +258,7 @@ namespace GUI_08YS.RF1
             }
             catch (Exception)
             {
-                // Error inesperado (base de datos, excepción no prevista): MessageBox nativo (E2-D1).
+                // Error inesperado (por ejemplo, de la base): se muestra en un MessageBox.
                 MessageBox.Show(this, t.GetTexto("FC_fatal_guardar"), t.GetTexto("error"),
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

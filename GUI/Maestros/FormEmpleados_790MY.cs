@@ -13,11 +13,8 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.Maestros
 {
-    /// <summary>
-    /// ABM de empleados (RF2). El empleado es independiente de la seguridad: el vínculo
-    /// con un usuario del sistema no se gestiona desde acá. Validaciones, DV y bitácora los resuelve
-    /// EmpleadoBLL_790MY (patente CrearEmpleado).
-    /// </summary>
+    // Maestro de empleados. El vínculo con un usuario del sistema no se edita desde acá.
+    // Las reglas, el DV y la bitácora los maneja EmpleadoBLL_790MY (permiso CrearEmpleado).
     public partial class FormEmpleados_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
@@ -163,7 +160,7 @@ namespace GUI_08YS.Maestros
             ActualizarAvisoMesas(emp);
         }
 
-        /// <summary>Aviso del escenario "camarero con mesas abiertas" (no puede cambiar de cargo ni darse de baja).</summary>
+        // Avisa si el camarero tiene mesas abiertas (en ese caso no puede cambiar de puesto ni darse de baja).
         private void ActualizarAvisoMesas(Empleado_790MY emp)
         {
             int abiertas = 0;
@@ -275,6 +272,7 @@ namespace GUI_08YS.Maestros
             EstablecerModo(ModoEdicion_790MY.Reposo);
         }
 
+        // Guarda el alta o la modificación con EmpleadoBLL_790MY.
         private void btnGuardar_790MY_Click(object sender, EventArgs e)
         {
             errValidacion_790MY.SetError(txtDni_790MY, string.Empty);
@@ -288,8 +286,7 @@ namespace GUI_08YS.Maestros
             }
 
             var puesto = (cmbCargo_790MY.SelectedItem as OpcionCombo_790MY<PuestoEmpleado_790MY>)?.Valor ?? PuestoEmpleado_790MY.Camarero;
-            // UsuarioDNI no se envía: el alta queda sin usuario y la DAL no lo modifica al
-            // actualizar, así se conserva el vínculo existente (p. ej. el del administrador).
+            // No se manda UsuarioDNI: el alta queda sin usuario y al modificar se conserva el que tenía.
             var empleado = new Empleado_790MY(dni, txtNombre_790MY.Text, txtApellido_790MY.Text, puesto, activo: chkActivo_790MY.Checked);
 
             try
@@ -308,7 +305,7 @@ namespace GUI_08YS.Maestros
             string exito = E.T(_modo == ModoEdicion_790MY.Alta ? "FE_msg_alta_ok" : "FE_msg_modificacion_ok", empleado.NombreCompleto);
             if (_modo == ModoEdicion_790MY.Alta)
             {
-                // Alta (E2-D4): la ficha queda limpia y con foco en el DNI para cargar otro empleado.
+                // Después de un alta la ficha queda limpia para cargar otro empleado.
                 _modo = ModoEdicion_790MY.Reposo;
                 Cargar();
                 dgvEmpleados_790MY.ClearSelection();
@@ -318,7 +315,7 @@ namespace GUI_08YS.Maestros
             }
             else
             {
-                // Modificación (E2-D4): queda elegido el empleado con los datos guardados.
+                // Después de modificar queda elegido el empleado guardado.
                 _modo = ModoEdicion_790MY.Reposo;
                 Cargar(dni);
                 EstablecerModo(ModoEdicion_790MY.Reposo);
@@ -385,7 +382,7 @@ namespace GUI_08YS.Maestros
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(txtBuscar_790MY), "AY_sug_em1_t", "AY_sug_em1_x"),

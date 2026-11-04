@@ -7,13 +7,10 @@ using Service_08YS;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Sugerencias del Chef (Etapa 5, Fase 6): recorre las pistas que devuelve la pantalla
-    /// activa (IAyudaContextual_790MY), resalta cada control con un marco de 4 paneles opacos
-    /// finos (TemaFogon.Oro) y muestra el globo al lado (C8: sin transparencia ni ventanas
-    /// propias, sin oscurecer la pantalla). Los controles visuales los declara el Designer
-    /// del formulario principal; esta clase solo los ubica y los muestra u oculta.
-    /// </summary>
+    // Ayuda de F1 (sugerencias). Recorre las pistas de la pantalla abierta
+    // (IAyudaContextual_790MY), marca cada control con un borde dorado (cuatro paneles finos,
+    // porque WinForms no tiene transparencia) y pone el globo al lado. Los paneles y el
+    // globo están en el formulario principal; esta clase solo los ubica y los muestra.
     public sealed class AyudaSugerencias_790MY
     {
         private const int Grosor = 3;      // ancho de cada lado del marco
@@ -43,10 +40,8 @@ namespace GUI_08YS.Estilo
 
         public bool Activas { get; private set; }
 
-        /// <summary>
-        /// Resuelve cada pista con Controls.Find sobre el hijo activo (si el control no existe
-        /// o no está visible, la omite). Devuelve false si no quedó ninguna.
-        /// </summary>
+        // Busca cada control por nombre en la pantalla y saltea los que no se ven.
+        // Devuelve false si no quedó ninguna pista.
         public bool Mostrar(Control hijo, IReadOnlyList<PistaAyuda_790MY> pistas, Control focoPrevio)
         {
             Cerrar();
@@ -117,7 +112,7 @@ namespace GUI_08YS.Estilo
             foreach (var lado in _marco) lado.Visible = true;
         }
 
-        /// <summary>Debajo del control si entra; si no, arriba; si no, a la derecha o a la izquierda.</summary>
+        // Debajo del control si entra; si no, arriba; si no, a la derecha o a la izquierda.
         private static Point UbicacionGlobo(Rectangle marco, Rectangle zona, Size globo)
         {
             int x = Math.Max(zona.Left + Distancia, Math.Min(marco.Left, zona.Right - globo.Width - Distancia));

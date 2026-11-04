@@ -4,38 +4,35 @@ using System.Collections.Generic;
 
 namespace DAL_08YS.Interfaces_Repositories
 {
+    // Cómo terminó el intento de registrar un cobro.
     public enum ResultadoRegistroCobro_790MY
     {
         Ok,
-        /// <summary>La factura no existe o ya no está Abierta (cobrada o anulada por otro puesto).</summary>
+        // La factura no existe o ya no está Abierta (la cobró o anuló otro puesto).
         FacturaNoAbierta,
-        /// <summary>La reserva de la factura ya no está Asistida.</summary>
+        // La mesa de la factura ya no está abierta.
         ReservaNoAsistida,
-        /// <summary>Quedan pedidos Pendiente/EnPreparacion: se comprometería stock para siempre.</summary>
+        // Quedan pedidos sin despachar en la mesa.
         PedidosSinDespachar,
-        /// <summary>Los consumos Listo de la reserva ya no suman el subtotal de la factura (hay que reemitirla).</summary>
+        // Los consumos cambiaron desde que se emitió la factura; hay que volver a emitirla.
         FacturaDesactualizada,
-        /// <summary>La caja del día del pago ya se cerró (existe la fila en CierresCaja).</summary>
+        // La caja de ese día ya está cerrada.
         CajaCerrada
     }
 
+    // Acceso a la tabla Pagos.
     public interface IPagoRepository_790MY
     {
-        /// <summary>
-        /// CUN-007. En una única transacción SERIALIZABLE:
-        ///  1) bloquea la factura y verifica que siga Abierta, que la caja del día del pago
-        ///     no esté cerrada y que el subtotal coincida con los consumos Listo actuales;
-        ///  2) verifica que la reserva siga Asistida y sin pedidos sin despachar;
-        ///  3) inserta el Pago;
-        ///  4) Factura -> Pagada, Reserva -> Finalizada, Mesa -> Libre.
-        /// Cualquier falla revierte todo. Asigna pago.IdPago si Ok.
-        /// mesaNumero / reservaId devuelven los datos liberados (para la bitácora).
-        /// </summary>
+        // Registra el cobro en una sola transacción. Primero vuelve a controlar la factura,
+        // la caja del día, los consumos y los pedidos pendientes; si está todo bien,
+        // inserta el pago y deja la factura Pagada, la reserva Finalizada y la mesa Libre.
+        // Si algo falla no queda nada a medias. Devuelve la reserva y la mesa liberadas.
         ResultadoRegistroCobro_790MY RegistrarCobro(Pago_790MY pago, out int reservaId, out int mesaNumero);
 
+        // Pago de una factura, o null.
         Pago_790MY GetPorFactura(int nroFactura);
 
-        /// <summary>Cobros confirmados en el día calendario indicado, ordenados por hora.</summary>
+        // Cobros de ese día, ordenados por hora (para el arqueo).
         List<CobroArqueo_790MY> ObtenerCobrosDelDia(DateTime fecha);
     }
 }

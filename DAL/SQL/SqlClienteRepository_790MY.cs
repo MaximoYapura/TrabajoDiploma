@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace DAL_08YS.SQL
 {
+    // Clientes en SQL Server. Los métodos están explicados en IClienteRepository_790MY.
     public class SqlClienteRepository_790MY : IClienteRepository_790MY
     {
         private readonly string _connectionString;
@@ -26,7 +27,7 @@ namespace DAL_08YS.SQL
 
         public bool Exists(int dni)
         {
-            // Sin filtro de Activo a proposito: ver comentario en la interfaz.
+            // No filtra por Activo a propósito: un DNI dado de baja no se puede reutilizar.
             const string sql = "SELECT COUNT(1) FROM Clientes WHERE DNI = @Dni";
 
             using (var connection = new SqlConnection(_connectionString))
@@ -129,8 +130,7 @@ namespace DAL_08YS.SQL
                 }
             }
 
-            // N+1 deliberado: el volumen esperado de clientes en este proyecto es chico;
-            // se prioriza código simple por sobre optimizar una consulta que no lo justifica hoy.
+            // Hace una consulta de adicionales por cliente. Con pocos clientes alcanza y es más simple.
             foreach (var cliente in resultado)
                 CargarAdicionales(cliente);
 
@@ -189,9 +189,7 @@ namespace DAL_08YS.SQL
             }
         }
 
-        // Reemplaza por completo los adicionales de un cliente (borra e inserta de nuevo).
-        // Es la forma más simple y correcta de sincronizar una colección chica sin tener
-        // que diffear altas/bajas/modificaciones una por una.
+        // Borra los emails y teléfonos adicionales del cliente y los vuelve a insertar.
         private void ReemplazarAdicionales(SqlConnection connection, SqlTransaction transaction, Cliente_790MY cliente)
         {
             using (var command = new SqlCommand("DELETE FROM EmailsAdicionalesCliente WHERE ClienteDNI = @Dni", connection, transaction))

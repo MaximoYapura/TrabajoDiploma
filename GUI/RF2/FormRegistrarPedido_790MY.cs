@@ -16,13 +16,10 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// CUN-006 Registrar Pedido (Camarero). Muestra las mesas abiertas a cargo del
-    /// camarero logueado, el catálogo por categoría con las porciones disponibles
-    /// (stock físico - comprometido) y la comanda en curso. El envío a cocina lo
-    /// valida y persiste PedidoBLL_790MY (stock, DV y bitácora).
-    /// También consulta periódicamente los pedidos Listos de sus mesas (CUN-008 paso 8).
-    /// </summary>
+    // RF2: Registrar pedido (CUN-006). Muestra las mesas del camarero logueado, la carta por
+    // categoría con las porciones disponibles y la comanda que se está armando. El envío a
+    // cocina lo valida y graba PedidoBLL_790MY. Cada 20 segundos se fija si algún pedido
+    // de sus mesas ya está Listo para avisarle.
     public partial class FormRegistrarPedido_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY, IConfirmarSalida_790MY
     {
         private const int UmbralBajoStock = 3;
@@ -43,7 +40,7 @@ namespace GUI_08YS.RF2
 
         // Una comanda por mesa: cambiar de mesa no pierde lo que se estaba cargando.
         private readonly Dictionary<int, List<ItemComanda_790MY>> _comandas = new Dictionary<int, List<ItemComanda_790MY>>();
-        // Avisos de "pedido listo" ya retirados en esta sesión de la pantalla.
+        // Avisos de "pedido listo" que el camarero ya marcó como retirados. Solo en memoria.
         private readonly HashSet<int> _retirados = new HashSet<int>();
 
         private Reserva_790MY _mesaSel;
@@ -92,10 +89,8 @@ namespace GUI_08YS.RF2
         // El usuario ya aceptó descartar las comandas: no se vuelve a preguntar en el mismo cierre.
         private bool _salidaConfirmada;
 
-        /// <summary>
-        /// M8: las comandas sin enviar a cocina se pierden al salir de la pantalla; se pide
-        /// confirmación al navegar (FormClosing) y al cerrar sesión o salir (FormMDI_08YS).
-        /// </summary>
+        // Las comandas sin enviar se pierden al salir de la pantalla, así que se pide
+        // confirmación al cambiar de pantalla, cerrar sesión o salir.
         public bool ConfirmarSalida()
         {
             int mesasConComanda = _comandas.Count(c => c.Value.Count > 0);
@@ -112,9 +107,8 @@ namespace GUI_08YS.RF2
 
         private void FormRegistrarPedido_790MY_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Application.Exit recorre Application.OpenForms: abrir un modal acá modifica esa
-            // colección y, si se cancela, deja la salida a medias (con la sesión ya cerrada).
-            // Para salir de la app pregunta FormMDI_08YS antes de llamar a Application.Exit.
+            // Al salir de la aplicación no se pregunta acá (abrir un modal en ese momento deja
+            // la salida a medias); en ese caso pregunta antes FormMDI_08YS.
             if (e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.ApplicationExitCall) return;
             if (!ConfirmarSalida())
                 e.Cancel = true;
@@ -143,9 +137,10 @@ namespace GUI_08YS.RF2
 
         #region Carga de datos
 
+        // Carga la carta, las mesas del camarero y sus pedidos.
         private void CargarTodo()
         {
-            // El catálogo solo depende de la patente: se carga aunque el usuario no
+            // La carta solo depende del permiso: se carga aunque el usuario no
             // esté vinculado a un camarero, para que la carta siempre sea visible.
             try
             {
@@ -188,6 +183,7 @@ namespace GUI_08YS.RF2
             ActualizarAviso();
         }
 
+        // Cada 20 segundos consulta los pedidos para avisar cuando uno está Listo.
         private void timerAvisos_790MY_Tick(object sender, EventArgs e)
         {
             if (!_puedeOperar) return;
@@ -318,7 +314,7 @@ namespace GUI_08YS.RF2
             return card;
         }
 
-        /// <summary>Renglón de texto de ancho fijo que corta con "…" en lugar de desbordar la tarjeta.</summary>
+        // Renglón de texto de ancho fijo que corta con "…" en lugar de desbordar la tarjeta.
         private static Label FilaTexto(string texto, Font fuente, Color color, int ancho)
         {
             var lbl = E.CrearLabel(texto, fuente, color, autoSize: false);
@@ -381,7 +377,7 @@ namespace GUI_08YS.RF2
             RenderizarProductos();
         }
 
-        /// <summary>Porciones que todavía pueden agregarse descontando lo ya cargado en la comanda.</summary>
+        // Porciones que todavía pueden agregarse descontando lo ya cargado en la comanda.
         private int DisponibleParaAgregar(Producto_790MY producto)
             => (producto.ControlaStock ? producto.PorcionesDisponibles : PedidoBLL_790MY.MaximoPorItemSinControl) - ComandaActual.Where(i => i.Producto.Equals(producto)).Sum(i => i.Cantidad);
 
@@ -510,6 +506,7 @@ namespace GUI_08YS.RF2
             btnAgregarItem_790MY.PerformClick();
         }
 
+        // Agrega el producto elegido a la comanda de la mesa.
         private void btnAgregarItem_790MY_Click(object sender, EventArgs e)
         {
             if (_productoSel == null || _mesaSel == null) return;
@@ -653,6 +650,7 @@ namespace GUI_08YS.RF2
             if (flpItems_790MY.Controls.Count > 0) RenderizarComanda();
         }
 
+        // Manda la comanda a cocina con PedidoBLL_790MY.
         private void btnEnviar_790MY_Click(object sender, EventArgs e)
         {
             var items = ComandaActual;
@@ -661,8 +659,7 @@ namespace GUI_08YS.RF2
             Pedido_790MY pedido;
             try
             {
-                // El precio vigente lo toma la DAL dentro de la transacción; aquí solo
-                // viajan producto, cantidad y observaciones.
+                // Solo viajan producto, cantidad y observaciones; el precio lo pone la DAL.
                 var renglones = items
                     .Select(i => new ItemPedido_790MY(i.Producto.ProductoID, i.Cantidad, i.Observaciones))
                     .ToList();
@@ -670,8 +667,8 @@ namespace GUI_08YS.RF2
             }
             catch (StockInsuficienteException_790MY ex)
             {
-                // Escenario alternativo 4.1: no se generó el pedido. Se refresca el catálogo
-                // para que el camarero vea las porciones reales y ajuste la comanda.
+                // Faltó stock y no se grabó nada. Se recarga la carta para que se vean las
+                // porciones reales.
                 E.MostrarErrorEnBanner(bnrAvisos_790MY, ex);
                 RecargarCatalogo();
                 return;
@@ -715,6 +712,7 @@ namespace GUI_08YS.RF2
                 lblAviso_790MY.Text = E.T("RP_aviso_listo", listo.NroPedido, listo.MesaNumero);
         }
 
+        // Oculta el aviso del pedido listo. No se guarda en la base.
         private void btnRetirado_790MY_Click(object sender, EventArgs e)
         {
             var listo = ProximoListo();
@@ -766,7 +764,7 @@ namespace GUI_08YS.RF2
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(flpMesas_790MY), "AY_sug_rp1_t", "RP_mis_mesas_sub"),

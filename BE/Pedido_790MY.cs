@@ -4,11 +4,10 @@ using System.Linq;
 
 namespace BE_08YS
 {
-    /// <summary>
-    /// Pendiente      -> registrado por el Camarero (CUN-006), stock validado pero no descontado.
-    /// EnPreparacion  -> el Chef inicio la elaboracion (CUN-008, paso 3).
-    /// Listo          -> el Chef lo finalizo; el stock ya fue descontado (CUN-008, paso 6/7).
-    /// </summary>
+    // Estados del pedido:
+    // Pendiente: lo cargó el camarero; el stock se controló pero no se descontó.
+    // EnPreparacion: cocina empezó a prepararlo.
+    // Listo: cocina lo terminó y se descontó el stock.
     public enum EstadoPedido_790MY
     {
         Pendiente,
@@ -16,9 +15,10 @@ namespace BE_08YS
         Listo
     }
 
+    // Pedido (comanda) de una mesa abierta.
     public class Pedido_790MY
     {
-        /// <summary>Estados cuyas porciones estan comprometidas pero no descontadas.</summary>
+        // Estados en los que las porciones están reservadas pero todavía no descontadas.
         public static readonly IReadOnlyList<EstadoPedido_790MY> EstadosConStockComprometido =
             new[] { EstadoPedido_790MY.Pendiente, EstadoPedido_790MY.EnPreparacion };
 
@@ -83,10 +83,8 @@ namespace BE_08YS
             set { _horaFin = value; }
         }
 
-        /// <summary>
-        /// Marca de idempotencia del descuento de inventario: una vez en true,
-        /// el pedido nunca vuelve a descontar stock aunque se reprocese.
-        /// </summary>
+        // Queda en true cuando cocina descontó el stock. Sirve para no descontar
+        // dos veces si el pedido se marca Listo de nuevo.
         public bool StockDescontado
         {
             get { return _stockDescontado; }
@@ -95,7 +93,7 @@ namespace BE_08YS
 
         public List<ItemPedido_790MY> Items { get; set; } = new List<ItemPedido_790MY>();
 
-        // Solo lectura (JOIN con Reservas): datos para la comanda de cocina.
+        // Datos de la reserva para mostrar en cocina. Se leen con JOIN, no se guardan.
         public int MesaNumero { get; set; }
         public int? CamareroDNI { get; set; }
 

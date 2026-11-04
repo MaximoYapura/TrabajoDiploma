@@ -7,13 +7,10 @@ using Service_08YS.Entities.Acceso;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Menú Degustación (Etapa 5, Fase 4, G5): la ruta de prueba completa con el flujo real
-    /// de FormMDI_08YS (Cliente → Reserva → Abrir mesa → Registrar pedido → Cocina → Caja y
-    /// cobro). Visible para todos los roles. «Ir» pide la navegación a FormMDI_08YS, que hace
-    /// PerformClick del ítem del menú (hereda ValidatePermission). Sin permiso, «Ir» queda
-    /// deshabilitado con el motivo. Las casillas «Hecho» no se guardan.
-    /// </summary>
+    // Menú Degustación: guía del servicio completo en seis pasos (cliente, reserva, abrir mesa,
+    // pedido, cocina y caja). "Ir" le pide a FormMDI_08YS que abra la pantalla haciendo clic
+    // en la opción real del menú, así respeta los mismos permisos. Sin permiso, el paso queda
+    // deshabilitado y dice por qué. Las casillas "Hecho" no se guardan.
     public partial class MenuDegustacion_UC_790MY : UserControl, IIdiomaObserver_08YS
     {
         public event EventHandler<DestinoAyudaEventArgs_790MY> NavegacionSolicitada;
@@ -31,10 +28,8 @@ namespace GUI_08YS.Estilo
 
         private readonly Paso[] _pasos;
 
-        /// <summary>
-        /// Pantalla accesible desde el menú lateral (FormMDI_08YS.PantallaDisponible). Además de
-        /// la patente del paso: p. ej. Recepción tiene VerClientes pero no el módulo Maestros.
-        /// </summary>
+        // Además del permiso, la pantalla tiene que estar en el menú del usuario (por ejemplo,
+        // Recepción tiene VerClientes pero no ve el menú Maestros).
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public Func<DestinoAyuda_790MY, bool> PantallaDisponible { get; set; }
@@ -84,12 +79,12 @@ namespace GUI_08YS.Estilo
             catch (FormatException) { return plantilla; }
         }
 
-        /// <summary>Texto de un botón tal como se ve en su pantalla (sin los espacios del ícono).</summary>
+        // Texto de un botón tal como se ve en su pantalla (sin los espacios del ícono).
         private static string Boton(string clave) => T(clave).Trim();
 
         private static string Ruta(string claveBoton, string claveItem) => $"{T(claveBoton).Trim()} › {T(claveItem).Trim()}";
 
-        /// <summary>Con turno en curso (real o de prueba), la pista muestra la hora en vivo.</summary>
+        // Con turno en curso (real o de prueba), la pista muestra la hora en vivo.
         private static string PistaReserva()
         {
             TimeSpan? turno = MesaBLL_790MY.ObtenerTurnoVigente(DateTime.Now);
@@ -98,7 +93,7 @@ namespace GUI_08YS.Estilo
                 : T("AY_paso2_pista_sin_turno", Boton("RR_btnConfirmar"));
         }
 
-        /// <summary>Permisos y textos en vivo: se llama cada vez que se abre el panel.</summary>
+        // Permisos y textos en vivo: se llama cada vez que se abre el panel.
         public void Refrescar()
         {
             lblIntro_790MY.Text = T("AY_deg_intro");
@@ -115,7 +110,7 @@ namespace GUI_08YS.Estilo
 
         public void UpdateIdioma() => Refrescar();
 
-        /// <summary>Muestra un aviso arriba de los pasos (lo usa también el submenú de Ayuda).</summary>
+        // Muestra un aviso arriba de los pasos (lo usa también el submenú de Ayuda).
         public void MostrarAviso(string mensaje) => bnrDegustacion_790MY.Mostrar(mensaje, TipoBanner_790MY.Error);
 
         private void Paso_RecetaSolicitada(object sender, EventArgs e)

@@ -15,6 +15,8 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Maestros
 {
+    // Maestro de clientes: lista con búsqueda, ficha para alta, modificación y baja, y
+    // exportación e importación en XML. Las reglas las controla ClienteBLL_790MY.
     public partial class FormClientes_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly Dictionary<string, Permisos> _mapaPermisos =
@@ -25,8 +27,8 @@ namespace GUI_08YS.Maestros
                 { nameof(btnEliminar_790MY), Permisos.CrearCliente }
             };
 
-        // Mismas expresiones que ya usaba el formulario (y que aplica la BLL para el email).
-        // DNI: solo números, sin puntos ni guiones, de 7 u 8 dígitos (regla del propietario).
+        // Mismas reglas que usa la BLL.
+        // DNI: solo números, sin puntos ni guiones, de 7 u 8 dígitos.
         private static readonly Regex _regexEmail = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         private static readonly Regex _regexCelular = new Regex(@"^\d+$");
         private static readonly Regex _regexDni = new Regex(@"^\d{7,8}$");
@@ -38,16 +40,15 @@ namespace GUI_08YS.Maestros
         private List<string> _emailsAdicionalesEdicion = new List<string>();
         private List<string> _telefonosAdicionalesEdicion = new List<string>();
 
-        // Validación en línea (P16, E2-D4): un campo muestra su error (ErrorProvider) recién
-        // cuando el usuario sale de él, para no llenar de rojo una ficha nueva vacía.
-        // El resumen en el banner aparece al intentar guardar y se va solo al corregirse.
+        // Cada campo muestra su error recién cuando el usuario sale de él, para no llenar de
+        // rojo una ficha vacía. El resumen del banner aparece al guardar y se va al corregir.
         private readonly HashSet<Control> _camposTocados = new HashSet<Control>();
         private bool _cargandoCampos;
         private bool _resumenVisible;
 
-        // «Guardar o descartar» (P18): huella de la ficha al empezar a editar, DNI de la
-        // fila a la que el usuario quiso ir con cambios sin guardar, y bandera para que
-        // los cambios de selección hechos por código no se tomen como del usuario.
+        // Para el "guardar o descartar": cómo estaba la ficha al empezar a editar, a qué fila
+        // quiso ir el usuario con cambios sin guardar, y una bandera para ignorar los cambios
+        // de selección que hace el propio código.
         private string _huellaInicial = string.Empty;
         private int? _dniPendiente;
         private bool _hayDestinoPendiente;
@@ -76,6 +77,7 @@ namespace GUI_08YS.Maestros
             AplicarFiltro(dniSeleccionar);
         }
 
+        // Muestra en la grilla los clientes que coinciden con la búsqueda.
         private void AplicarFiltro(int? dniSeleccionar)
         {
             string texto = txtBuscar_790MY.Text.Trim();
@@ -153,7 +155,7 @@ namespace GUI_08YS.Maestros
             AplicarFiltro(DniEnFoco());
         }
 
-        /// <summary>DNI que debe quedar elegido al refiltrar: el que se edita o el de la fila actual.</summary>
+        // DNI que debe quedar elegido al refiltrar: el que se edita o el de la fila actual.
         private int? DniEnFoco()
         {
             if (_modo == ModoEdicion_790MY.Modificacion && int.TryParse(txtDni_790MY.Text.Trim(), out int dni))
@@ -279,6 +281,7 @@ namespace GUI_08YS.Maestros
             btnEliminar_790MY.Enabled = haySeleccion;
         }
 
+        // Habilita los campos y botones según el modo (reposo, alta o modificación).
         private void EstablecerModo(ModoEdicion_790MY modo)
         {
             _modo = modo;
@@ -310,13 +313,11 @@ namespace GUI_08YS.Maestros
             btnAplicar_790MY.Visible = editando;
             btnCancelar_790MY.Visible = editando;
 
-            // La lista sigue disponible mientras se edita: al cambiar de fila con datos
-            // sin guardar se ofrece «Guardar o descartar» (P18).
+            // La lista se puede usar mientras se edita: si se cambia de fila con datos sin
+            // guardar, se ofrece guardar o descartar.
             btnAnadir_790MY.Enabled = !editando;
 
-            // La sección de Serialización opera sobre la lista ya cargada en la grilla,
-            // asi que se deshabilita mientras se está dando de alta o modificando
-            // (evita serializar datos a medio confirmar).
+            // La exportación XML usa la grilla, así que se deshabilita mientras se edita.
             btnSerializar_790MY.Enabled = !editando;
             btnDeserializar_790MY.Enabled = !editando;
             btnExaminarSerializar_790MY.Enabled = !editando;
@@ -444,14 +445,14 @@ namespace GUI_08YS.Maestros
         }
 
         #region Avisos (Etapa 2: banner, toast y MessageBox solo para errores fatales)
-        /// <summary>Error recuperable (regla de la BLL, archivo, etc.): queda en el banner hasta cerrarlo o corregirlo.</summary>
+        // Error recuperable (regla de la BLL, archivo, etc.): queda en el banner hasta cerrarlo o corregirlo.
         private void MostrarErrorEnBanner(string mensaje, TipoBanner_790MY tipo = TipoBanner_790MY.Error)
         {
             _resumenVisible = false;
             bnrAvisos_790MY.Mostrar(mensaje, tipo, cerrable: true);
         }
 
-        /// <summary>Error inesperado (base de datos, excepción no prevista): se conserva el MessageBox nativo (E2-D1).</summary>
+        // Error inesperado (por ejemplo, de la base): se muestra en un MessageBox.
         private void MostrarErrorFatal(string mensaje)
         {
             MessageBox.Show(this, mensaje, TraductorManager_08YS.Instance.GetTexto("error"),
@@ -504,7 +505,7 @@ namespace GUI_08YS.Maestros
             ActualizarValidacion();
         }
 
-        /// <summary>Motivo si el email/celular adicional no tiene formato válido; null si es válido.</summary>
+        // Motivo si el email/celular adicional no tiene formato válido; null si es válido.
         private static string ErrorFormatoAdicional(bool esEmail, string valor)
         {
             var t = TraductorManager_08YS.Instance;
@@ -513,10 +514,8 @@ namespace GUI_08YS.Maestros
             return _regexCelular.IsMatch(valor) ? null : t.GetTexto("FC_val_celular_numeros");
         }
 
-        /// <summary>
-        /// Adicionales ya cargados con formato inválido (p. ej. datos viejos guardados antes de
-        /// validarlos). Al guardar se informan para que se quiten con su ✕.
-        /// </summary>
+        // Adicionales ya cargados con formato inválido (p. ej. datos viejos guardados antes de
+        // validarlos). Al guardar se informan para que se quiten con su ✕.
         private List<string> AdicionalesInvalidos()
             => _emailsAdicionalesEdicion.Where(v => ErrorFormatoAdicional(true, v) != null)
                 .Concat(_telefonosAdicionalesEdicion.Where(v => ErrorFormatoAdicional(false, v) != null))
@@ -608,11 +607,8 @@ namespace GUI_08YS.Maestros
             ActualizarValidacion();
         }
 
-        /// <summary>
-        /// Reglas simples repetidas en la GUI (E2-H3); ClienteBLL_790MY sigue siendo la
-        /// autoridad al guardar. Obligatorios: DNI, apellido, nombre, email y celular.
-        /// La dirección es opcional (la BLL no la exige).
-        /// </summary>
+        // Las mismas reglas de ClienteBLL_790MY, para avisar antes de guardar (la BLL las
+        // vuelve a controlar). Obligatorios: DNI, apellido, nombre, email y celular.
         private Dictionary<TextBox, string> ValidarFicha()
         {
             var t = TraductorManager_08YS.Instance;
@@ -702,7 +698,7 @@ namespace GUI_08YS.Maestros
             Guardar();
         }
 
-        /// <summary>Guarda la ficha. Devuelve true si la BLL aceptó los datos.</summary>
+        // Guarda la ficha. Devuelve true si la BLL aceptó los datos.
         private bool Guardar()
         {
             var t = TraductorManager_08YS.Instance;
@@ -739,9 +735,8 @@ namespace GUI_08YS.Maestros
                     _clienteBll.RegistrarCliente(dni, nombre, apellido, email, celular, direccion,
                                                   _emailsAdicionalesEdicion, _telefonosAdicionalesEdicion);
 
-                    // Alta (E2-D4): la ficha queda limpia y lista para el siguiente cliente.
-                    // Se recarga la grilla en reposo para que la selección no dispare
-                    // el aviso de «Guardar o descartar».
+                    // Después de un alta la ficha queda limpia para cargar otro cliente.
+                    // La grilla se recarga en reposo para que no salte el "guardar o descartar".
                     _modo = ModoEdicion_790MY.Reposo;
                     CargarGrilla(null);
                     ToastHost_790MY.Mostrar(dgvClientes_790MY,
@@ -753,7 +748,7 @@ namespace GUI_08YS.Maestros
                     return true;
                 }
 
-                // Modificación (E2-D4): la ficha conserva los datos guardados.
+                // Después de modificar, la ficha queda con los datos guardados.
                 var cliente = new Cliente_790MY(dni, nombre, apellido, email, celular, direccion)
                 {
                     EmailsAdicionales = _emailsAdicionalesEdicion,
@@ -889,6 +884,7 @@ namespace GUI_08YS.Maestros
             }
         }
 
+        // Exporta a XML los clientes seleccionados en la grilla.
         private void btnSerializar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
@@ -939,6 +935,7 @@ namespace GUI_08YS.Maestros
         private static bool EsErrorDeArchivo(Exception ex)
             => ex is ArgumentException || ex is IOException || ex is UnauthorizedAccessException;
 
+        // Lee un XML y muestra los clientes en la lista (no los graba en la base).
         private void btnDeserializar_790MY_Click(object sender, EventArgs e)
         {
             var t = TraductorManager_08YS.Instance;
@@ -1036,7 +1033,7 @@ namespace GUI_08YS.Maestros
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(txtBuscar_790MY), "AY_sug_cli1_t", "FC_marca_buscar"),

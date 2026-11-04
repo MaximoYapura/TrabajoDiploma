@@ -17,26 +17,17 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>
-    /// Caja y cobro unificado: CUN-007 Cobrar Venta. Cuenta / pre-ticket, factura y
-    /// pago forman un único flujo (antes Generar Factura y Registrar Pago).
-    ///  - Izquierda: mesas ocupadas (reservas Asistidas).
-    ///  - Centro: consumos entregados, descuento (% o monto fijo), subtotal, IVA y total.
-    ///  - Derecha: medio de pago, propina, validación en tiempo real (Luhn / vuelto) y
-    ///    "Registrar Cobro y Liberar Mesa", que emite la Factura B en estado PAGADA.
-    /// Los cálculos y validaciones definitivos los repite la BLL; la pantalla solo
-    /// anticipa el resultado. Bitácora y DV los registra la BLL después del COMMIT.
-    /// Etapa 4: errores y rechazos en el banner, éxito en toast, confirmación con
-    /// ConfirmModal y el cobro (GenerarFactura + RegistrarCobro) en un Task.Run.
-    /// </summary>
+    // RF2: Caja y cobro (CUN-007). Tiene tres partes:
+    // - izquierda: las mesas abiertas;
+    // - centro: lo consumido, el descuento (% o monto) y los importes;
+    // - derecha: el medio de pago, la propina y el botón para cobrar y liberar la mesa.
+    // La pantalla valida mientras se escribe, pero la BLL vuelve a controlar todo al cobrar.
+    // El cobro corre en segundo plano (Task.Run) para que la pantalla no se congele.
     public partial class FormFacturacionCobro_790MY : Form, IIdiomaObserver_08YS, IAyudaContextual_790MY
     {
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
 
-        /// <summary>
-        /// Demora simulada de la entidad bancaria antes de procesar el cobro (Etapa 4, E4-D6).
-        /// Solo se aplica con ModoDemostracion=true (desarrollo / defensa); en producción no hay demora.
-        /// </summary>
+        // Espera que simula la respuesta del banco. Solo en modo demostración.
         private const int LatenciaSimuladaMs = 2500;
 
         private readonly FacturaBLL_790MY _facturaBll;
@@ -56,8 +47,8 @@ namespace GUI_08YS.RF2
         private int _cobradasEnTurno;
         private bool _cargando;
         private bool _listo;
-        private bool _procesando;      // cobro en curso en segundo plano (E4-D6)
-        private bool _rechazoVisible;  // el banner muestra un rechazo de tarjeta (E4-D5)
+        private bool _procesando;      // hay un cobro en curso
+        private bool _rechazoVisible;  // el banner muestra un rechazo de tarjeta
 
         private readonly Font _fMesaTitulo = new Font("Segoe UI", 14F, FontStyle.Bold);
         private readonly Font _fMesaDetalle = new Font("Segoe UI", 9.75F);
@@ -108,6 +99,7 @@ namespace GUI_08YS.RF2
 
         #region Mesas (panel izquierdo)
 
+        // Carga las mesas por cobrar.
         private void CargarMesas(bool mantenerSeleccion)
         {
             int? seleccion = mantenerSeleccion ? _detalle?.ReservaID : null;
@@ -140,7 +132,7 @@ namespace GUI_08YS.RF2
 
             if (_mesas.Count == 0)
             {
-                // Escenario alternativo 1.1: no hay mesas ocupadas para facturar.
+                // No hay mesas abiertas para cobrar.
                 var vacio = E.CrearLabel(E.T("msg_fc_sin_mesas"), _fMesaDetalle, E.Gris, autoSize: false);
                 vacio.Size = new Size(ancho, 90);
                 vacio.TextAlign = ContentAlignment.MiddleCenter;
@@ -215,6 +207,7 @@ namespace GUI_08YS.RF2
 
         #region Cuenta (panel central) — CUN-007
 
+        // Muestra la cuenta de la mesa elegida.
         private void SeleccionarMesa(int reservaId)
         {
             try
@@ -223,7 +216,7 @@ namespace GUI_08YS.RF2
             }
             catch (ArgumentException ex)
             {
-                // Escenario 2.1: la reserva no tiene consumos entregados para facturar.
+                // La mesa todavía no tiene consumos para cobrar.
                 _detalle = null;
                 MesaCobroDTO_790MY mesa = _mesas.FirstOrDefault(m => m.ReservaID == reservaId);
                 LimpiarCuenta(ex.Message, mesa);
@@ -255,7 +248,7 @@ namespace GUI_08YS.RF2
             Recalcular();
         }
 
-        /// <summary>Recupera el descuento de la factura Abierta para no emitir otra igual.</summary>
+        // Recupera el descuento de la factura Abierta para no emitir otra igual.
         private void PrecargarDescuento(Factura_790MY abierta)
         {
             decimal porPorcentaje = Math.Round(abierta.Subtotal * abierta.PorcentajeDescuento / 100m, 2, MidpointRounding.AwayFromZero);
@@ -316,7 +309,7 @@ namespace GUI_08YS.RF2
             if (!_cargando) Recalcular();
         }
 
-        /// <summary>CUN-007 paso 3: valida el descuento y recalcula subtotal, IVA y total.</summary>
+        // Valida el descuento y recalcula los importes.
         private void Recalcular()
         {
             _importes = null;
@@ -336,7 +329,7 @@ namespace GUI_08YS.RF2
                     }
                     catch (ArgumentException ex)
                     {
-                        // Escenario 4.1: descuento inválido, se informa el motivo y no se avanza.
+                        // Descuento inválido: se muestra el motivo.
                         lblErrorDescuento_790MY.Text = ex.Message;
                     }
                 }
@@ -361,6 +354,7 @@ namespace GUI_08YS.RF2
             btnPreTicket_790MY.Enabled = imp != null;
         }
 
+        // Emite la factura y muestra el pre-ticket (sin pago).
         private void btnPreTicket_790MY_Click(object sender, EventArgs e)
         {
             if (_procesando || _detalle == null || _importes == null) return;
@@ -370,7 +364,7 @@ namespace GUI_08YS.RF2
                 SessionManager_08YS.Instance.ValidatePermission(Permisos.GenerarFactura);
                 TryParseImporte(txtDescuento_790MY.Text, out decimal valor, permitirVacio: true);
 
-                // CUN-007 paso 8 (pre-ticket): factura Abierta con importes congelados.
+                // Se emite (o reutiliza) la factura Abierta.
                 Factura_790MY factura = _facturaBll.GenerarFactura(_detalle.ReservaID, valor, TipoDescuentoSeleccionado);
 
                 using (var comprobante = new FormComprobanteFactura_790MY(factura, null))
@@ -456,11 +450,8 @@ namespace GUI_08YS.RF2
                 ? Pago_790MY.CuotasPermitidas[cmbCuotas_790MY.SelectedIndex]
                 : 1;
 
-        /// <summary>
-        /// Validación en tiempo real del panel de cobro: total con propina, vuelto (efectivo)
-        /// o Luhn y cuotas (tarjeta). Habilita "Registrar Cobro" solo con datos válidos y deja
-        /// en lblValidacion el motivo cuando no se puede confirmar.
-        /// </summary>
+        // Valida el panel de cobro mientras se escribe: total con propina, vuelto (efectivo) o
+        // número y cuotas (tarjeta). Habilita el botón solo si está todo bien; si no, muestra el motivo.
         private void ActualizarCobro()
         {
             string motivo = null;
@@ -559,18 +550,14 @@ namespace GUI_08YS.RF2
             lblValidacion_790MY.Text = motivo ?? string.Empty;
         }
 
-        /// <summary>
-        /// CUN-007 pasos 5 a 9. Todos los valores de pantalla se leen ANTES del
-        /// Task.Run: el hilo secundario solo ejecuta GenerarFactura + RegistrarCobro con datos
-        /// ya capturados (leer un control desde otro hilo lanza InvalidOperationException).
-        /// Los textos, el banner y el comprobante se resuelven después del await, ya en el hilo
-        /// de la interfaz.
-        /// </summary>
+        // Cobra la mesa. Los datos de la pantalla se leen antes del Task.Run, porque desde
+        // otro hilo no se pueden tocar los controles. En segundo plano solo se emite la factura
+        // y se registra el cobro; el banner y el comprobante se muestran después del await.
         private async void btnRegistrarCobro_790MY_Click(object sender, EventArgs e)
         {
             if (_procesando || _detalle == null || _importes == null) return;
 
-            // ─── Captura en el hilo de la interfaz ───
+            // ─── Datos de la pantalla ───
             TryParseImporte(txtPropina_790MY.Text, out decimal propina, permitirVacio: true);
             TryParseImporte(txtDescuento_790MY.Text, out decimal valorDescuento, permitirVacio: true);
             decimal total = _importes.MontoTotal + propina;
@@ -583,7 +570,7 @@ namespace GUI_08YS.RF2
             int reservaId = _detalle.ReservaID;
             int mesaNumero = _detalle.MesaNumero;
 
-            // Sin la patente GenerarFactura (solo cobra) se usa la cuenta ya emitida por el camarero.
+            // Sin el permiso GenerarFactura (solo cobra) se usa la factura que ya emitió el camarero.
             bool generarFactura = SessionManager_08YS.Instance.HasPermission(Permisos.GenerarFactura);
             Factura_790MY facturaEmitida = _detalle.FacturaAbierta;
             if (!generarFactura && facturaEmitida == null)
@@ -592,7 +579,7 @@ namespace GUI_08YS.RF2
                 return;
             }
 
-            // Paso 5 (5.3 en efectivo): el camarero verifica los datos y confirma (E4-D2).
+            // Se pide confirmación antes de cobrar.
             string medio = metodo == MetodoPago_790MY.Efectivo
                 ? E.T("CJ_efectivo").Trim()
                 : E.T("CJ_medio_tarjeta", PagoBLL_790MY.DetectarMarca(nroTarjeta), cuotas);
@@ -616,14 +603,14 @@ namespace GUI_08YS.RF2
 
                 resultado = await Task.Run(() =>
                 {
-                    // CUN-007 paso 8: factura vigente con los importes mostrados.
+                    // Factura con los importes que se ven en pantalla.
                     var reloj = Stopwatch.StartNew();
                     Factura_790MY factura = generarFactura
                         ? _facturaBll.GenerarFactura(reservaId, valorDescuento, tipoDescuento)
                         : facturaEmitida;
                     Trace.WriteLine($"GenerarFactura: {reloj.ElapsedMilliseconds} ms", "Cobro");
 
-                    // CUN-007: pago, factura Pagada, reserva Finalizada y mesa Libre.
+                    // Pago, factura Pagada, reserva Finalizada y mesa Libre.
                     var solicitud = new SolicitudCobro_790MY
                     {
                         NroFactura = factura.NroFactura,
@@ -653,7 +640,7 @@ namespace GUI_08YS.RF2
 
             if (error is PagoRechazadoException_790MY rechazo)
             {
-                // Escenario 7.1: sin cambios de estado; se solicita otro medio de pago (E4-D5).
+                // El banco rechazó la tarjeta: no cambió nada y se pide otro medio de pago.
                 MostrarRechazo(rechazo);
                 return;
             }
@@ -673,17 +660,14 @@ namespace GUI_08YS.RF2
             E.MostrarExitoToast(this, E.T("msg_fc_cobro_ok", resultado.Factura.NumeroComprobante, mesaNumero));
         }
 
-        /// <summary>Controles que no se pueden usar mientras el cobro está en curso.</summary>
+        // Controles que no se pueden usar mientras el cobro está en curso.
         private IEnumerable<Control> ControlesDeEntrada
             => new Control[] { tlpMesas_790MY, tlpCuenta_790MY, sldMetodo_790MY, tlpPropina_790MY, pnlMetodoHost_790MY };
 
         private FormMDI_08YS Contenedor => TopLevelControl as FormMDI_08YS;
 
-        /// <summary>
-        /// E4-D6: la bandera se activa antes del primer await (bloquea doble clic y
-        /// reentradas), el botón pasa a «Procesando», se deshabilitan las entradas y el
-        /// contenedor principal bloquea navegación, idioma y cierre.
-        /// </summary>
+        // Mientras se cobra: la bandera evita el doble clic, el botón muestra "Procesando",
+        // se deshabilitan los campos y la ventana principal bloquea el menú, el idioma y el cierre.
         private void IniciarProcesamiento()
         {
             _procesando = true;
@@ -701,10 +685,7 @@ namespace GUI_08YS.RF2
             }
         }
 
-        /// <summary>
-        /// ModoDemostracion del App.config (mismo criterio que PanelAyuda_UC_790MY):
-        /// ausente, inválido o ilegible equivale a false (producción, sin demora simulada).
-        /// </summary>
+        // True si el App.config tiene ModoDemostracion = true. Si falta o es inválido, false.
         private static bool ModoDemostracionActivo()
         {
             try
@@ -717,7 +698,7 @@ namespace GUI_08YS.RF2
             }
         }
 
-        /// <summary>Restaura el estado original (también tras un rechazo o un error).</summary>
+        // Restaura el estado original (también tras un rechazo o un error).
         private void FinalizarProcesamiento()
         {
             FormMDI_08YS contenedor = Contenedor;
@@ -756,7 +737,7 @@ namespace GUI_08YS.RF2
             txtNroTarjeta_790MY.SelectAll();
         }
 
-        /// <summary>El aviso de rechazo se quita al corregir la tarjeta o cambiar de medio de pago.</summary>
+        // El aviso de rechazo se quita al corregir la tarjeta o cambiar de medio de pago.
         private void OcultarRechazo()
         {
             if (!_rechazoVisible) return;
@@ -769,11 +750,11 @@ namespace GUI_08YS.RF2
 
         #region Helpers
 
-        /// <summary>"$ 102.584" o "$ 102.583,80" (sin decimales si son cero).</summary>
+        // "$ 102.584" o "$ 102.583,80" (sin decimales si son cero).
         internal static string Moneda(decimal valor)
             => "$ " + valor.ToString(valor == decimal.Truncate(valor) ? "N0" : "N2", CulturaMoneda);
 
-        /// <summary>Acepta "1.500", "1500,50" o "1500.50"; vacío = 0 si permitirVacio.</summary>
+        // Acepta "1.500", "1500,50" o "1500.50"; vacío = 0 si permitirVacio.
         private static bool TryParseImporte(string texto, out decimal valor, bool permitirVacio)
         {
             valor = 0m;
@@ -817,7 +798,7 @@ namespace GUI_08YS.RF2
         #endregion
 
         #region Ayuda contextual (Etapa 5)
-        /// <summary>Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.</summary>
+        // Sugerencias del Chef (F1): solo datos; el globo y el resalte los dibuja AyudaSugerencias_790MY.
         public IReadOnlyList<PistaAyuda_790MY> ObtenerPistas() => new[]
         {
             new PistaAyuda_790MY(nameof(flpMesas_790MY), "AY_sug_cj1_t", "CJ_mesas_sub"),

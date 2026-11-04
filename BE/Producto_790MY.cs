@@ -1,10 +1,7 @@
 ﻿namespace BE_08YS
 {
-    /// <summary>
-    /// Seccion de la carta. Se persiste como texto (nvarchar(20)), igual que
-    /// PuestoEmpleado_790MY, por lo que el orden del enum no afecta a los datos.
-    /// FormRegistrarPedido_790MY arma una pestana por cada valor.
-    /// </summary>
+    // Sección de la carta. Se guarda como texto, así que el orden del enum no importa.
+    // Registrar pedido muestra una pestaña por cada valor.
     public enum CategoriaProducto_790MY
     {
         Entrada,
@@ -13,12 +10,10 @@
         Bebida
     }
 
-    /// <summary>
-    /// Item del menu. El stock se controla en porciones por producto:
-    /// - StockPorciones: existencia fisica (se descuenta en CUN-008, al marcar Listo).
-    /// - PorcionesComprometidas: porciones de pedidos Pendiente/EnPreparacion que
-    ///   todavia no se descontaron. Lo calcula la consulta; no se persiste.
-    /// </summary>
+    // Producto de la carta. El stock se maneja en porciones:
+    // StockPorciones es lo que hay físicamente (cocina lo descuenta al marcar Listo).
+    // PorcionesComprometidas son las de pedidos que todavía no salieron de cocina;
+    // la calcula la consulta y no se guarda.
     public class Producto_790MY
     {
         private int _productoId;
@@ -75,19 +70,17 @@
             set { _categoria = value; }
         }
 
-        /// <summary>Solo lectura: porciones reservadas por pedidos aun no despachados.</summary>
+        // Porciones de pedidos que todavía no se despacharon.
         public int PorcionesComprometidas { get; set; }
 
-        /// <summary>Porciones que todavia pueden pedirse sin generar sobreventa.</summary>
+        // Porciones que todavía se pueden pedir.
         public int PorcionesDisponibles => _stockPorciones - PorcionesComprometidas;
 
-        /// <summary>
-        /// False para productos sin control de porciones (p. ej. preparaciones a pedido):
-        /// no se rechazan por stock en CUN-006 ni se descuentan en CUN-008.
-        /// </summary>
+        // En false el producto no tiene límite de porciones: no se rechaza por stock
+        // al pedir ni se descuenta en cocina.
         public bool ControlaStock { get; set; } = true;
 
-        /// <summary>True si se pueden pedir <paramref name="cantidad"/> porciones más.</summary>
+        // True si se pueden pedir esa cantidad de porciones.
         public bool Admite(int cantidad) => !ControlaStock || PorcionesDisponibles >= cantidad;
 
         public override string ToString() => _nombre;

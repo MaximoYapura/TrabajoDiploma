@@ -4,23 +4,20 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Tokens visuales únicos de «El Fogón del Sur» (Rediseño UX, Etapa 1: P01–P10).
-    /// Las pantallas se migran de a una a esta clase; EstiloRF2_790MY y
-    /// EstiloMaestros_790MY conservan sus valores hasta que cada pantalla se migre.
-    /// Regla P04: bordó sólido = acción. Los estados usan superficie suave + ícono + texto.
-    /// </summary>
+    // Colores, fuentes y medidas de la aplicación, más funciones para darle estilo a
+    // botones y grillas. El bordó sólido se usa para la acción principal; los estados se
+    // muestran con un fondo suave, ícono y texto.
     internal static class TemaFogon_790MY
     {
-        // ── Paleta (P03) ─────────────────────────────────────────────
+        // ── Paleta ───────────────────────────────────────────────────
         public static readonly Color Accion       = Color.FromArgb(107, 29, 47);   // #6B1D2F
         public static readonly Color AccionHover  = Color.FromArgb(86, 22, 37);    // #561625
         public static readonly Color AccionSuave  = Color.FromArgb(248, 236, 238); // selección / hover de secundarios
         public static readonly Color Marca        = Color.FromArgb(97, 13, 16);    // #610D10 (estimado del logo)
         public static readonly Color OroClaro     = Color.FromArgb(242, 217, 166); // #F2D9A6
         public static readonly Color Oro          = Color.FromArgb(232, 185, 100); // #E8B964
-        // Fondo del área de trabajo (panel2 de FormMDI_08YS) y del Maître digital: el mismo
-        // valor en los dos (RGB Matching), así el rectángulo del asistente no se distingue.
+        // Fondo del área de trabajo y del Maître digital. Es el mismo en los dos para que no
+        // se note el rectángulo del asistente.
         public static readonly Color Crema        = Color.FromArgb(250, 248, 245); // #FAF8F5
         public static readonly Color Panel        = Color.FromArgb(244, 240, 233); // #F4F0E9
         public static readonly Color Tarjeta      = Color.White;
@@ -31,7 +28,7 @@ namespace GUI_08YS.Estilo
         public static readonly Color TextoDeshabilitado = Color.FromArgb(163, 153, 144);
         public static readonly Color Foco         = Color.FromArgb(168, 115, 15);
 
-        // ── Estados (P04): fondo de chip, superficie suave, texto, borde ─
+        // ── Estados: fondo de chip, superficie suave, texto y borde ──
         public static readonly Color OkFondo    = Color.FromArgb(225, 242, 230);
         public static readonly Color OkSuave    = Color.FromArgb(240, 248, 242);
         public static readonly Color OkTexto    = Color.FromArgb(30, 110, 60);
@@ -54,7 +51,7 @@ namespace GUI_08YS.Estilo
         public static readonly Color ErrorFondo = Color.FromArgb(252, 232, 230);
         public static readonly Color ErrorTexto = Color.FromArgb(179, 38, 30);
 
-        // ── Tema oscuro de cocina (P05): solo definición, el KDS no se migra en Etapa 1 ─
+        // ── Tema oscuro de cocina (la pantalla de cocina todavía usa EstiloRF2_790MY) ─
         public static readonly Color KdsFondo    = Color.FromArgb(30, 24, 22);
         public static readonly Color KdsColumna  = Color.FromArgb(40, 33, 31);
         public static readonly Color KdsTarjeta  = Color.FromArgb(52, 44, 41);
@@ -71,7 +68,7 @@ namespace GUI_08YS.Estilo
         public static readonly Color MaitreTexto     = Color.FromArgb(234, 223, 207); // #EADFCF
         public static readonly Color MaitreSeparador = Color.FromArgb(74, 42, 38);    // #4A2A26
 
-        // ── Barra lateral de FormMDI_08YS: conserva sus colores reales (Etapa 5) ─
+        // ── Barra lateral de FormMDI_08YS ─
         // Valores medidos sobre los IconButton del menú (FlatStyle.Flat sin FlatAppearance propio).
         public static readonly Color BarraFondo      = Color.FromArgb(60, 15, 15);
         public static readonly Color BarraHover      = Color.FromArgb(72, 18, 18);
@@ -79,10 +76,10 @@ namespace GUI_08YS.Estilo
         public static readonly Color BarraTinta      = Color.FromArgb(235, 195, 140);
         public const string BarraFamilia = "Microsoft Sans Serif";
 
-        // ── Tipografía (P06, P07): Segoe UI en toda la aplicación, escala fija ─
+        // ── Tipografía: Segoe UI en toda la aplicación ─
         public const string Familia = "Segoe UI";
 
-        // ── Espaciado y radios (P08): múltiplos de 4, radios 6/10/12, sin sombras ─
+        // ── Espaciado y radios: múltiplos de 4, radios de 6, 10 y 12 ─
         public const int Espacio1 = 4;
         public const int Espacio2 = 8;
         public const int Espacio3 = 12;
@@ -92,7 +89,7 @@ namespace GUI_08YS.Estilo
         public const int RadioTarjeta = 10;
         public const int RadioPanel   = 12;
 
-        /// <summary>Botón primario (bordó sólido: la acción principal) o secundario (contorno).</summary>
+        // Botón primario (bordó sólido: la acción principal) o secundario (contorno).
         public static void EstilizarBoton(Button boton, bool primario)
         {
             boton.FlatStyle = FlatStyle.Flat;
@@ -110,10 +107,8 @@ namespace GUI_08YS.Estilo
             AplicarEstadoBoton(boton);
         }
 
-        /// <summary>
-        /// Grilla de maestros: encabezado sobrio sobre panel, filas altas con separador
-        /// suave y selección en bordó suave con texto en tinta (sin el azul del sistema).
-        /// </summary>
+        // Grilla de maestros: encabezado sobrio sobre panel, filas altas con separador
+        // suave y selección en bordó suave con texto en tinta (sin el azul del sistema).
         public static void EstilizarGrilla(DataGridView dgv)
         {
             ActivarDobleBufer(dgv);
@@ -144,12 +139,8 @@ namespace GUI_08YS.Estilo
             dgv.DefaultCellStyle.Padding = new Padding(8, 0, 0, 0);
         }
 
-        /// <summary>
-        /// DataGridView trae DoubleBuffered = false (propiedad protegida). Pintando directo a
-        /// la ventana, algunos equipos muestran el texto de celdas y encabezados como bloques
-        /// sólidos del color del texto; con doble búfer se dibuja bien y además sin parpadeo.
-        /// Los formularios con WS_EX_COMPOSITED (Bitácora, Usuarios, Acceso) ya lo tenían.
-        /// </summary>
+        // Activa el doble búfer de la grilla. Sin él, en algunos equipos el texto se ve como
+        // bloques sólidos y la grilla parpadea.
         public static void ActivarDobleBufer(DataGridView dgv)
         {
             typeof(Control)
@@ -163,7 +154,7 @@ namespace GUI_08YS.Estilo
         [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
         private static extern System.IntPtr SendMessage(System.IntPtr hWnd, int msg, System.IntPtr wParam, string lParam);
 
-        /// <summary>Muestra <paramref name="texto"/> en gris mientras el TextBox está vacío, incluso con foco.</summary>
+        // Muestra texto en gris mientras el TextBox está vacío, incluso con foco.
         public static void PonerMarcaDeAgua(TextBox caja, string texto)
         {
             if (caja.IsHandleCreated)
@@ -172,10 +163,8 @@ namespace GUI_08YS.Estilo
                 caja.HandleCreated += (s, e) => SendMessage(caja.Handle, EM_SETCUEBANNER, (System.IntPtr)1, texto ?? string.Empty);
         }
 
-        /// <summary>
-        /// Opción de un selector segmentado (RadioButton con Appearance = Button):
-        /// la opción elegida va en bordó sólido; las demás, con contorno.
-        /// </summary>
+        // Opción de un selector segmentado (RadioButton con Appearance = Button):
+        // la opción elegida va en bordó sólido; las demás, con contorno.
         public static void EstilizarOpcion(RadioButton opcion)
         {
             opcion.FlatStyle = FlatStyle.Flat;

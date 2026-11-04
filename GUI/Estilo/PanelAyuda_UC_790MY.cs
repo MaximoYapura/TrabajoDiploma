@@ -7,14 +7,12 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Panel lateral derecho de ayuda (Etapa 5, C1): hermano de panel2 en FormMDI_08YS, así
-    /// que OpenChildForm (que limpia panel2) nunca lo toca y la pantalla activa sigue operativa.
-    /// Pestañas: Ficha de Ingredientes (solo Modo Demostración + SuperAdmin) y Menú Degustación.
-    /// </summary>
+    // Panel de ayuda a la derecha de la ventana principal, con dos pestañas: Ficha de
+    // ingredientes (solo modo demostración y SuperAdmin) y Menú Degustación. Está al lado
+    // del área de pantallas, así abrir una pantalla no lo cierra.
     public partial class PanelAyuda_UC_790MY : UserControl, IIdiomaObserver_08YS
     {
-        /// <summary>Nombre exacto del rol en la base (Roles.Nombre, script.sql).</summary>
+        // Nombre exacto del rol en la base (Roles.Nombre, script.sql).
         private const string RolFicha = "SuperAdmin";
 
         private const int TabFicha = 0;
@@ -22,13 +20,13 @@ namespace GUI_08YS.Estilo
 
         private bool _fichaPermitida;
 
-        /// <summary>El usuario pidió cerrar el panel (botón ✕ o Esc con el foco adentro).</summary>
+        // El usuario pidió cerrar el panel (botón ✕ o Esc con el foco adentro).
         public event EventHandler CerrarSolicitado;
 
-        /// <summary>Un paso del Menú Degustación pidió abrir su pantalla.</summary>
+        // Un paso del Menú Degustación pidió abrir su pantalla.
         public event EventHandler<DestinoAyudaEventArgs_790MY> NavegacionSolicitada;
 
-        /// <summary>«Repetir visita» del encabezado.</summary>
+        // «Repetir visita» del encabezado.
         public event EventHandler RepetirVisitaSolicitada;
 
         public PanelAyuda_UC_790MY()
@@ -36,10 +34,8 @@ namespace GUI_08YS.Estilo
             InitializeComponent();
         }
 
-        /// <summary>
-        /// G3: la Ficha existe solo con ModoDemostracion = true en App.config y el usuario
-        /// actual con rol SuperAdmin. Si no, se quita y se descarta: sin pestaña ni datos.
-        /// </summary>
+        // La Ficha solo existe con ModoDemostracion = true y un usuario SuperAdmin. Si no,
+        // se saca del panel: no queda ni la pestaña ni los datos.
         public void Preparar()
         {
             _fichaPermitida = ModoDemostracionActivo() && UsuarioEsSuperAdmin();
@@ -57,11 +53,11 @@ namespace GUI_08YS.Estilo
 
         public bool FichaPermitida => _fichaPermitida;
 
-        /// <summary>Rol del usuario actual = SuperAdmin (Ficha y Manual de Recetas).</summary>
+        // Rol del usuario actual = SuperAdmin (Ficha y Manual de Recetas).
         public static bool UsuarioEsSuperAdmin()
             => string.Equals(SessionManager_08YS.Instance.Current?.Rol?.Nombre, RolFicha, StringComparison.Ordinal);
 
-        /// <summary>Muestra un error en el panel, en la pestaña del Menú Degustación.</summary>
+        // Muestra un error en el panel, en la pestaña del Menú Degustación.
         public void MostrarAviso(string mensaje)
         {
             if (pnlTabs_790MY.Visible) tabAyuda_790MY.IndiceSeleccionado = TabDegustacion;
@@ -81,10 +77,8 @@ namespace GUI_08YS.Estilo
             }
         }
 
-        /// <summary>
-        /// Disponibilidad real de cada pantalla en el menú lateral (la asigna FormMDI_08YS):
-        /// el Menú Degustación solo ofrece «Ir» a lo que el menú muestra.
-        /// </summary>
+        // Qué pantallas están en el menú del usuario (lo asigna FormMDI_08YS). El Menú
+        // Degustación solo ofrece "Ir" a esas.
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public Func<DestinoAyuda_790MY, bool> PantallaDisponible
@@ -93,7 +87,7 @@ namespace GUI_08YS.Estilo
             set => ucDegustacion_790MY.PantallaDisponible = value;
         }
 
-        /// <summary>Al abrir el panel: datos en vivo y foco en la primera opción.</summary>
+        // Al abrir el panel: datos en vivo y foco en la primera opción.
         public void AlMostrar()
         {
             ucFicha_790MY?.Cargar();
@@ -133,7 +127,7 @@ namespace GUI_08YS.Estilo
         private void ucDegustacion_790MY_NavegacionSolicitada(object sender, DestinoAyudaEventArgs_790MY e)
             => NavegacionSolicitada?.Invoke(this, e);
 
-        /// <summary>Esc cierra el panel cuando el foco está adentro (F1 sigue hacia la MDI).</summary>
+        // Esc cierra el panel cuando el foco está adentro (F1 sigue hacia la MDI).
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Escape)

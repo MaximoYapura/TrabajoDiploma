@@ -1,6 +1,6 @@
 ﻿namespace DAL_08YS.Interfaces_Repositories
 {
-    /// <summary>Resultado del alta transaccional de un pedido (CUN-006).</summary>
+    // Resultado de grabar un pedido. Si faltó stock, dice de qué producto y cuánto queda.
     public class ResultadoRegistroPedido_790MY
     {
         public EstadoRegistroPedido_790MY Estado { get; set; }

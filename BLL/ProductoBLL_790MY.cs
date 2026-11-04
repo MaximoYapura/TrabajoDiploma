@@ -8,11 +8,8 @@ using System.Collections.Generic;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// ABM de la carta (FormProductos_790MY). Mismo patrón que el resto de las BLL:
-    /// patente -> validaciones traducidas -> persistencia -> DV -> bitácora post-commit.
-    /// La baja es lógica (Activo = 0): un producto con pedidos históricos no puede borrarse.
-    /// </summary>
+    // Reglas del maestro de productos (la carta). La baja es lógica: un producto con
+    // pedidos viejos no se puede borrar.
     public class ProductoBLL_790MY
     {
         private const int LargoMaximoNombre = 100;
@@ -27,12 +24,14 @@ namespace BLL_08YS
             _bitacoraBll = bitacoraBll ?? throw new ArgumentNullException(nameof(bitacoraBll));
         }
 
+        // Todos los productos (maestro).
         public List<Producto_790MY> GetAll()
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionProductos);
             return _productoRepository.GetAll();
         }
 
+        // Alta de producto.
         public void RegistrarProducto(Producto_790MY producto)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionProductos);
@@ -44,7 +43,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ProductoRegistrado, $"Prod {producto.ProductoID} {producto.Nombre}");
         }
 
-        /// <param name="stockLeido">Stock físico que la pantalla leyó al cargar el producto.</param>
+        // Modificación. stockLeido es el stock que vio la pantalla al abrir el producto.
         public void ModificarProducto(Producto_790MY producto, int stockLeido)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionProductos);
@@ -52,12 +51,12 @@ namespace BLL_08YS
             Producto_790MY actual = ObtenerExistente(producto?.ProductoID ?? 0);
             ValidarDatos(producto, producto.ProductoID);
 
-            // No se puede bajar el stock físico por debajo de lo ya comprometido por
-            // pedidos Pendiente/EnPreparacion: al despacharlos fallaría el descuento.
+            // El stock no puede quedar por debajo de lo que ya pidieron pedidos que siguen en
+            // cocina, porque después no se podría descontar.
             if (producto.ControlaStock && producto.StockPorciones < actual.PorcionesComprometidas)
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_stock_bajo_comprometido", actual.PorcionesComprometidas);
 
-            // Cocina descuenta stock al despachar: si cambió mientras se editaba, no se pisa.
+            // Si cocina descontó stock mientras se editaba, no se pisa.
             if (!_productoRepository.Update(producto, stockLeido))
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_stock_cambio", producto.Nombre,
                     ObtenerExistente(producto.ProductoID).StockPorciones);
@@ -66,7 +65,7 @@ namespace BLL_08YS
             _bitacoraBll.RegistrarEventoPostCommit(Evento.ProductoModificado, $"Prod {producto.ProductoID} {producto.Nombre}");
         }
 
-        /// <summary>Baja lógica: deja de aparecer en la carta de Registrar Pedido.</summary>
+        // Baja lógica: deja de aparecer en la carta de Registrar pedido.
         public void DarDeBaja(int productoId)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionProductos);
@@ -75,7 +74,7 @@ namespace BLL_08YS
             if (!producto.Activo)
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_ya_inactivo", producto.Nombre);
 
-            // Solo Activo: la baja no reescribe el stock que pudo descontar cocina.
+            // Solo cambia Activo, así no pisa el stock que pudo descontar cocina.
             if (!_productoRepository.DarDeBaja(productoId))
                 throw MensajesBLL_790MY.Regla("msg_rf2_producto_ya_inactivo", producto.Nombre);
             DVManager_08YS.Recalcular();
@@ -83,11 +82,10 @@ namespace BLL_08YS
         }
 
         // ─── Consultas para otras BLL ────────────────────────────────────────
-        // Sin ValidatePermission: el Camarero (PedidoBLL, RegistrarPedido) y la auditoría
-        // (ProductoCBLL, AuditarProductos) no tienen GestionProductos; cada llamador ya
-        // validó su propia patente.
+        // No validan permiso: las usan PedidoBLL (el camarero) y ProductoCBLL (la auditoría),
+        // que no tienen GestionProductos y ya validaron el suyo.
 
-        /// <summary>Productos activos con sus porciones disponibles (carta de Registrar Pedido).</summary>
+        // Productos activos con sus porciones disponibles (carta de Registrar pedido).
         internal List<Producto_790MY> ObtenerActivos()
             => _productoRepository.GetActivos();
 
@@ -103,6 +101,7 @@ namespace BLL_08YS
             => _productoRepository.GetById(productoId)
                ?? throw MensajesBLL_790MY.Regla("msg_rf2_producto_inexistente", productoId);
 
+        // Nombre, categoría, precio y stock válidos, y nombre sin repetir.
         private void ValidarDatos(Producto_790MY producto, int exceptoId)
         {
             if (producto == null)

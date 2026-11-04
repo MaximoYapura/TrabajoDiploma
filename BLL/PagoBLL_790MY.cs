@@ -11,19 +11,12 @@ using System.Security.Cryptography;
 
 namespace BLL_08YS
 {
-    /// <summary>
-    /// CUN-007 Cobrar Venta (registro del pago) y reporte de Arqueo / Cierre de Caja.
-    ///
-    /// El pago, el paso de la factura a Pagada, la reserva a Finalizada y la mesa a Libre
-    /// ocurren en una única transacción del repositorio. Un rechazo bancario no toca la
-    /// base de negocio: solo deja constancia en la bitácora (escenario 7.1).
-    /// </summary>
+    // Caja y cobro, segunda parte (CUN-007): el cobro. También el arqueo y el cierre de caja.
+    // El pago, la factura Pagada, la reserva Finalizada y la mesa Libre se graban en una
+    // sola transacción. Un rechazo del banco no cambia nada; solo queda en la bitácora.
     public class PagoBLL_790MY
     {
-        /// <summary>
-        /// Terminación de tarjeta que la entidad bancaria simulada siempre rechaza,
-        /// para poder probar el escenario 7.1 (p. ej. 4000 0000 0000 0002, Luhn válido).
-        /// </summary>
+        // El banco simulado rechaza las tarjetas que terminan así (por ejemplo 4000 0000 0000 0002).
         public const string TerminacionRechazoSimulado = "0002";
 
         private static readonly CultureInfo CulturaMoneda = CultureInfo.GetCultureInfo("es-AR");
@@ -43,13 +36,10 @@ namespace BLL_08YS
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Validaciones de tarjeta (sintácticas, sin acceso a datos)
+        //  Validaciones de la tarjeta (no usan la base)
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Algoritmo de Luhn (módulo 10). Acepta espacios o guiones como separadores;
-        /// exige entre 13 y 19 dígitos.
-        /// </summary>
+        // Algoritmo de Luhn. Acepta espacios o guiones y pide entre 13 y 19 dígitos.
         public static bool ValidarTarjetaLuhn(string nroTarjeta)
         {
             string digitos = SoloDigitos(nroTarjeta);
@@ -72,7 +62,7 @@ namespace BLL_08YS
             return suma % 10 == 0;
         }
 
-        /// <summary>Dígitos del número ingresado, o null si contiene otros caracteres.</summary>
+        // Dígitos del número ingresado, o null si contiene otros caracteres.
         public static string SoloDigitos(string nroTarjeta)
         {
             if (string.IsNullOrWhiteSpace(nroTarjeta)) return null;
@@ -80,7 +70,7 @@ namespace BLL_08YS
             return limpio.All(char.IsDigit) ? limpio : null;
         }
 
-        /// <summary>Marca deducida del prefijo (IIN): VISA, MASTERCARD, AMEX u OTRA.</summary>
+        // Marca según cómo empieza el número: VISA, MASTERCARD, AMEX u OTRA.
         public static string DetectarMarca(string nroTarjeta)
         {
             string d = SoloDigitos(nroTarjeta);
@@ -100,7 +90,7 @@ namespace BLL_08YS
             return "OTRA";
         }
 
-        /// <summary>"**** **** **** 1111": nunca se persiste ni se muestra el número completo.</summary>
+        // "**** **** **** 1111". El número completo nunca se guarda ni se muestra.
         public static string EnmascararTarjeta(string nroTarjeta)
         {
             string d = SoloDigitos(nroTarjeta) ?? string.Empty;
@@ -108,35 +98,30 @@ namespace BLL_08YS
             return "**** **** **** " + ultimos;
         }
 
-        /// <summary>Vuelto a entregar; negativo si el efectivo no alcanza.</summary>
+        // Vuelto a entregar; negativo si el efectivo no alcanza.
         public static decimal CalcularCambio(decimal montoAbonado, decimal montoRecibido)
             => montoRecibido - montoAbonado;
 
         // ═══════════════════════════════════════════════════════════════════
-        //  CUN-007 Cobrar Venta — registro del pago
+        //  Cobro
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Procesa el cobro de una factura Abierta. Efectivo: el monto recibido debe cubrir
-        /// total + propina y se calcula el vuelto. Tarjeta: valida Luhn y cuotas (1, 3, 6, 12)
-        /// y solicita la autorización a la entidad bancaria simulada.
-        /// Lanza PagoRechazadoException_790MY si el banco rechaza (sin cambios en la base).
-        /// </summary>
+        // Cobra una factura Abierta. En efectivo, lo recibido tiene que cubrir el total más la
+        // propina y se calcula el vuelto. Con tarjeta se valida el número y las cuotas y se
+        // pide autorización al banco simulado; si la rechaza, lanza PagoRechazadoException_790MY.
         public ResultadoCobroDTO_790MY RegistrarCobro(SolicitudCobro_790MY solicitud)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.RegistrarCobro);
             if (solicitud == null) throw new ArgumentNullException(nameof(solicitud));
 
-            // Pasos 1-2: factura Abierta. RegistrarCobro ya habilita el acceso a Caja
-            // que exige FacturaBLL_790MY.ObtenerFactura.
+            // La factura tiene que estar Abierta.
             Factura_790MY factura = _facturaBll.ObtenerFactura(solicitud.NroFactura);
             if (factura == null || factura.Estado != EstadoFactura_790MY.Abierta)
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_no_abierta", solicitud.NroFactura);
 
-            // Precondiciones de la mesa ANTES de pedir la autorización bancaria (no se autoriza
-            // una tarjeta para un cobro que después se rechazaría). Son avisos tempranos: la
-            // transacción de SqlPagoRepository_790MY.RegistrarCobro las vuelve a verificar.
-            // La cuenta cambió desde que se emitió (p. ej. se despachó otro pedido).
+            // Antes de pedir la autorización se controla la mesa, para no autorizar una tarjeta
+            // en un cobro que después falla. La transacción del repositorio lo vuelve a controlar.
+            // Primero: que la cuenta no haya cambiado desde que se emitió la factura.
             if (!_facturaBll.FacturaVigente(factura))
                 throw MensajesBLL_790MY.Regla("msg_fc_factura_desactualizada", factura.MesaNumero);
 
@@ -160,7 +145,7 @@ namespace BLL_08YS
 
             if (solicitud.MetodoPago == MetodoPago_790MY.Efectivo)
             {
-                // Escenarios 4.1.1, 4.1.2 y 4.2.
+                // Efectivo: lo recibido tiene que alcanzar.
                 if (!solicitud.MontoRecibido.HasValue || solicitud.MontoRecibido.Value < pago.MontoAbonado)
                     throw MensajesBLL_790MY.Regla("msg_fc_efectivo_insuficiente");
 
@@ -169,7 +154,7 @@ namespace BLL_08YS
             }
             else
             {
-                // Paso 5 / escenarios 5.1-5.2: datos del medio de pago.
+                // Tarjeta: número y cuotas.
                 if (!ValidarTarjetaLuhn(solicitud.NroTarjeta))
                     throw MensajesBLL_790MY.Regla("msg_fc_tarjeta_invalida");
                 if (!Pago_790MY.CuotasPermitidas.Contains(solicitud.CantidadCuotas))
@@ -179,7 +164,7 @@ namespace BLL_08YS
                 pago.MarcaTarjeta = DetectarMarca(solicitud.NroTarjeta);
                 pago.CantidadCuotas = solicitud.CantidadCuotas;
 
-                // Pasos 6-7 / escenario 7.1: autorización de la entidad bancaria simulada.
+                // Autorización del banco simulado.
                 if (!SolicitarAutorizacionBancaria(solicitud.NroTarjeta, pago.MontoAbonado, out string autorizacion))
                 {
                     _bitacoraBll.RegistrarEventoPostCommit(Evento.PagoRechazado,
@@ -190,7 +175,7 @@ namespace BLL_08YS
                 pago.NroAutorizacion = autorizacion;
             }
 
-            // Pasos 8-9: confirmación transaccional.
+            // Se graba todo en una transacción.
             pago.FechaHoraPago = Truncar(DateTime.Now);
             ResultadoRegistroCobro_790MY resultado = _pagoRepository.RegistrarCobro(pago, out int reservaId, out int mesaNumero);
             switch (resultado)
@@ -228,10 +213,7 @@ namespace BLL_08YS
         //  Arqueo y cierre de caja
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Totales de la jornada (efectivo, tarjetas, propinas, descuentos y recaudación
-        /// neta = efectivo + tarjetas) con el detalle de cuentas cobradas.
-        /// </summary>
+        // Arqueo del día: los cobros con sus totales.
         public ReporteArqueoCaja_790MY GenerarReporteArqueoCaja(DateTime fecha)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
@@ -242,24 +224,20 @@ namespace BLL_08YS
             };
         }
 
-        /// <summary>
-        /// Cierre de caja del día: recalcula el arqueo, lo registra en la tabla CierresCaja
-        /// y deja constancia en la bitácora (fecha y recaudación neta). No modifica los
-        /// pagos registrados.
-        /// </summary>
+        // Cierra la caja del día: lo graba en CierresCaja y en la bitácora. No toca los pagos.
         public ReporteArqueoCaja_790MY CerrarCaja(DateTime fecha)
         {
             ReporteArqueoCaja_790MY reporte = GenerarReporteArqueoCaja(fecha);
             if (reporte.CantidadCuentas == 0)
                 throw MensajesBLL_790MY.Regla("msg_ac_sin_cobros", fecha.ToString("dd/MM/yyyy"));
 
-            // Una sola vez por día. La consulta previa da el mensaje sin intentar el INSERT;
-            // la garantía real es la PK (Fecha) de CierresCaja: si otra terminal cerró la
-            // misma jornada en el medio, el repositorio devuelve false.
+            // Una sola vez por día. Esta consulta es para avisar antes; lo que de verdad lo
+            // impide es la clave primaria de CierresCaja (si otra terminal cerró en el medio,
+            // el repositorio devuelve false).
             if (EstaCajaCerrada(fecha))
                 throw MensajesBLL_790MY.Regla("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy"));
 
-            // Con mesas abiertas quedarían cobros fuera del arqueo (y no se podrían registrar).
+            // Con mesas abiertas, esos cobros quedarían afuera del arqueo.
             int mesasAbiertas = _facturaBll.ContarMesasAbiertas();
             if (mesasAbiertas > 0)
                 throw MensajesBLL_790MY.Regla("msg_ac_mesas_abiertas", mesasAbiertas);
@@ -268,18 +246,14 @@ namespace BLL_08YS
             if (!_cierreCajaRepository.Registrar(fecha.Date, reporte.RecaudacionNeta, reporte.CantidadCuentas, usuario))
                 throw MensajesBLL_790MY.Regla("msg_ac_caja_ya_cerrada", fecha.ToString("dd/MM/yyyy"));
 
-            // Texto de la bitácora sin cambios ("Caja dd/MM/yyyy - importe"); cultura
-            // invariante para que la barra no dependa del idioma activo.
+            // En la bitácora queda "Caja dd/MM/yyyy - importe", con la fecha en cultura invariante.
             _bitacoraBll.RegistrarEventoPostCommit(Evento.CierreCajaRealizado,
                 "Caja " + fecha.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) + " - " +
                 reporte.RecaudacionNeta.ToString("N2", CulturaMoneda));
             return reporte;
         }
 
-        /// <summary>
-        /// Factura B de un cobro del arqueo como PDF A4 (mismo contenido fiscal que el ticket).
-        /// Solo facturas Pagadas; no registra eventos en la bitácora.
-        /// </summary>
+        // PDF A4 de la factura de un cobro del arqueo. Solo para facturas pagadas.
         public byte[] ExportarFacturaPDF(int nroFactura)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
@@ -294,7 +268,7 @@ namespace BLL_08YS
             return _facturaBll.GenerarFacturaPDF(factura, pago);
         }
 
-        /// <summary>True si la caja de <paramref name="fecha"/> ya se cerró (tabla CierresCaja).</summary>
+        // True si la caja de fecha ya se cerró (tabla CierresCaja).
         public bool EstaCajaCerrada(DateTime fecha)
         {
             SessionManager_08YS.Instance.ValidatePermission(Permisos.GestionCaja);
@@ -303,11 +277,8 @@ namespace BLL_08YS
 
         // ─── Helpers ─────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Entidad bancaria simulada (actor secundario de CUN-007). Aprueba toda tarjeta
-        /// válida salvo la terminación de prueba <see cref="TerminacionRechazoSimulado"/>,
-        /// y devuelve un código de autorización de 6 dígitos.
-        /// </summary>
+        // Banco simulado. Aprueba toda tarjeta válida salvo las que terminan en
+        // TerminacionRechazoSimulado, y devuelve un código de autorización de 6 dígitos.
         private static bool SolicitarAutorizacionBancaria(string nroTarjeta, decimal monto, out string codigoAutorizacion)
         {
             codigoAutorizacion = null;
@@ -322,6 +293,7 @@ namespace BLL_08YS
             return true;
         }
 
+        // Saca los milisegundos, para que la fecha coincida con la que se guarda.
         private static DateTime Truncar(DateTime momento)
             => new DateTime(momento.Year, momento.Month, momento.Day, momento.Hour, momento.Minute, momento.Second);
     }

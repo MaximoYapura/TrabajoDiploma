@@ -4,18 +4,15 @@ using T = GUI_08YS.Estilo.TemaFogon_790MY;
 
 namespace GUI_08YS.Estilo
 {
-    /// <summary>
-    /// Capa de la Visita Guiada (Etapa 5, Fase 7, técnica (a) del spike B2): control opaco que
-    /// pinta una captura de la ventana, la oscurece y deja un hueco nítido sobre el elemento
-    /// que se explica. WinForms no compone transparencia sobre hermanos (C8), así que el
-    /// «transparente» se simula dentro de un único control. Absorbe los clics.
-    /// </summary>
+    // Capa oscura de la visita guiada: dibuja la captura de la ventana, la oscurece y deja un
+    // hueco sobre el elemento que se explica. WinForms no tiene transparencia entre controles,
+    // así que se simula dentro de este único control. También frena los clics.
     public class VisitaOverlay_790MY : Control
     {
         private static readonly Color Sombra = Color.FromArgb(170, 20, 10, 10);
         private const int Borde = 3;
 
-        /// <summary>Espacio que ocupa el borde dorado por fuera del hueco.</summary>
+        // Espacio que ocupa el borde dorado por fuera del hueco.
         public const int AnchoBorde = Borde / 2 + 1 + Borde;
 
         private Bitmap _captura;
@@ -29,7 +26,7 @@ namespace GUI_08YS.Estilo
             TabStop = false;
         }
 
-        /// <summary>La captura pasa a ser de este control (se libera al reemplazarla).</summary>
+        // La captura pasa a ser de este control (se libera al reemplazarla).
         public Bitmap Captura
         {
             get => _captura;

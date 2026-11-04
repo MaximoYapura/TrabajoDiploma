@@ -10,14 +10,15 @@ using System.Windows.Forms;
 
 namespace GUI_08YS.RF1
 {
+    // Plano del salón para elegir la mesa. Lo usan Registrar reserva y el walk-in de Abrir
+    // mesa. Cada mesa se dibuja con MesaVisualControl_790MY con el color de su estado.
     public partial class FormSeleccionarMesa_790MY : Form, IIdiomaObserver_08YS
     {
-        // ── Palette ──────────────────────────────────────────────────────
-        // Los colores de los controles estáticos se configuran en el Designer;
-        // aquí solo queda el que usan los manejadores de pintura.
+        // ── Colores ──────────────────────────────────────────────────────
+        // Los colores de los controles están en el Designer; acá solo el que usa la pintura.
         private static readonly Color ClrCremaOscura   = Color.FromArgb(238, 233, 225);
 
-        // ── BLL & state ──────────────────────────────────────────────────
+        // ── Datos ────────────────────────────────────────────────────────
         private readonly MesaBLL_790MY _mesaBll;
         private readonly DateTime      _fecha;
         private readonly TimeSpan      _hora;
@@ -27,9 +28,8 @@ namespace GUI_08YS.RF1
         public Mesa_790MY MesaSeleccionada { get; private set; }
 
         // ── Controles ─────────────────────────────────────────────────────
-        // Todos los controles se declaran y configuran en
-        // FormSeleccionarMesa_790MY.Designer.cs. Aquí solo se agrupan las
-        // etiquetas de la leyenda para poder traducirlas en bloque.
+        // Los controles están en el Designer. Acá se juntan las etiquetas de la leyenda
+        // para traducirlas todas juntas.
         private Label[] _lblsLeyenda;
 
         // ── Constructor ───────────────────────────────────────────────────
@@ -51,7 +51,7 @@ namespace GUI_08YS.RF1
                 _lblLeyendaSeleccionada
             };
 
-            // Fallback: grilla geométrica si la imagen de fondo no está disponible.
+            // Si no está la foto del salón, se dibuja una grilla de fondo.
             if (_pnlSalon.BackgroundImage == null)
             {
                 _pnlSalon.BackColor = Color.FromArgb(248, 245, 240);
@@ -99,7 +99,7 @@ namespace GUI_08YS.RF1
                 lHor, _hora.ToString(@"hh\:mm"));
         }
 
-        // ── Floor background (fallback sin imagen) ────────────────────────
+        // ── Fondo sin foto ────────────────────────────────────────────────
         private void PintarFondoSalon(object sender, PaintEventArgs e)
         {
             var g     = e.Graphics;
@@ -114,7 +114,7 @@ namespace GUI_08YS.RF1
             }
         }
 
-        // ── Data loading ──────────────────────────────────────────────────
+        // ── Carga del plano ───────────────────────────────────────────────
         private void CargarMesasMapa()
         {
             _pnlSalon.Controls.Clear();
@@ -123,7 +123,7 @@ namespace GUI_08YS.RF1
             _btnAceptar.Enabled = false;
             ActualizarDetalle(null);
 
-            // 1. Llamada a BLL — puede lanzar ArgumentException por regla de negocio
+            // 1. Se piden las mesas a la BLL. Si no se cumple una regla, se avisa.
             List<MesaMapaDTO_790MY> mesas;
             try
             {
@@ -135,10 +135,8 @@ namespace GUI_08YS.RF1
                 return;
             }
 
-            // 2. Instanciación de controles — cada mesa se protege individualmente
-            //    para que un fallo aislado no interrumpa el renderizado de las demás.
-            //    Auto-Grid Layout: 3 columnas a X=50+col*185 px, filas cada 150 px desde Y=40.
-            // Grilla 4×3 (hasta 12 mesas): X = 50+col*195 px, Y = 40+row*155 px
+            // 2. Se crea un control por mesa en una grilla de 4 columnas (hasta 12 mesas).
+            //    Si una mesa falla, se saltea y se siguen dibujando las demás.
             int idx = 0;
             foreach (var dto in mesas)
             {
@@ -160,13 +158,13 @@ namespace GUI_08YS.RF1
                 }
                 catch
                 {
-                    // Error aislado en la mesa #{dto.Mesa.NroMesa} — se omite sin bloquear el resto
+                    // Esta mesa no se pudo dibujar; se sigue con el resto.
                 }
                 idx++;
             }
         }
 
-        // ── Selection ─────────────────────────────────────────────────────
+        // ── Selección ─────────────────────────────────────────────────────
         private void CtrlMesa_Click(object sender, MesaMapaDTO_790MY dto)
         {
             if (_ctrlSeleccionado != null)
@@ -229,7 +227,7 @@ namespace GUI_08YS.RF1
             }
         }
 
-        // ── Buttons ───────────────────────────────────────────────────────
+        // ── Botones ───────────────────────────────────────────────────────
         private void _btnAceptar_Click(object sender, EventArgs e)
         {
             if (MesaSeleccionada == null)
@@ -243,7 +241,7 @@ namespace GUI_08YS.RF1
             Close();
         }
 
-        // ── Avisos (Etapa 2) ─────────────────────────────────────────────
+        // ── Avisos ───────────────────────────────────────────────────────
         // El banner flota sobre la franja superior del plano (sin Dock) para no mover
         // ni redimensionar ningún control del salón. Se cierra con su ✕ o al elegir una mesa.
         private void MostrarAvisoFlotante(string mensaje, TipoBanner_790MY tipo)
@@ -261,7 +259,7 @@ namespace GUI_08YS.RF1
             Close();
         }
 
-        // ── i18n ─────────────────────────────────────────────────────────
+        // ── Idioma ───────────────────────────────────────────────────────
         public void UpdateIdioma()
         {
             var t = TraductorManager_08YS.Instance;
@@ -305,14 +303,10 @@ namespace GUI_08YS.RF1
             }
         }
 
-        // ── Nested types ──────────────────────────────────────────────────
-        /// <summary>
-        /// Panel con DoubleBuffered y pintura de BackgroundImage sobre ClientRectangle.
-        /// La sobreescritura de OnPaintBackground evita que WinForms estire la imagen
-        /// sobre la DisplayRectangle (área virtual del scroll), que causaba recorte lateral.
-        /// Al mantener BackgroundImage asignado, MesaVisualControl_790MY puede leer la
-        /// propiedad para calcular la región correspondiente en su propia transparencia.
-        /// </summary>
+        // ── Panel del salón ───────────────────────────────────────────────
+        // Panel con doble buffer que dibuja la foto del salón sobre el área visible.
+        // Así la imagen no se corta a los costados cuando hay scroll, y las mesas pueden
+        // leer la foto para simular su fondo transparente.
         private sealed class DoubleBufferedPanel : Panel
         {
             public DoubleBufferedPanel()
@@ -326,14 +320,12 @@ namespace GUI_08YS.RF1
 
             protected override void OnPaintBackground(PaintEventArgs e)
             {
-                // Limpieza base primero (evita artefactos de re-pintado parcial).
+                // Primero se limpia el fondo, para que no queden restos de un dibujo anterior.
                 base.OnPaintBackground(e);
 
                 if (BackgroundImage != null)
                 {
-                    // InterpolationMode.HighQualityBicubic garantiza calidad al escalar.
-                    // DrawImage sobre ClientRectangle (área visible real) evita el recorte
-                    // que causaba DisplayRectangle cuando AutoScroll estaba activo.
+                    // Se escala en alta calidad y sobre el área visible.
                     e.Graphics.InterpolationMode =
                         System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     e.Graphics.DrawImage(BackgroundImage, ClientRectangle);

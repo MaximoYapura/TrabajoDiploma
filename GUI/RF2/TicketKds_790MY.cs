@@ -9,7 +9,7 @@ using E = GUI_08YS.RF2.EstiloRF2_790MY;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>Fuentes compartidas por todos los tickets del KDS (no se crea una por ticket).</summary>
+    // Fuentes compartidas por todos los tickets del KDS (no se crea una por ticket).
     internal sealed class FuentesKds_790MY : IDisposable
     {
         public readonly Font Pedido  = new Font("Segoe UI", 15F, FontStyle.Bold);
@@ -27,23 +27,16 @@ namespace GUI_08YS.RF2
         }
     }
 
-    /// <summary>
-    /// Etapa 3 (Opción C): un ticket del KDS que vive mientras el pedido esté en pantalla.
-    /// <see cref="Aplicar"/> lo sincroniza con el pedido recién consultado:
-    /// <list type="bullet">
-    /// <item>Pendiente ↔ En preparación: cambia texto, ícono y colores del botón y de las cantidades.</item>
-    /// <item>Cambio de contenido (ítems, mesa, ancho, paso a Listo): rearma solo los hijos de este ticket.</item>
-    /// <item>Siempre: minutos de espera y semáforo, solo si cambió el minuto.</item>
-    /// </list>
-    /// El ticket nunca se destruye por un cambio de estado; el formulario lo mueve de columna.
-    /// </summary>
+    // Tarjeta de un pedido en la pantalla de cocina. Vive mientras el pedido esté en pantalla
+    // y Aplicar la actualiza con los datos nuevos:
+    // - si pasó de Pendiente a En preparación, cambia el botón y los colores;
+    // - si cambiaron los ítems, la mesa o el ancho, se rearma;
+    // - siempre actualiza los minutos de espera y el color del semáforo.
+    // Cuando cambia de estado no se destruye: el formulario la mueve de columna.
     internal sealed class TicketKds_790MY : PanelRedondeado_790MY
     {
-        /// <summary>
-        /// Semáforo por tiempo de espera desde la solicitud (comandas Pendiente / EnPreparación):
-        /// menos de 10 min = verde (a tiempo), 10 a 20 min = amarillo (atención),
-        /// más de 20 min = rojo (demorado).
-        /// </summary>
+        // Semáforo según cuánto hace que se pidió: menos de 10 minutos verde, de 10 a 20
+        // amarillo y más de 20 rojo.
         internal enum NivelSemaforo { ATiempo, Atencion, Demorado }
 
         private const int MinutosAtencion = 10;
@@ -102,13 +95,11 @@ namespace GUI_08YS.RF2
             ActualizarTiempo();
         }
 
-        /// <summary>Obliga a rearmar en el próximo <see cref="Aplicar"/> (por ejemplo, al cambiar el idioma).</summary>
+        // Obliga a rearmar en el próximo Aplicar (por ejemplo, al cambiar el idioma).
         public void Invalidar() => _estructura = null;
 
-        /// <summary>
-        /// Todo lo que define qué hijos tiene el ticket. Pendiente y En preparación
-        /// comparten estructura (solo cambian el botón y los colores); Listo no.
-        /// </summary>
+        // Todo lo que define qué hijos tiene el ticket. Pendiente y En preparación
+        // comparten estructura (solo cambian el botón y los colores); Listo no.
         private static string Estructura(Pedido_790MY p, int ancho)
         {
             var sb = new System.Text.StringBuilder()
@@ -251,7 +242,7 @@ namespace GUI_08YS.RF2
             ResumeLayout();
         }
 
-        /// <summary>Pendiente ↔ En preparación sin rearmar: botón y color de las cantidades.</summary>
+        // Pendiente ↔ En preparación sin rearmar: botón y color de las cantidades.
         private void AplicarEstado()
         {
             _estado = Pedido.Estado;
@@ -270,9 +261,8 @@ namespace GUI_08YS.RF2
             _boton.BackColor = pendiente ? E.KdsAzul : E.KdsVerde;
         }
 
-        // La acción recarga el KDS, que puede rearmar este ticket y destruir el botón: se
-        // difiere para no disponerlo dentro de su propio Click, y se deshabilita para que
-        // un doble toque no la dispare dos veces.
+        // La acción recarga la pantalla y puede borrar este botón, así que se ejecuta un
+        // instante después del clic. El botón se deshabilita para evitar el doble toque.
         private void Boton_Click(object sender, EventArgs e)
         {
             var boton = (IconButton)sender;
@@ -288,7 +278,7 @@ namespace GUI_08YS.RF2
             }));
         }
 
-        /// <summary>Minutos, texto y colores del semáforo, solo si cambió el minuto.</summary>
+        // Minutos, texto y colores del semáforo, solo si cambió el minuto.
         public void ActualizarTiempo()
         {
             if (_chipTiempo == null) return; // los listos no muestran espera

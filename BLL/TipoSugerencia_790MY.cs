@@ -1,12 +1,13 @@
 ﻿namespace BLL_08YS
 {
+    // Los tres tipos de sugerencia del reporte predictivo.
     public enum TipoSugerencia_790MY
     {
-        /// <summary>Regla de mayor confianza: armar un combo con ambos productos.</summary>
+        // Regla de mayor confianza: armar un combo con ambos productos.
         CrearCombo,
-        /// <summary>Otra regla fuerte, promocionada el día de la semana con menos cuentas.</summary>
+        // Otra regla fuerte, promocionada el día de la semana con menos cuentas.
         PromocionDiaBajaDemanda,
-        /// <summary>Regla de mayor soporte: aviso de venta cruzada en la comanda del camarero.</summary>
+        // Regla de mayor soporte: aviso de venta cruzada en la comanda del camarero.
         VentaCruzadaCamarero
     }
 }

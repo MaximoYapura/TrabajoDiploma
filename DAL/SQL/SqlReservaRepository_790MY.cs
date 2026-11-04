@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 
 namespace DAL_08YS.SQL
 {
+    // Reservas en SQL Server. Los métodos están explicados en IReservaRepository_790MY.
     public class SqlReservaRepository_790MY : IReservaRepository_790MY
     {
         private const string ColumnasSelect = @"
@@ -27,7 +28,7 @@ namespace DAL_08YS.SQL
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        // ─── Alta atomica ────────────────────────────────────────────────────
+        // ─── Alta ────────────────────────────────────────────────────────────
 
         public bool AddSiMesaDisponible(Reserva_790MY reserva, bool ocuparMesaFisica)
         {
@@ -38,10 +39,9 @@ namespace DAL_08YS.SQL
                 {
                     try
                     {
-                        // 1) Re-validacion bajo bloqueo. UPDLOCK + HOLDLOCK toma un bloqueo
-                        //    de rango sobre (MesaNumero, Fecha, Hora): un segundo puesto que
-                        //    intente lo mismo queda esperando hasta el COMMIT/ROLLBACK y
-                        //    luego ve la reserva insertada, evitando la doble asignacion.
+                        // 1) Se vuelve a controlar la mesa con bloqueo (UPDLOCK, HOLDLOCK). Si otro
+                        //    puesto intenta reservar la misma mesa y turno, espera a que esta
+                        //    transacción termine y después ve la reserva nueva.
                         using (var check = new SqlCommand { Connection = connection, Transaction = tx })
                         {
                             string ocupa = FiltroOcupacionMesa_790MY.CondicionEstado(check, "r");
@@ -92,7 +92,7 @@ namespace DAL_08YS.SQL
                             reserva.ReservaID = Convert.ToInt32(insert.ExecuteScalar());
                         }
 
-                        // 3) Walk-in: la mesa queda fisicamente ocupada en la misma transaccion.
+                        // 3) En un walk-in la mesa queda Ocupada en la misma transacción.
                         if (ocuparMesaFisica)
                             ActualizarEstadoMesa(connection, tx, reserva.MesaNumero, EstadoMesa_790MY.Ocupada);
 
@@ -171,9 +171,8 @@ namespace DAL_08YS.SQL
                     {
                         int mesaNumero;
 
-                        // Transicion condicional: solo se abre si sigue Confirmada y la mesa
-                        // no esta ocupada fisicamente ni fuera de servicio. El WHERE actua
-                        // como control optimista: si otro puesto ya la abrio, afecta 0 filas.
+                        // Solo se abre si la reserva sigue Confirmada y la mesa está disponible.
+                        // Si otro puesto ya la abrió, el UPDATE no afecta ninguna fila.
                         using (var cmd = new SqlCommand(@"
                                 UPDATE r
                                 SET r.Estado = @Asistida, r.CamareroDNI = @CamareroDNI

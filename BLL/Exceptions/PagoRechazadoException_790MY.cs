@@ -2,11 +2,8 @@ using System;
 
 namespace BLL_08YS.Exceptions
 {
-    /// <summary>
-    /// CUN-007, escenario 7.1: la entidad bancaria (simulada) rechazó la operación.
-    /// No se registró ningún pago ni cambió el estado de factura, reserva o mesa;
-    /// el intento quedó en la bitácora. La GUI pide otro medio de pago.
-    /// </summary>
+    // El banco simulado rechazó la tarjeta. No se grabó nada (solo el evento en la
+    // bitácora) y la pantalla pide otro medio de pago.
     public class PagoRechazadoException_790MY : Exception
     {
         public string MotivoRechazo { get; }

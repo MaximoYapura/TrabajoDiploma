@@ -4,7 +4,8 @@ using System.Drawing.Drawing2D;
 
 namespace GUI_08YS.RF2
 {
-    /// <summary>Cursor de escritura del ticket de FormComprobanteFactura_790MY: posición vertical, márgenes y fuentes.</summary>
+    // Ayuda para dibujar el ticket de FormComprobanteFactura_790MY: lleva la posición
+    // vertical, los márgenes y las fuentes, y tiene métodos para escribir renglones.
     internal sealed class TicketFactura_790MY : IDisposable
     {
         private const float MargenLateral = 22f;
@@ -40,7 +41,7 @@ namespace GUI_08YS.RF2
 
         public void Espacio(float alto) => Y += alto;
 
-        /// <summary>Achica (positivo) o restaura (negativo) el área de escritura.</summary>
+        // Achica (positivo) o restaura (negativo) el área de escritura.
         public void Margen(float delta)
         {
             X += delta;
@@ -80,7 +81,7 @@ namespace GUI_08YS.RF2
             Y += med.Height + 2;
         }
 
-        /// <summary>Cant | Descripción (con salto de línea) | P.Unit | Subt.</summary>
+        // Cant | Descripción (con salto de línea) | P.Unit | Subt.
         public void Columnas(string cant, string descripcion, string precio, string subtotal, Font fuente)
         {
             float wCant = 36, wPrecio = 78, wSub = 78;

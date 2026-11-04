@@ -12,11 +12,8 @@ using GUI_08YS.Estilo;
 
 namespace GUI_08YS.RF1
 {
-    /// <summary>
-    /// Modal que se abre al confirmar una reserva: muestra la vista previa del
-    /// comprobante con la estética de El Fogón del Sur, lo envía por email al
-    /// cliente en segundo plano y permite guardarlo en PDF.
-    /// </summary>
+    // Ventana que se abre al confirmar una reserva. Muestra la vista previa del
+    // comprobante, lo manda por mail al cliente en segundo plano y permite guardarlo en PDF.
     public partial class FormComprobanteReserva_790MY : Form, IIdiomaObserver_08YS
     {
         private enum EstadoEmail { Enviando, Enviado, Error, NoEnviado }
@@ -104,12 +101,10 @@ namespace GUI_08YS.RF1
 
         #region Email en segundo plano
 
-        /// <summary>
-        /// Envía el comprobante sin bloquear la ventana. Cualquier resultado (enviado,
-        /// sin configuración SMTP, sin email del cliente o error de conexión) solo se
-        /// refleja en el indicador de estado: la vista previa y "Guardar PDF" siguen
-        /// funcionando en todos los casos.
-        /// </summary>
+        // Envía el comprobante sin bloquear la ventana. Cualquier resultado (enviado,
+        // sin configuración SMTP, sin email del cliente o error de conexión) solo se
+        // refleja en el indicador de estado: la vista previa y "Guardar PDF" siguen
+        // funcionando en todos los casos.
         private async Task EnviarEmailAsync()
         {
             var t = TraductorManager_08YS.Instance;
@@ -141,8 +136,8 @@ namespace GUI_08YS.RF1
             }
             catch (Exception ex)
             {
-                // Red de seguridad: el BLL no lanza excepciones, pero un async void
-                // (Shown / Click) nunca debe dejar escapar una y cerrar la aplicación.
+                // La BLL no lanza excepciones, pero por las dudas: un error en un async void
+                // cerraría la aplicación.
                 enviado = false;
                 detalle = ex.Message;
             }
@@ -231,7 +226,7 @@ namespace GUI_08YS.RF1
                 }
                 catch (Exception ex)
                 {
-                    // Error inesperado al generar el PDF: MessageBox nativo (E2-D1).
+                    // Error inesperado al generar el PDF: se muestra en un MessageBox.
                     MessageBox.Show(this, string.Format(t.GetTexto("CR_fatal_generar"), ex.Message),
                                     t.GetTexto("error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -281,6 +276,7 @@ namespace GUI_08YS.RF1
                 e.Graphics.DrawLine(pen, 0, 0, pnlFooter_790MY.Width, 0);
         }
 
+        // Dibuja la vista previa del comprobante con GDI+.
         private void pnlTicket_790MY_Paint(object sender, PaintEventArgs e)
         {
             var g       = e.Graphics;
@@ -467,9 +463,7 @@ namespace GUI_08YS.RF1
         #endregion
     }
 
-    /// <summary>
-    /// Panel con doble buffer para dibujar la vista previa del comprobante sin parpadeo.
-    /// </summary>
+    // Panel con doble buffer para dibujar la vista previa del comprobante sin parpadeo.
     public class TicketPreviewPanel_790MY : Panel
     {
         public TicketPreviewPanel_790MY()

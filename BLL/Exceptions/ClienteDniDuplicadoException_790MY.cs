@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BLL_08YS.Exceptions
 {
+    // Se lanza al dar de alta un cliente con un DNI que ya existe (aunque esté dado de baja).
     public class ClienteDniDuplicadoException_790MY : Exception
     {
         public ClienteDniDuplicadoException_790MY(int dni)

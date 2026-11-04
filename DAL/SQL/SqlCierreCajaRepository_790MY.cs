@@ -5,9 +5,10 @@ using System.Data.SqlClient;
 
 namespace DAL_08YS.SQL
 {
+    // Cierres de caja en SQL Server. Los métodos están explicados en ICierreCajaRepository_790MY.
     public class SqlCierreCajaRepository_790MY : ICierreCajaRepository_790MY
     {
-        // Violación de PRIMARY KEY / UNIQUE constraint.
+        // Código de error de SQL Server cuando se repite la clave primaria.
         private const int ErrorClaveDuplicada = 2627;
 
         private readonly string _connectionString;
